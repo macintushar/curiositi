@@ -1,4 +1,4 @@
-# Curiositi
+# Curiositi 🧠
 
 Curiositi is an AI assistant that unifies semantic search across personal documents and the live web. It leverages LangChain.js, Chroma, SearXNG, and Ollama for hybrid Retrieval-Augmented Generation (RAG), orchestrated via a high-performance Bun+Hono TypeScript API with a React-based UI.
 
@@ -11,21 +11,7 @@ Curiositi is an AI assistant that unifies semantic search across personal docume
 5. **Answer Generation**: An LLM synthesizes information from documents or web results to generate an answer.
 6. **Response**: The answer is streamed back to the user in the UI.
 
-```mermaid
-flowchart LR
-    subgraph UI
-        A[User Query] --> B(LLM Response);
-    end
-    subgraph Server
-        C[Input] --> D{Doc Search};
-        D --> E{Are Docs Relevant?};
-        E -- Yes --> G[Generate Answer];
-        E -- No --> F[Web Search];
-        F --> G;
-    end
-    A --> C;
-    G --> B;
-```
+![Flow Image](./docs/curiositi-flow.png)
 
 ## Technology Stack
 
