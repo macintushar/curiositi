@@ -1,5 +1,10 @@
 import app from "./src";
-import { SERVER_PORT } from "./src/constants";
+import {
+  CHROMA_URL,
+  OLLAMA_BASE_URL,
+  SEARXNG_URL,
+  SERVER_PORT,
+} from "./src/constants";
 
 try {
   Bun.serve({
@@ -7,6 +12,9 @@ try {
     fetch: app.fetch,
   });
   console.log("Server is running on port", SERVER_PORT);
+  console.log(
+    `Ollama_URL: ${OLLAMA_BASE_URL}\nSearXNG_URL: ${SEARXNG_URL}\nChroma_URL: ${CHROMA_URL}`
+  );
 } catch (error) {
   console.error(error);
 }
