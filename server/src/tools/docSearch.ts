@@ -12,7 +12,9 @@ const formatDocumentsWithMetadata = (
 	return docs
 		.map(([doc, score], i) => {
 			const metadata = doc.metadata || {};
-			const source = metadata.source ? ` (Source: ${metadata.source})` : "";
+			const source = metadata.source
+				? ` (Source: ${metadata.source})`
+				: "";
 			const scoreInfo = score ? ` [Relevance: ${score.toFixed(2)}]` : "";
 			return `Document ${i + 1}${source}${scoreInfo}:\n${doc.pageContent}\n`;
 		})
@@ -24,9 +26,14 @@ async function searchDocs(query: string, k = 4): Promise<string> {
 	try {
 		const results = await vectorStore.similaritySearchWithScore(query, k);
 		return formatDocumentsWithMetadata(results);
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error("Error searching documents:", error);
-		return `Error performing document search: ${error.message}`;
+		// Check if error is an instance of Error before accessing message
+		if (error instanceof Error) {
+			return `Error performing document search: ${error.message}`;
+		}
+		// Handle cases where error is not an Error object
+		return "An unknown error occurred during document search.";
 	}
 }
 

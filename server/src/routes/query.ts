@@ -19,22 +19,32 @@ queryRouter.post("/", zValidator("json", QuerySchema), async (c) => {
 				// intermediate_steps: result.intermediateSteps
 			},
 		});
-	} catch (error: any) {
+	} catch (error: unknown) {
 		console.error("Error invoking agent:", error);
 		// Provide more detailed error response
 		let errorMessage = "Failed to process query with agent.";
-		let errorDetails = error.message || "Unknown error";
-		if (error.message?.includes("Could not parse LLM output")) {
-			errorMessage =
-				"Agent failed to generate a valid response or tool instruction.";
+		let errorDetails = "Unknown error";
+		let errorType = "AgentError";
+
+		// Check if error is an Error instance to safely access properties
+		if (error instanceof Error) {
 			errorDetails = error.message;
+			errorType = error.name;
+			// Specific check for parsing errors
+			if (error.message?.includes("Could not parse LLM output")) {
+				errorMessage =
+					"Agent failed to generate a valid response or tool instruction.";
+			}
+		} else {
+			// Handle non-Error types if necessary, e.g., log or format differently
+			errorDetails = String(error); // Convert the unknown error to string
 		}
 
 		return c.json(
 			{
 				error: errorMessage,
 				details: errorDetails,
-				type: error.name || "AgentError",
+				type: errorType,
 			},
 			500,
 		);

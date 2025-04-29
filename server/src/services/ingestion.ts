@@ -39,7 +39,9 @@ export async function processAndStoreDocument(
 		}
 
 		if (!text || text.trim().length === 0) {
-			console.warn(`No text extracted from ${originalFilename}. Skipping.`);
+			console.warn(
+				`No text extracted from ${originalFilename}. Skipping.`,
+			);
 			return;
 		}
 
@@ -51,7 +53,9 @@ export async function processAndStoreDocument(
 		console.log(`Split into ${chunks.length} chunks.`);
 
 		if (chunks.length === 0) {
-			console.warn(`No chunks generated for ${originalFilename}. Skipping.`);
+			console.warn(
+				`No chunks generated for ${originalFilename}. Skipping.`,
+			);
 			return;
 		}
 
@@ -67,7 +71,9 @@ export async function processAndStoreDocument(
 				}),
 		);
 
-		console.log(`Adding ${documents.length} document chunks to ChromaDB...`);
+		console.log(
+			`Adding ${documents.length} document chunks to ChromaDB...`,
+		);
 
 		await vectorStore.addDocuments(documents);
 
