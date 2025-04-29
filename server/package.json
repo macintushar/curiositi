@@ -1,22 +1,23 @@
 {
-  "name": "server",
-  "scripts": {
-    "dev": "bun run --hot server.ts",
-    "start": "bun run server.ts"
-  },
-  "dependencies": {
-    "@hono/zod-validator": "^0.5.0",
-    "@langchain/community": "^0.3.41",
-    "@langchain/core": "^0.3.49",
-    "@langchain/ollama": "^0.2.0",
-    "chromadb": "^2.3.0",
-    "hono": "^4.7.8",
-    "langchain": "^0.3.24",
-    "pdf-parse": "^1.1.1",
-    "pg": "^8.15.6"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/pg": "^8.11.14"
-  }
+	"name": "server",
+	"scripts": {
+		"dev": "bun run --hot server.ts",
+		"start": "bun run server.ts"
+	},
+	"dependencies": {
+		"@hono/zod-validator": "^0.5.0",
+		"@langchain/community": "^0.3.41",
+		"@langchain/core": "^0.3.49",
+		"@langchain/ollama": "^0.2.0",
+		"chromadb": "^2.3.0",
+		"hono": "^4.7.8",
+		"langchain": "^0.3.24",
+		"pdf-parse": "^1.1.1",
+		"pg": "^8.15.6"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/bun": "latest",
+		"@types/pg": "^8.11.14"
+	}
 }

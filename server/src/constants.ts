@@ -5,7 +5,7 @@ export const SERVER_PORT = process.env.SERVER_PORT || 3030;
 
 // Database
 export const DATABASE_URL =
-  process.env.DATABASE_URL || "postgres://user:pass@localhost:5432/dbname";
+	process.env.DATABASE_URL || "postgres://user:pass@localhost:5432/dbname";
 
 // Chroma
 export const CHROMA_URL = process.env.CHROMA_URL || "http://localhost:8090";
@@ -13,9 +13,9 @@ export const CHROMA_COLLECTION_NAME = "curiositi_docs";
 
 // Ollama
 export const OLLAMA_BASE_URL =
-  process.env.OLLAMA_BASE_URL || "http://localhost:11434";
+	process.env.OLLAMA_BASE_URL || "http://localhost:11434";
 export const OLLAMA_EMBEDDING_MODEL =
-  process.env.OLLAMA_EMBEDDING_MODEL || "snowflake-arctic-embed2:latest";
+	process.env.OLLAMA_EMBEDDING_MODEL || "snowflake-arctic-embed2:latest";
 
 // SearXNG
 export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
@@ -23,24 +23,24 @@ export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
 // File Types
 
 export const SUPPORTED_FILE_TYPES = [
-  "application/pdf",
-  "text/plain;charset=utf-8",
-  "text/plain",
-  "text/csv",
-  "text/markdown",
+	"application/pdf",
+	"text/plain;charset=utf-8",
+	"text/plain",
+	"text/csv",
+	"text/markdown",
 ];
 
 // LangChain Prompt
 
 export const CHAT_PROMPT = new PromptTemplate({
-  inputVariables: [
-    "tools",
-    "tool_names",
-    "agent_scratchpad",
-    "input",
-    "chat_history",
-  ],
-  template: `
+	inputVariables: [
+		"tools",
+		"tool_names",
+		"agent_scratchpad",
+		"input",
+		"chat_history",
+	],
+	template: `
   Assistant is designed to be able to assist with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics. As a language model, Assistant is able to generate human-like text based on the input it receives, allowing it to engage in natural-sounding conversations and provide responses that are coherent and relevant to the topic at hand.
 
   Assistant is constantly learning and improving, and its capabilities are constantly evolving. It is able to process and understand large amounts of text, and can use this knowledge to provide accurate and informative responses to a wide range of questions. Additionally, Assistant is able to generate its own text based on the input it receives, allowing it to engage in discussions and provide explanations and descriptions on a wide range of topics.

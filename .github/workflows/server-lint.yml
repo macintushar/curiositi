@@ -1,0 +1,32 @@
+name: Server Lint (Biome)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "server/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "server/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest # Or specify a version
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: ./server
+
+      - name: Run Biome Lint
+        run: bunx biome lint ./src # Run biome from the server directory context
+        working-directory: ./server
