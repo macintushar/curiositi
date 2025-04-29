@@ -1,36 +1,38 @@
 import { OllamaChat } from "@/tools/chat";
-import { BufferMemory } from "langchain/memory";
 import { AgentExecutor, createReactAgent } from "langchain/agents";
-import { pull } from "langchain/hub";
-
-import { PromptTemplate } from "@langchain/core/prompts";
 
 import { webSearchTool } from "@/tools/webSearch";
 import { docSearchTool } from "@/tools/docSearch";
+import { PostgresChatMessageHistory } from "@langchain/community/stores/message/postgres";
+import { db } from "@/services/db";
+import { AIMessage, BaseMessage, HumanMessage } from "@langchain/core/messages";
+import { CHAT_PROMPT } from "@/constants";
 
-const memory = new BufferMemory({
-  returnMessages: true,
-  memoryKey: "chat_history",
-  inputKey: "input",
-  outputKey: "output",
-});
+const agentTools = [webSearchTool, docSearchTool];
 
-export default async function queryAgent(input: string, model: string) {
+export default async function queryAgent(
+  input: string,
+  model: string,
+  sessionId: string
+) {
   const chatModel = OllamaChat(model);
-  const tools = [webSearchTool, docSearchTool];
 
-  const prompt = await pull<PromptTemplate>("hwchase17/react-chat");
+  const postgresMessageHistory = new PostgresChatMessageHistory({
+    sessionId: sessionId,
+    pool: db,
+  });
+
+  const prompt = CHAT_PROMPT;
 
   const agent = await createReactAgent({
     llm: chatModel,
-    tools,
+    tools: agentTools,
     prompt,
   });
 
   const agentExecutor = new AgentExecutor({
     agent,
-    tools,
-    memory,
+    tools: agentTools,
     verbose: true,
     handleParsingErrors: true,
     maxIterations: 3,
@@ -38,18 +40,18 @@ export default async function queryAgent(input: string, model: string) {
 
   console.log(`Invoking agent with input: "${input}"`);
 
-  const chatHistory = await memory.loadMemoryVariables({});
-
   const result = await agentExecutor.invoke({
     input: input,
-    chat_history: chatHistory.chat_history || [],
+    chat_history: await postgresMessageHistory.getMessages(),
   });
 
   console.log("Agent finished successfully.");
 
-  const response = result.output;
-
-  await memory.saveContext({ input: input }, { output: response });
+  const messages: BaseMessage[] = [
+    new HumanMessage(input),
+    new AIMessage(result.output),
+  ];
+  await postgresMessageHistory.addMessages(messages);
 
   return result;
 }

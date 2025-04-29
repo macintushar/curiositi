@@ -7,10 +7,10 @@ import queryAgent from "@/agents/queryAgent";
 const queryRouter = new Hono();
 
 queryRouter.post("/", zValidator("json", QuerySchema), async (c) => {
-  const { input, model } = c.req.valid("json");
+  const { input, model, session_id } = c.req.valid("json");
 
   try {
-    const response = await queryAgent(input, model);
+    const response = await queryAgent(input, model, session_id);
     return c.json({
       response: response.output,
       // You might want to add metadata about which tools were used if available from result
