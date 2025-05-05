@@ -7,55 +7,53 @@ import { docSearchTool } from "@/tools/docSearch";
 import { webSearchTool } from "@/tools/webSearch";
 import { PostgresChatMessageHistory } from "@langchain/community/stores/message/postgres";
 import {
-	AIMessage,
-	type BaseMessage,
-	HumanMessage,
+  AIMessage,
+  type BaseMessage,
+  HumanMessage,
 } from "@langchain/core/messages";
 
 const agentTools = [webSearchTool, docSearchTool];
 
 export default async function queryAgent(
-	input: string,
-	model: string,
-	sessionId: string,
+  input: string,
+  model: string,
+  sessionId: string,
 ) {
-	const chatModel = OllamaChat(model);
+  const chatModel = OllamaChat(model);
 
-	const postgresMessageHistory = new PostgresChatMessageHistory({
-		sessionId: sessionId,
-		pool: db,
-	});
+  const postgresMessageHistory = new PostgresChatMessageHistory({
+    sessionId: sessionId,
+    pool: db,
+  });
 
-	const prompt = CHAT_PROMPT;
+  const agent = await createReactAgent({
+    llm: chatModel,
+    tools: agentTools,
+    prompt: CHAT_PROMPT,
+  });
 
-	const agent = await createReactAgent({
-		llm: chatModel,
-		tools: agentTools,
-		prompt,
-	});
+  const agentExecutor = new AgentExecutor({
+    agent,
+    tools: agentTools,
+    verbose: true,
+    handleParsingErrors: true,
+    maxIterations: 4,
+  });
 
-	const agentExecutor = new AgentExecutor({
-		agent,
-		tools: agentTools,
-		verbose: true,
-		handleParsingErrors: true,
-		maxIterations: 3,
-	});
+  console.log(`Invoking agent with input: "${input}"`);
 
-	console.log(`Invoking agent with input: "${input}"`);
+  const result = await agentExecutor.invoke({
+    input: input,
+    chat_history: await postgresMessageHistory.getMessages(),
+  });
 
-	const result = await agentExecutor.invoke({
-		input: input,
-		chat_history: await postgresMessageHistory.getMessages(),
-	});
+  console.log("Agent finished successfully.");
 
-	console.log("Agent finished successfully.");
+  const messages: BaseMessage[] = [
+    new HumanMessage(input),
+    new AIMessage(result.output),
+  ];
+  await postgresMessageHistory.addMessages(messages);
 
-	const messages: BaseMessage[] = [
-		new HumanMessage(input),
-		new AIMessage(result.output),
-	];
-	await postgresMessageHistory.addMessages(messages);
-
-	return result;
+  return result;
 }

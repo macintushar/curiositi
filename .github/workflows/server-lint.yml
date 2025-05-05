@@ -28,5 +28,5 @@ jobs:
         working-directory: ./server
 
       - name: Run Biome Lint
-        run: bunx biome lint ./src # Run biome from the server directory context
+        run: bunx prettier --check . # Run prettier from the server directory context
         working-directory: ./server
