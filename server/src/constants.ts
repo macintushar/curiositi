@@ -1,5 +1,8 @@
 import { PromptTemplate } from "@langchain/core/prompts";
 
+// Host
+export const HOST = process.env.HOST || "https://curiositi.macintushar.xyz";
+
 // Server
 export const SERVER_PORT = process.env.SERVER_PORT || 3030;
 
@@ -17,11 +20,13 @@ export const OLLAMA_BASE_URL =
 export const OLLAMA_EMBEDDING_MODEL =
   process.env.OLLAMA_EMBEDDING_MODEL || "snowflake-arctic-embed2:latest";
 
-// SearXNG
-export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
-
+// OpenRouter
+export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 export const OPENROUTER_ENABLED = OPENROUTER_API_KEY ? true : false;
+
+// SearXNG
+export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
 
 // File Types
 
@@ -46,16 +51,15 @@ export const CHAT_PROMPT = new PromptTemplate({
   template: `
 # ASSISTANT CAPABILITIES & PURPOSE
 You are an intelligent assistant whose job is to answer user queries thoroughly, accurately, and with source attributions.  
-
-Temperature is set low (0.2) to minimize hallucinations; if you are <90% confident in an answer, explicitly say “I’m not sure.”  
+If you are <90% confident in an answer, explicitly say “I’m not sure.”  
 
 # TOOLS
 {tools}
 
-# MULTI‑QUERY WORKFLOW
+# MULTI-QUERY WORKFLOW
 1. **Plan Queries**  
-   - Draft up to 2 distinct queries for \`document_search\`  
-   - Draft up to 2 distinct queries for \`searxng-search\`  
+   - Draft up to 2 distinct queries for \`document_search\`  
+   - Draft up to 2 distinct queries for \`searxng-search\`  
 2. **Execute** each query in turn.  
 3. **Collate** the Observations under headings “Document Results” and “Web Results.”  
 4. **Synthesize**: use all results together in your final answer.
@@ -66,7 +70,7 @@ Use exactly:
 Thought: [why this query]
 Action: [tool_name]
 Action Input: [your query here]
-Observation: [auto‑filled]
+Observation: [auto-filled]
 \`\`\`
 
 # FINAL ANSWER

@@ -1,4 +1,4 @@
-import { OLLAMA_BASE_URL, OPENROUTER_API_KEY } from "@/constants";
+import { HOST, OLLAMA_BASE_URL, OPENROUTER_API_KEY } from "@/constants";
 import { ChatOllama } from "@langchain/ollama";
 import { ChatOpenAI } from "@langchain/openai";
 
@@ -16,5 +16,9 @@ export const OpenRouterChat = (model: string) =>
     apiKey: OPENROUTER_API_KEY,
     configuration: {
       baseURL: "https://openrouter.ai/api/v1",
+      defaultHeaders: {
+        "HTTP-Referer": HOST,
+        "X-Title": "Curiositi",
+      },
     },
   });
