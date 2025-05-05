@@ -74,7 +74,7 @@ API will be available at `http://localhost:3030`.
   - [x] Query processing with LangChain.js.
   - [x] PDF/TXT ingestion and embedding via Ollama.
   - [x] Streaming API for chat responses.
-  - [x] Basic React UI for user interaction.
+  - [ ] Basic React UI for user interaction.
   - [x] Bun+Hono backend setup.
 
 ### v2: Enhanced Integration
@@ -94,7 +94,6 @@ API will be available at `http://localhost:3030`.
   - [ ] Plugin system for extensibility.
   - [ ] Role-Based Access Control (RBAC) for enterprise use.
   - [ ] Billing system for monetization.
-  - [ ] SLA 99.9% uptime for reliability.
 
 ## Contributing
 
