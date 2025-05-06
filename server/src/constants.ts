@@ -1,5 +1,3 @@
-import { PromptTemplate } from "@langchain/core/prompts";
-
 // Host
 export const HOST = process.env.HOST || "https://curiositi.macintushar.xyz";
 
@@ -38,59 +36,45 @@ export const SUPPORTED_FILE_TYPES = [
   "text/markdown",
 ];
 
-// LangChain Prompt
+export const QUERY_JSON_STRUCTURE = {
+  type: "object",
+  properties: {
+    docQueries: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+    webQueries: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+  },
+  required: ["docQueries", "webQueries"],
+};
 
-export const CHAT_PROMPT = new PromptTemplate({
-  inputVariables: [
-    "tools",
-    "tool_names",
-    "agent_scratchpad",
-    "input",
-    "chat_history",
+export const STRATEGY_JSON_SCHEMA = {
+  type: "object",
+  properties: {
+    strategy: {
+      type: "string",
+      enum: ["direct", "retrieve"],
+    },
+    answer: {
+      type: "string",
+    },
+  },
+  required: ["strategy"],
+  oneOf: [
+    {
+      properties: { strategy: { const: "direct" }, answer: { type: "string" } },
+      required: ["strategy", "answer"],
+    },
+    {
+      properties: { strategy: { const: "retrieve" } },
+      required: ["strategy"],
+    },
   ],
-  template: `
-# ASSISTANT CAPABILITIES & PURPOSE
-You are an intelligent assistant whose job is to answer user queries thoroughly, accurately, and with source attributions.  
-If you are <90% confident in an answer, explicitly say “I’m not sure.”  
-
-# TOOLS
-{tools}
-
-# MULTI-QUERY WORKFLOW
-1. **Plan Queries**  
-   - Draft up to 2 distinct queries for \`document_search\`  
-   - Draft up to 2 distinct queries for \`searxng-search\`  
-2. **Execute** each query in turn.  
-3. **Collate** the Observations under headings “Document Results” and “Web Results.”  
-4. **Synthesize**: use all results together in your final answer.
-
-# TOOL USAGE
-Use exactly:
-\`\`\`
-Thought: [why this query]
-Action: [tool_name]
-Action Input: [your query here]
-Observation: [auto-filled]
-\`\`\`
-
-# FINAL ANSWER
-When you have run *all* planned queries and reviewed their outputs:
-\`\`\`
-Thought: [why you are now confident]
-Final Answer: [Answer, with attributions (“According to doc X…”, “Based on URL Y…”). Acknowledge any gaps.]
-\`\`\`
-
-# FAILURE & FALLBACKS
-- If both document queries return no relevant hits → proceed to web.  
-- If web hits also fail → apologize and offer next steps.
-
-# CONTEXT
-Use chat history as needed:
-{chat_history}
-
-Begin!
-New input: {input}
-
-{agent_scratchpad}
-  `,
-});
+};

@@ -2,7 +2,8 @@ import { vectorStore } from "@/tools/vectorStore";
 import type { Document } from "@langchain/core/documents";
 import { DynamicTool } from "@langchain/core/tools";
 
-// Format documents with metadata and content
+const MAX_RESULTS = 5;
+
 const formatDocumentsWithMetadata = (
   docs: Array<[Document, number]>,
 ): string => {
@@ -10,27 +11,27 @@ const formatDocumentsWithMetadata = (
     return "No relevant documents found.";
   }
   return docs
+    .slice(0, MAX_RESULTS)
     .map(([doc, score], i) => {
       const metadata = doc.metadata || {};
       const source = metadata.source ? ` (Source: ${metadata.source})` : "";
       const scoreInfo = score ? ` [Relevance: ${score.toFixed(2)}]` : "";
       return `Document ${i + 1}${source}${scoreInfo}:\n${doc.pageContent}\n`;
     })
-    .join("\n---\n"); // Separator between documents
+    .join("\n---\n");
 };
 
-async function searchDocs(query: string, k = 4): Promise<string> {
-  console.log(`Searching documents for query: "${query}", k=${k}`);
+async function searchDocs(query: string): Promise<string> {
+  console.log(`Searching documents for query: "${query}"`);
   try {
-    const results = await vectorStore.similaritySearchWithScore(query, k);
+    const results = await vectorStore.similaritySearchWithScore(query);
     return formatDocumentsWithMetadata(results);
   } catch (error: unknown) {
     console.error("Error searching documents:", error);
-    // Check if error is an instance of Error before accessing message
+
     if (error instanceof Error) {
       return `Error performing document search: ${error.message}`;
     }
-    // Handle cases where error is not an Error object
     return "An unknown error occurred during document search.";
   }
 }
@@ -39,21 +40,7 @@ export const docSearchTool = new DynamicTool({
   name: "document_search",
   description:
     "Search and retrieve relevant information from uploaded documents. Input should be a search query.",
-  func: async (input: string | { query: string; k?: number }) => {
-    let query: string;
-    let k: number | undefined;
-
-    if (typeof input === "string") {
-      query = input;
-    } else {
-      query = input.query;
-      k = input.k;
-    }
-
-    if (!query) {
-      return "Error: Missing query for document search.";
-    }
-
-    return searchDocs(query, k);
+  func: async (input: string) => {
+    return searchDocs(input);
   },
 });

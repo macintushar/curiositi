@@ -2,49 +2,55 @@ import { QuerySchema } from "@/types/schemas";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 
-import queryAgent from "@/agents/queryAgent";
+import { curiositiAgent } from "@/agents/curiositiAgent";
 
 const queryRouter = new Hono();
 
+// New route for testing curiositiAgent
 queryRouter.post("/", zValidator("json", QuerySchema), async (c) => {
-  const { input, model, session_id } = c.req.valid("json");
+  const { input, model } = c.req.valid("json");
 
   try {
-    const response = await queryAgent(input, model, session_id);
+    const response = await curiositiAgent(input, model);
+
     return c.json({
-      response: response.output,
-      // You might want to add metadata about which tools were used if available from result
-      metadata: {
-        // Example: Add intermediate steps if needed for debugging/transparency
-        // intermediate_steps: result.intermediateSteps
+      data: {
+        answer: response.answer,
+        metadata: {
+          docQueries: response.docQueries,
+          webQueries: response.webQueries,
+          docResults: response.docResults,
+          webResults: response.webResults,
+          strategy: response.strategy,
+        },
       },
     });
   } catch (error: unknown) {
-    console.error("Error invoking agent:", error);
-    // Provide more detailed error response
-    let errorMessage = "Failed to process query with agent.";
-    let errorDetails = "Unknown error";
-    let errorType = "AgentError";
+    console.error("Error invoking curiositiAgent:", error);
 
-    // Check if error is an Error instance to safely access properties
+    let errorMessage = "Failed to process query with Curiositi agent.";
+    let errorDetails = "Unknown error";
+    let errorType = "CuriositiAgentError";
+
     if (error instanceof Error) {
       errorDetails = error.message;
       errorType = error.name;
-      // Specific check for parsing errors
+
       if (error.message?.includes("Could not parse LLM output")) {
         errorMessage =
-          "Agent failed to generate a valid response or tool instruction.";
+          "Curiositi agent failed to generate a valid response or tool instruction.";
       }
     } else {
-      // Handle non-Error types if necessary, e.g., log or format differently
-      errorDetails = String(error); // Convert the unknown error to string
+      errorDetails = String(error);
     }
 
     return c.json(
       {
-        error: errorMessage,
-        details: errorDetails,
-        type: errorType,
+        error: {
+          message: errorMessage,
+          details: errorDetails,
+          type: errorType,
+        },
       },
       500,
     );
