@@ -1,106 +1,97 @@
 # Curiositi 🧠
 
-Curiositi is an AI assistant that unifies semantic search across personal documents and the live web. It leverages LangChain.js, Chroma, SearXNG, and Ollama for hybrid Retrieval-Augmented Generation (RAG), orchestrated via a high-performance Bun+Hono TypeScript API with a React-based UI.
+Curiositi is an AI-powered assistant that delivers precise, context-aware answers by combining user documents with live web data. It implements a hybrid Retrieval-Augmented Generation (RAG) system to help you find and synthesize information across your files, and the internet.
 
-## How it Works
+---
 
-1. **User Query**: Users submit queries through the UI.
-2. **Document Search**: The server first searches indexed local documents using Chroma for vector search.
-3. **Relevance Check**: It checks if the documents are relevant to the query.
-4. **Web Search**: If documents aren't relevant, a web search is performed using SearXNG.
-5. **Answer Generation**: An LLM synthesizes information from documents or web results to generate an answer.
-6. **Response**: The answer is streamed back to the user in the UI.
+## 🔍 What Curiositi Does
 
-![Flow Image](./docs/curiositi-flow.png)
+1. **Document Ingestion**
 
-## Technology Stack
+   - Upload files via the API.
+   - Automatically extract, split, and embed your documents into a vector store for fast similarity search.
 
-- **Backend**: [Bun](https://bun.sh/) + [Hono](https://hono.dev/)
-- **Agent Logic**: [LangChain.js](https://js.langchain.com/docs/get_started/introduction)
-- **Document Store**: [Chroma](https://www.trychroma.com/)
-- **Web Search**: [SearXNG](https://docs.searxng.org/)
-- **Embeddings/LLM**: [Ollama](https://ollama.com/)
-- **Frontend**: React-based UI
+2. **Query Handling**
 
-## Features
+   - Clients send natural-language questions to `/api/v1/query`.
+   - The agent selects a strategy:
+     - **Direct**: answer immediately using the LLM's knowledge.
+     - **Retrieve**: generate sub-queries against uploaded docs and web (via SearXNG).
 
-- **Hybrid RAG**: Combines Chroma vector search and SearXNG web search.
-- **PDF/TXT Ingestion**: Upload, chunk, and embed documents.
-- **Streaming API**: `/chat` endpoint streams responses.
-- **Extensible Tools**: Modular agent tools for integration and expansion.
+3. **Context Retrieval**
 
-## Quickstart
+   - **Document Search**: similarity search in ChromaDB returns top-scoring chunks.
+   - **Web Search**: SearXNG tool fetches external results.
+
+4. **Answer Synthesis**
+   - Retrieved results are combined and fed back into the LLM.
+   - The final answer is synthesized with citations and returned alongside metadata.
+
+![System Flow Diagram](docs/curiositi-flow.png)
+
+---
+
+## 🚀 Key Features
+
+- **Easy Upload**: Just POST your files; ingestion is fully automated.
+- **Scalable Vector Store**: Powered by ChromaDB for lightning-fast similarity search.
+- **Dual-Source RAG**: Seamlessly combine internal document search with external web search.
+- **Configurable LLMs**: Choose Ollama or OpenAI models and fine-tune your temperature.
+- **Type-Safe API**: Input validation with Zod ensures robust, predictable behavior.
+- **Transparent Metadata**: Trace every sub-query and see exactly which sources informed the answer.
+
+---
+
+## 🏃‍♂️ Getting Started
+
+To get a more detailed step-by-step process of setting up Curiositi, take a look at the [getting started doc](./docs/getting-started.md)
 
 ### 1. Clone & Install
 
-```bash
+````bash
+# 1. Clone the repo and enter server directory
 git clone https://github.com/macintushar/curiositi.git
 cd curiositi/server
+
+# 2. Install dependencies with Bun
 bun install
-```
 
-### 2. Configure Environment
+### 2. Configure
 
-Copy the example environment file and fill in your values:
+Copy the environment template and edit your service URLs and credentials:
 
 ```bash
 cp .env.example .env
+# Edit .env: CHROMA_URL, OLLAMA_BASE_URL, DATABASE_URL, OPENROUTER_API_KEY, SEARXNG_URL
+
+# 4. Start the server (dev vs prod)
+bun run dev    # development (hot reload)
+bun run start  # production
+````
+
+The API listens by default on `http://localhost:3030`.
+
+---
+
+## Project Layout
+
+```
+curiositi/
+├─ .github/               # CI/CD workflows
+├─ docs/                  # Flow diagrams (curiositi-flow.png) & PRD (PRD.md)
+├─ server/                # Bun + Hono backend (API & agent)
+├─ LICENSE                # Elastic License v2
+└─ README.md              # This overview (you are here)
 ```
 
-Edit `.env` with your configuration details.
+---
 
-### 3. Run the Server
+## Contributing & License
 
-```bash
-bun run dev
-# or for production
-bun run start
-```
+Contributions are welcome! Please review the [contribution guidelines](CONTRIBUTING.md) before submitting issues or pull requests.
 
-API will be available at `http://localhost:3030`.
+---
 
-## API Endpoints
+## 💼 License
 
-- **`/upload`**: Upload PDF/TXT, chunk, embed, and store in Chroma.
-- **`/chat`**: Hybrid RAG chat, streams response.
-
-## Roadmap
-
-### v1: Core Features
-
-- **Hybrid Retrieval-Augmented Generation (RAG)**
-  - [x] Document Search using Chroma vector search.
-  - [x] Web Search using SearXNG.
-  - [x] Query processing with LangChain.js.
-  - [x] PDF/TXT ingestion and embedding via Ollama.
-  - [x] Streaming API for chat responses.
-  - [ ] Basic React UI for user interaction.
-  - [x] Bun+Hono backend setup.
-
-### v2: Enhanced Integration
-
-- **Integrations**
-  - [ ] Notion MCP connector for fetching pages and databases.
-  - [ ] Google Drive API connector for folder/file selection.
-- **Hybrid Retrieval**
-  - [ ] Combine semantic and keyword retrieval.
-- **Analytics**
-  - [ ] Basic analytics dashboard for user interactions.
-
-### v3: Market Readiness
-
-- **Advanced Features**
-  - [ ] Multi-LLM support for diverse query handling.
-  - [ ] Plugin system for extensibility.
-  - [ ] Role-Based Access Control (RBAC) for enterprise use.
-  - [ ] Billing system for monetization.
-
-## Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
-© 2025 Curiositi Team
+Curiositi is licensed under the Elastic License v2. See [LICENSE](LICENSE).
