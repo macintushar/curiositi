@@ -4,9 +4,9 @@ import { UploadSchema } from "@/types/schemas";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 
-const uploadRoutes = new Hono();
+const uploadRouter = new Hono();
 
-uploadRoutes.post("/", zValidator("form", UploadSchema), async (c) => {
+uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
   try {
     const formData = await c.req.valid("form");
     const file = formData.file;
@@ -49,4 +49,4 @@ uploadRoutes.post("/", zValidator("form", UploadSchema), async (c) => {
   }
 });
 
-export default uploadRoutes;
+export default uploadRouter;
