@@ -48,12 +48,14 @@ To get a more detailed step-by-step process of setting up Curiositi, take a look
 
 ### 1. Clone & Install
 
-````bash
+```bash
 # 1. Clone the repo and enter server directory
 git clone https://github.com/macintushar/curiositi.git
 cd curiositi/server
+```
 
 # 2. Install dependencies with Bun
+
 bun install
 
 ### 2. Configure
@@ -67,7 +69,7 @@ cp .env.example .env
 # 4. Start the server (dev vs prod)
 bun run dev    # development (hot reload)
 bun run start  # production
-````
+```
 
 The API listens by default on `http://localhost:3030`.
 
