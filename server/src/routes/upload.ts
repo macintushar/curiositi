@@ -10,7 +10,7 @@ uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
   try {
     const formData = await c.req.valid("form");
     const file = formData.file;
-    const fileType = file.type.split(";")[1];
+    const fileType = file.type.split(";")[0];
 
     console.log(
       `Received file: ${file.name} (${fileType}, size: ${file.size} bytes)`,
