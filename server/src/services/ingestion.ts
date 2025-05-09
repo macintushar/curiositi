@@ -1,8 +1,6 @@
-import { Document } from "@langchain/core/documents";
-
 import { SUPPORTED_FILE_TYPES } from "@/constants";
 import { textSplitter } from "@/tools/utils";
-import { vectorStore } from "@/tools/vectorStore";
+import { getVectorStore, generateEmbeddings } from "@/tools/vectorStore";
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 
 async function extractTextFromPdf(fileBuffer: Buffer<ArrayBuffer>) {
@@ -55,21 +53,29 @@ export async function processAndStoreDocument(
       return;
     }
 
-    // Create LangChain Documents
-    const documents = chunks.map(
-      (chunk, index) =>
-        new Document({
-          pageContent: chunk,
-          metadata: {
-            source: originalFilename,
-            chunk_index: index,
-          },
-        }),
+    // Create documents with metadata
+    const documents = chunks;
+    const ids = chunks.map(
+      (_, index) => `${originalFilename}-${index}-${Date.now()}`,
     );
+    const metadatas = chunks.map((_, index) => ({
+      source: originalFilename,
+      chunk_index: index,
+    }));
 
     console.log(`Adding ${documents.length} document chunks to ChromaDB...`);
 
-    await vectorStore.addDocuments(documents);
+    // Generate embeddings for the chunks
+    const embeddings = await generateEmbeddings(chunks);
+
+    // Get the vector store and add the documents
+    const collection = await getVectorStore();
+    await collection.add({
+      ids,
+      embeddings,
+      metadatas,
+      documents,
+    });
 
     console.log(
       `Successfully processed and stored ${originalFilename} in ChromaDB.`,

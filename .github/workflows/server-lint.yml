@@ -1,4 +1,4 @@
-name: Server Lint (Biome)
+name: Server Lint (Prettier)
 
 on:
   push:

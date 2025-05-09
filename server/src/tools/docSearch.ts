@@ -1,22 +1,28 @@
-import { vectorStore } from "@/tools/vectorStore";
-import type { Document } from "@langchain/core/documents";
+import { getVectorStore, generateEmbeddings } from "@/tools/vectorStore";
 import { DynamicTool } from "@langchain/core/tools";
+import type { IncludeEnum } from "chromadb";
 
 const MAX_RESULTS = 5;
 
 const formatDocumentsWithMetadata = (
-  docs: Array<[Document, number]>,
+  documents: string[],
+  metadatas: Array<Record<string, unknown>>,
+  distances: number[] | null,
 ): string => {
-  if (!docs || docs.length === 0) {
+  if (!documents || documents.length === 0) {
     return "No relevant documents found.";
   }
-  return docs
+
+  return documents
     .slice(0, MAX_RESULTS)
-    .map(([doc, score], i) => {
-      const metadata = doc.metadata || {};
+    .map((content, i) => {
+      const metadata = metadatas[i] || {};
       const source = metadata.source ? ` (Source: ${metadata.source})` : "";
-      const scoreInfo = score ? ` [Relevance: ${score.toFixed(2)}]` : "";
-      return `Document ${i + 1}${source}${scoreInfo}:\n${doc.pageContent}\n`;
+      const score =
+        distances && distances[i]
+          ? ` [Relevance: ${(1 - distances[i]).toFixed(2)}]`
+          : "";
+      return `Document ${i + 1}${source}${score}:\n${content}\n`;
     })
     .join("\n---\n");
 };
@@ -24,8 +30,31 @@ const formatDocumentsWithMetadata = (
 async function searchDocs(query: string): Promise<string> {
   console.log(`Searching documents for query: "${query}"`);
   try {
-    const results = await vectorStore.similaritySearchWithScore(query);
-    return formatDocumentsWithMetadata(results);
+    // Get the vector store collection
+    const collection = await getVectorStore();
+
+    // Generate embeddings for the query
+    const queryEmbeddings = await generateEmbeddings([query]);
+    if (!queryEmbeddings || queryEmbeddings.length === 0) {
+      return "Error generating embeddings for the query.";
+    }
+
+    // Query the collection
+    const results = await collection.query({
+      queryEmbeddings: queryEmbeddings[0],
+      nResults: MAX_RESULTS,
+      include: ["documents", "metadatas", "distances"] as IncludeEnum[],
+    });
+
+    if (!results.documents || results.documents.length === 0) {
+      return "No relevant documents found.";
+    }
+
+    return formatDocumentsWithMetadata(
+      results.documents[0] as string[],
+      (results.metadatas?.[0] as Array<Record<string, unknown>>) || [],
+      (results.distances?.[0] as number[]) || null,
+    );
   } catch (error: unknown) {
     console.error("Error searching documents:", error);
 

@@ -10,15 +10,19 @@ uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
   try {
     const formData = await c.req.valid("form");
     const file = formData.file;
+    const fileType = file.type.split(";")[0];
 
     console.log(
-      `Received file: ${file.name} (${file.type}, size: ${file.size} bytes)`,
+      `Received file: ${file.name} (${fileType}, size: ${file.size} bytes)`,
     );
 
-    if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
+    if (!SUPPORTED_FILE_TYPES.includes(fileType)) {
       return c.json(
         {
-          error: "Unsupported file type. Only PDF and TXT are allowed.",
+          error: "Unsupported file type.",
+          details: `Uploaded file type: ${fileType}. Only ${SUPPORTED_FILE_TYPES.join(
+            ", ",
+          )} are supported.`,
         },
         415,
       );
@@ -29,7 +33,9 @@ uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
     await processAndStoreDocument(fileBuffer, file.name, file.type);
 
     return c.json({
-      message: `File '${file.name}' processed successfully.`,
+      data: {
+        message: `File '${file.name}' processed successfully.`,
+      },
     });
   } catch (error: unknown) {
     console.error("Error handling file upload:", error);
