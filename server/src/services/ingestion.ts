@@ -1,6 +1,6 @@
 import { SUPPORTED_FILE_TYPES } from "@/constants";
-import { textSplitter } from "@/tools/utils";
-import { getVectorStore, generateEmbeddings } from "@/tools/vectorStore";
+import { textSplitter } from "@/lib/utils";
+import { getVectorStore, generateEmbeddings } from "@/lib/vectorStore";
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 
 async function extractTextFromPdf(fileBuffer: Buffer<ArrayBuffer>) {
