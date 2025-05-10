@@ -13,3 +13,13 @@ export const QuerySchema = z.object({
 });
 
 export type QuerySchemaType = z.infer<typeof QuerySchema>;
+
+export const STRATEGY_JSON_SCHEMA = z.object({
+  strategy: z.enum(["direct", "retrieve"]),
+  answer: z.string(),
+});
+
+export const QUERY_JSON_SCHEMA = z.object({
+  docQueries: z.array(z.string()),
+  webQueries: z.array(z.string()),
+});

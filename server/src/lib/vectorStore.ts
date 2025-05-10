@@ -1,10 +1,6 @@
-import {
-  CHROMA_COLLECTION_NAME,
-  CHROMA_URL,
-  OLLAMA_EMBEDDING_MODEL,
-} from "@/constants";
+import { CHROMA_COLLECTION_NAME, CHROMA_URL } from "@/constants";
 import { ChromaClient } from "chromadb";
-import { ollama } from "./chat";
+import { ollamaEmbedding } from "@/lib/llms";
 
 // Initialize the Chroma client
 const client = new ChromaClient({ path: CHROMA_URL });
@@ -27,9 +23,8 @@ export const generateEmbeddings = async (
   texts: string[],
 ): Promise<number[][]> => {
   try {
-    const response = await ollama.embed({
-      model: OLLAMA_EMBEDDING_MODEL,
-      input: texts,
+    const response = await ollamaEmbedding.doEmbed({
+      values: texts,
     });
 
     return response.embeddings;
