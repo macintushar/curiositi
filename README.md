@@ -81,7 +81,7 @@ curiositi/
 
 ## Contributing & License
 
-Contributions are welcome! Please review the [contribution guidelines](CONTRIBUTING.md) before submitting issues or pull requests.
+Contributions are welcome! Please review the [contribution guidelines](docs/CONTRIBUTING.md) before submitting issues or pull requests.
 
 ## 💼 License
 
