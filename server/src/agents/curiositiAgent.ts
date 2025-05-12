@@ -139,8 +139,6 @@ async function curiositiAgent(
       temperature: 0.7,
     });
 
-    console.log(webSearchResults);
-
     return {
       docQueries: queryPlan.docQueries || [],
       webQueries: queryPlan.webQueries || [],
