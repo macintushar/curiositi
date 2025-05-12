@@ -9,22 +9,10 @@ type CuriositiAgentResponse = {
   docQueries: string[];
   webQueries: string[];
   docResults: string[];
-  webResults: string[];
   answer: string;
-  strategy: "direct" | "retrieve";
-  sourcesUsed: string[];
+  strategy: "direct" | "retrieve" | "error";
   reasoning: string;
 };
-
-/**
- * Utility function to extract URLs from web search results
- */
-function extractUrls(text: string): string[] {
-  // Pattern to match URLs - handles various URL formats including http, https
-  const urlPattern = /(https?:\/\/[^\s),"]+)/g;
-  const matches = text.match(urlPattern);
-  return matches || [];
-}
 
 async function curiositiAgent(
   input: string,
@@ -40,6 +28,7 @@ async function curiositiAgent(
       system:
         "You are a senior AI strategy planner determining the best approach to answer questions.",
       prompt: strategyPrompt(input),
+      temperature: 0.5,
     });
 
     if (strategyObj.strategy === "direct" && strategyObj.answer) {
@@ -47,10 +36,8 @@ async function curiositiAgent(
         docQueries: [],
         webQueries: [],
         docResults: [],
-        webResults: [],
         answer: strategyObj.answer,
         strategy: "direct",
-        sourcesUsed: [],
         reasoning: "Direct answer from model knowledge",
       };
     }
@@ -62,7 +49,7 @@ async function curiositiAgent(
       system:
         "You are a search query specialist optimizing queries for different information sources.",
       prompt: queryGenPrompt(input),
-      temperature: 0.4,
+      temperature: 0.6,
     });
 
     // Document search worker with error handling
@@ -135,11 +122,9 @@ async function curiositiAgent(
         docQueries: queryPlan.docQueries || [],
         webQueries: queryPlan.webQueries || [],
         docResults: [],
-        webResults: [],
         answer:
           "I couldn't find relevant information to answer your question accurately. Please try rephrasing your question or asking something else.",
         strategy: "retrieve",
-        sourcesUsed: [],
         reasoning: "Information retrieval failed",
       };
     }
@@ -151,45 +136,17 @@ async function curiositiAgent(
       system:
         "You are an expert at synthesizing information from multiple sources into clear, accurate answers.",
       prompt: synthPrompt(input, formattedDocResults, formattedWebResults),
-      temperature: 0.6,
+      temperature: 0.7,
     });
 
-    // Extract all URLs from web results
-    const webUrls: string[] = [];
-    webSearchResults
-      .filter((item) => !item.error)
-      .forEach((item) => {
-        const urls = extractUrls(item.result);
-        urls.forEach((url) => webUrls.push(url));
-      });
-
-    // Get unique URLs (remove duplicates)
-    const uniqueWebUrls = Array.from(new Set(webUrls));
-
-    // Track sources used for better explainability
-    const sourcesUsed = [
-      // Document sources
-      ...docSearchResults
-        .filter((item) => !item.error)
-        .map((item) => `Document: ${item.query}`),
-
-      // Web query sources
-      ...webSearchResults
-        .filter((item) => !item.error)
-        .map((item) => `Web Query: ${item.query}`),
-
-      // Specific web URLs (extracted from results)
-      ...uniqueWebUrls.map((url) => `Web Link: ${url}`),
-    ];
+    console.log(webSearchResults);
 
     return {
       docQueries: queryPlan.docQueries || [],
       webQueries: queryPlan.webQueries || [],
       docResults: formattedDocResults,
-      webResults: formattedWebResults,
       answer,
       strategy: "retrieve",
-      sourcesUsed,
       reasoning: "Answer synthesized from retrieved information",
     };
   } catch (error) {
@@ -198,11 +155,9 @@ async function curiositiAgent(
       docQueries: [],
       webQueries: [],
       docResults: [],
-      webResults: [],
       answer:
         "I encountered an error while processing your question. Please try again later.",
-      strategy: "direct",
-      sourcesUsed: [],
+      strategy: "error",
       reasoning: error instanceof Error ? error.message : String(error),
     };
   }
