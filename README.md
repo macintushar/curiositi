@@ -2,8 +2,6 @@
 
 Curiositi is an AI-powered assistant that delivers precise, context-aware answers by combining user documents with live web data. It implements a hybrid Retrieval-Augmented Generation (RAG) system to help you find and synthesize information across your files, and the internet.
 
----
-
 ## 🔍 What Curiositi Does
 
 1. **Document Ingestion**
@@ -29,8 +27,6 @@ Curiositi is an AI-powered assistant that delivers precise, context-aware answer
 
 ![System Flow Diagram](docs/curiositi-flow.png)
 
----
-
 ## 🚀 Key Features
 
 - **Easy Upload**: Just POST your files; ingestion is fully automated.
@@ -39,8 +35,6 @@ Curiositi is an AI-powered assistant that delivers precise, context-aware answer
 - **Configurable LLMs**: Choose Ollama or OpenAI models and fine-tune your temperature.
 - **Type-Safe API**: Input validation with Zod ensures robust, predictable behavior.
 - **Transparent Metadata**: Trace every sub-query and see exactly which sources informed the answer.
-
----
 
 ## 🏃‍♂️ Getting Started
 
@@ -54,11 +48,13 @@ git clone https://github.com/macintushar/curiositi.git
 cd curiositi/server
 ```
 
-# 2. Install dependencies with Bun
+### 2. Install dependencies with Bun
 
+```bash
 bun install
+```
 
-### 2. Configure
+### 3. Configure
 
 Copy the environment template and edit your service URLs and credentials:
 
@@ -73,8 +69,6 @@ bun run start  # production
 
 The API listens by default on `http://localhost:3030`.
 
----
-
 ## Project Layout
 
 ```
@@ -83,16 +77,11 @@ curiositi/
 ├─ docs/                  # Flow diagrams (curiositi-flow.png) & PRD (PRD.md)
 ├─ server/                # Bun + Hono backend (API & agent)
 ├─ LICENSE                # Elastic License v2
-└─ README.md              # This overview (you are here)
 ```
-
----
 
 ## Contributing & License
 
 Contributions are welcome! Please review the [contribution guidelines](CONTRIBUTING.md) before submitting issues or pull requests.
-
----
 
 ## 💼 License
 
