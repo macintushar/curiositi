@@ -1,15 +1,16 @@
 import { SUPPORTED_FILE_TYPES } from "@/constants";
 import { processAndStoreDocument } from "@/services/ingestion";
+import { addFileToDB } from "@/services/queries";
 import { UploadSchema } from "@/types/schemas";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-
+import { createHash } from "crypto";
 const uploadRouter = new Hono();
 
 uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
   try {
-    const formData = await c.req.valid("form");
-    const file = formData.file;
+    const { file, space_id } = await c.req.valid("form");
+
     const fileType = file.type.split(";")[0];
 
     console.log(
@@ -29,12 +30,36 @@ uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
     }
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const fileHash = createHash("sha256").update(fileBuffer).digest("hex");
 
-    await processAndStoreDocument(fileBuffer, file.name, file.type);
+    const fileUpload = await addFileToDB(
+      fileBuffer,
+      file.name,
+      fileType,
+      file.size,
+      space_id,
+      fileHash,
+    );
+
+    await processAndStoreDocument(
+      fileBuffer,
+      file.name,
+      fileType,
+      fileUpload[0].id,
+      space_id,
+    );
 
     return c.json({
       data: {
         message: `File '${file.name}' processed successfully.`,
+        file: {
+          id: fileUpload[0].id,
+          name: fileUpload[0].name,
+          type: fileUpload[0].type,
+          size: fileUpload[0].file_size,
+          space_id: fileUpload[0].space_id,
+          hash: fileHash,
+        },
       },
     });
   } catch (error: unknown) {
