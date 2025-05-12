@@ -1,4 +1,4 @@
-import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
 
@@ -24,4 +24,18 @@ export const files = pgTable("files", {
   type: text("type").notNull(),
   file: bytea("file").notNull(),
   file_size: text("file_size").notNull(),
+  space_id: uuid("space_id")
+    .notNull()
+    .references(() => spaces.id, { onDelete: "cascade" }),
+  hash: text("hash").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export const spaces = pgTable("spaces", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

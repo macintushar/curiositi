@@ -17,6 +17,8 @@ export async function processAndStoreDocument(
   fileBuffer: Buffer<ArrayBuffer>,
   originalFilename: string,
   mimeType: string,
+  fileId: string,
+  spaceId: string,
 ): Promise<void> {
   console.log(`Processing ${originalFilename} (${mimeType})...`);
 
@@ -61,6 +63,8 @@ export async function processAndStoreDocument(
     const metadatas = chunks.map((_, index) => ({
       source: originalFilename,
       chunk_index: index,
+      file_id: fileId,
+      space_id: spaceId,
     }));
 
     console.log(`Adding ${documents.length} document chunks to ChromaDB...`);
