@@ -6,9 +6,9 @@ import { Hono } from "hono";
 const queryRouter = new Hono();
 
 queryRouter.post("/", zValidator("json", QuerySchema), async (c) => {
-  const { input, model } = c.req.valid("json");
+  const { input, model, space_id } = c.req.valid("json");
 
-  const response = await curiositiAgent(input, model);
+  const response = await curiositiAgent(input, model, space_id);
 
   return c.json({
     data: {
@@ -17,9 +17,7 @@ queryRouter.post("/", zValidator("json", QuerySchema), async (c) => {
         docQueries: response.docQueries,
         webQueries: response.webQueries,
         docResults: response.docResults,
-        webResults: response.webResults,
         strategy: response.strategy,
-        sourcesUsed: response.sourcesUsed,
         reasoning: response.reasoning,
       },
     },

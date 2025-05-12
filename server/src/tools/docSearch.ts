@@ -1,5 +1,4 @@
 import { getVectorStore, generateEmbeddings } from "@/lib/vectorStore";
-import { DynamicTool } from "@langchain/core/tools";
 import type { IncludeEnum } from "chromadb";
 
 const MAX_RESULTS = 5;
@@ -27,8 +26,10 @@ const formatDocumentsWithMetadata = (
     .join("\n---\n");
 };
 
-async function searchDocs(query: string): Promise<string> {
-  console.log(`Searching documents for query: "${query}"`);
+async function searchDocs(query: string, spaceId?: string): Promise<string> {
+  console.log(
+    `Searching documents for query: "${query}"${spaceId ? ` in space: ${spaceId}` : ""}`,
+  );
   try {
     // Get the vector store collection
     const collection = await getVectorStore();
@@ -39,12 +40,25 @@ async function searchDocs(query: string): Promise<string> {
       return "Error generating embeddings for the query.";
     }
 
-    // Query the collection
-    const results = await collection.query({
+    // Query parameters
+    const queryParams: {
+      queryEmbeddings: number[];
+      nResults: number;
+      include: IncludeEnum[];
+      where?: { space_id: string };
+    } = {
       queryEmbeddings: queryEmbeddings[0],
       nResults: MAX_RESULTS,
       include: ["documents", "metadatas", "distances"] as IncludeEnum[],
-    });
+    };
+
+    // Add filter by space_id if provided
+    if (spaceId) {
+      queryParams.where = { space_id: spaceId };
+    }
+
+    // Query the collection
+    const results = await collection.query(queryParams);
 
     if (!results.documents || results.documents.length === 0) {
       return "No relevant documents found.";
@@ -65,11 +79,6 @@ async function searchDocs(query: string): Promise<string> {
   }
 }
 
-export const docSearchTool = new DynamicTool({
-  name: "document_search",
-  description:
-    "Search and retrieve relevant information from uploaded documents. Input should be a search query.",
-  func: async (input: string) => {
-    return searchDocs(input);
-  },
-});
+export async function docSearchToolWithSpaceId(query: string, spaceId: string) {
+  return searchDocs(query, spaceId);
+}
