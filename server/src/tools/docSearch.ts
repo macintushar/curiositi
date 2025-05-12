@@ -1,4 +1,4 @@
-import { getVectorStore, generateEmbeddings } from "@/tools/vectorStore";
+import { getVectorStore, generateEmbeddings } from "@/lib/vectorStore";
 import { DynamicTool } from "@langchain/core/tools";
 import type { IncludeEnum } from "chromadb";
 
