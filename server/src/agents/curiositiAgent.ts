@@ -1,7 +1,7 @@
 import { generateObject, generateText } from "ai";
 import { ollama } from "@/lib/llms";
 import { queryGenPrompt, synthPrompt, strategyPrompt } from "@/lib/prompts";
-import { docSearchTool } from "@/tools/docSearch";
+import { docSearchToolWithSpaceId } from "@/tools/docSearch";
 import { webSearchTool } from "@/tools/webSearch";
 import { QUERY_JSON_SCHEMA, STRATEGY_JSON_SCHEMA } from "@/types/schemas";
 
@@ -17,6 +17,7 @@ type CuriositiAgentResponse = {
 async function curiositiAgent(
   input: string,
   modelName: string,
+  spaceId: string,
 ): Promise<CuriositiAgentResponse> {
   try {
     const llmModel = ollama(modelName);
@@ -57,7 +58,7 @@ async function curiositiAgent(
       const results = await Promise.all(
         queries.map(async (query) => {
           try {
-            const result = await docSearchTool.func(query);
+            const result = await docSearchToolWithSpaceId(query, spaceId);
             return { query, result, error: null };
           } catch (error) {
             console.error(`Error in doc search for query "${query}":`, error);
