@@ -1,7 +1,7 @@
 import curiositiAgent from "@/agents/curiositiAgent";
 import { Context } from "hono";
 
-export async function queryHandler(c: Context) {
+export async function searchHandler(c: Context) {
   const { input, model, space_id, provider } = await c.req.json();
 
   const response = await curiositiAgent(
@@ -26,7 +26,7 @@ export async function queryHandler(c: Context) {
   });
 }
 
-export async function generalQueryHandler(c: Context) {
+export async function generalSearchHandler(c: Context) {
   const { input, model, provider } = await c.req.json();
 
   const response = await curiositiAgent(input, model, "general", provider);

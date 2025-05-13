@@ -7,15 +7,12 @@ export const UploadSchema = z.object({
   space_id: z.string().min(1, '"space_id" cannot be empty'),
 });
 
-export const QuerySchema = z.object({
+export const SearchSchema = z.object({
   input: z.string().min(1, '"input" cannot be empty'),
   model: z.string().optional().default("gemma3:1b"),
   session_id: z.string().min(1, '"session_id" cannot be empty'),
   space_id: z.string(),
-  provider: z
-    .nativeEnum(LLM_PROVIDERS)
-    .optional()
-    .default(LLM_PROVIDERS.OLLAMA),
+  provider: z.nativeEnum(LLM_PROVIDERS).default(LLM_PROVIDERS.OLLAMA),
 });
 
 export const STRATEGY_JSON_SCHEMA = z.object({
