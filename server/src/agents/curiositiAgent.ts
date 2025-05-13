@@ -1,11 +1,12 @@
 import { generateObject, generateText } from "ai";
-import { ollama } from "@/lib/llms";
+
 import { queryGenPrompt, synthPrompt, strategyPrompt } from "@/lib/prompts";
+import { QUERY_JSON_SCHEMA, STRATEGY_JSON_SCHEMA } from "@/types/schemas";
 import { docSearchToolWithSpaceId } from "@/tools/docSearch";
 import { webSearchTool } from "@/tools/webSearch";
-import { QUERY_JSON_SCHEMA, STRATEGY_JSON_SCHEMA } from "@/types/schemas";
-
-export type CuriositiAgentMode = "general" | "space";
+import { CuriositiAgentMode } from "@/types";
+import { LLM_PROVIDERS } from "@/constants";
+import { llm } from "@/lib/llms";
 
 type CuriositiAgentResponse = {
   docQueries: string[];
@@ -19,7 +20,8 @@ type CuriositiAgentResponse = {
 async function curiositiAgent(
   input: string,
   modelName: string,
-  mode: CuriositiAgentMode = "general",
+  mode: CuriositiAgentMode,
+  provider: LLM_PROVIDERS = LLM_PROVIDERS.OLLAMA,
   spaceId?: string,
 ): Promise<CuriositiAgentResponse> {
   try {
@@ -28,7 +30,7 @@ async function curiositiAgent(
       throw new Error("spaceId is required when mode is 'space'");
     }
 
-    const llmModel = ollama(modelName);
+    const llmModel = llm(modelName, provider);
 
     // Determine if we can answer directly or need retrieval
     const { object: strategyObj } = await generateObject({

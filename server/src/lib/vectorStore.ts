@@ -1,6 +1,6 @@
-import { CHROMA_COLLECTION_NAME, CHROMA_URL } from "@/constants";
+import { CHROMA_COLLECTION_NAME, CHROMA_URL, LLM_PROVIDERS } from "@/constants";
 import { ChromaClient } from "chromadb";
-import { ollamaEmbedding } from "@/lib/llms";
+import { llmEmbedding } from "@/lib/llms";
 
 // Initialize the Chroma client
 const client = new ChromaClient({ path: CHROMA_URL });
@@ -23,11 +23,17 @@ export const generateEmbeddings = async (
   texts: string[],
 ): Promise<number[][]> => {
   try {
-    const response = await ollamaEmbedding.doEmbed({
+    const embeddingModel = llmEmbedding(LLM_PROVIDERS.OLLAMA);
+
+    if (!embeddingModel) {
+      throw new Error("Embedding model not found");
+    }
+
+    const response = await embeddingModel.doEmbed({
       values: texts,
     });
 
-    return response.embeddings;
+    return response.embeddings || [];
   } catch (error) {
     console.error("Error generating embeddings:", error);
     throw error;

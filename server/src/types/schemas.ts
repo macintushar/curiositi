@@ -1,5 +1,6 @@
-import { CuriositiAgentMode } from "@/agents/curiositiAgent";
+import { LLM_PROVIDERS } from "@/constants";
 import { z } from "zod";
+import { CuriositiAgentMode } from ".";
 
 export const UploadSchema = z.object({
   file: z.instanceof(File),
@@ -11,6 +12,10 @@ export const QuerySchema = z.object({
   model: z.string().optional().default("gemma3:1b"),
   session_id: z.string().min(1, '"session_id" cannot be empty'),
   space_id: z.string(),
+  provider: z
+    .nativeEnum(LLM_PROVIDERS)
+    .optional()
+    .default(LLM_PROVIDERS.OLLAMA),
 });
 
 export const STRATEGY_JSON_SCHEMA = z.object({
