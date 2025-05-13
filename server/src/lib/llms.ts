@@ -24,8 +24,12 @@ export function llm(model: string, provider: LLM_PROVIDERS) {
   switch (provider) {
     case LLM_PROVIDERS.OPENROUTER:
       return openRouter(model);
+
     case LLM_PROVIDERS.OLLAMA:
       return ollama(model);
+
+    default:
+      throw new Error(`Unsupported LLM provider: ${provider}`);
   }
 }
 
@@ -33,5 +37,8 @@ export function llmEmbedding(provider: LLM_PROVIDERS) {
   switch (provider) {
     case LLM_PROVIDERS.OLLAMA:
       return ollama.embedding(OLLAMA_EMBEDDING_MODEL);
+
+    default:
+      throw new Error(`Embedding not supported for provider: ${provider}`);
   }
 }
