@@ -101,6 +101,7 @@ Guidelines:
       (queryPlan.webQueries || []).map(async (query) => {
         try {
           const result = await webSearchTool.invoke(query);
+          console.log("Searching the web for:", query);
           return {
             query,
             result:
