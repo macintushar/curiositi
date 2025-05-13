@@ -51,7 +51,7 @@ apiRouter.use("*", async (c, next) => {
 // Upload routes
 apiRouter.post("/upload", zValidator("form", UploadSchema), uploadFileHandler);
 
-// Query routes
+// Search routes
 apiRouter.post("/search", zValidator("json", SearchSchema), searchHandler);
 apiRouter.post(
   "/search/general",
