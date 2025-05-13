@@ -5,6 +5,8 @@ import { docSearchToolWithSpaceId } from "@/tools/docSearch";
 import { webSearchTool } from "@/tools/webSearch";
 import { QUERY_JSON_SCHEMA, STRATEGY_JSON_SCHEMA } from "@/types/schemas";
 
+export type CuriositiAgentMode = "general" | "space";
+
 type CuriositiAgentResponse = {
   docQueries: string[];
   webQueries: string[];
@@ -17,9 +19,15 @@ type CuriositiAgentResponse = {
 async function curiositiAgent(
   input: string,
   modelName: string,
-  spaceId: string,
+  mode: CuriositiAgentMode = "general",
+  spaceId?: string,
 ): Promise<CuriositiAgentResponse> {
   try {
+    // Validate that spaceId is provided when mode is "space"
+    if (mode === "space" && !spaceId) {
+      throw new Error("spaceId is required when mode is 'space'");
+    }
+
     const llmModel = ollama(modelName);
 
     // Determine if we can answer directly or need retrieval
@@ -43,66 +51,70 @@ async function curiositiAgent(
       };
     }
 
-    // Generate retrieval queries
+    // Generate retrieval queries - modify prompt based on mode
+    const modeSpecificPrompt =
+      mode === "space"
+        ? queryGenPrompt(input)
+        : `Given the user question: "${input}", generate up to 5 web search queries as JSON:\n{\n  "webQueries": ["..."]\n}\n
+Guidelines:
+- Focus on creating effective web search queries to find relevant information online.
+- Ensure queries are specific enough to return useful results but not too narrow.
+- If user instructs to only use the documents, explain that document search is not available in general mode.
+- Output only valid JSON.`;
+
     const { object: queryPlan } = await generateObject({
       model: llmModel,
-      schema: QUERY_JSON_SCHEMA,
+      schema: QUERY_JSON_SCHEMA(mode),
       system:
         "You are a search query specialist optimizing queries for different information sources.",
-      prompt: queryGenPrompt(input),
+      prompt: modeSpecificPrompt,
       temperature: 0.6,
     });
 
-    // Document search worker with error handling
-    const docWorker = async (queries: string[]) => {
-      const results = await Promise.all(
-        queries.map(async (query) => {
-          try {
-            const result = await docSearchToolWithSpaceId(query, spaceId);
-            return { query, result, error: null };
-          } catch (error) {
-            console.error(`Error in doc search for query "${query}":`, error);
-            return {
-              query,
-              result: "Error retrieving document results",
-              error: error instanceof Error ? error.message : String(error),
-            };
-          }
-        }),
-      );
-      return results;
-    };
+    // Document search worker - only run in space mode
+    const docSearchResults =
+      mode === "space" && spaceId
+        ? await Promise.all(
+            (queryPlan.docQueries || []).map(async (query) => {
+              try {
+                const result = await docSearchToolWithSpaceId(query, spaceId);
+                return { query, result, error: null };
+              } catch (error) {
+                console.error(
+                  `Error in doc search for query "${query}":`,
+                  error,
+                );
+                return {
+                  query,
+                  result: "Error retrieving document results",
+                  error: error instanceof Error ? error.message : String(error),
+                };
+              }
+            }),
+          )
+        : [];
 
     // Web search worker with error handling
-    const webWorker = async (queries: string[]) => {
-      const results = await Promise.all(
-        queries.map(async (query) => {
-          try {
-            const result = await webSearchTool.invoke(query);
-            return {
-              query,
-              result:
-                typeof result === "string" ? result : JSON.stringify(result),
-              error: null,
-            };
-          } catch (error) {
-            console.error(`Error in web search for query "${query}":`, error);
-            return {
-              query,
-              result: "Error retrieving web results",
-              error: error instanceof Error ? error.message : String(error),
-            };
-          }
-        }),
-      );
-      return results;
-    };
-
-    // Execute workers in parallel
-    const [docSearchResults, webSearchResults] = await Promise.all([
-      docWorker(queryPlan.docQueries || []),
-      webWorker(queryPlan.webQueries || []),
-    ]);
+    const webSearchResults = await Promise.all(
+      (queryPlan.webQueries || []).map(async (query) => {
+        try {
+          const result = await webSearchTool.invoke(query);
+          return {
+            query,
+            result:
+              typeof result === "string" ? result : JSON.stringify(result),
+            error: null,
+          };
+        } catch (error) {
+          console.error(`Error in web search for query "${query}":`, error);
+          return {
+            query,
+            result: "Error retrieving web results",
+            error: error instanceof Error ? error.message : String(error),
+          };
+        }
+      }),
+    );
 
     // Format results for synthesis, filtering out errors
     const formattedDocResults = docSearchResults
@@ -114,13 +126,17 @@ async function curiositiAgent(
       .map((item) => `Query: ${item.query}\n${item.result}`);
 
     // If all searches failed, provide a fallback answer
+    const hasQueries =
+      (mode === "space" && (queryPlan.docQueries || []).length > 0) ||
+      (queryPlan.webQueries || []).length > 0;
+
     if (
       formattedDocResults.length === 0 &&
       formattedWebResults.length === 0 &&
-      (queryPlan.docQueries?.length > 0 || queryPlan.webQueries?.length > 0)
+      hasQueries
     ) {
       return {
-        docQueries: queryPlan.docQueries || [],
+        docQueries: mode === "space" ? queryPlan.docQueries || [] : [],
         webQueries: queryPlan.webQueries || [],
         docResults: [],
         answer:
@@ -141,7 +157,7 @@ async function curiositiAgent(
     });
 
     return {
-      docQueries: queryPlan.docQueries || [],
+      docQueries: mode === "space" ? queryPlan.docQueries || [] : [],
       webQueries: queryPlan.webQueries || [],
       docResults: formattedDocResults,
       answer,
