@@ -16,7 +16,13 @@ app.get("/", (c) => {
 app.use(
   "*",
   cors({
-    origin: "*",
+    origin:
+      process.env.NODE_ENV === "production"
+        ? [
+            "https://curiositi.macintushar.xyz",
+            "https://api.curiositi.macintushar.xyz",
+          ]
+        : "*",
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS", "PATCH", "DELETE"],
     exposeHeaders: ["Content-Length"],
