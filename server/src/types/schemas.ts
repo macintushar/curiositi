@@ -1,3 +1,4 @@
+import { CuriositiAgentMode } from "@/agents/curiositiAgent";
 import { z } from "zod";
 
 export const UploadSchema = z.object({
@@ -17,10 +18,12 @@ export const STRATEGY_JSON_SCHEMA = z.object({
   answer: z.string(),
 });
 
-export const QUERY_JSON_SCHEMA = z.object({
-  docQueries: z.array(z.string()),
-  webQueries: z.array(z.string()),
-});
+export const QUERY_JSON_SCHEMA = (mode: CuriositiAgentMode) =>
+  z.object({
+    docQueries:
+      mode === "space" ? z.array(z.string()) : z.array(z.string()).optional(),
+    webQueries: z.array(z.string()),
+  });
 
 export const CreateSpaceSchema = z.object({
   name: z.string().min(1, '"name" cannot be empty'),
