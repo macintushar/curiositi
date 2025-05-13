@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { CreateSpaceSchema, QuerySchema, UploadSchema } from "@/types/schemas";
+import { CreateSpaceSchema, SearchSchema, UploadSchema } from "@/types/schemas";
 
 // Service handlers
 import {
@@ -10,7 +10,7 @@ import {
   createSpaceHandler,
   getSpaceHandler,
 } from "@/services/spaces";
-import { queryHandler, generalQueryHandler } from "@/services/query";
+import { searchHandler, generalSearchHandler } from "@/services/search";
 import {
   getFilesHandler,
   getFileHandler,
@@ -48,12 +48,12 @@ apiRouter.use("*", async (c, next) => {
   return next();
 });
 
-// Query routes
-apiRouter.post("/query", zValidator("json", QuerySchema), queryHandler);
+// Search routes
+apiRouter.post("/search", zValidator("json", SearchSchema), searchHandler);
 apiRouter.post(
-  "/query/general",
-  zValidator("json", QuerySchema.omit({ space_id: true })),
-  generalQueryHandler,
+  "/search/general",
+  zValidator("json", SearchSchema.omit({ space_id: true })),
+  generalSearchHandler,
 );
 
 // Spaces routes

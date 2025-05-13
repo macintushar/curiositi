@@ -1,4 +1,4 @@
-import { files, spaces } from "@/db/schema";
+import { files, spaces, user } from "@/db/schema";
 import db from "@/db";
 import { and, desc, eq } from "drizzle-orm";
 
@@ -108,7 +108,8 @@ export async function getSpacesFromDB() {
     const data = await db
       .select()
       .from(spaces)
-      .orderBy(desc(spaces.updated_at));
+      .orderBy(desc(spaces.updated_at))
+      .leftJoin(user, eq(spaces.created_by, user.id));
     return data;
   } catch (error) {
     console.error("Error getting spaces from DB:", error);
@@ -118,7 +119,11 @@ export async function getSpacesFromDB() {
 
 export async function getSpaceFromDB(id: string) {
   try {
-    const data = await db.select().from(spaces).where(eq(spaces.id, id));
+    const data = await db
+      .select()
+      .from(spaces)
+      .where(eq(spaces.id, id))
+      .leftJoin(user, eq(spaces.created_by, user.id));
     return data;
   } catch (error) {
     console.error("Error getting space from DB:", error);
