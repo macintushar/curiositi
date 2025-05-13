@@ -48,9 +48,6 @@ apiRouter.use("*", async (c, next) => {
   return next();
 });
 
-// Upload routes
-apiRouter.post("/upload", zValidator("form", UploadSchema), uploadFileHandler);
-
 // Query routes
 apiRouter.post("/query", zValidator("json", QuerySchema), queryHandler);
 apiRouter.post(
@@ -69,6 +66,12 @@ apiRouter.post(
 apiRouter.get("/spaces/:id", getSpaceHandler);
 
 // Files routes
+apiRouter.post(
+  "/files/upload",
+  zValidator("form", UploadSchema),
+  uploadFileHandler,
+);
+
 apiRouter.get(
   "/files/:space_id",
   zValidator("param", z.object({ space_id: z.string() })),
