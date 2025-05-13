@@ -1,0 +1,36 @@
+name: Web CI (Lint + Build)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "clients/web/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "clients/web/**"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+        working-directory: ./clients/web
+
+      - name: Run Lint Check
+        run: bun run lint
+        working-directory: ./clients/web
+
+      - name: Run Build Check
+        run: bun run build
+        working-directory: ./clients/web
