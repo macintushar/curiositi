@@ -90,9 +90,12 @@ export async function deleteFileFromDB(id: string, spaceId: string) {
   }
 }
 
-export async function addSpaceToDB(name: string) {
+export async function addSpaceToDB(name: string, userId: string) {
   try {
-    const space = await db.insert(spaces).values({ name }).returning();
+    const space = await db
+      .insert(spaces)
+      .values({ name, created_by: userId })
+      .returning();
     return space;
   } catch (error) {
     console.error("Error adding space to DB:", error);

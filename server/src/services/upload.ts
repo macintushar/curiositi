@@ -1,15 +1,31 @@
 import { SUPPORTED_FILE_TYPES } from "@/constants";
-import { processAndStoreDocument } from "@/services/ingestion";
 import { addFileToDB } from "@/services/queries";
-import { UploadSchema } from "@/types/schemas";
-import { zValidator } from "@hono/zod-validator";
-import { Hono } from "hono";
+import { processAndStoreDocument } from "@/services/ingestion";
 import { createHash } from "crypto";
-const uploadRouter = new Hono();
+import { Context } from "hono";
 
-uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
+interface FileUpload {
+  name: string;
+  type: string;
+  size: number;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+}
+
+export async function uploadFileHandler(c: Context) {
   try {
-    const { file, space_id } = await c.req.valid("form");
+    const formData = await c.req.parseBody();
+    const file = formData.file as FileUpload;
+    const space_id = formData.space_id as string;
+
+    if (!file || typeof file === "string") {
+      return c.json(
+        {
+          error: "Invalid file upload",
+          details: "No file was uploaded or invalid file format",
+        },
+        400,
+      );
+    }
 
     const fileType = file.type.split(";")[0];
 
@@ -78,6 +94,4 @@ uploadRouter.post("/", zValidator("form", UploadSchema), async (c) => {
       500,
     );
   }
-});
-
-export default uploadRouter;
+}

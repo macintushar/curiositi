@@ -1,5 +1,5 @@
 // Host
-export const HOST = process.env.HOST || "https://curiositi.macintushar.xyz";
+export const HOST = process.env.HOST || "https://api.curiositi.macintushar.xyz";
 
 // Server
 export const SERVER_PORT = process.env.SERVER_PORT || 3030;
@@ -7,6 +7,11 @@ export const SERVER_PORT = process.env.SERVER_PORT || 3030;
 // Database
 export const DATABASE_URL =
   process.env.DATABASE_URL || "postgres://user:pass@localhost:5432/dbname";
+
+// Better Auth
+export const BETTER_AUTH_SECRET =
+  process.env.BETTER_AUTH_SECRET || "your-secret-key-at-least-32-chars-long";
+export const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL || HOST;
 
 // Chroma
 export const CHROMA_URL = process.env.CHROMA_URL || "http://localhost:8090";
