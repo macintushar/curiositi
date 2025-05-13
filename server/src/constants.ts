@@ -35,3 +35,8 @@ export const SUPPORTED_FILE_TYPES = [
   "text/csv",
   "text/markdown",
 ];
+
+export enum LLM_PROVIDERS {
+  OPENROUTER = "openrouter",
+  OLLAMA = "ollama",
+}
