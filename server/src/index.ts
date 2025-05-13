@@ -1,12 +1,11 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
-import queryRouter from "@/routes/query";
-import uploadRoutes from "@/routes/upload";
-import spacesRouter from "@/routes/spaces";
-import filesRouter from "@/routes/files";
+import apiRouter from "@/routes/api";
 
 const app = new Hono();
+import { auth } from "./lib/auth";
 
 app.use("*", logger());
 
@@ -14,13 +13,27 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-const apiRouter = new Hono();
-apiRouter.basePath("/api/v1");
+app.use(
+  "*",
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? [
+            "https://curiositi.macintushar.xyz",
+            "https://api.curiositi.macintushar.xyz",
+          ]
+        : "*",
+    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["POST", "GET", "OPTIONS", "PATCH", "DELETE"],
+    exposeHeaders: ["Content-Length"],
+    maxAge: 600,
+    credentials: true,
+  }),
+);
 
-apiRouter.route("/upload", uploadRoutes);
-apiRouter.route("/query", queryRouter);
-apiRouter.route("/spaces", spacesRouter);
-apiRouter.route("/files", filesRouter);
+app.on(["POST", "GET"], "/api/auth/*", (c) => {
+  return auth.handler(c.req.raw);
+});
 
 app.route("/api/v1", apiRouter);
 
