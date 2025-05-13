@@ -1,9 +1,13 @@
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Curiositi
+    <main className="flex min-h-screen flex-col items-center justify-center bg-emerald-800">
+      <div className="flex flex-col items-center justify-center gap-4">
+        <h1 className="text-7xl font-extrabold text-white">curiositi</h1>
+        <h1 className="font-serif text-3xl text-stone-100">
+          Find what you need,{" "}
+          <span className="text-stone-100/50 italic">
+            anything from anywhere.
+          </span>
         </h1>
       </div>
     </main>
