@@ -8,7 +8,8 @@ export enum LLM_PROVIDERS {
 export const SERVER_PORT = process.env.SERVER_PORT || 3030;
 
 // Default Providers
-export const DEFAULT_EMBEDDING_PROVIDER = LLM_PROVIDERS.OPENAI;
+export const DEFAULT_EMBEDDING_PROVIDER =
+  process.env.DEFAULT_EMBEDDING_PROVIDER || LLM_PROVIDERS.OLLAMA;
 
 // Host
 export const HOST =
