@@ -1,5 +1,14 @@
+export enum LLM_PROVIDERS {
+  OPENROUTER = "openrouter",
+  OLLAMA = "ollama",
+  OPENAI = "openai",
+}
+
 // Server
 export const SERVER_PORT = process.env.SERVER_PORT || 3030;
+
+// Default Providers
+export const DEFAULT_EMBEDDING_PROVIDER = LLM_PROVIDERS.OPENAI;
 
 // Host
 export const HOST =
@@ -30,6 +39,12 @@ export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 export const OPENROUTER_ENABLED = OPENROUTER_API_KEY ? true : false;
 
+// OpenAI
+export const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+export const OPENAI_EMBEDDING_MODEL =
+  process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
+export const OPENAI_ENABLED = OPENAI_API_KEY ? true : false;
+
 // SearXNG
 export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
 
@@ -42,8 +57,3 @@ export const SUPPORTED_FILE_TYPES = [
   "text/csv",
   "text/markdown",
 ];
-
-export enum LLM_PROVIDERS {
-  OPENROUTER = "openrouter",
-  OLLAMA = "ollama",
-}
