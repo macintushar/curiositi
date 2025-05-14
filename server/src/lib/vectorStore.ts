@@ -1,4 +1,8 @@
-import { CHROMA_COLLECTION_NAME, CHROMA_URL, LLM_PROVIDERS } from "@/constants";
+import {
+  CHROMA_COLLECTION_NAME,
+  CHROMA_URL,
+  DEFAULT_EMBEDDING_PROVIDER,
+} from "@/constants";
 import { ChromaClient } from "chromadb";
 import { llmEmbedding } from "@/lib/llms";
 
@@ -23,7 +27,7 @@ export const generateEmbeddings = async (
   texts: string[],
 ): Promise<number[][]> => {
   try {
-    const embeddingModel = llmEmbedding(LLM_PROVIDERS.OLLAMA);
+    const embeddingModel = llmEmbedding(DEFAULT_EMBEDDING_PROVIDER);
 
     if (!embeddingModel) {
       throw new Error("Embedding model not found");
