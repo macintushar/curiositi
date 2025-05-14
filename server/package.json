@@ -9,31 +9,31 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.5.0",
-    "@langchain/community": "^0.3.41",
-    "@langchain/core": "^0.3.49",
+    "@langchain/community": "^0.3.42",
+    "@langchain/core": "^0.3.55",
     "@openrouter/ai-sdk-provider": "^0.4.5",
     "ai": "^4.3.15",
     "better-auth": "^1.2.7",
     "bun": "^1.2.13",
-    "chromadb": "^2.3.0",
+    "chromadb": "^2.4.3",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
-    "hono": "^4.7.8",
-    "langchain": "^0.3.24",
+    "hono": "^4.7.9",
+    "langchain": "^0.3.25",
     "ollama-ai-provider": "^1.2.0",
     "pdf-parse": "^1.1.1",
-    "pg": "^8.15.6",
+    "pg": "^8.16.0",
     "zod": "^3.24.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
     "@types/bun": "latest",
-    "@types/pg": "^8.11.14",
+    "@types/pg": "^8.15.1",
     "drizzle-kit": "^0.31.1",
     "eslint": "^9.26.0",
-    "eslint-config-prettier": "^10.1.2",
-    "globals": "^16.0.0",
+    "eslint-config-prettier": "^10.1.5",
+    "globals": "^16.1.0",
     "prettier": "3.5.3",
-    "typescript-eslint": "^8.31.1"
+    "typescript-eslint": "^8.32.1"
   }
 }
