@@ -1,7 +1,7 @@
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-emerald-800">
-      <div className="flex flex-col items-center justify-center gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 text-center">
         <h1 className="text-7xl font-extrabold text-white">curiositi</h1>
         <h1 className="font-serif text-3xl text-stone-100">
           Find what you need,{" "}
