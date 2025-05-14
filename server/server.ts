@@ -5,6 +5,7 @@ import {
   SEARXNG_URL,
   SERVER_PORT,
   DATABASE_URL,
+  DEFAULT_EMBEDDING_PROVIDER,
 } from "./src/constants";
 
 try {
@@ -14,7 +15,11 @@ try {
   });
   console.log("Server is running on port", SERVER_PORT);
   console.log(
-    `Ollama URL: ${OLLAMA_BASE_URL}\nSearXNG URL: ${SEARXNG_URL}\nChroma URL: ${CHROMA_URL}\nDatabase URL: ${DATABASE_URL}`,
+    `Ollama URL: ${OLLAMA_BASE_URL}
+    SearXNG URL: ${SEARXNG_URL}
+    Chroma URL: ${CHROMA_URL}
+    Database URL: ${DATABASE_URL}
+    Default Embedding Provider: ${DEFAULT_EMBEDDING_PROVIDER}`,
   );
 } catch (error) {
   console.error(error);
