@@ -32,6 +32,10 @@ async function curiositiAgent(
 
     const llmModel = llm(modelName, provider);
 
+    console.log(
+      `User Question: ${input} | Model: ${modelName} | Provider: ${provider} | SpaceId: ${spaceId}`,
+    );
+
     // Determine if we can answer directly or need retrieval
     const { object: strategyObj } = await generateObject({
       model: llmModel,
