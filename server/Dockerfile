@@ -1,12 +1,15 @@
-FROM oven/bun:latest AS base
+FROM oven/bun:1.1.42
+
 WORKDIR /app
 
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+# Copy package files
+COPY package.json ./
 
+# Install dependencies
+RUN bun install
+
+# Copy the rest of the code
 COPY . .
-
-# RUN bun run db:migrate
 
 EXPOSE 3030
 
