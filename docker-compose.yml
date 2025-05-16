@@ -33,14 +33,14 @@ services:
     ports:
       - "8095:8080"
     volumes:
-      - ./searxng_data:/etc/searxng:rw
+      - searxng_data:/etc/searxng:rw
 
   chromadb:
     image: chromadb/chroma:latest
     ports:
       - "8090:8000"
     volumes:
-      - ./chromadb_data:/chroma_data
+      - chromadb_data:/chroma_data
 
   postgres:
     image: postgres:16
@@ -51,7 +51,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mydb
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
       interval: 5s
