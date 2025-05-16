@@ -1,10 +1,14 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/bun-sql";
-import { SQL } from "bun";
-import { DATABASE_URL } from "@/constants";
+
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+
 import * as schema from "@/db/schema";
 
-const client = new SQL(DATABASE_URL, { prepare: false });
-const db = drizzle({ client, schema });
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+const db = drizzle({ client: pool, schema });
 
 export default db;

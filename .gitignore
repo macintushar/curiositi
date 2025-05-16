@@ -1,0 +1,6 @@
+postgres_data
+searxng_data
+chromadb_data
+
+.env
+.env.local

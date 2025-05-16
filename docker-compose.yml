@@ -1,0 +1,64 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3030:3030"
+    volumes:
+      - ./server/src:/app/src
+    environment:
+      - DATABASE_URL=postgres://user:password@postgres:5432/mydb
+      - SEARXNG_URL=http://searxng:8080
+      - CHROMA_URL=http://chromadb:8000
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "bun run db:migrate && bun run start"
+
+  web-ui:
+    build:
+      context: ./clients/web
+      dockerfile: Dockerfile
+    ports:
+      - "3040:3040"
+    volumes:
+      - ./clients/web:/app/clients/web
+    depends_on:
+      - server
+
+  searxng:
+    image: searxng/searxng:latest
+    ports:
+      - "8095:8080"
+    volumes:
+      - searxng_data:/etc/searxng:rw
+
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8090:8000"
+    volumes:
+      - chromadb_data:/chroma_data
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  chromadb_data:
+  searxng_data: 
