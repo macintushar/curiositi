@@ -73,7 +73,7 @@ export default function LandingPage() {
                 <span>Introducing Curiositi</span>
               </div>
               <h1 className="font-serif text-4xl font-medium tracking-tight text-balance text-emerald-700 md:text-5xl lg:text-6xl">
-                <span className="text-gradient">Precise answers</span> from your
+                <span className="text-gradient">Get answers</span> from your
                 documents and the web
               </h1>
               <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
