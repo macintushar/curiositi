@@ -130,3 +130,13 @@ export async function getSpaceFromDB(id: string) {
     throw error;
   }
 }
+
+export async function deleteSpaceFromDB(id: string) {
+  try {
+    await db.delete(spaces).where(eq(spaces.id, id));
+    return true;
+  } catch (error) {
+    console.error("Error deleting space from DB:", error);
+    throw error;
+  }
+}

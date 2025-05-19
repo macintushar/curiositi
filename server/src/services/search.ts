@@ -1,40 +1,58 @@
 import curiositiAgent from "@/agents/curiositiAgent";
-import { LLM_PROVIDERS } from "@/types";
+import db from "@/db";
+import { messages } from "@/db/schema";
+import { formatHistory } from "@/lib/utils";
+import { CuriositiAgentMode, LLM_PROVIDERS } from "@/types";
+import { eq } from "drizzle-orm";
 
-export async function searchHandler(
-  input: string,
-  model: string,
-  space_id: string,
-  provider: LLM_PROVIDERS,
-) {
+export async function searchHandler({
+  input,
+  model,
+  provider,
+  thread_id,
+  mode,
+  space_id,
+}: {
+  input: string;
+  model: string;
+  provider: LLM_PROVIDERS;
+  thread_id: string;
+  mode: CuriositiAgentMode;
+  space_id?: string;
+}) {
+  const history = await db.query.messages.findMany({
+    where: eq(messages.threadId, thread_id),
+    columns: {
+      role: true,
+      content: true,
+    },
+  });
+
+  const formattedHistory = formatHistory(history);
+
   const response = await curiositiAgent(
     input,
     model,
-    "space",
+    mode,
     provider,
     space_id,
+    formattedHistory,
   );
 
-  return {
-    data: {
-      answer: response.answer,
-      metadata: {
-        docQueries: response.docQueries,
-        webQueries: response.webQueries,
-        docResults: response.docResults,
-        strategy: response.strategy,
-        reasoning: response.reasoning,
-      },
+  await db.insert(messages).values([
+    {
+      role: "user",
+      content: input,
+      threadId: thread_id,
     },
-  };
-}
-
-export async function generalSearchHandler(
-  input: string,
-  model: string,
-  provider: LLM_PROVIDERS,
-) {
-  const response = await curiositiAgent(input, model, "general", provider);
+    {
+      role: "assistant",
+      content: response.answer,
+      threadId: thread_id,
+      documentSearches: response.docQueries,
+      webSearches: response.webQueries,
+    },
+  ]);
 
   return {
     data: {
