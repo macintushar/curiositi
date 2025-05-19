@@ -1,18 +1,14 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import Image from "next/image";
 
-import logoDark from "@/assets/logo-dark.svg";
-import logoLight from "@/assets/logo.svg";
+import logo from "@/assets/icon.svg";
 
-export default function ThemedLogo({ height = 32 }: { height?: number }) {
-  const { theme } = useTheme();
+export default function ThemedLogo({ height = 28 }: { height?: number }) {
   return (
-    <Image
-      src={theme === "dark" ? (logoLight as string) : (logoDark as string)}
-      alt="Curiositi"
-      height={height}
-    />
+    <div className="flex items-center gap-2">
+      <Image src={logo as string} alt="Curiositi" height={height} />
+      <span className="text-lg text-black dark:text-white">Curiositi</span>
+    </div>
   );
 }
