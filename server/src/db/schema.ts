@@ -118,3 +118,32 @@ export const documents = pgTable("documents", {
     .references(() => user.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
+
+export const threads = pgTable("threads", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  createdBy: text("created_by")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  spaceId: uuid("space_id").references(() => spaces.id, {
+    onDelete: "cascade",
+  }),
+});
+
+export const messages = pgTable("messages", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  content: text("content").notNull(),
+  role: text("role", { enum: ["user", "assistant", "system"] }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  threadId: uuid("thread_id")
+    .notNull()
+    .references(() => threads.id, { onDelete: "cascade" }),
+  documentSearches: text("document_searches").array(),
+  webSearches: text("web_searches").array(),
+});

@@ -58,3 +58,8 @@ export const createErrorResponse = (
     requestId,
   },
 });
+
+export type Message = {
+  role: "user" | "assistant" | "system";
+  content: string;
+};

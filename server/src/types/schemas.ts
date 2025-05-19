@@ -13,6 +13,7 @@ export const SearchSchema = z.object({
   session_id: z.string().min(1, '"session_id" cannot be empty'),
   space_id: z.string(),
   provider: z.nativeEnum(LLM_PROVIDERS),
+  thread_id: z.string(),
 });
 
 export const STRATEGY_JSON_SCHEMA = z.object({

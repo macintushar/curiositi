@@ -1,10 +1,14 @@
-import { generateObject, generateText } from "ai";
+import { generateObject, generateText, type Message as AIMessage } from "ai";
 
-import { queryGenPrompt, synthPrompt, strategyPrompt } from "@/lib/prompts";
+import { queryGenPrompt, synthPrompt } from "@/lib/prompts";
 import { QUERY_JSON_SCHEMA, STRATEGY_JSON_SCHEMA } from "@/types/schemas";
 import { docSearchToolWithSpaceId } from "@/tools/docSearch";
 import { webSearchTool } from "@/tools/webSearch";
-import { CuriositiAgentMode, LLM_PROVIDERS } from "@/types";
+import {
+  CuriositiAgentMode,
+  LLM_PROVIDERS,
+  Message as HistoryMessage,
+} from "@/types";
 import { llm } from "@/lib/llms";
 
 type CuriositiAgentResponse = {
@@ -22,6 +26,7 @@ async function curiositiAgent(
   mode: CuriositiAgentMode,
   provider: LLM_PROVIDERS = LLM_PROVIDERS.OLLAMA,
   spaceId?: string,
+  history: HistoryMessage[] = [],
 ): Promise<CuriositiAgentResponse> {
   try {
     // Validate that spaceId is provided when mode is "space"
@@ -36,12 +41,19 @@ async function curiositiAgent(
     );
 
     // Determine if we can answer directly or need retrieval
+    const strategyMessages = [
+      {
+        role: "system",
+        content:
+          "You are a senior AI strategy planner determining the best approach to answer questions.",
+      },
+      ...history.map(({ role, content }) => ({ role, content })),
+      { role: "user", content: input },
+    ];
     const { object: strategyObj } = await generateObject({
       model: llmModel,
       schema: STRATEGY_JSON_SCHEMA,
-      system:
-        "You are a senior AI strategy planner determining the best approach to answer questions.",
-      prompt: strategyPrompt(input),
+      messages: strategyMessages as Omit<AIMessage, "id">[],
       temperature: 0.5,
     });
 
@@ -67,12 +79,19 @@ Guidelines:
 - If user instructs to only use the documents, explain that document search is not available in general mode.
 - Output only valid JSON.`;
 
+    const queryMessages = [
+      {
+        role: "system",
+        content:
+          "You are a search query specialist optimizing queries for different information sources.",
+      },
+      ...history.map(({ role, content }) => ({ role, content })),
+      { role: "user", content: modeSpecificPrompt },
+    ];
     const { object: queryPlan } = await generateObject({
       model: llmModel,
       schema: QUERY_JSON_SCHEMA(mode),
-      system:
-        "You are a search query specialist optimizing queries for different information sources.",
-      prompt: modeSpecificPrompt,
+      messages: queryMessages as Omit<AIMessage, "id">[],
       temperature: 0.6,
     });
 
@@ -154,11 +173,21 @@ Guidelines:
 
     // === SYNTHESIZER: Final Answer Generation Phase ===
     // Get the final answer
+    const synthMessages = [
+      {
+        role: "system",
+        content:
+          "You are an expert at synthesizing information from multiple sources into clear, accurate answers.",
+      },
+      ...history.map(({ role, content }) => ({ role, content })),
+      {
+        role: "user",
+        content: synthPrompt(input, formattedDocResults, formattedWebResults),
+      },
+    ];
     const { text: answer } = await generateText({
       model: llmModel,
-      system:
-        "You are an expert at synthesizing information from multiple sources into clear, accurate answers.",
-      prompt: synthPrompt(input, formattedDocResults, formattedWebResults),
+      messages: synthMessages as Omit<AIMessage, "id">[],
       temperature: 0.7,
     });
 
