@@ -21,6 +21,7 @@ import { uploadFileHandler } from "@/services/upload";
 import {
   createThreadHandler,
   deleteThreadHandler,
+  getThreadMessagesHandler,
   getThreadsHandler,
 } from "@/services/threads";
 
@@ -82,6 +83,20 @@ apiRouter.delete(
     }
     const { id } = c.req.valid("param");
     const result = await deleteThreadHandler(id);
+    return c.json(result);
+  },
+);
+
+apiRouter.post(
+  "/threads/:id/messages",
+  zValidator("param", z.object({ id: z.string() })),
+  async (c) => {
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+    const { id } = c.req.valid("param");
+    const result = await getThreadMessagesHandler(id);
     return c.json(result);
   },
 );

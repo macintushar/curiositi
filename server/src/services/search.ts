@@ -25,10 +25,16 @@ export async function searchHandler({
     columns: {
       role: true,
       content: true,
+      documentSearches: true,
+      webSearches: true,
+      documentSearchResults: true,
+      webSearchResults: true,
     },
   });
 
   const formattedHistory = formatHistory(history);
+
+  console.log(formattedHistory, history);
 
   const response = await curiositiAgent(
     input,
@@ -51,6 +57,8 @@ export async function searchHandler({
       threadId: thread_id,
       documentSearches: response.docQueries,
       webSearches: response.webQueries,
+      documentSearchResults: response.docResults,
+      webSearchResults: response.webResults,
     },
   ]);
 

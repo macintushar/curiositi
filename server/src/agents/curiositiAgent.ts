@@ -15,6 +15,7 @@ type CuriositiAgentResponse = {
   docQueries: string[];
   webQueries: string[];
   docResults: string[];
+  webResults: string[];
   answer: string;
   strategy: "direct" | "retrieve" | "error";
   reasoning: string;
@@ -62,6 +63,7 @@ async function curiositiAgent(
         docQueries: [],
         webQueries: [],
         docResults: [],
+        webResults: [],
         answer: strategyObj.answer,
         strategy: "direct",
         reasoning: "Direct answer from model knowledge",
@@ -164,6 +166,7 @@ Guidelines:
         docQueries: mode === "space" ? queryPlan.docQueries || [] : [],
         webQueries: queryPlan.webQueries || [],
         docResults: [],
+        webResults: [],
         answer:
           "I couldn't find relevant information to answer your question accurately. Please try rephrasing your question or asking something else.",
         strategy: "retrieve",
@@ -195,6 +198,7 @@ Guidelines:
       docQueries: mode === "space" ? queryPlan.docQueries || [] : [],
       webQueries: queryPlan.webQueries || [],
       docResults: formattedDocResults,
+      webResults: formattedWebResults,
       answer,
       strategy: "retrieve",
       reasoning: "Answer synthesized from retrieved information",
@@ -205,6 +209,7 @@ Guidelines:
       docQueries: [],
       webQueries: [],
       docResults: [],
+      webResults: [],
       answer:
         "I encountered an error while processing your question. Please try again later.",
       strategy: "error",

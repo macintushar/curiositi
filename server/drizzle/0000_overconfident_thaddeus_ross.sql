@@ -44,7 +44,9 @@ CREATE TABLE "messages" (
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"thread_id" uuid NOT NULL,
 	"document_searches" text[],
-	"web_searches" text[]
+	"web_searches" text[],
+	"document_search_results" text[],
+	"web_search_results" text[]
 );
 --> statement-breakpoint
 CREATE TABLE "session" (

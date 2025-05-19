@@ -10,6 +10,11 @@ export const textSplitter = (chunkSize = 500, chunkOverlap = 50) =>
 export const formatHistory = (history: Message[]) => {
   return history.map((message) => ({
     role: message.role,
-    content: message.content,
+    content: `Response: ${message.content}
+    Document Searches: ${message.documentSearches}
+    Web Searches: ${message.webSearches}
+    Document Search Results: ${message.documentSearchResults}
+    Web Search Results: ${message.webSearchResults}
+    `,
   }));
 };
