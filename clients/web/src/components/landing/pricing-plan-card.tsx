@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 interface PricingPlanCardProps {
@@ -9,7 +11,10 @@ interface PricingPlanCardProps {
   features: string[];
   isPopular?: boolean;
   ctaText: string;
+  CtaExtra?: React.ReactNode;
+  CtaIcon?: LucideIcon;
   ctaVariant?: "default" | "outline";
+  ctaHref?: string;
   className?: string;
 }
 
@@ -38,7 +43,10 @@ export function PricingPlanCard({
   features,
   isPopular,
   ctaText,
+  CtaExtra,
+  CtaIcon,
   ctaVariant = "default",
+  ctaHref,
   className,
 }: PricingPlanCardProps) {
   return (
@@ -68,9 +76,13 @@ export function PricingPlanCard({
           </li>
         ))}
       </ul>
-      <Button variant={ctaVariant} className="w-full rounded-full">
-        {ctaText}
-      </Button>
+      <Link href={ctaHref ?? "#"}>
+        <Button variant={ctaVariant} className="w-full rounded-full">
+          {CtaIcon && <CtaIcon className="h-4 w-4" />}
+          {CtaExtra && CtaExtra}
+          {ctaText}
+        </Button>
+      </Link>
     </div>
   );
 }

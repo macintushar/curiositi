@@ -1,16 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+
 import { Search, FileText, Globe, Zap, MessageSquare } from "lucide-react";
+
 import { Section } from "@/components/landing/section";
 import { FeatureCard } from "@/components/landing/feature-card";
 import { HowItWorksStep } from "@/components/landing/how-it-works-step";
 import { UseCaseCard } from "@/components/landing/use-case-card";
 import { PricingPlanCard } from "@/components/landing/pricing-plan-card";
-import { CallToActionSection } from "@/components/landing/call-to-action-section";
 
-import logo from "@/assets/logo-dark.svg";
+import { Button } from "@/components/ui/button";
+import ThemedLogo from "@/components/themes/themed-logo";
+import ThemeSwitcher from "@/components/themes/theme-switcher";
 
+import agentFlowImage from "@/assets/images/agent-flow.png";
+import GithubIcon from "@/assets/icons/github-icon";
 const navLinks = [
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
@@ -19,11 +23,12 @@ const navLinks = [
 ];
 
 const footerLinks = [
-  { href: "#", label: "About" },
-  { href: "#features", label: "Features" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#", label: "Blog" },
-  { href: "#", label: "Contact" },
+  { href: "#features", label: "Features", isExternal: false },
+  {
+    href: "https://github.com/macintushar/curiositi",
+    label: "GitHub",
+    isExternal: true,
+  },
 ];
 
 export default function LandingPage() {
@@ -32,7 +37,7 @@ export default function LandingPage() {
       <header className="bg-background/80 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-md">
         <div className="flex h-16 items-center justify-between px-4 md:px-6">
           <Link href="/" className="flex items-center gap-2">
-            <Image src={logo as string} alt="Curiositi" height={32} />
+            <ThemedLogo />
           </Link>
           <nav className="hidden gap-8 md:flex">
             {navLinks.map((link) => (
@@ -55,6 +60,7 @@ export default function LandingPage() {
             <Button variant="default" className="rounded-full">
               Get Started
             </Button>
+            <ThemeSwitcher />
           </div>
         </div>
       </header>
@@ -187,11 +193,11 @@ export default function LandingPage() {
             <div className="relative overflow-hidden rounded-xl border shadow-lg">
               <div className="from-primary/5 absolute inset-0 bg-gradient-to-br to-transparent"></div>
               <Image
-                src="/placeholder.svg?height=400&width=500"
+                src={agentFlowImage}
                 width={500}
                 height={400}
                 alt="RAG System Diagram"
-                className="h-auto w-full object-cover"
+                className="h-auto w-full object-cover p-1"
               />
             </div>
             <div className="space-y-8">
@@ -277,22 +283,18 @@ export default function LandingPage() {
                 "Basic web retrieval",
               ]}
               ctaText="GitHub"
+              CtaExtra={<GithubIcon />}
+              ctaHref="https://github.com/macintushar/curiositi"
               className="w-full md:w-1/3"
             />
           </div>
         </Section>
-
-        <CallToActionSection
-          title="Ready to transform how you work with information?"
-          subtitle="Start getting better answers with Curiositi."
-          primaryActionText="Get Started Free"
-        />
       </main>
       <footer className="bg-background w-full border-t">
         <div className="flex flex-col gap-8 px-4 py-8 md:px-6">
           <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-8">
             <Link href="/" className="flex items-center gap-2">
-              <Image src={logo as string} alt="Curiositi" height={32} />
+              <ThemedLogo />
             </Link>
             <nav className="flex flex-wrap gap-6 md:ml-auto">
               {footerLinks.map((link) => (
@@ -300,6 +302,7 @@ export default function LandingPage() {
                   key={link.href + link.label}
                   href={link.href}
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                  target={link.isExternal ? "_blank" : "_self"}
                 >
                   {link.label}
                 </Link>
