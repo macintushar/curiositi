@@ -4,8 +4,7 @@ import { queryGenPrompt, synthPrompt, strategyPrompt } from "@/lib/prompts";
 import { QUERY_JSON_SCHEMA, STRATEGY_JSON_SCHEMA } from "@/types/schemas";
 import { docSearchToolWithSpaceId } from "@/tools/docSearch";
 import { webSearchTool } from "@/tools/webSearch";
-import { CuriositiAgentMode } from "@/types";
-import { LLM_PROVIDERS } from "@/constants";
+import { CuriositiAgentMode, LLM_PROVIDERS } from "@/types";
 import { llm } from "@/lib/llms";
 
 type CuriositiAgentResponse = {

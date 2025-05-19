@@ -1,15 +1,12 @@
-export enum LLM_PROVIDERS {
-  OPENROUTER = "openrouter",
-  OLLAMA = "ollama",
-  OPENAI = "openai",
-}
+import { EMBEDDING_PROVIDERS } from "./types";
 
 // Server
 export const SERVER_PORT = process.env.SERVER_PORT || 3030;
 
 // Default Providers
 export const DEFAULT_EMBEDDING_PROVIDER =
-  process.env.DEFAULT_EMBEDDING_PROVIDER || LLM_PROVIDERS.OLLAMA;
+  (process.env.DEFAULT_EMBEDDING_PROVIDER as EMBEDDING_PROVIDERS) ||
+  EMBEDDING_PROVIDERS.OLLAMA;
 
 // Host
 export const HOST =
@@ -24,10 +21,6 @@ export const DATABASE_URL =
 // Better Auth
 export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
 export const BETTER_AUTH_URL = HOST;
-
-// Chroma
-export const CHROMA_URL = process.env.CHROMA_URL || "http://localhost:8090";
-export const CHROMA_COLLECTION_NAME = "curiositi_docs";
 
 // Ollama
 export const OLLAMA_BASE_URL =

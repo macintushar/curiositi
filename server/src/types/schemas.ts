@@ -1,6 +1,5 @@
-import { LLM_PROVIDERS } from "@/constants";
 import { z } from "zod";
-import { CuriositiAgentMode } from ".";
+import { CuriositiAgentMode, LLM_PROVIDERS } from ".";
 
 export const UploadSchema = z.object({
   file: z.instanceof(File),
