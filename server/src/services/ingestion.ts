@@ -1,6 +1,9 @@
 import { SUPPORTED_FILE_TYPES } from "@/constants";
 import { textSplitter } from "@/lib/utils";
-import { getVectorStore, generateEmbeddings } from "@/lib/vectorStore";
+import {
+  addDocumentsToVectorStore,
+  generateEmbeddings,
+} from "@/lib/vectorStore";
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 
 async function extractTextFromPdf(fileBuffer: Buffer<ArrayBuffer>) {
@@ -19,6 +22,7 @@ export async function processAndStoreDocument(
   mimeType: string,
   fileId: string,
   spaceId: string,
+  userId: string,
 ): Promise<void> {
   console.log(`Processing ${originalFilename} (${mimeType})...`);
 
@@ -43,47 +47,29 @@ export async function processAndStoreDocument(
       return;
     }
 
-    console.log(
-      `Extracted text from ${originalFilename} (length: ${text.length}). Splitting...`,
-    );
-
     const chunks = await textSplitter().splitText(text);
-    console.log(`Split into ${chunks.length} chunks.`);
 
     if (chunks.length === 0) {
       console.warn(`No chunks generated for ${originalFilename}. Skipping.`);
       return;
     }
 
-    // Create documents with metadata
-    const documents = chunks;
-    const ids = chunks.map(
-      (_, index) => `${originalFilename}-${index}-${Date.now()}`,
-    );
-    const metadatas = chunks.map((_, index) => ({
-      source: originalFilename,
-      chunk_index: index,
-      file_id: fileId,
-      space_id: spaceId,
-    }));
-
-    console.log(`Adding ${documents.length} document chunks to ChromaDB...`);
-
     // Generate embeddings for the chunks
     const embeddings = await generateEmbeddings(chunks);
+    {
+      chunks.forEach((chunk, index) => {
+        addDocumentsToVectorStore(
+          chunk,
+          spaceId,
+          fileId,
+          userId,
+          embeddings[index],
+          originalFilename,
+        );
+      });
+    }
 
-    // Get the vector store and add the documents
-    const collection = await getVectorStore();
-    await collection.add({
-      ids,
-      embeddings,
-      metadatas,
-      documents,
-    });
-
-    console.log(
-      `Successfully processed and stored ${originalFilename} in ChromaDB.`,
-    );
+    console.log(`Successfully processed and stored ${originalFilename}.`);
   } catch (error) {
     console.error(`Error processing file ${originalFilename}:`, error);
     throw new Error(`Failed to process file ${originalFilename}`);

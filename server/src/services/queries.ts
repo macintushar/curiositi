@@ -3,7 +3,7 @@ import db from "@/db";
 import { and, desc, eq } from "drizzle-orm";
 
 export async function addFileToDB(
-  buffer: Buffer<ArrayBuffer>,
+  buffer: Buffer,
   name: string,
   type: string,
   fileSize: number,
@@ -14,7 +14,7 @@ export async function addFileToDB(
     const isFileInSpace = await db
       .select()
       .from(files)
-      .where(and(eq(files.hash, hash), eq(files.space_id, spaceId)));
+      .where(and(eq(files.hash, hash), eq(files.spaceId, spaceId)));
 
     if (isFileInSpace.length > 0) {
       throw new Error("File already exists in space");
@@ -26,16 +26,16 @@ export async function addFileToDB(
         name,
         type,
         file: buffer,
-        file_size: fileSize.toString(),
-        space_id: spaceId,
+        fileSize: fileSize.toString(),
+        spaceId,
         hash,
       })
       .returning({
         id: files.id,
         name: files.name,
         type: files.type,
-        file_size: files.file_size,
-        space_id: files.space_id,
+        fileSize: files.fileSize,
+        spaceId: files.spaceId,
       });
 
     return file;
@@ -52,11 +52,11 @@ export async function getFilesFromDB(spaceId: string) {
         id: true,
         name: true,
         type: true,
-        file_size: true,
-        space_id: true,
-        created_at: true,
+        fileSize: true,
+        spaceId: true,
+        createdAt: true,
       },
-      where: eq(files.space_id, spaceId),
+      where: eq(files.spaceId, spaceId),
     });
     return data;
   } catch (error) {
@@ -70,7 +70,7 @@ export async function getFileFromDB(id: string, spaceId: string) {
     const file = await db
       .select()
       .from(files)
-      .where(and(eq(files.id, id), eq(files.space_id, spaceId)));
+      .where(and(eq(files.id, id), eq(files.spaceId, spaceId)));
     return file;
   } catch (error) {
     console.error("Error getting file from DB:", error);
@@ -82,7 +82,7 @@ export async function deleteFileFromDB(id: string, spaceId: string) {
   try {
     await db
       .delete(files)
-      .where(and(eq(files.id, id), eq(files.space_id, spaceId)));
+      .where(and(eq(files.id, id), eq(files.spaceId, spaceId)));
     return true;
   } catch (error) {
     console.error("Error deleting file from DB:", error);
@@ -94,7 +94,7 @@ export async function addSpaceToDB(name: string, userId: string) {
   try {
     const space = await db
       .insert(spaces)
-      .values({ name, created_by: userId })
+      .values({ name, createdBy: userId })
       .returning();
     return space;
   } catch (error) {
@@ -108,8 +108,8 @@ export async function getSpacesFromDB() {
     const data = await db
       .select()
       .from(spaces)
-      .orderBy(desc(spaces.updated_at))
-      .leftJoin(user, eq(spaces.created_by, user.id));
+      .orderBy(desc(spaces.updatedAt))
+      .leftJoin(user, eq(spaces.createdBy, user.id));
     return data;
   } catch (error) {
     console.error("Error getting spaces from DB:", error);
@@ -123,7 +123,7 @@ export async function getSpaceFromDB(id: string) {
       .select()
       .from(spaces)
       .where(eq(spaces.id, id))
-      .leftJoin(user, eq(spaces.created_by, user.id));
+      .leftJoin(user, eq(spaces.createdBy, user.id));
     return data;
   } catch (error) {
     console.error("Error getting space from DB:", error);

@@ -3,39 +3,33 @@ import {
   getFileFromDB,
   deleteFileFromDB,
 } from "@/services/queries";
-import { Context } from "hono";
 
-export async function getFilesHandler(c: Context) {
-  const { space_id } = c.req.param();
+export async function getFilesHandler(space_id: string) {
   const files = await getFilesFromDB(space_id);
-  return c.json({ data: files });
+  return { data: files };
 }
 
-export async function getFileHandler(c: Context) {
-  const { id, space_id } = c.req.param();
-
+export async function getFileHandler(id: string, space_id: string) {
   const fileResult = await getFileFromDB(id, space_id);
 
   if (fileResult.length === 0) {
-    return c.json({ error: "File not found" }, 404);
+    throw new Error("File not found");
   }
 
   const file = fileResult[0];
-
-  c.header("Content-Type", file.type);
-  c.header("Content-Disposition", `attachment; filename="${file.name}"`);
-
-  return c.body(file.file);
+  return {
+    contentType: file.type,
+    fileName: file.name,
+    data: file.file,
+  };
 }
 
-export async function deleteFileHandler(c: Context) {
-  const { id, space_id } = c.req.param();
-
+export async function deleteFileHandler(id: string, space_id: string) {
   const deletedFile = await deleteFileFromDB(id, space_id);
 
   if (!deletedFile) {
-    return c.json({ error: "File not found" }, 404);
+    throw new Error("File not found");
   }
 
-  return c.json({ data: { message: "File deleted successfully" } });
+  return { data: { message: "File deleted successfully" } };
 }
