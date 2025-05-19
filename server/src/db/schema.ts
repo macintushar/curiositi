@@ -146,4 +146,6 @@ export const messages = pgTable("messages", {
     .references(() => threads.id, { onDelete: "cascade" }),
   documentSearches: text("document_searches").array(),
   webSearches: text("web_searches").array(),
+  documentSearchResults: text("document_search_results").array(),
+  webSearchResults: text("web_search_results").array(),
 });

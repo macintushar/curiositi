@@ -1,5 +1,5 @@
 {
-  "id": "da3c9d49-265d-4148-9b4c-65e5e5df2f66",
+  "id": "55a2747a-428e-4158-8bfb-164643de7527",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -340,6 +340,18 @@
         },
         "web_searches": {
           "name": "web_searches",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "document_search_results": {
+          "name": "document_search_results",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "web_search_results": {
+          "name": "web_search_results",
           "type": "text[]",
           "primaryKey": false,
           "notNull": false

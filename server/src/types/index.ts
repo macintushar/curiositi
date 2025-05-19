@@ -62,4 +62,8 @@ export const createErrorResponse = (
 export type Message = {
   role: "user" | "assistant" | "system";
   content: string;
+  documentSearches?: string[] | null;
+  webSearches?: string[] | null;
+  documentSearchResults?: string[] | null;
+  webSearchResults?: string[] | null;
 };
