@@ -2,7 +2,6 @@ import { SUPPORTED_FILE_TYPES } from "@/constants";
 import { addFileToDB } from "@/services/queries";
 import { processAndStoreDocument } from "@/services/ingestion";
 import { createHash } from "crypto";
-import { Context } from "hono";
 
 interface FileUpload {
   name: string;
@@ -11,20 +10,14 @@ interface FileUpload {
   arrayBuffer: () => Promise<ArrayBuffer>;
 }
 
-export async function uploadFileHandler(c: Context) {
+export async function uploadFileHandler(
+  file: FileUpload,
+  spaceId: string,
+  userId: string,
+) {
   try {
-    const formData = await c.req.parseBody();
-    const file = formData.file as FileUpload;
-    const space_id = formData.space_id as string;
-
-    if (!file || typeof file === "string") {
-      return c.json(
-        {
-          error: "Invalid file upload",
-          details: "No file was uploaded or invalid file format",
-        },
-        400,
-      );
+    if (!file) {
+      throw new Error("No file was uploaded or invalid file format");
     }
 
     const fileType = file.type.split(";")[0];
@@ -34,14 +27,10 @@ export async function uploadFileHandler(c: Context) {
     );
 
     if (!SUPPORTED_FILE_TYPES.includes(fileType)) {
-      return c.json(
-        {
-          error: "Unsupported file type.",
-          details: `Uploaded file type: ${fileType}. Only ${SUPPORTED_FILE_TYPES.join(
-            ", ",
-          )} are supported.`,
-        },
-        415,
+      throw new Error(
+        `Unsupported file type. Uploaded file type: ${fileType}. Only ${SUPPORTED_FILE_TYPES.join(
+          ", ",
+        )} are supported.`,
       );
     }
 
@@ -53,7 +42,7 @@ export async function uploadFileHandler(c: Context) {
       file.name,
       fileType,
       file.size,
-      space_id,
+      spaceId,
       fileHash,
     );
 
@@ -62,23 +51,23 @@ export async function uploadFileHandler(c: Context) {
       file.name,
       fileType,
       fileUpload[0].id,
-      space_id,
-      user_id,
+      spaceId,
+      userId,
     );
 
-    return c.json({
+    return {
       data: {
         message: `File '${file.name}' processed successfully.`,
         file: {
           id: fileUpload[0].id,
           name: fileUpload[0].name,
           type: fileUpload[0].type,
-          size: fileUpload[0].file_size,
-          space_id: fileUpload[0].space_id,
+          size: fileUpload[0].fileSize,
+          spaceId: fileUpload[0].spaceId,
           hash: fileHash,
         },
       },
-    });
+    };
   } catch (error: unknown) {
     console.error("Error handling file upload:", error);
     let errorDetails = "Unknown error";
@@ -87,12 +76,6 @@ export async function uploadFileHandler(c: Context) {
     } else {
       errorDetails = String(error);
     }
-    return c.json(
-      {
-        error: "Failed to process uploaded file.",
-        details: errorDetails,
-      },
-      500,
-    );
+    throw new Error(`Failed to process uploaded file: ${errorDetails}`);
   }
 }

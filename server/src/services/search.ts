@@ -1,9 +1,12 @@
 import curiositiAgent from "@/agents/curiositiAgent";
-import { Context } from "hono";
+import { LLM_PROVIDERS } from "@/types";
 
-export async function searchHandler(c: Context) {
-  const { input, model, space_id, provider } = await c.req.json();
-
+export async function searchHandler(
+  input: string,
+  model: string,
+  space_id: string,
+  provider: LLM_PROVIDERS,
+) {
   const response = await curiositiAgent(
     input,
     model,
@@ -12,7 +15,7 @@ export async function searchHandler(c: Context) {
     space_id,
   );
 
-  return c.json({
+  return {
     data: {
       answer: response.answer,
       metadata: {
@@ -23,15 +26,17 @@ export async function searchHandler(c: Context) {
         reasoning: response.reasoning,
       },
     },
-  });
+  };
 }
 
-export async function generalSearchHandler(c: Context) {
-  const { input, model, provider } = await c.req.json();
-
+export async function generalSearchHandler(
+  input: string,
+  model: string,
+  provider: LLM_PROVIDERS,
+) {
   const response = await curiositiAgent(input, model, "general", provider);
 
-  return c.json({
+  return {
     data: {
       answer: response.answer,
       metadata: {
@@ -42,5 +47,5 @@ export async function generalSearchHandler(c: Context) {
         reasoning: response.reasoning,
       },
     },
-  });
+  };
 }

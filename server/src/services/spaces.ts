@@ -3,27 +3,22 @@ import {
   getSpaceFromDB,
   addSpaceToDB,
 } from "@/services/queries";
-import { Context } from "hono";
 
-export async function getSpacesHandler(c: Context) {
+export async function getSpacesHandler() {
   const data = await getSpacesFromDB();
-  return c.json({ data });
+  return { data };
 }
 
-export async function createSpaceHandler(c: Context) {
-  const { name } = await c.req.json();
-  const user = c.get("user");
-
-  if (!user) {
-    return c.json({ error: "Unauthorized" }, 401);
+export async function createSpaceHandler(name: string, userId: string) {
+  if (!userId) {
+    throw new Error("Unauthorized");
   }
 
-  const data = await addSpaceToDB(name, user.id);
-  return c.json({ data });
+  const data = await addSpaceToDB(name, userId);
+  return { data };
 }
 
-export async function getSpaceHandler(c: Context) {
-  const { id } = c.req.param();
+export async function getSpaceHandler(id: string) {
   const data = await getSpaceFromDB(id);
-  return c.json({ data: data[0] });
+  return { data: data[0] };
 }

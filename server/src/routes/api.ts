@@ -49,45 +49,123 @@ apiRouter.use("*", async (c, next) => {
 });
 
 // Search routes
-apiRouter.post("/search", zValidator("json", SearchSchema), searchHandler);
+apiRouter.post("/search", zValidator("json", SearchSchema), async (c) => {
+  const { input, model, space_id, provider } = await c.req.json();
+  const result = await searchHandler(input, model, space_id, provider);
+  return c.json(result);
+});
+
 apiRouter.post(
   "/search/general",
   zValidator("json", SearchSchema.omit({ space_id: true })),
-  generalSearchHandler,
+  async (c) => {
+    const { input, model, provider } = await c.req.json();
+    const result = await generalSearchHandler(input, model, provider);
+    return c.json(result);
+  },
 );
 
 // Spaces routes
-apiRouter.get("/spaces", getSpacesHandler);
-apiRouter.post(
-  "/spaces",
-  zValidator("json", CreateSpaceSchema),
-  createSpaceHandler,
-);
-apiRouter.get("/spaces/:id", getSpaceHandler);
+apiRouter.get("/spaces", async (c) => {
+  const result = await getSpacesHandler();
+  return c.json(result);
+});
+
+apiRouter.post("/spaces", zValidator("json", CreateSpaceSchema), async (c) => {
+  const { name } = await c.req.json();
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+  const result = await createSpaceHandler(name, user.id);
+  return c.json(result);
+});
+
+apiRouter.get("/spaces/:id", async (c) => {
+  const { id } = c.req.param();
+  const result = await getSpaceHandler(id);
+  return c.json(result);
+});
 
 // Files routes
-apiRouter.post(
-  "/files/upload",
-  zValidator("form", UploadSchema),
-  uploadFileHandler,
-);
+apiRouter.post("/files/upload", zValidator("form", UploadSchema), async (c) => {
+  const formData = await c.req.parseBody();
+  const file = formData.file;
+  const space_id = formData.space_id as string;
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  if (!file || typeof file === "string") {
+    return c.json(
+      {
+        error: "Invalid file upload",
+        details: "No file was uploaded or invalid file format",
+      },
+      400,
+    );
+  }
+
+  try {
+    const result = await uploadFileHandler(file, space_id, user.id);
+    return c.json(result);
+  } catch (error) {
+    if (error instanceof Error) {
+      return c.json({ error: error.message }, 400);
+    }
+    return c.json({ error: "Unknown error occurred" }, 500);
+  }
+});
 
 apiRouter.get(
   "/files/:space_id",
   zValidator("param", z.object({ space_id: z.string() })),
-  getFilesHandler,
+  async (c) => {
+    const { space_id } = c.req.param();
+    const result = await getFilesHandler(space_id);
+    return c.json(result);
+  },
 );
 
 apiRouter.post(
   "/files/:space_id/:id",
   zValidator("param", z.object({ space_id: z.string(), id: z.string() })),
-  getFileHandler,
+  async (c) => {
+    const { id, space_id } = c.req.param();
+    try {
+      const result = await getFileHandler(id, space_id);
+      c.header("Content-Type", result.contentType);
+      c.header(
+        "Content-Disposition",
+        `attachment; filename="${result.fileName}"`,
+      );
+      return c.body(result.data);
+    } catch (error) {
+      if (error instanceof Error) {
+        return c.json({ error: error.message }, 404);
+      }
+      return c.json({ error: "Unknown error occurred" }, 500);
+    }
+  },
 );
 
 apiRouter.delete(
   "/files/:space_id/:id",
   zValidator("param", z.object({ space_id: z.string(), id: z.string() })),
-  deleteFileHandler,
+  async (c) => {
+    const { id, space_id } = c.req.param();
+    try {
+      const result = await deleteFileHandler(id, space_id);
+      return c.json(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        return c.json({ error: error.message }, 404);
+      }
+      return c.json({ error: "Unknown error occurred" }, 500);
+    }
+  },
 );
 
 export default apiRouter;

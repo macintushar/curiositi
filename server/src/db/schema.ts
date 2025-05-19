@@ -110,9 +110,7 @@ export const documents = pgTable("documents", {
   spaceId: uuid("space_id")
     .notNull()
     .references(() => spaces.id, { onDelete: "cascade" }),
-  filename: text("filename")
-    .notNull()
-    .references(() => files.name, { onDelete: "cascade" }),
+  filename: text("filename").notNull(),
   content: text("content").notNull(),
   embedding: vector({ dimensions: 1024 }).notNull(),
   createdBy: text("created_by")

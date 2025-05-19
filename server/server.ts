@@ -1,6 +1,5 @@
 import app from "./src";
 import {
-  CHROMA_URL,
   OLLAMA_BASE_URL,
   SEARXNG_URL,
   SERVER_PORT,
@@ -17,7 +16,6 @@ try {
   console.log(
     `Ollama URL: ${OLLAMA_BASE_URL}
     SearXNG URL: ${SEARXNG_URL}
-    Chroma URL: ${CHROMA_URL}
     Database URL: ${DATABASE_URL}
     Default Embedding Provider: ${DEFAULT_EMBEDDING_PROVIDER}`,
   );
