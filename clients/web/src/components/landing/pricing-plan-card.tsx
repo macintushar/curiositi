@@ -15,6 +15,7 @@ interface PricingPlanCardProps {
   CtaIcon?: LucideIcon;
   ctaVariant?: "default" | "outline";
   ctaHref?: string;
+  ctaHrefExternal?: boolean;
   className?: string;
 }
 
@@ -47,6 +48,7 @@ export function PricingPlanCard({
   CtaIcon,
   ctaVariant = "default",
   ctaHref,
+  ctaHrefExternal = false,
   className,
 }: PricingPlanCardProps) {
   return (
@@ -76,7 +78,7 @@ export function PricingPlanCard({
           </li>
         ))}
       </ul>
-      <Link href={ctaHref ?? "#"}>
+      <Link href={ctaHref ?? "#"} target={ctaHrefExternal ? "_blank" : "_self"}>
         <Button variant={ctaVariant} className="w-full rounded-full">
           {CtaIcon && <CtaIcon className="h-4 w-4" />}
           {CtaExtra && CtaExtra}

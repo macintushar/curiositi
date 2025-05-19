@@ -23,7 +23,7 @@ export function Section({
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="max-w-3xl space-y-2">
             {titlePrefix}
-            <h2 className="font-serif text-3xl font-medium tracking-tight md:text-4xl">
+            <h2 className="font-serif text-3xl font-medium tracking-tight text-emerald-700 md:text-4xl">
               {title}
             </h2>
             <p className="text-muted-foreground text-xl">{subtitle}</p>

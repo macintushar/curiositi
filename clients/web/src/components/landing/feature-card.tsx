@@ -17,7 +17,7 @@ export function FeatureCard({
 }: FeatureCardProps) {
   return (
     <div className="group hover:bg-background flex flex-col space-y-4 rounded-lg p-6 transition-all">
-      <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-lg">
+      <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg text-emerald-700">
         {icon}
       </div>
       <div className="space-y-2">

@@ -14,6 +14,7 @@ import ThemedLogo from "@/components/themes/themed-logo";
 import ThemeSwitcher from "@/components/themes/theme-switcher";
 
 import agentFlowImage from "@/assets/images/agent-flow.png";
+import AgentFlow from "@/assets/images/agent-flow";
 import GithubIcon from "@/assets/icons/github-icon";
 const navLinks = [
   { href: "#features", label: "Features" },
@@ -71,7 +72,7 @@ export default function LandingPage() {
               <div className="bg-secondary text-secondary-foreground mb-4 inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium">
                 <span>Introducing Curiositi</span>
               </div>
-              <h1 className="font-serif text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-6xl">
+              <h1 className="font-serif text-4xl font-medium tracking-tight text-balance text-emerald-700 md:text-5xl lg:text-6xl">
                 <span className="text-gradient">Precise answers</span> from your
                 documents and the web
               </h1>
@@ -197,7 +198,7 @@ export default function LandingPage() {
                 width={500}
                 height={400}
                 alt="RAG System Diagram"
-                className="h-auto w-full object-cover p-1"
+                className="h-auto w-full bg-white object-cover p-1"
               />
             </div>
             <div className="space-y-8">
@@ -241,22 +242,16 @@ export default function LandingPage() {
               icon={<MessageSquare className="h-6 w-6" />}
               title="Research & Analysis"
               description="Researchers use Curiositi to analyze documents and find connections across multiple sources, saving hours of manual work."
-              quote='"Curiositi has cut my research time in half by finding relevant information across all my documents and the latest publications."'
-              author="Dr. Sarah Chen, Research Scientist"
             />
             <UseCaseCard
               icon={<MessageSquare className="h-6 w-6" />}
               title="Knowledge Management"
               description="Companies use Curiositi to make their internal knowledge bases accessible and actionable for all employees."
-              quote='"Our team can now instantly access information from our knowledge base combined with the latest industry trends."'
-              author="Michael Torres, CTO at TechFlow"
             />
             <UseCaseCard
               icon={<MessageSquare className="h-6 w-6" />}
-              title="Content Creation"
-              description="Writers and marketers use Curiositi to research topics and generate content backed by accurate, up-to-date information."
-              quote='"Curiositi helps me create content that&apos;s both creative and factually accurate by pulling from my research and current trends."'
-              author="Emma Rodriguez, Content Strategist"
+              title="Study & Research"
+              description="Students and researchers use Curiositi to research topics and generate content backed by accurate, up-to-date information based on their lectures, textbooks, and other documents."
             />
           </div>
         </Section>
@@ -278,14 +273,17 @@ export default function LandingPage() {
               price=""
               priceSuffix=""
               features={[
-                "Upload up to 100 documents",
-                "100 queries per day",
-                "Basic web retrieval",
+                "Upload unlimited documents",
+                "Unlimited queries",
+                "Unlimited web retrieval",
+                "Bring your own models",
+                "Own your data, forever",
               ]}
               ctaText="GitHub"
               CtaExtra={<GithubIcon />}
               ctaHref="https://github.com/macintushar/curiositi"
               className="w-full md:w-1/3"
+              ctaHrefExternal
             />
           </div>
         </Section>
