@@ -13,6 +13,7 @@ export default function ThemeSwitcher() {
       variant="outline"
       className="rounded-full"
     >
+      <span className="sr-only">Toggle theme</span>
       <SunMoonIcon />
     </Button>
   );

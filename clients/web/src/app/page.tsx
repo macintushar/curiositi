@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 
 import { Search, FileText, Globe, Zap, MessageSquare } from "lucide-react";
@@ -10,67 +9,24 @@ import { UseCaseCard } from "@/components/landing/use-case-card";
 import { PricingPlanCard } from "@/components/landing/pricing-plan-card";
 
 import { Button } from "@/components/ui/button";
-import ThemedLogo from "@/components/themes/themed-logo";
-import ThemeSwitcher from "@/components/themes/theme-switcher";
 
 import agentFlowImage from "@/assets/images/agent-flow.png";
 import GithubIcon from "@/assets/icons/github-icon";
+import Header from "@/views/landing/header";
+import Footer from "@/views/landing/footer";
 
-const navLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#use-cases", label: "Use Cases" },
-  { href: "#pricing", label: "Pricing" },
-];
-
-const footerLinks = [
-  { href: "#features", label: "Features", isExternal: false },
-  {
-    href: "https://github.com/macintushar/curiositi",
-    label: "GitHub",
-    isExternal: true,
-  },
-];
+import { ghURL } from "@/constants";
 
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen w-full flex-col items-center">
-      <header className="bg-background/80 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-md">
-        <div className="flex h-16 items-center justify-between px-4 md:px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <ThemedLogo />
-          </Link>
-          <nav className="hidden gap-8 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/login"
-              className="text-muted-foreground hover:text-foreground hidden text-sm font-medium transition-colors md:block"
-            >
-              Log In
-            </Link>
-            <Button variant="default" className="rounded-full">
-              Get Started
-            </Button>
-            <ThemeSwitcher />
-          </div>
-        </div>
-      </header>
+      <Header />
       <main className="w-full flex-1 pt-4">
         <section className="w-full py-20 md:py-32 lg:py-40">
           <div className="px-4 md:px-6">
             <div className="animate-fade-up mx-auto max-w-3xl space-y-8 text-center">
               <div className="bg-secondary text-secondary-foreground mb-4 inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium">
-                <span>Introducing Curiositi</span>
+                <span>🎉 Introducing Curiositi! 🎉</span>
               </div>
               <h1 className="text-primary font-serif text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-6xl">
                 <span className="text-gradient">Get answers</span> from your
@@ -241,17 +197,17 @@ export default function LandingPage() {
             <UseCaseCard
               icon={<MessageSquare className="h-6 w-6" />}
               title="Research & Analysis"
-              description="Researchers use Curiositi to analyze documents and find connections across multiple sources, saving hours of manual work."
+              description="Use Curiositi to analyze documents and find connections across multiple sources, saving hours of manual work."
             />
             <UseCaseCard
               icon={<MessageSquare className="h-6 w-6" />}
               title="Knowledge Management"
-              description="Companies use Curiositi to make their internal knowledge bases accessible and actionable for all employees."
+              description="Use Curiositi to make their internal knowledge bases accessible and actionable for all employees."
             />
             <UseCaseCard
               icon={<MessageSquare className="h-6 w-6" />}
               title="Study & Research"
-              description="Students and researchers use Curiositi to research topics and generate content backed by accurate, up-to-date information based on their lectures, textbooks, and other documents."
+              description="Use Curiositi to research topics and generate content backed by accurate, up-to-date information based on their lectures, textbooks, and other documents."
             />
           </div>
         </Section>
@@ -281,53 +237,14 @@ export default function LandingPage() {
               ]}
               ctaText="GitHub"
               CtaExtra={<GithubIcon />}
-              ctaHref="https://github.com/macintushar/curiositi"
+              ctaHref={ghURL}
               className="w-full md:w-1/3"
               ctaHrefExternal
             />
           </div>
         </Section>
       </main>
-      <footer className="bg-background w-full border-t">
-        <div className="flex flex-col gap-8 px-4 py-8 md:px-6">
-          <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-8">
-            <Link href="/" className="flex items-center gap-2">
-              <ThemedLogo />
-            </Link>
-            <nav className="flex flex-wrap gap-6 md:ml-auto">
-              {footerLinks.map((link) => (
-                <Link
-                  key={link.href + link.label}
-                  href={link.href}
-                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-                  target={link.isExternal ? "_blank" : "_self"}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-            <p className="text-muted-foreground text-xs">
-              &copy; {new Date().getFullYear()} Curiositi. All rights reserved.
-            </p>
-            <div className="flex gap-6">
-              <Link
-                href="#"
-                className="text-muted-foreground hover:text-foreground text-xs transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="#"
-                className="text-muted-foreground hover:text-foreground text-xs transition-colors"
-              >
-                Privacy Policy
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
