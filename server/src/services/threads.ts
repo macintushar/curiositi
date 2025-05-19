@@ -1,5 +1,5 @@
 import db from "@/db";
-import { threads } from "@/db/schema";
+import { messages, threads } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function getThreadsHandler(userId: string) {
@@ -29,4 +29,11 @@ export async function deleteThreadHandler(threadId: string) {
       message: deletedThread,
     },
   };
+}
+
+export async function getThreadMessagesHandler(threadId: string) {
+  const threadMessages = await db.query.messages.findMany({
+    where: eq(messages.threadId, threadId),
+  });
+  return { data: threadMessages };
 }
