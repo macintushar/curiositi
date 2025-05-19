@@ -25,8 +25,10 @@ export default function LandingPage() {
         <section className="w-full py-20 md:py-32 lg:py-40">
           <div className="px-4 md:px-6">
             <div className="animate-fade-up mx-auto max-w-3xl space-y-8 text-center">
-              <div className="bg-secondary text-secondary-foreground mb-4 inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium">
-                <span>🎉 Introducing Curiositi! 🎉</span>
+              <div className="bg-secondary text-secondary-foreground mb-4 inline-flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm font-medium">
+                <span>🎉</span>
+                <span>Introducing Curiositi!</span>
+                <span>🎉</span>
               </div>
               <h1 className="text-primary font-serif text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-6xl">
                 <span className="text-gradient">Get answers</span> from your
