@@ -1,4 +1,11 @@
-import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  boolean,
+  vector,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
 
@@ -23,12 +30,12 @@ export const files = pgTable("files", {
   name: text("name").notNull(),
   type: text("type").notNull(),
   file: bytea("file").notNull(),
-  file_size: text("file_size").notNull(),
-  space_id: uuid("space_id")
+  fileSize: text("file_size").notNull(),
+  spaceId: uuid("space_id")
     .notNull()
     .references(() => spaces.id, { onDelete: "cascade" }),
   hash: text("hash").notNull(),
-  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
 export const spaces = pgTable("spaces", {
@@ -36,11 +43,11 @@ export const spaces = pgTable("spaces", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
-  created_by: text("created_by")
+  createdBy: text("created_by")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
 export const user = pgTable("user", {
@@ -91,4 +98,25 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
+});
+
+export const documents = pgTable("documents", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  fileId: uuid("file_id")
+    .notNull()
+    .references(() => files.id, { onDelete: "cascade" }),
+  spaceId: uuid("space_id")
+    .notNull()
+    .references(() => spaces.id, { onDelete: "cascade" }),
+  filename: text("filename")
+    .notNull()
+    .references(() => files.name, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  embedding: vector({ dimensions: 1024 }).notNull(),
+  createdBy: text("created_by")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });

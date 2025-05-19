@@ -63,6 +63,7 @@ export async function uploadFileHandler(c: Context) {
       fileType,
       fileUpload[0].id,
       space_id,
+      user_id,
     );
 
     return c.json({

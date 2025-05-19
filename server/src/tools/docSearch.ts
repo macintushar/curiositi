@@ -1,74 +1,47 @@
-import { getVectorStore, generateEmbeddings } from "@/lib/vectorStore";
-import type { IncludeEnum } from "chromadb";
-
-const MAX_RESULTS = 5;
+import { documents } from "@/db/schema";
+import { type InferSelectModel } from "drizzle-orm";
+import {
+  getDocumentsFromVectorStore,
+  generateEmbeddings,
+} from "@/lib/vectorStore";
 
 const formatDocumentsWithMetadata = (
-  documents: string[],
-  metadatas: Array<Record<string, unknown>>,
-  distances: number[] | null,
+  docs: InferSelectModel<typeof documents>[],
 ): string => {
-  if (!documents || documents.length === 0) {
-    return "No relevant documents found.";
-  }
-
-  return documents
-    .slice(0, MAX_RESULTS)
-    .map((content, i) => {
-      const metadata = metadatas[i] || {};
-      const source = metadata.source ? ` (Source: ${metadata.source})` : "";
-      const score =
-        distances && distances[i]
-          ? ` [Relevance: ${(1 - distances[i]).toFixed(2)}]`
-          : "";
-      return `Document ${i + 1}${source}${score}:\n${content}\n`;
+  return docs
+    .map((doc) => {
+      return `Document ${doc.id} (${doc.filename}):\n${doc.content}\n`;
     })
     .join("\n---\n");
 };
 
-async function searchDocs(query: string, spaceId?: string): Promise<string> {
+async function searchDocs(query: string, spaceId: string): Promise<string> {
   console.log(
     `Searching documents for query: "${query}"${spaceId ? ` in space: ${spaceId}` : ""}`,
   );
-  try {
-    // Get the vector store collection
-    const collection = await getVectorStore();
 
+  try {
     // Generate embeddings for the query
     const queryEmbeddings = await generateEmbeddings([query]);
-    if (!queryEmbeddings || queryEmbeddings.length === 0) {
-      return "Error generating embeddings for the query.";
-    }
-
-    // Query parameters
-    const queryParams: {
-      queryEmbeddings: number[];
-      nResults: number;
-      include: IncludeEnum[];
-      where?: { space_id: string };
-    } = {
-      queryEmbeddings: queryEmbeddings[0],
-      nResults: MAX_RESULTS,
-      include: ["documents", "metadatas", "distances"] as IncludeEnum[],
-    };
-
-    // Add filter by space_id if provided
-    if (spaceId) {
-      queryParams.where = { space_id: spaceId };
+    if (
+      !queryEmbeddings ||
+      !Array.isArray(queryEmbeddings) ||
+      queryEmbeddings.length === 0
+    ) {
+      throw new Error("Failed to generate valid embeddings for the query.");
     }
 
     // Query the collection
-    const results = await collection.query(queryParams);
+    const results = await getDocumentsFromVectorStore(
+      spaceId,
+      queryEmbeddings[0],
+    );
 
-    if (!results.documents || results.documents.length === 0) {
+    if (!results || results.length === 0) {
       return "No relevant documents found.";
     }
 
-    return formatDocumentsWithMetadata(
-      results.documents[0] as string[],
-      (results.metadatas?.[0] as Array<Record<string, unknown>>) || [],
-      (results.distances?.[0] as number[]) || null,
-    );
+    return formatDocumentsWithMetadata(results);
   } catch (error: unknown) {
     console.error("Error searching documents:", error);
 

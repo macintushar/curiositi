@@ -1,6 +1,5 @@
 import {
   HOST,
-  LLM_PROVIDERS,
   OLLAMA_BASE_URL,
   OLLAMA_EMBEDDING_MODEL,
   OPENAI_API_KEY,
@@ -10,6 +9,7 @@ import {
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { createOllama } from "ollama-ai-provider";
 import { createOpenAI } from "@ai-sdk/openai";
+import { EMBEDDING_PROVIDERS, LLM_PROVIDERS } from "@/types";
 
 export const ollama = createOllama({
   baseURL: `${OLLAMA_BASE_URL}/api`,
@@ -44,12 +44,12 @@ export function llm(model: string, provider: LLM_PROVIDERS) {
   }
 }
 
-export function llmEmbedding(provider: LLM_PROVIDERS) {
+export function llmEmbedding(provider: EMBEDDING_PROVIDERS) {
   switch (provider) {
-    case LLM_PROVIDERS.OLLAMA:
+    case EMBEDDING_PROVIDERS.OLLAMA:
       return ollama.embedding(OLLAMA_EMBEDDING_MODEL);
 
-    case LLM_PROVIDERS.OPENAI:
+    case EMBEDDING_PROVIDERS.OPENAI:
       return openai.embedding(OPENAI_EMBEDDING_MODEL, { dimensions: 1024 });
 
     default:

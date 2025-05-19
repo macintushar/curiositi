@@ -1,26 +1,45 @@
-import {
-  CHROMA_COLLECTION_NAME,
-  CHROMA_URL,
-  DEFAULT_EMBEDDING_PROVIDER,
-} from "@/constants";
-import { ChromaClient } from "chromadb";
+import { DEFAULT_EMBEDDING_PROVIDER } from "@/constants";
+import db from "@/db";
+import { documents } from "@/db/schema";
 import { llmEmbedding } from "@/lib/llms";
+import { and, cosineDistance, eq, gt, sql } from "drizzle-orm";
 
-// Initialize the Chroma client
-const client = new ChromaClient({ path: CHROMA_URL });
+export async function addDocumentsToVectorStore(
+  chunk: string,
+  spaceId: string,
+  fileId: string,
+  userId: string,
+  embeddings: number[],
+  filename: string,
+) {
+  const embeddedData = await db
+    .insert(documents)
+    .values({
+      fileId: fileId,
+      filename: filename,
+      content: chunk,
+      spaceId: spaceId,
+      createdBy: userId,
+      embedding: embeddings,
+    })
+    .returning();
 
-// Get or create the collection
-export const getVectorStore = async () => {
-  try {
-    const collection = await client.getOrCreateCollection({
-      name: CHROMA_COLLECTION_NAME,
-    });
-    return collection;
-  } catch (error) {
-    console.error("Error initializing vector store:", error);
-    throw error;
-  }
-};
+  return embeddedData;
+}
+
+export async function getDocumentsFromVectorStore(
+  spaceId: string,
+  embedding: number[],
+) {
+  const similarity = sql<number>`1 - (${cosineDistance(documents.embedding, embedding)})`;
+
+  const docs = await db
+    .select()
+    .from(documents)
+    .where(and(gt(similarity, 0.5), eq(documents.spaceId, spaceId)));
+
+  return docs;
+}
 
 // Helper function to generate embeddings using Ollama
 export const generateEmbeddings = async (
