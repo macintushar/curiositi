@@ -7,7 +7,7 @@ import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 export const metadata: Metadata = {
   title: webMetaData.siteName,
   description: webMetaData.description,
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/favicon.svg" }],
   openGraph: {
     title: webMetaData.siteName,
     description: webMetaData.description,
