@@ -14,8 +14,8 @@ import ThemedLogo from "@/components/themes/themed-logo";
 import ThemeSwitcher from "@/components/themes/theme-switcher";
 
 import agentFlowImage from "@/assets/images/agent-flow.png";
-import AgentFlow from "@/assets/images/agent-flow";
 import GithubIcon from "@/assets/icons/github-icon";
+
 const navLinks = [
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
