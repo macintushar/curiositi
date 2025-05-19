@@ -79,7 +79,10 @@ export function PricingPlanCard({
         ))}
       </ul>
       <Link href={ctaHref ?? "#"} target={ctaHrefExternal ? "_blank" : "_self"}>
-        <Button variant={ctaVariant} className="w-full rounded-full">
+        <Button
+          variant={ctaVariant}
+          className={`w-full rounded-full ${ctaHrefExternal ? "cursor-pointer" : ""}`}
+        >
           {CtaIcon && <CtaIcon className="h-4 w-4" />}
           {CtaExtra && CtaExtra}
           {ctaText}
