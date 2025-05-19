@@ -1,14 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import {
-  Search,
-  FileText,
-  Globe,
-  Zap,
-  Brain,
-  MessageSquare,
-} from "lucide-react";
+import { Search, FileText, Globe, Zap, MessageSquare } from "lucide-react";
 import { Section } from "@/components/landing/section";
 import { FeatureCard } from "@/components/landing/feature-card";
 import { HowItWorksStep } from "@/components/landing/how-it-works-step";
@@ -65,7 +58,7 @@ export default function LandingPage() {
           </div>
         </div>
       </header>
-      <main className="w-full flex-1 pt-16">
+      <main className="w-full flex-1 pt-4">
         <section className="w-full py-20 md:py-32 lg:py-40">
           <div className="px-4 md:px-6">
             <div className="animate-fade-up mx-auto max-w-3xl space-y-8 text-center">
@@ -272,7 +265,7 @@ export default function LandingPage() {
             </div>
           }
         >
-          <div className="mx-auto grid max-w-5xl gap-8 py-12 md:grid-cols-3">
+          <div className="mx-auto flex max-w-5xl justify-center py-12">
             <PricingPlanCard
               title="Free"
               description="Use Curiositi for free by deploying your own instance"
@@ -284,34 +277,8 @@ export default function LandingPage() {
                 "Basic web retrieval",
               ]}
               ctaText="GitHub"
+              className="w-full md:w-1/3"
             />
-            {/* <PricingPlanCard
-              title="Professional"
-              description="For professionals and small teams"
-              price="$29"
-              features={[
-                "Upload up to 1,000 documents",
-                "Unlimited queries",
-                "Advanced web retrieval",
-                "Team collaboration",
-              ]}
-              ctaText="Get Started"
-              isPopular
-            />
-            <PricingPlanCard
-              title="Enterprise"
-              description="For organizations with advanced needs"
-              price="Custom"
-              features={[
-                "Unlimited documents",
-                "Unlimited queries",
-                "Premium web retrieval",
-                "Advanced security & compliance",
-                "Dedicated support",
-              ]}
-              ctaText="Contact Sales"
-              ctaVariant="outline"
-            /> */}
           </div>
         </Section>
 
@@ -322,7 +289,7 @@ export default function LandingPage() {
         />
       </main>
       <footer className="bg-background w-full border-t">
-        <div className="flex flex-col gap-8 px-4 py-12 md:px-6">
+        <div className="flex flex-col gap-8 px-4 py-8 md:px-6">
           <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-8">
             <Link href="/" className="flex items-center gap-2">
               <Image src={logo as string} alt="Curiositi" height={32} />

@@ -10,6 +10,7 @@ interface PricingPlanCardProps {
   isPopular?: boolean;
   ctaText: string;
   ctaVariant?: "default" | "outline";
+  className?: string;
 }
 
 const CheckIcon = () => (
@@ -38,10 +39,11 @@ export function PricingPlanCard({
   isPopular,
   ctaText,
   ctaVariant = "default",
+  className,
 }: PricingPlanCardProps) {
   return (
     <div
-      className={`bg-card rounded-lg border p-8 shadow-sm transition-all hover:shadow-md ${isPopular ? "relative shadow-lg hover:shadow-xl" : ""}`}
+      className={`bg-card rounded-lg border p-8 shadow-sm transition-all hover:shadow-md ${isPopular ? "relative shadow-lg hover:shadow-xl" : ""} ${className}`}
     >
       {isPopular && (
         <div className="bg-primary text-primary-foreground absolute -top-4 right-0 left-0 mx-auto w-fit rounded-full px-4 py-1 text-sm font-medium">
