@@ -4,6 +4,7 @@ export enum LLM_PROVIDERS {
   OPENROUTER = "openrouter",
   OLLAMA = "ollama",
   OPENAI = "openai",
+  ANTHROPIC = "anthropic",
 }
 
 export enum EMBEDDING_PROVIDERS {
@@ -69,7 +70,7 @@ export type Message = {
 };
 
 export type Provider = {
-  name: string;
+  name: LLM_PROVIDERS;
   models: string[];
 };
 

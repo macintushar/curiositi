@@ -39,6 +39,10 @@ export const OPENAI_EMBEDDING_MODEL =
   process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
 export const OPENAI_ENABLED = OPENAI_API_KEY ? true : false;
 
+// Anthropic
+export const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+export const ANTHROPIC_ENABLED = ANTHROPIC_API_KEY ? true : false;
+
 // SearXNG
 export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
 

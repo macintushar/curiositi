@@ -1,14 +1,22 @@
 import { OLLAMA_BASE_URL } from "@/constants";
-import { Provider, Providers } from "@/types";
+import { Provider, Providers, LLM_PROVIDERS } from "@/types";
 import { Ollama } from "ollama";
 
 export const models: Provider[] = [
   {
-    name: "openai",
-    models: ["gpt-4o", "gpt-4o-mini", "o3-mini", "o3", "o4-mini", "gpt-4.1"],
+    name: LLM_PROVIDERS.OPENAI,
+    models: [
+      "gpt-4o",
+      "gpt-4o-mini",
+      "o3-mini",
+      "o3",
+      "o4-mini",
+      "gpt-4.1",
+      "gpt-4",
+    ],
   },
   {
-    name: "openrouter",
+    name: LLM_PROVIDERS.OPENROUTER,
     models: [
       "microsoft/phi-4-reasoning-plus:free",
       "meta-llama/llama-4-maverick:free",
@@ -18,6 +26,14 @@ export const models: Provider[] = [
       "deepseek/deepseek-r1-distill-qwen-14b:free",
       "deepseek/deepseek-r1-distill-qwen-32b:free",
       "google/gemini-2.0-flash-exp:free",
+    ],
+  },
+  {
+    name: LLM_PROVIDERS.ANTHROPIC,
+    models: [
+      "claude-3-7-sonnet-20250219",
+      "claude-3-5-sonnet-20241022",
+      "claude-3-5-sonnet-20240620",
     ],
   },
 ];
@@ -66,7 +82,6 @@ export async function getOllamaModels(invalidateCache = false) {
 
     return chatModels;
   } catch (error) {
-    // If error occurs, use cached data if available (even if expired)
     if (ollamaModelsCache) {
       return ollamaModelsCache;
     }
@@ -78,7 +93,7 @@ export async function getConfigs(invalidateCache = false): Promise<Providers> {
   return {
     providers: [
       {
-        name: "ollama",
+        name: LLM_PROVIDERS.OLLAMA,
         models: await getOllamaModels(invalidateCache),
       },
       ...models,
