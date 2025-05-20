@@ -363,4 +363,37 @@ apiRouter.post(
   },
 );
 
+apiRouter.get("/user/keys", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const result = await getApiKeys(user.id);
+
+  return c.json({ data: result });
+});
+
+apiRouter.post(
+  "/user/keys",
+  zValidator("json", AddOrUpdateApiKeySchema),
+  async (c) => {
+    const user = c.get("user");
+
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const { provider, api_key, url } = await c.req.valid("json");
+
+    const result = await addOrUpdateApiKey(user.id, provider, {
+      apiKey: api_key ?? "",
+      url: url ?? "",
+    });
+
+    return c.json({ data: { message: result } });
+  },
+);
+
 export default apiRouter;
