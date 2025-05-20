@@ -11,7 +11,7 @@ export default function ThemeSwitcher() {
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       variant="outline"
-      className="rounded-full"
+      className="cursor-pointer rounded-full"
     >
       <span className="sr-only">Toggle theme</span>
       <SunMoonIcon />
