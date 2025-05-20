@@ -24,6 +24,7 @@ import {
   getThreadMessagesHandler,
   getThreadsHandler,
 } from "@/services/threads";
+import { getConfigs } from "@/services/configs";
 
 const apiRouter = new Hono<{
   Variables: {
@@ -250,6 +251,16 @@ apiRouter.delete(
       }
       return c.json({ error: "Unknown error occurred" }, 500);
     }
+  },
+);
+
+apiRouter.post(
+  "/configs",
+  zValidator("json", z.object({ invalidate_cache: z.boolean().optional() })),
+  async (c) => {
+    const { invalidate_cache } = await c.req.valid("json");
+    const result = await getConfigs(invalidate_cache);
+    return c.json({ data: result });
   },
 );
 

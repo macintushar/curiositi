@@ -67,3 +67,12 @@ export type Message = {
   documentSearchResults?: string[] | null;
   webSearchResults?: string[] | null;
 };
+
+export type Provider = {
+  name: string;
+  models: string[];
+};
+
+export type Providers = {
+  providers: Provider[];
+};
