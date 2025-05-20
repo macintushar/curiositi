@@ -5,6 +5,7 @@ import ThemedLogo from "@/components/themes/themed-logo";
 import { Button } from "@/components/ui/button";
 
 import { navLinks } from "@/constants";
+import NavLink from "./NavLink";
 
 export default function Header() {
   return (
@@ -14,14 +15,8 @@ export default function Header() {
           <ThemedLogo />
         </Link>
         <nav className="hidden gap-8 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-            >
-              {link.label}
-            </Link>
+          {navLinks.map((link, idx) => (
+            <NavLink key={idx} href={link.href} label={link.label} />
           ))}
         </nav>
         <div className="flex items-center gap-4">

@@ -17,14 +17,16 @@ export default function FAQPage() {
       <main className="w-full flex-1 pt-4">
         <section className="w-full py-20 md:py-32">
           <div className="mx-auto max-w-3xl space-y-2 px-4 md:px-6">
-            <h1 className="text-primary text-gradient text-center font-serif text-4xl font-medium tracking-tight text-balance">
-              Frequently Asked Questions
-            </h1>
-            <p className="text-muted-foreground text-md max-w-2xl text-center">
-              Curiositi combines your documents with live web data to deliver
-              context-aware answers using advanced AI and Retrieval-Augmented
-              Generation.
-            </p>
+            <div className="flex flex-col gap-2 text-center">
+              <h1 className="text-gradient font-serif text-4xl font-medium tracking-tight md:text-5xl">
+                Frequently Asked Questions
+              </h1>
+              <p className="text-muted-foreground text-md max-w-2xl">
+                Curiositi combines your documents with live web data to deliver
+                context-aware answers using advanced AI and Retrieval-Augmented
+                Generation.
+              </p>
+            </div>
             <div className="mt-6">
               <Accordion type="multiple">
                 {faqs.map((faq, idx) => (

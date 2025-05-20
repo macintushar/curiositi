@@ -19,7 +19,7 @@ import { ghURL } from "@/constants";
 
 export default function LandingPage() {
   return (
-    <div className="flex min-h-screen w-full flex-col items-center">
+    <div className="flex min-h-screen w-full flex-col items-center scroll-smooth">
       <Header />
       <main className="w-full flex-1 pt-4">
         <section className="w-full py-20 md:py-32 lg:py-40">
