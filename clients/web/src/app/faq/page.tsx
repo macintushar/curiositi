@@ -18,7 +18,6 @@ export default function FAQPage() {
       <main className="w-full flex-1 pt-4">
         <Section
           id="features"
-          className="bg-secondary/50"
           title="Frequently Asked Questions"
           subtitle="Curiositi combines the best of AI language models with your data and the latest information from the web."
         >
