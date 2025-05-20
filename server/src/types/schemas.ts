@@ -41,3 +41,9 @@ export const AddOrUpdateApiKeySchema = z.object({
   api_key: z.string().optional(),
   url: z.string().optional(),
 });
+
+export const AddOrUpdateApiKeySchema = z.object({
+  provider: ProviderSchema,
+  api_key: z.string().optional(),
+  url: z.string().optional(),
+});
