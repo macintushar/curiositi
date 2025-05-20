@@ -4,79 +4,128 @@ Curiositi is an AI-powered assistant that delivers precise, context-aware answer
 
 ## 🔍 What Curiositi Does
 
-1. **Document Ingestion**
+1. **Knowledge Spaces**
 
-   - Upload files via the API.
-   - Automatically extract, split, and embed your documents into a vector store for fast similarity search.
+   - Create and manage topic-based spaces for your documents
+   - Organize information in a structured way
+   - Associate conversation threads with specific spaces
 
-2. **Query Handling**
+2. **Document Management**
 
-   - Clients send natural-language questions to `/api/v1/query`.
-   - The agent selects a strategy:
-     - **Direct**: answer immediately using the LLM's knowledge.
-     - **Retrieve**: generate sub-queries against uploaded docs and web (via SearXNG).
+   - Upload multiple file types (PDF, text, CSV, markdown, etc.)
+   - Automatic extraction, chunking, and embedding generation
+   - Document retrieval and metadata tracking
 
-3. **Context Retrieval**
+3. **AI-Powered Search**
 
-   - **Document Search**: similarity search in ChromaDB returns top-scoring chunks.
-   - **Web Search**: SearXNG tool fetches external results.
+   - Vector-based similarity search across your documents
+   - Space-specific or general search capabilities
+   - Support for multiple embedding model providers
 
-4. **Answer Synthesis**
-   - Retrieved results are combined and fed back into the LLM.
-   - The final answer is synthesized with citations and returned alongside metadata.
+4. **Conversational Interface**
 
-![System Flow Diagram](docs/curiositi-flow.png)
+   - Thread-based conversation history
+   - Context-aware responses using document context and web search
+   - Long-term memory for more relevant interactions
+
+5. **Web Search Integration**
+   - SearXNG integration for up-to-date information
+   - Combines web results with your document knowledge
+   - Provides comprehensive answers with citations
+
+![System Architecture](docs/curiositi-flow.png)
 
 ## 🚀 Key Features
 
-- **Easy Upload**: Just POST your files; ingestion is fully automated.
-- **Scalable Vector Store**: Powered by ChromaDB for lightning-fast similarity search.
-- **Dual-Source RAG**: Seamlessly combine internal document search with external web search.
-- **Configurable LLMs**: Choose Ollama or OpenAI models and fine-tune your temperature.
-- **Type-Safe API**: Input validation with Zod ensures robust, predictable behavior.
-- **Transparent Metadata**: Trace every sub-query and see exactly which sources informed the answer.
+- **User Authentication**: Complete authentication flow with session management
+- **Knowledge Spaces**: Organize documents in topic-based collections
+- **Multi-Provider Support**: Choose between Ollama, OpenAI, or OpenRouter models
+- **PostgreSQL Vector Storage**: Native vector capabilities for fast similarity search
+- **RESTful API**: Comprehensive endpoints for all system functionality
+- **Thread Management**: Organize conversations and maintain context
+- **Docker Support**: Easy deployment with containerization
+- **Modern Web Interface**: Clean, responsive UI built with Next.js
 
 ## 🏃‍♂️ Getting Started
 
-To get a more detailed step-by-step process of setting up Curiositi, take a look at the [getting started doc](./docs/getting-started.md)
+For a more detailed step-by-step process of setting up Curiositi, take a look at the [getting started doc](./docs/getting-started.md)
 
 ### 1. Clone & Install
 
 ```bash
-# 1. Clone the repo and enter server directory
+# 1. Clone the repo
 git clone https://github.com/macintushar/curiositi.git
-cd curiositi/server
+cd curiositi
 ```
 
-### 2. Install dependencies with Bun
+### 2. Server Setup
 
 ```bash
+# Navigate to server directory
+cd server
+
+# Install dependencies with Bun
 bun install
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your database, Ollama, and other service configurations
 ```
 
-### 3. Configure
-
-Copy the environment template and edit your service URLs and credentials:
+### 3. Database Setup
 
 ```bash
-cp .env.example .env
-# Edit .env: CHROMA_URL, OLLAMA_BASE_URL, DATABASE_URL, OPENROUTER_API_KEY, SEARXNG_URL
+# Generate database schema
+bun run db:generate
 
-# 4. Start the server (dev vs prod)
-bun run dev    # development (hot reload)
-bun run start  # production
+# Run migrations
+bun run db:migrate
 ```
 
-The API listens by default on `http://localhost:3030`.
+### 4. Web Client Setup
+
+```bash
+# Navigate to web client directory
+cd ../clients/web
+
+# Install dependencies
+bun install
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your server URL and other configurations
+```
+
+### 5. Start the Services
+
+```bash
+# Start the server (development mode with hot reload)
+cd ../../server
+bun run dev
+
+# In a separate terminal, start the web client
+cd ../clients/web
+bun run dev
+```
+
+Access the web interface at `http://localhost:3040` and the API at `http://localhost:3030`
 
 ## Project Layout
 
 ```
 curiositi/
-├─ .github/               # CI/CD workflows
-├─ docs/                  # Flow diagrams (curiositi-flow.png) & PRD (PRD.md)
-├─ server/                # Bun + Hono backend (API & agent)
-├─ LICENSE                # Elastic License v2
+├─ .github/              # CI/CD workflows
+├─ clients/
+│  ├─ web/               # Next.js web interface
+├─ server/               # Bun + Hono backend with API
+│  ├─ src/               # Server source code
+│  │  ├─ agents/         # AI agent implementation
+│  │  ├─ db/             # Database schemas and connection
+│  │  ├─ routes/         # API endpoints
+│  │  ├─ services/       # Core service implementations
+│  │  ├─ tools/          # Utility functions and tools
+├─ docs/                 # Documentation and guides
+├─ LICENSE               # Elastic License v2
 ```
 
 ## Contributing & License
