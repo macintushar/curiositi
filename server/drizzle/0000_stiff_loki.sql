@@ -83,6 +83,10 @@ CREATE TABLE "user" (
 	"email" text NOT NULL,
 	"email_verified" boolean NOT NULL,
 	"image" text,
+	"openai_api_key" text,
+	"anthropic_api_key" text,
+	"openrouter_api_key" text,
+	"ollama_url" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email")

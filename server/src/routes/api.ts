@@ -2,7 +2,12 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { CreateSpaceSchema, SearchSchema, UploadSchema } from "@/types/schemas";
+import {
+  AddOrUpdateApiKeySchema,
+  CreateSpaceSchema,
+  SearchSchema,
+  UploadSchema,
+} from "@/types/schemas";
 
 // Service handlers
 import {
@@ -25,6 +30,7 @@ import {
   getThreadsHandler,
 } from "@/services/threads";
 import { getConfigs } from "@/services/configs";
+import { addOrUpdateApiKey, getApiKeys } from "@/services/user";
 
 const apiRouter = new Hono<{
   Variables: {
@@ -261,6 +267,39 @@ apiRouter.post(
     const { invalidate_cache } = await c.req.valid("json");
     const result = await getConfigs(invalidate_cache);
     return c.json({ data: result });
+  },
+);
+
+apiRouter.get("/user/keys", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const result = await getApiKeys(user.id);
+
+  return c.json({ data: result });
+});
+
+apiRouter.post(
+  "/user/keys",
+  zValidator("json", AddOrUpdateApiKeySchema),
+  async (c) => {
+    const user = c.get("user");
+
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const { provider, api_key, url } = await c.req.valid("json");
+
+    const result = await addOrUpdateApiKey(user.id, provider, {
+      apiKey: api_key ?? "",
+      url: url ?? "",
+    });
+
+    return c.json({ data: { message: result } });
   },
 );
 
