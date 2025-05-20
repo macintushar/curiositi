@@ -3,8 +3,17 @@
  * for Docker builds.
  */
 import "./src/env.js";
+import { env } from "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
-
+const config = {
+  async rewrites() {
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: `${env.SERVER_URL}/api/v1/:path*`,
+      },
+    ];
+  },
+};
 export default config;

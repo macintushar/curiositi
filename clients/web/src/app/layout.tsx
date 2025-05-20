@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/components/themes/theme-provider";
 import { webMetaData } from "@/constants";
 import "@/styles/globals.css";
 
@@ -35,8 +36,18 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${instrumentSans.variable} ${instrumentSerif.variable}`}
+      suppressHydrationWarning
     >
-      <body>{children}</body>
+      <body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
