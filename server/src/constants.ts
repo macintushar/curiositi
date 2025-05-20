@@ -19,7 +19,7 @@ export const DATABASE_URL =
   process.env.DATABASE_URL || "postgres://user:pass@localhost:5432/dbname";
 
 // Better Auth
-export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
+export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET || "";
 export const BETTER_AUTH_URL = HOST;
 
 // Ollama
@@ -44,10 +44,21 @@ export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
 
 // File Types
 
+export const OFFICE_FILE_TYPES = [
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation", // pptx
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // xlsx
+  "application/vnd.oasis.opendocument.text", // odt
+  "application/vnd.oasis.opendocument.presentation", // odp
+  "application/vnd.oasis.opendocument.spreadsheet", // ods
+];
+
+export const PDF_FILE_TYPE = "application/pdf";
+
+export const TEXT_FILE_TYPES = ["text/plain", "text/csv", "text/markdown"];
+
 export const SUPPORTED_FILE_TYPES = [
-  "application/pdf",
-  "text/plain;charset=utf-8",
-  "text/plain",
-  "text/csv",
-  "text/markdown",
+  PDF_FILE_TYPE,
+  ...TEXT_FILE_TYPES,
+  ...OFFICE_FILE_TYPES,
 ];
