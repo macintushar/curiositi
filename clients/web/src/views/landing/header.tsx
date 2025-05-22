@@ -3,7 +3,7 @@ import Link from "next/link";
 import ThemeSwitcher from "@/components/themes/theme-switcher";
 import ThemedLogo from "@/components/themes/themed-logo";
 
-import { navLinks } from "@/constants";
+import { navLinks } from "@/constants/landing-constants";
 import NavLink from "./NavLink";
 import CTAButton from "./cta-button";
 

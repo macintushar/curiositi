@@ -3,8 +3,9 @@ import ThemeSwitcher from "../themes/theme-switcher";
 import ThemedLogo from "../themes/themed-logo";
 
 import Section from "./section";
-import { IconUser, IconFolder } from "@tabler/icons-react";
+import { IconFolder } from "@tabler/icons-react";
 import NavButton from "./nav-button";
+import { Profile } from "./profile";
 
 const navLinks: { icon: React.ReactNode; link: string; label: string }[] = [
   {
@@ -33,11 +34,7 @@ export default function Header() {
 
           <ThemeSwitcher className="rounded-md" variant="ghost" />
 
-          <NavButton
-            href="/app/settings"
-            icon={<IconUser className="size-5" />}
-            label="Settings"
-          />
+          <Profile />
         </div>
       </div>
     </Section>

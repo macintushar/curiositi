@@ -8,11 +8,19 @@ import Link from "next/link";
 
 export default function CTAButton() {
   const { data, isPending } = useSession();
-  const authed = data?.session !== null;
+  const authed = data && data.session !== null;
 
   return (
-    <Link href={authed ? "/app" : "/sign-in"}>
-      <Button variant="default" className="rounded-full" size="sm">
+    <Link
+      href={authed ? "/app" : "/sign-in"}
+      className="cursor-pointer"
+      prefetch={true}
+    >
+      <Button
+        variant="default"
+        className="cursor-pointer rounded-full"
+        size="sm"
+      >
         {isPending ? (
           <IconLoader className="animate-spin" />
         ) : authed ? (
