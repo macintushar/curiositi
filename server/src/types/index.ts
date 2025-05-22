@@ -69,9 +69,15 @@ export type Message = {
   webSearchResults?: string[] | null;
 };
 
+export type Model = {
+  name: string;
+  model: string;
+  capabilities: string[];
+};
+
 export type Provider = {
   name: LLM_PROVIDERS;
-  models: string[];
+  models: Model[];
 };
 
 export type Providers = {
