@@ -15,5 +15,12 @@ const config = {
       },
     ];
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "placeholder.pics",
+      },
+    ],
+  },
 };
 export default config;

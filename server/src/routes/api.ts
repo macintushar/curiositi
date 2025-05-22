@@ -279,7 +279,7 @@ apiRouter.get("/user/keys", async (c) => {
 
   const result = await getApiKeys(user.id);
 
-  return c.json({ data: result });
+  return c.json({ data: result[0] });
 });
 
 apiRouter.post(

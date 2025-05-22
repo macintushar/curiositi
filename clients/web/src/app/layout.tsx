@@ -1,4 +1,6 @@
 import { ThemeProvider } from "@/components/themes/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+
 import { webMetaData } from "@/constants";
 import "@/styles/globals.css";
 
@@ -46,6 +48,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

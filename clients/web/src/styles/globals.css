@@ -12,6 +12,7 @@
     var(--font-instrument-serif), ui-serif, serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.21 0 0);

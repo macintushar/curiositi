@@ -36,7 +36,7 @@ export async function getDocumentsFromVectorStore(
   const docs = await db
     .select()
     .from(documents)
-    .where(and(gt(similarity, 0.5), eq(documents.spaceId, spaceId)));
+    .where(and(gt(similarity, 0.3), eq(documents.spaceId, spaceId)));
 
   return docs;
 }

@@ -14,6 +14,10 @@ export const HOST =
     ? "https://api.curiositi.macintushar.xyz"
     : `http://localhost:${SERVER_PORT}`;
 
+export const UI_HOST = process.env.UI_HOST || "http://localhost:3040";
+
+export const TRUSTED_ORIGINS = ["https://curiositi.macintushar.xyz", UI_HOST];
+
 // Database
 export const DATABASE_URL =
   process.env.DATABASE_URL || "postgres://user:pass@localhost:5432/dbname";
