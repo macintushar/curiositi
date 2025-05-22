@@ -5,12 +5,8 @@ export function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
 
   if (!sessionCookie) {
-    console.log("middleware - no session");
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
-
-  console.log("middleware - with session");
-  console.log(sessionCookie);
 
   return NextResponse.next();
 }
