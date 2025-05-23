@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
+import { tryCatch } from "@/lib/try-catch";
 import {
   AddOrUpdateApiKeySchema,
   CreateSpaceSchema,
@@ -67,8 +68,11 @@ apiRouter.get("/threads", async (c) => {
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);
   }
-  const result = await getThreadsHandler(user.id);
-  return c.json(result);
+  const { data, error } = await tryCatch(getThreadsHandler(user.id));
+  if (error) {
+    return c.json({ error: error.message || "Failed to get threads" }, 500);
+  }
+  return c.json(data);
 });
 
 apiRouter.post("/threads", async (c) => {
@@ -76,8 +80,11 @@ apiRouter.post("/threads", async (c) => {
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);
   }
-  const result = await createThreadHandler(user.id);
-  return c.json(result);
+  const { data, error } = await tryCatch(createThreadHandler(user.id));
+  if (error) {
+    return c.json({ error: error.message || "Failed to create thread" }, 500);
+  }
+  return c.json(data);
 });
 
 apiRouter.delete(
@@ -89,8 +96,11 @@ apiRouter.delete(
       return c.json({ error: "Unauthorized" }, 401);
     }
     const { id } = c.req.valid("param");
-    const result = await deleteThreadHandler(id);
-    return c.json(result);
+    const { data, error } = await tryCatch(deleteThreadHandler(id));
+    if (error) {
+      return c.json({ error: error.message || "Failed to delete thread" }, 500);
+    }
+    return c.json(data);
   },
 );
 
@@ -103,8 +113,14 @@ apiRouter.post(
       return c.json({ error: "Unauthorized" }, 401);
     }
     const { id } = c.req.valid("param");
-    const result = await getThreadMessagesHandler(id);
-    return c.json(result);
+    const { data, error } = await tryCatch(getThreadMessagesHandler(id));
+    if (error) {
+      return c.json(
+        { error: error.message || "Failed to get thread messages" },
+        500,
+      );
+    }
+    return c.json(data);
   },
 );
 
@@ -113,15 +129,21 @@ apiRouter.post("/search", zValidator("json", SearchSchema), async (c) => {
   const { input, model, space_id, provider, thread_id } =
     await c.req.valid("json");
 
-  const result = await searchHandler({
-    input: input,
-    model: model,
-    space_id: space_id,
-    provider: provider,
-    thread_id: thread_id,
-    mode: "space",
-  });
-  return c.json(result);
+  const { data, error } = await tryCatch(
+    searchHandler({
+      input: input,
+      model: model,
+      space_id: space_id,
+      provider: provider,
+      thread_id: thread_id,
+      mode: "space",
+    }),
+  );
+
+  if (error) {
+    return c.json({ error: error.message || "Search failed" }, 500);
+  }
+  return c.json(data);
 });
 
 apiRouter.post(
@@ -129,21 +151,30 @@ apiRouter.post(
   zValidator("json", SearchSchema.omit({ space_id: true })),
   async (c) => {
     const { input, model, provider, thread_id } = await c.req.valid("json");
-    const result = await searchHandler({
-      input: input,
-      model: model,
-      provider: provider,
-      thread_id: thread_id,
-      mode: "general",
-    });
-    return c.json(result);
+    const { data, error } = await tryCatch(
+      searchHandler({
+        input: input,
+        model: model,
+        provider: provider,
+        thread_id: thread_id,
+        mode: "general",
+      }),
+    );
+
+    if (error) {
+      return c.json({ error: error.message || "General search failed" }, 500);
+    }
+    return c.json(data);
   },
 );
 
 // Spaces routes
 apiRouter.get("/spaces", async (c) => {
-  const result = await getSpacesHandler();
-  return c.json(result);
+  const { data, error } = await tryCatch(getSpacesHandler());
+  if (error) {
+    return c.json({ error: error.message || "Failed to get spaces" }, 500);
+  }
+  return c.json(data);
 });
 
 apiRouter.post("/spaces", zValidator("json", CreateSpaceSchema), async (c) => {
@@ -152,8 +183,11 @@ apiRouter.post("/spaces", zValidator("json", CreateSpaceSchema), async (c) => {
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);
   }
-  const result = await createSpaceHandler(name, user.id);
-  return c.json(result);
+  const { data, error } = await tryCatch(createSpaceHandler(name, user.id));
+  if (error) {
+    return c.json({ error: error.message || "Failed to create space" }, 500);
+  }
+  return c.json(data);
 });
 
 apiRouter.get(
@@ -161,8 +195,11 @@ apiRouter.get(
   zValidator("param", z.object({ id: z.string() })),
   async (c) => {
     const { id } = c.req.valid("param");
-    const result = await getSpaceHandler(id);
-    return c.json(result);
+    const { data, error } = await tryCatch(getSpaceHandler(id));
+    if (error) {
+      return c.json({ error: error.message || "Failed to get space" }, 500);
+    }
+    return c.json(data);
   },
 );
 
@@ -171,8 +208,11 @@ apiRouter.delete(
   zValidator("param", z.object({ id: z.string() })),
   async (c) => {
     const { id } = c.req.valid("param");
-    const result = await deleteSpaceHandler(id);
-    if (result) {
+    const { data, error } = await tryCatch(deleteSpaceHandler(id));
+    if (error) {
+      return c.json({ error: error.message || "Failed to delete space" }, 500);
+    }
+    if (data) {
       return c.json({ message: "Space deleted successfully" }, 200);
     }
     return c.json({ error: "Failed to delete space" }, 500);
@@ -200,15 +240,13 @@ apiRouter.post("/files/upload", zValidator("form", UploadSchema), async (c) => {
     );
   }
 
-  try {
-    const result = await uploadFileHandler(file, space_id, user.id);
-    return c.json(result);
-  } catch (error) {
-    if (error instanceof Error) {
-      return c.json({ error: error.message }, 400);
-    }
-    return c.json({ error: "Unknown error occurred" }, 500);
+  const { data, error } = await tryCatch(
+    uploadFileHandler(file, space_id, user.id),
+  );
+  if (error) {
+    return c.json({ error: error.message || "File upload failed" }, 500);
   }
+  return c.json(data);
 });
 
 apiRouter.get(
@@ -216,8 +254,11 @@ apiRouter.get(
   zValidator("param", z.object({ space_id: z.string() })),
   async (c) => {
     const { space_id } = c.req.valid("param");
-    const result = await getFilesHandler(space_id);
-    return c.json(result);
+    const { data, error } = await tryCatch(getFilesHandler(space_id));
+    if (error) {
+      return c.json({ error: error.message || "Failed to get files" }, 500);
+    }
+    return c.json(data);
   },
 );
 
@@ -226,20 +267,13 @@ apiRouter.post(
   zValidator("param", z.object({ space_id: z.string(), id: z.string() })),
   async (c) => {
     const { id, space_id } = c.req.valid("param");
-    try {
-      const result = await getFileHandler(id, space_id);
-      c.header("Content-Type", result.contentType);
-      c.header(
-        "Content-Disposition",
-        `attachment; filename="${result.fileName}"`,
-      );
-      return c.body(result.data);
-    } catch (error) {
-      if (error instanceof Error) {
-        return c.json({ error: error.message }, 404);
-      }
-      return c.json({ error: "Unknown error occurred" }, 500);
+    const { data, error } = await tryCatch(getFileHandler(id, space_id));
+    if (error) {
+      return c.json({ error: error.message || "Failed to get file" }, 404);
     }
+    c.header("Content-Type", data.contentType);
+    c.header("Content-Disposition", `attachment; filename="${data.fileName}"`);
+    return c.body(data.data);
   },
 );
 
@@ -248,15 +282,11 @@ apiRouter.delete(
   zValidator("param", z.object({ space_id: z.string(), id: z.string() })),
   async (c) => {
     const { id, space_id } = c.req.valid("param");
-    try {
-      const result = await deleteFileHandler(id, space_id);
-      return c.json(result);
-    } catch (error) {
-      if (error instanceof Error) {
-        return c.json({ error: error.message }, 404);
-      }
-      return c.json({ error: "Unknown error occurred" }, 500);
+    const { data, error } = await tryCatch(deleteFileHandler(id, space_id));
+    if (error) {
+      return c.json({ error: error.message || "Failed to delete file" }, 404);
     }
+    return c.json(data);
   },
 );
 
@@ -265,8 +295,11 @@ apiRouter.post(
   zValidator("json", z.object({ invalidate_cache: z.boolean().optional() })),
   async (c) => {
     const { invalidate_cache } = await c.req.valid("json");
-    const result = await getConfigs(invalidate_cache);
-    return c.json({ data: result });
+    const { data, error } = await tryCatch(getConfigs(invalidate_cache));
+    if (error) {
+      return c.json({ error: error.message || "Failed to get configs" }, 500);
+    }
+    return c.json({ data });
   },
 );
 
@@ -277,9 +310,11 @@ apiRouter.get("/user/keys", async (c) => {
     return c.json({ error: "Unauthorized" }, 401);
   }
 
-  const result = await getApiKeys(user.id);
-
-  return c.json({ data: result[0] });
+  const { data, error } = await tryCatch(getApiKeys(user.id));
+  if (error) {
+    return c.json({ error: error.message || "Failed to get API keys" }, 500);
+  }
+  return c.json({ data: data[0] });
 });
 
 apiRouter.post(
@@ -294,12 +329,20 @@ apiRouter.post(
 
     const { provider, api_key, url } = await c.req.valid("json");
 
-    const result = await addOrUpdateApiKey(user.id, provider, {
-      apiKey: api_key ?? "",
-      url: url ?? "",
-    });
+    const { data, error } = await tryCatch(
+      addOrUpdateApiKey(user.id, provider, {
+        apiKey: api_key ?? "",
+        url: url ?? "",
+      }),
+    );
 
-    return c.json({ data: { message: result } });
+    if (error) {
+      return c.json(
+        { error: error.message || "Failed to update API key" },
+        500,
+      );
+    }
+    return c.json({ data: { message: data } });
   },
 );
 

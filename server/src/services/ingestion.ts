@@ -8,6 +8,7 @@ import {
   addDocumentsToVectorStore,
   generateEmbeddings,
 } from "@/lib/vectorStore";
+import { tryCatch } from "@/lib/try-catch";
 
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
 import { parseOfficeAsync } from "officeparser";
@@ -37,9 +38,9 @@ export async function processAndStoreDocument(
 ): Promise<void> {
   console.log(`Processing ${originalFilename} (${mimeType})...`);
 
-  let text = "";
+  const processFilePromise = async () => {
+    let text = "";
 
-  try {
     if (!SUPPORTED_FILE_TYPES.includes(mimeType)) {
       console.warn(
         `Unsupported file type: ${mimeType}. Skipping ${originalFilename}.`,
@@ -83,7 +84,11 @@ export async function processAndStoreDocument(
     }
 
     console.log(`Successfully processed and stored ${originalFilename}.`);
-  } catch (error) {
+  };
+
+  const { error } = await tryCatch(processFilePromise());
+
+  if (error) {
     console.error(`Error processing file ${originalFilename}:`, error);
     throw new Error(`Failed to process file ${originalFilename}`);
   }

@@ -1,5 +1,6 @@
 import { BETTER_AUTH_SECRET } from "@/constants";
 import * as crypto from "crypto";
+import { tryCatch } from "@/lib/try-catch";
 
 const ALGORITHM = "aes-256-cbc";
 
@@ -17,8 +18,8 @@ export function encrypt(text: string): string {
   return `${iv.toString("base64")}:${encrypted}`;
 }
 
-export function decrypt(encryptedText: string): string {
-  try {
+export async function decrypt(encryptedText: string): Promise<string> {
+  const decryptPromise = async () => {
     const [ivBase64, encryptedData] = encryptedText.split(":");
 
     if (!ivBase64 || !encryptedData) {
@@ -36,8 +37,14 @@ export function decrypt(encryptedText: string): string {
     decrypted += decipher.final("utf8");
 
     return decrypted;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(decryptPromise());
+
+  if (error) {
     console.error("Decryption error:", error);
     return "";
   }
+
+  return data;
 }

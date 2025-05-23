@@ -1,6 +1,7 @@
 import { OLLAMA_BASE_URL } from "@/constants";
 import { Provider, Providers, LLM_PROVIDERS, Model } from "@/types";
 import { Ollama } from "ollama";
+import { tryCatch } from "@/lib/try-catch";
 
 export const models: Provider[] = [
   {
@@ -107,7 +108,7 @@ export async function getOllamaModels(invalidateCache = false) {
     return ollamaModelsCache;
   }
 
-  try {
+  const fetchModelsPromise = async () => {
     const ollama = new Ollama({ host: OLLAMA_BASE_URL });
     const models = await ollama.list();
 
@@ -137,12 +138,18 @@ export async function getOllamaModels(invalidateCache = false) {
     console.log("Fetching Ollama models");
 
     return chatModels;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(fetchModelsPromise());
+
+  if (error) {
     if (ollamaModelsCache) {
       return ollamaModelsCache;
     }
     throw error;
   }
+
+  return data;
 }
 
 export async function getConfigs(invalidateCache = false): Promise<Providers> {
