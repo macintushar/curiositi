@@ -10,7 +10,7 @@ export default function Section({
   return (
     <div
       className={cn(
-        "bg-secondary border-primary h-full w-full rounded-lg border-[1px]",
+        "bg-muted border-accent-muted h-full w-full rounded-lg border-[1px]",
         className,
       )}
     >
