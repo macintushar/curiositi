@@ -23,7 +23,13 @@ export const DATABASE_URL =
   process.env.DATABASE_URL || "postgres://user:pass@localhost:5432/dbname";
 
 // Better Auth
-export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET || "";
+if (!process.env.BETTER_AUTH_SECRET) {
+  throw new Error(
+    "BETTER_AUTH_SECRET is not set – refusing to start without a signing secret.",
+  );
+}
+
+export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
 export const BETTER_AUTH_URL = HOST;
 
 // Ollama
