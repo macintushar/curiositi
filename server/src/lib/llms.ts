@@ -1,4 +1,5 @@
 import {
+  ANTHROPIC_API_KEY,
   HOST,
   OLLAMA_BASE_URL,
   OLLAMA_EMBEDDING_MODEL,
@@ -6,10 +7,12 @@ import {
   OPENAI_EMBEDDING_MODEL,
   OPENROUTER_API_KEY,
 } from "@/constants";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { createOllama } from "ollama-ai-provider";
-import { createOpenAI } from "@ai-sdk/openai";
 import { EMBEDDING_PROVIDERS, LLM_PROVIDERS } from "@/types";
+
+import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOllama } from "ollama-ai-provider";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 export const ollama = createOllama({
   baseURL: `${OLLAMA_BASE_URL}/api`,
@@ -28,6 +31,10 @@ export const openai = createOpenAI({
   compatibility: "strict",
 });
 
+export const anthropic = createAnthropic({
+  apiKey: ANTHROPIC_API_KEY,
+});
+
 export function llm(model: string, provider: LLM_PROVIDERS) {
   switch (provider) {
     case LLM_PROVIDERS.OPENROUTER:
@@ -38,6 +45,9 @@ export function llm(model: string, provider: LLM_PROVIDERS) {
 
     case LLM_PROVIDERS.OPENAI:
       return openai(model);
+
+    case LLM_PROVIDERS.ANTHROPIC:
+      return anthropic(model);
 
     default:
       throw new Error(`Unsupported LLM provider: ${provider}`);

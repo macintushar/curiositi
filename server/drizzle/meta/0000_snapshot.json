@@ -1,5 +1,5 @@
 {
-  "id": "55a2747a-428e-4158-8bfb-164643de7527",
+  "id": "5fbf0603-a16e-4d5d-8490-6ce1972d418c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -625,6 +625,30 @@
         },
         "image": {
           "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "openai_api_key": {
+          "name": "openai_api_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "anthropic_api_key": {
+          "name": "anthropic_api_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "openrouter_api_key": {
+          "name": "openrouter_api_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ollama_url": {
+          "name": "ollama_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false

@@ -1,6 +1,7 @@
 import { files, spaces, user } from "@/db/schema";
 import db from "@/db";
 import { and, desc, eq } from "drizzle-orm";
+import { tryCatch } from "@/lib/try-catch";
 
 export async function addFileToDB(
   buffer: Buffer,
@@ -10,7 +11,7 @@ export async function addFileToDB(
   spaceId: string,
   hash: string,
 ) {
-  try {
+  const addFilePromise = async () => {
     const isFileInSpace = await db
       .select()
       .from(files)
@@ -39,14 +40,20 @@ export async function addFileToDB(
       });
 
     return file;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(addFilePromise());
+
+  if (error) {
     console.error("Error adding file to DB:", error);
     throw error;
   }
+
+  return data;
 }
 
 export async function getFilesFromDB(spaceId: string) {
-  try {
+  const getFilesPromise = async () => {
     const data = await db.query.files.findMany({
       columns: {
         id: true,
@@ -59,84 +66,126 @@ export async function getFilesFromDB(spaceId: string) {
       where: eq(files.spaceId, spaceId),
     });
     return data;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(getFilesPromise());
+
+  if (error) {
     console.error("Error getting files from DB:", error);
     throw error;
   }
+
+  return data;
 }
 
 export async function getFileFromDB(id: string, spaceId: string) {
-  try {
+  const getFilePromise = async () => {
     const file = await db
       .select()
       .from(files)
       .where(and(eq(files.id, id), eq(files.spaceId, spaceId)));
     return file;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(getFilePromise());
+
+  if (error) {
     console.error("Error getting file from DB:", error);
     throw error;
   }
+
+  return data;
 }
 
 export async function deleteFileFromDB(id: string, spaceId: string) {
-  try {
+  const deleteFilePromise = async () => {
     await db
       .delete(files)
       .where(and(eq(files.id, id), eq(files.spaceId, spaceId)));
     return true;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(deleteFilePromise());
+
+  if (error) {
     console.error("Error deleting file from DB:", error);
     throw error;
   }
+
+  return data;
 }
 
 export async function addSpaceToDB(name: string, userId: string) {
-  try {
+  const addSpacePromise = async () => {
     const space = await db
       .insert(spaces)
       .values({ name, createdBy: userId })
       .returning();
     return space;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(addSpacePromise());
+
+  if (error) {
     console.error("Error adding space to DB:", error);
     throw error;
   }
+
+  return data;
 }
 
 export async function getSpacesFromDB() {
-  try {
+  const getSpacesPromise = async () => {
     const data = await db
       .select()
       .from(spaces)
       .orderBy(desc(spaces.updatedAt))
       .leftJoin(user, eq(spaces.createdBy, user.id));
     return data;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(getSpacesPromise());
+
+  if (error) {
     console.error("Error getting spaces from DB:", error);
     throw error;
   }
+
+  return data;
 }
 
 export async function getSpaceFromDB(id: string) {
-  try {
+  const getSpacePromise = async () => {
     const data = await db
       .select()
       .from(spaces)
       .where(eq(spaces.id, id))
       .leftJoin(user, eq(spaces.createdBy, user.id));
     return data;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(getSpacePromise());
+
+  if (error) {
     console.error("Error getting space from DB:", error);
     throw error;
   }
+
+  return data;
 }
 
 export async function deleteSpaceFromDB(id: string) {
-  try {
+  const deleteSpacePromise = async () => {
     await db.delete(spaces).where(eq(spaces.id, id));
     return true;
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(deleteSpacePromise());
+
+  if (error) {
     console.error("Error deleting space from DB:", error);
     throw error;
   }
+
+  return data;
 }

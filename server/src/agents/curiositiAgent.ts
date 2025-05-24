@@ -10,6 +10,7 @@ import {
   Message as HistoryMessage,
 } from "@/types";
 import { llm } from "@/lib/llms";
+import { tryCatch } from "@/lib/try-catch";
 
 type CuriositiAgentResponse = {
   docQueries: string[];
@@ -29,7 +30,7 @@ async function curiositiAgent(
   spaceId?: string,
   history: HistoryMessage[] = [],
 ): Promise<CuriositiAgentResponse> {
-  try {
+  const agentPromise = async (): Promise<CuriositiAgentResponse> => {
     // Validate that spaceId is provided when mode is "space"
     if (mode === "space" && !spaceId) {
       throw new Error("spaceId is required when mode is 'space'");
@@ -102,10 +103,10 @@ Guidelines:
       mode === "space" && spaceId
         ? await Promise.all(
             (queryPlan.docQueries || []).map(async (query) => {
-              try {
-                const result = await docSearchToolWithSpaceId(query, spaceId);
-                return { query, result, error: null };
-              } catch (error) {
+              const { data: result, error } = await tryCatch(
+                docSearchToolWithSpaceId(query, spaceId),
+              );
+              if (error) {
                 console.error(
                   `Error in doc search for query "${query}":`,
                   error,
@@ -116,6 +117,7 @@ Guidelines:
                   error: error instanceof Error ? error.message : String(error),
                 };
               }
+              return { query, result, error: null };
             }),
           )
         : [];
@@ -123,16 +125,10 @@ Guidelines:
     // Web search worker with error handling
     const webSearchResults = await Promise.all(
       (queryPlan.webQueries || []).map(async (query) => {
-        try {
-          const result = await webSearchTool.invoke(query);
-          console.log("Searching the web for query:", query);
-          return {
-            query,
-            result:
-              typeof result === "string" ? result : JSON.stringify(result),
-            error: null,
-          };
-        } catch (error) {
+        const { data: result, error } = await tryCatch(
+          webSearchTool.invoke(query),
+        );
+        if (error) {
           console.error(`Error in web search for query "${query}":`, error);
           return {
             query,
@@ -140,6 +136,12 @@ Guidelines:
             error: error instanceof Error ? error.message : String(error),
           };
         }
+        console.log("Searching the web for query:", query);
+        return {
+          query,
+          result: typeof result === "string" ? result : JSON.stringify(result),
+          error: null,
+        };
       }),
     );
 
@@ -203,8 +205,15 @@ Guidelines:
       strategy: "retrieve",
       reasoning: "Answer synthesized from retrieved information",
     };
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch<CuriositiAgentResponse, Error>(
+    agentPromise(),
+  );
+
+  if (error) {
     console.error("Error in curiositiAgent:", error);
+    // Create a new object with the right type
     return {
       docQueries: [],
       webQueries: [],
@@ -212,10 +221,12 @@ Guidelines:
       webResults: [],
       answer:
         "I encountered an error while processing your question. Please try again later.",
-      strategy: "error",
+      strategy: "error", // This is a valid value for the union type
       reasoning: error instanceof Error ? error.message : String(error),
-    };
+    } as CuriositiAgentResponse; // Type assertion to ensure compatibility
   }
+
+  return data;
 }
 
 export default curiositiAgent;

@@ -1,5 +1,7 @@
 import { ThemeProvider } from "@/components/themes/theme-provider";
-import { webMetaData } from "@/constants";
+import { Toaster } from "@/components/ui/sonner";
+
+import { webMetaData } from "@/constants/landing-constants";
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
@@ -46,6 +48,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

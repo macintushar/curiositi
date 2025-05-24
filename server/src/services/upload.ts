@@ -2,6 +2,7 @@ import { SUPPORTED_FILE_TYPES } from "@/constants";
 import { addFileToDB } from "@/services/queries";
 import { processAndStoreDocument } from "@/services/ingestion";
 import { createHash } from "crypto";
+import { tryCatch } from "@/lib/try-catch";
 
 interface FileUpload {
   name: string;
@@ -15,7 +16,7 @@ export async function uploadFileHandler(
   spaceId: string,
   userId: string,
 ) {
-  try {
+  const processFilePromise = async () => {
     if (!file) {
       throw new Error("No file was uploaded or invalid file format");
     }
@@ -68,7 +69,11 @@ export async function uploadFileHandler(
         },
       },
     };
-  } catch (error: unknown) {
+  };
+
+  const { data, error } = await tryCatch(processFilePromise());
+
+  if (error) {
     console.error("Error handling file upload:", error);
     let errorDetails = "Unknown error";
     if (error instanceof Error) {
@@ -78,4 +83,6 @@ export async function uploadFileHandler(
     }
     throw new Error(`Failed to process uploaded file: ${errorDetails}`);
   }
+
+  return data;
 }
