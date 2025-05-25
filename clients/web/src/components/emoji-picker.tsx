@@ -6,13 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useState } from "react";
 import { Button } from "./ui/button";
 
-export default function EmojiPicker({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
+export default function EmojiPicker() {
   const [search, setSearch] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [emojis, setEmojis] = useState(emojiList);
