@@ -28,6 +28,8 @@ function HiddenInput({ className, ...props }: React.ComponentProps<"input">) {
         size="icon"
         className="absolute right-2 h-6 w-6"
         type="button"
+        aria-label={isVisible ? "Hide password" : "Show password"}
+        aria-pressed={isVisible}
         onClick={() => {
           setIsVisible(!isVisible);
         }}
