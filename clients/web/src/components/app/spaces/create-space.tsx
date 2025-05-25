@@ -22,7 +22,6 @@ import { createSpaceSchema } from "@/lib/schema";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -74,14 +73,11 @@ export default function CreateSpaceDialog() {
               <FormField
                 control={form.control}
                 name="icon"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Icon</FormLabel>
                     <FormControl>
-                      <EmojiPicker
-                        value={field.value ?? "🙂"}
-                        onChange={field.onChange}
-                      />
+                      <EmojiPicker />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
