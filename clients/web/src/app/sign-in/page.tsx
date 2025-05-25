@@ -38,12 +38,10 @@ export default function SignIn() {
   async function onSubmit(values: z.infer<typeof signInSchema>) {
     const { email, password } = values;
     try {
-      // const response = await handleSignIn({ email, password });
       const response = await authClient.signIn.email({
         email,
         password,
         rememberMe: true,
-        callbackURL: "/app",
       });
 
       if (response.data?.user) {

@@ -20,8 +20,12 @@ import { signUpSchema } from "@/lib/schema";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import AuthLayout from "@/views/auth/layout";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function SignUp() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -33,16 +37,23 @@ export default function SignUp() {
   });
 
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
-    const { name, email, password } = values;
+    const { email, password, name } = values;
     try {
       const response = await authClient.signUp.email({
-        email: email,
-        password: password,
-        name: name,
+        email,
+        password,
+        name,
       });
-      console.log(response);
+
+      if (response.data?.user) {
+        toast.success("Signed up successfully");
+        router.push("/app");
+      } else {
+        toast.error(response.error?.message ?? "Failed to sign up");
+      }
     } catch (error) {
       console.error(error);
+      toast.error("An error occurred while signing up. Please try again.");
     }
   }
   return (
