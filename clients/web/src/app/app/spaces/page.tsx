@@ -22,8 +22,8 @@ export default async function SpacesPage() {
           <div className="grid grid-cols-1 gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             <CreateSpaceDialog />
             {data.data.map((space, index) => (
-              <Link key={index} href={`/app/spaces/${space.spaces.id}`}>
-                <Space text={space.spaces.name} />
+              <Link key={index} href={`/app/spaces/${space.space.id}`}>
+                <Space text={space.space.name} />
               </Link>
             ))}
           </div>

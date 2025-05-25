@@ -137,7 +137,15 @@ export async function addSpaceToDB(name: string, userId: string) {
 export async function getSpacesFromDB() {
   const getSpacesPromise = async () => {
     const data = await db
-      .select()
+      .select({
+        space: spaces,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        },
+      })
       .from(spaces)
       .orderBy(desc(spaces.updatedAt))
       .leftJoin(user, eq(spaces.createdBy, user.id));
@@ -157,7 +165,15 @@ export async function getSpacesFromDB() {
 export async function getSpaceFromDB(id: string) {
   const getSpacePromise = async () => {
     const data = await db
-      .select()
+      .select({
+        space: spaces,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          image: user.image,
+        },
+      })
       .from(spaces)
       .where(eq(spaces.id, id))
       .leftJoin(user, eq(spaces.createdBy, user.id));
@@ -171,7 +187,7 @@ export async function getSpaceFromDB(id: string) {
     throw error;
   }
 
-  return data;
+  return data[0];
 }
 
 export async function deleteSpaceFromDB(id: string) {

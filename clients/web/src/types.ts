@@ -54,6 +54,6 @@ export type ProviderResponse = {
 };
 
 export type SpaceResponse = {
-  spaces: Space;
+  space: Space;
   user: User;
 };

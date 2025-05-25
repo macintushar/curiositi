@@ -21,7 +21,7 @@ export async function createSpaceHandler(name: string, userId: string) {
 
 export async function getSpaceHandler(id: string) {
   const data = await getSpaceFromDB(id);
-  return { data: data[0] };
+  return { data };
 }
 
 export async function deleteSpaceHandler(id: string) {
