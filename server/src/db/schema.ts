@@ -56,10 +56,6 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
-  openaiApiKey: text("openai_api_key"),
-  anthropicApiKey: text("anthropic_api_key"),
-  openRouterApiKey: text("openrouter_api_key"),
-  ollamaUrl: text("ollama_url"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
@@ -152,4 +148,17 @@ export const messages = pgTable("messages", {
   webSearches: text("web_searches").array(),
   documentSearchResults: text("document_search_results").array(),
   webSearchResults: text("web_search_results").array(),
+});
+
+export const settings = pgTable("settings", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  openaiApiKey: text("openai_api_key"),
+  anthropicApiKey: text("anthropic_api_key"),
+  openRouterApiKey: text("openrouter_api_key"),
+  ollamaUrl: text("ollama_url"),
 });

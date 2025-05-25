@@ -303,7 +303,7 @@ apiRouter.post(
   },
 );
 
-apiRouter.get("/user/keys", async (c) => {
+apiRouter.get("/user/settings", async (c) => {
   const user = c.get("user");
 
   if (!user) {
@@ -318,7 +318,7 @@ apiRouter.get("/user/keys", async (c) => {
 });
 
 apiRouter.post(
-  "/user/keys",
+  "/user/settings",
   zValidator("json", AddOrUpdateApiKeySchema),
   async (c) => {
     const user = c.get("user");

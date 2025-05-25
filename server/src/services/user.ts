@@ -1,5 +1,5 @@
 import db from "@/db";
-import { user } from "@/db/schema";
+import { settings } from "@/db/schema";
 import { LLM_PROVIDERS } from "@/types";
 import { encrypt, decrypt } from "@/lib/crypto";
 import { eq } from "drizzle-orm";
@@ -18,9 +18,9 @@ export async function addOrUpdateApiKey(
     switch (provider) {
       case LLM_PROVIDERS.OLLAMA:
         await db
-          .update(user)
+          .update(settings)
           .set({ ollamaUrl: updateValue.url })
-          .where(eq(user.id, userId));
+          .where(eq(settings.userId, userId));
 
         updated = true;
 
@@ -28,9 +28,9 @@ export async function addOrUpdateApiKey(
 
       case LLM_PROVIDERS.OPENAI:
         await db
-          .update(user)
+          .update(settings)
           .set({ openaiApiKey: encryptedKey })
-          .where(eq(user.id, userId));
+          .where(eq(settings.userId, userId));
 
         updated = true;
 
@@ -38,9 +38,9 @@ export async function addOrUpdateApiKey(
 
       case LLM_PROVIDERS.OPENROUTER:
         await db
-          .update(user)
+          .update(settings)
           .set({ openRouterApiKey: encryptedKey })
-          .where(eq(user.id, userId));
+          .where(eq(settings.userId, userId));
 
         updated = true;
 
@@ -48,9 +48,9 @@ export async function addOrUpdateApiKey(
 
       case LLM_PROVIDERS.ANTHROPIC:
         await db
-          .update(user)
+          .update(settings)
           .set({ anthropicApiKey: encryptedKey })
-          .where(eq(user.id, userId));
+          .where(eq(settings.userId, userId));
 
         updated = true;
 
@@ -75,7 +75,10 @@ export async function addOrUpdateApiKey(
 }
 
 export async function getApiKeys(userId: string) {
-  const result = await db.select().from(user).where(eq(user.id, userId));
+  const result = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.userId, userId));
 
   if (result.length > 0) {
     const userData = { ...result[0] };
