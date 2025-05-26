@@ -16,8 +16,18 @@ import { signOut } from "@/lib/auth-client";
 
 import { IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function Profile() {
+  const router = useRouter();
+
+  async function handleSignOut() {
+    await signOut();
+    router.push("/sign-in");
+    toast.success("Signed out successfully");
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -35,11 +45,10 @@ export function Profile() {
                 <Link
                   href={link.url}
                   key={link.label}
-                  className="cursor-pointer"
                   target={link.isLinkExternal ? "_blank" : "_self"}
                   prefetch={link.isLinkExternal ? false : true}
                 >
-                  <DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer">
                     {link.icon}
                     {link.label}
                   </DropdownMenuItem>
@@ -49,7 +58,11 @@ export function Profile() {
             <DropdownMenuSeparator />
           </div>
         ))}
-        <DropdownMenuItem onClick={() => signOut()}>
+        <DropdownMenuItem
+          variant="destructive"
+          className="cursor-pointer"
+          onClick={handleSignOut}
+        >
           <IconLogout className="size-4" />
           Log out
         </DropdownMenuItem>
