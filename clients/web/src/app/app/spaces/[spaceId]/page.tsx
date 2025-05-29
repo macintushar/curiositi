@@ -1,3 +1,3 @@
-export default function SpacePage() {
-  return <div>SpacePage</div>;
+export default function Space() {
+  return <h1>Space</h1>;
 }

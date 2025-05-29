@@ -1,4 +1,4 @@
-import ThemedLogo from "@/components/themes/themed-logo";
+import ThemedLogo from "@/components/themes/logo/themed-logo";
 import Link from "next/link";
 import { footerLinks } from "@/constants/landing-constants";
 

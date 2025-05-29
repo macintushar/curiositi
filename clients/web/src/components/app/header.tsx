@@ -1,6 +1,6 @@
 import Link from "next/link";
 import ThemeSwitcher from "../themes/theme-switcher";
-import ThemedLogo from "../themes/themed-logo";
+import ThemedLogo from "../themes/logo/themed-logo";
 
 import Section from "./section";
 import { IconFolder } from "@tabler/icons-react";

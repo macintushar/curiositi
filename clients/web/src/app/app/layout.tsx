@@ -1,13 +1,30 @@
+import AppSidebar from "@/components/app/sidebar/app-sidebar";
 import Header from "@/components/app/header";
 import Section from "@/components/app/section";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+import { getThreads } from "@/services/chats";
+
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const threads = await getThreads();
+
   return (
-    <div className="flex h-screen max-h-screen min-h-screen flex-col gap-[16px] p-[16px]">
-      <Header />
-      <Section>
-        <main className="h-full w-full p-4">{children}</main>
-      </Section>
-    </div>
+    <SidebarProvider>
+      <SidebarInset>
+        <div className="flex h-screen max-h-screen min-h-screen flex-col gap-[16px] p-[16px]">
+          <Header />
+          <div className="flex h-full gap-3">
+            <AppSidebar threads={threads} />
+            <Section className="max-h-full overflow-auto p-4">
+              {children}
+            </Section>
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

@@ -1,25 +1,6 @@
 "use client";
 
 import {
-  DialogHeader,
-  DialogContent,
-  DialogTrigger,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Dialog } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-
-import Space from "./space";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import type { z } from "zod";
-
-import { createSpaceSchema } from "@/lib/schema";
-
-import {
   Form,
   FormControl,
   FormField,
@@ -27,36 +8,67 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  DialogHeader,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Dialog } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
 import EmojiPicker from "@/components/emoji-picker";
 
-export default function CreateSpaceDialog() {
+import Space from "./space";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import type { z } from "zod";
+
+import { createSpaceSchema } from "@/lib/schema";
+import { Textarea } from "@/components/ui/textarea";
+
+export default function CreateSpaceDialog({
+  handleSubmit,
+}: {
+  handleSubmit: (values: z.infer<typeof createSpaceSchema>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
   const form = useForm<z.infer<typeof createSpaceSchema>>({
     resolver: zodResolver(createSpaceSchema),
     defaultValues: {
       name: "",
       icon: "",
+      description: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof createSpaceSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  function handleFormSubmit(values: z.infer<typeof createSpaceSchema>) {
+    handleSubmit(values);
+    setOpen(false);
+    form.reset();
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger>
         <Space text="Create new space" isEmpty />
       </DialogTrigger>
       <DialogContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(handleFormSubmit)}
+            className="space-y-8"
+          >
             <DialogHeader>
               <DialogTitle>Create new space</DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-5">
               <FormField
                 control={form.control}
                 name="name"
@@ -64,7 +76,26 @@ export default function CreateSpaceDialog() {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="My space" {...field} />
+                      <div className="relative">
+                        <FormField
+                          control={form.control}
+                          name="icon"
+                          render={({ field }) => (
+                            <EmojiPicker value={field}>
+                              <Input
+                                className="absolute top-1/2 left-2 h-8 w-8 -translate-y-1/2 cursor-pointer border-2 border-dashed p-0 text-center"
+                                placeholder="+"
+                                {...field}
+                              />
+                            </EmojiPicker>
+                          )}
+                        />
+                        <Input
+                          placeholder="Enter a space name"
+                          className="h-11 pl-12"
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -72,12 +103,15 @@ export default function CreateSpaceDialog() {
               />
               <FormField
                 control={form.control}
-                name="icon"
-                render={() => (
+                name="description"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Icon</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <EmojiPicker />
+                      <Textarea
+                        placeholder="e.g. These documents have notes on cars."
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,7 +120,9 @@ export default function CreateSpaceDialog() {
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" onClick={() => form.reset()}>
+                  Cancel
+                </Button>
               </DialogClose>
               <Button type="submit">Create</Button>
             </DialogFooter>

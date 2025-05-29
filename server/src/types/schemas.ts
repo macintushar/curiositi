@@ -32,6 +32,8 @@ export const QUERY_JSON_SCHEMA = (mode: CuriositiAgentMode) =>
 
 export const CreateSpaceSchema = z.object({
   name: z.string().min(1, '"name" cannot be empty'),
+  icon: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export const AddOrUpdateApiKeySchema = z.object({

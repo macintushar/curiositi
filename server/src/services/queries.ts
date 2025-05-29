@@ -1,6 +1,6 @@
 import { files, spaces, user } from "@/db/schema";
 import db from "@/db";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { tryCatch } from "@/lib/try-catch";
 
 export async function addFileToDB(
@@ -115,11 +115,16 @@ export async function deleteFileFromDB(id: string, spaceId: string) {
   return data;
 }
 
-export async function addSpaceToDB(name: string, userId: string) {
+export async function addSpaceToDB(
+  name: string,
+  userId: string,
+  icon: string | null,
+  description: string | null,
+) {
   const addSpacePromise = async () => {
     const space = await db
       .insert(spaces)
-      .values({ name, createdBy: userId })
+      .values({ name, createdBy: userId, icon, description })
       .returning();
     return space;
   };
@@ -145,10 +150,13 @@ export async function getSpacesFromDB() {
           email: user.email,
           image: user.image,
         },
+        files: sql<number>`count(${files.id})::int`,
       })
       .from(spaces)
       .orderBy(desc(spaces.updatedAt))
-      .leftJoin(user, eq(spaces.createdBy, user.id));
+      .leftJoin(user, eq(spaces.createdBy, user.id))
+      .leftJoin(files, eq(spaces.id, files.spaceId))
+      .groupBy(spaces.id, user.id, user.name, user.email, user.image);
     return data;
   };
 

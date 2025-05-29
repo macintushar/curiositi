@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import ThemeSwitcher from "@/components/themes/theme-switcher";
-import ThemedLogo from "@/components/themes/themed-logo";
+import ThemedLogo from "@/components/themes/logo/themed-logo";
 
 import { navLinks } from "@/constants/landing-constants";
 import NavLink from "./NavLink";

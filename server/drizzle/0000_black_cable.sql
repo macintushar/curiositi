@@ -61,9 +61,20 @@ CREATE TABLE "session" (
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
+CREATE TABLE "settings" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL,
+	"openai_api_key" text,
+	"anthropic_api_key" text,
+	"openrouter_api_key" text,
+	"ollama_url" text
+);
+--> statement-breakpoint
 CREATE TABLE "spaces" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
+	"icon" text,
+	"description" text,
 	"created_by" text NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now()
@@ -83,10 +94,6 @@ CREATE TABLE "user" (
 	"email" text NOT NULL,
 	"email_verified" boolean NOT NULL,
 	"image" text,
-	"openai_api_key" text,
-	"anthropic_api_key" text,
-	"openrouter_api_key" text,
-	"ollama_url" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
@@ -108,6 +115,7 @@ ALTER TABLE "documents" ADD CONSTRAINT "documents_created_by_user_id_fk" FOREIGN
 ALTER TABLE "files" ADD CONSTRAINT "files_space_id_spaces_id_fk" FOREIGN KEY ("space_id") REFERENCES "public"."spaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "messages" ADD CONSTRAINT "messages_thread_id_threads_id_fk" FOREIGN KEY ("thread_id") REFERENCES "public"."threads"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "settings" ADD CONSTRAINT "settings_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "spaces" ADD CONSTRAINT "spaces_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "threads" ADD CONSTRAINT "threads_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "threads" ADD CONSTRAINT "threads_space_id_spaces_id_fk" FOREIGN KEY ("space_id") REFERENCES "public"."spaces"("id") ON DELETE cascade ON UPDATE no action;

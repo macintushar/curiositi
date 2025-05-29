@@ -19,7 +19,7 @@ import { HiddenInput } from "@/components/ui/hidden-input";
 import { signUpSchema } from "@/lib/schema";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import AuthLayout from "@/views/auth/layout";
+import AuthLayout from "@/views/auth/auth-layout";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -57,18 +57,12 @@ export default function SignUp() {
     }
   }
   return (
-    <AuthLayout>
+    <AuthLayout description="Create your account to access curiositi">
       <Form {...form}>
         <form
           className="flex flex-col gap-6"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Sign Up to access Curiositi</h1>
-            <p className="text-muted-foreground text-sm text-balance">
-              Create an account to get started
-            </p>
-          </div>
           <div className="grid gap-6">
             <div className="grid gap-2">
               <FormField

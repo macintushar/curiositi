@@ -178,12 +178,14 @@ apiRouter.get("/spaces", async (c) => {
 });
 
 apiRouter.post("/spaces", zValidator("json", CreateSpaceSchema), async (c) => {
-  const { name } = await c.req.valid("json");
+  const { name, icon, description } = await c.req.valid("json");
   const user = c.get("user");
   if (!user) {
     return c.json({ error: "Unauthorized" }, 401);
   }
-  const { data, error } = await tryCatch(createSpaceHandler(name, user.id));
+  const { data, error } = await tryCatch(
+    createSpaceHandler(name, user.id, icon ?? null, description ?? null),
+  );
   if (error) {
     return c.json({ error: error.message || "Failed to create space" }, 500);
   }

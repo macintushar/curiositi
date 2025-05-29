@@ -20,8 +20,13 @@ export type ApiResponse<T> = {
   error: string | null;
 };
 
+export type MessageResponse = {
+  message: string;
+};
+
 export type Space = {
   id: string;
+  icon: string;
   name: string;
   description: string;
   createdBy: string;
@@ -56,4 +61,13 @@ export type ProviderResponse = {
 export type SpaceResponse = {
   space: Space;
   user: User;
+  files: number;
+};
+
+export type Thread = {
+  id: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  spaceId: string | null;
 };

@@ -43,6 +43,8 @@ export const spaces = pgTable("spaces", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
+  icon: text("icon"),
+  description: text("description"),
   createdBy: text("created_by")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
