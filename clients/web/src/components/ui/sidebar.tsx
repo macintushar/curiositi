@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import { type VariantProps, cva } from "class-variance-authority";
+
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -32,7 +33,7 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3.8rem";
+const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
 type SidebarContextProps = {
@@ -173,7 +174,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "text-sidebar-foreground bg-sidebar flex h-full w-(--sidebar-width) flex-col",
+          "bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
           className,
         )}
         {...props}
@@ -210,7 +211,7 @@ function Sidebar({
 
   return (
     <div
-      className="group peer text-sidebar-foreground hidden md:block"
+      className="group peer text-sidebar-foreground hidden rounded-lg md:block"
       data-state={state}
       data-collapsible={state === "collapsed" ? collapsible : ""}
       data-variant={variant}
@@ -232,14 +233,14 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "hidden h-full w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          "hidden h-full w-(--sidebar-width) rounded-lg transition-[left,right,width] duration-200 ease-linear md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
           // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r-0 group-data-[side=right]:border-l",
+            : "border-sidebar-border group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-[1px] group-data-[side=right]:border-l",
           className,
         )}
         {...props}
@@ -247,7 +248,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-muted border-accent-muted group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col rounded-lg border-[1px] group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col rounded-lg group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
         >
           {children}
         </div>
@@ -277,9 +278,9 @@ function SidebarTrigger({
       {...props}
     >
       {state === "collapsed" ? (
-        <IconLayoutSidebarLeftExpand className="text-brand size-4" />
+        <IconLayoutSidebarLeftExpand />
       ) : (
-        <IconLayoutSidebarLeftCollapse className="text-brand size-4" />
+        <IconLayoutSidebarLeftCollapse />
       )}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>

@@ -2,8 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { SunMoonIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { IconMoon, IconSun, IconSunMoon, type Icon } from "@tabler/icons-react";
 
 export default function ThemeSwitcher({
   className,
@@ -13,6 +13,17 @@ export default function ThemeSwitcher({
   variant?: "outline" | "ghost";
 }) {
   const { theme, setTheme } = useTheme();
+
+  let ThemedIcon: Icon;
+
+  if (theme === "dark") {
+    ThemedIcon = IconSun;
+  } else if (theme === "light") {
+    ThemedIcon = IconMoon;
+  } else {
+    ThemedIcon = IconSunMoon;
+  }
+
   return (
     <Button
       size="icon"
@@ -24,7 +35,7 @@ export default function ThemeSwitcher({
       )}
     >
       <span className="sr-only">Toggle theme</span>
-      <SunMoonIcon className="size-5" />
+      <ThemedIcon className="size-4" />
     </Button>
   );
 }

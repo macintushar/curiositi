@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,15 +11,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { profileLinks } from "@/constants/app-constants";
-import { signOut } from "@/lib/auth-client";
+import { authClient, signOut } from "@/lib/auth-client";
 
 import { IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function Profile() {
+  const { useSession } = authClient;
+
   const router = useRouter();
+  const session = useSession();
 
   async function handleSignOut() {
     await signOut();
@@ -31,9 +34,12 @@ export function Profile() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="cursor-pointer">
-          <IconUser className="size-5" />
-        </Button>
+        <Avatar>
+          <AvatarImage src={session.data?.user.image ?? ""} />
+          <AvatarFallback>
+            {session.data?.user.name?.split(" ")[0]?.[0] ?? <IconUser />}
+          </AvatarFallback>
+        </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" side="bottom" align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>

@@ -36,42 +36,42 @@ export default function AppSidebar({ threads }: AppSidebarProps) {
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarContent>
-        <div
-          className={cn(
-            `hidden h-full w-full flex-col`,
-            state === "collapsed" ? "" : "block",
-          )}
-        >
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <Link href={`/app/spaces`} prefetch>
-                    <SidebarMenuButton
-                      isActive={path === "/app/spaces"}
-                      className="text-brand"
-                    >
-                      <IconFolder />
-                      Spaces
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <Link href={`/app`} prefetch>
-                    <SidebarMenuButton
-                      isActive={path === "/app"}
-                      className="text-brand"
-                    >
-                      <IconMessage />
-                      Chat
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <Link href={`/app/spaces`} prefetch>
+                  <SidebarMenuButton
+                    isActive={path === "/app/spaces"}
+                    className="hover:cursor-pointer"
+                  >
+                    <IconFolder />
+                    Spaces
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href={`/app`} prefetch>
+                  <SidebarMenuButton
+                    isActive={path === "/app"}
+                    className="hover:cursor-pointer"
+                  >
+                    <IconMessage />
+                    Chat
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <div
+                className={cn(
+                  `hidden h-full w-full flex-col`,
+                  state === "collapsed" ? "" : "block",
+                )}
+              >
                 <SidebarChats threads={threads} currentPath={path} />
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        </div>
+              </div>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <SidebarTrigger />

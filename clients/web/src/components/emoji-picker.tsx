@@ -38,7 +38,7 @@ export default function EmojiPicker({
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="flex flex-col justify-between gap-4 rounded-xl p-4">
         <div className="flex h-fit items-center justify-between">
-          <h1 className="text-sm font-medium">Emoji</h1>
+          <h1 className="text-primary text-sm font-medium">Emoji</h1>
           <IconTrashX
             className={
               `h-5 w-5 ` +
@@ -55,7 +55,7 @@ export default function EmojiPicker({
           value={search}
           onChange={(e) => filterEmojis(e.target.value)}
         />
-        <div className="grid h-48 w-full grid-cols-7 gap-2 overflow-scroll">
+        <div className="grid h-48 w-full grid-cols-7 gap-2 overflow-x-clip overflow-y-scroll p-2">
           {emojis.map((emoji, index) => (
             <div
               key={index}

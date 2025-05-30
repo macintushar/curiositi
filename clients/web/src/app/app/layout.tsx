@@ -15,7 +15,7 @@ export default async function AppLayout({
   return (
     <SidebarProvider>
       <SidebarInset>
-        <div className="flex h-screen max-h-screen min-h-screen flex-col gap-[16px] p-[16px]">
+        <div className="bg-muted flex h-screen max-h-screen min-h-screen flex-col gap-[16px] p-[16px]">
           <Header />
           <div className="flex h-full gap-3">
             <AppSidebar threads={threads} />
