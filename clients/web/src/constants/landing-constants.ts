@@ -1,5 +1,5 @@
-import { env } from "./env";
-import type { NavLink } from "./types";
+import { env } from "@/env";
+import type { NavLink } from "@/types";
 
 export const webMetaData = {
   siteName: "Curiositi",

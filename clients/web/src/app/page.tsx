@@ -15,7 +15,7 @@ import GithubIcon from "@/assets/icons/github-icon";
 import Header from "@/views/landing/header";
 import Footer from "@/views/landing/footer";
 
-import { ghURL } from "@/constants";
+import { ghURL } from "@/constants/landing-constants";
 
 export default function LandingPage() {
   return (
