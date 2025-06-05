@@ -51,6 +51,8 @@ export type Model = {
 
 export type Provider = {
   name: string;
+  title: string;
+  enabled: boolean;
   models: Model[];
 };
 
@@ -58,10 +60,10 @@ export type ProviderResponse = {
   providers: Provider[];
 };
 
-export type SpaceResponse = {
+export type SpaceResponse<T> = {
   space: Space;
   user: User;
-  files: number;
+  files: T;
 };
 
 export type Thread = {
@@ -70,4 +72,30 @@ export type Thread = {
   createdAt: string;
   updatedAt: string;
   spaceId: string | null;
+};
+
+export type ThreadMessage = {
+  id: string;
+  content: string;
+  role: "user" | "assistant";
+  createdAt: string;
+  updatedAt: string;
+  threadId: string;
+  documentSearches: string[] | null;
+  webSearches: string[] | null;
+  documentSearchResults: string[] | null;
+  webSearchResults: string[] | null;
+};
+
+export type Context = {
+  id: string;
+  type: "file" | "space";
+  name: string;
+};
+
+export type SearchTab = "all" | "documents" | "spaces";
+
+export type AllFiles = File & {
+  spaceName: string;
+  spaceIcon: string;
 };

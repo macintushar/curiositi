@@ -78,6 +78,35 @@ export async function getFilesFromDB(spaceId: string) {
   return data;
 }
 
+export async function getAllUsersFilesFromDB(userId: string) {
+  const getFilesPromise = async () => {
+    const data = await db
+      .select({
+        id: files.id,
+        name: files.name,
+        type: files.type,
+        fileSize: files.fileSize,
+        spaceId: files.spaceId,
+        createdAt: files.createdAt,
+        spaceName: spaces.name,
+        spaceIcon: spaces.icon,
+      })
+      .from(files)
+      .innerJoin(spaces, eq(files.spaceId, spaces.id))
+      .where(eq(spaces.createdBy, userId));
+    return data;
+  };
+
+  const { data, error } = await tryCatch(getFilesPromise());
+
+  if (error) {
+    console.error("Error getting files from DB:", error);
+    throw error;
+  }
+
+  return data;
+}
+
 export async function getFileFromDB(id: string, spaceId: string) {
   const getFilePromise = async () => {
     const file = await db

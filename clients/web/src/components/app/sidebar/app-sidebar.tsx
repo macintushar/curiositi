@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { IconFolder, IconPlus } from "@tabler/icons-react";
 
 import {
   Sidebar,
@@ -8,25 +10,24 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 import SidebarChats from "./sidebar-chats";
 
 import { cn } from "@/lib/utils";
-import type { ApiResponse, Thread } from "@/types";
-import { IconFolder, IconMessage } from "@tabler/icons-react";
-import { usePathname } from "next/navigation";
+import type { Thread } from "@/types";
 
 type AppSidebarProps = {
-  threads: {
-    data: ApiResponse<Thread[]> | null;
-    error: Error | null;
-  };
+  threads: Thread[] | null;
 };
 
 export default function AppSidebar({ threads }: AppSidebarProps) {
@@ -35,40 +36,44 @@ export default function AppSidebar({ threads }: AppSidebarProps) {
 
   return (
     <Sidebar variant="sidebar" collapsible="icon">
+      <SidebarHeader>
+        <SidebarMenu className="flex flex-col gap-3">
+          <SidebarMenuItem>
+            <Link href={`/app`} prefetch>
+              <Button
+                variant="outline"
+                className="w-full cursor-pointer truncate"
+              >
+                <IconPlus />
+                {state === "collapsed" ? "" : "New Thread"}
+              </Button>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href={`/app/spaces`} prefetch>
+              <SidebarMenuButton
+                isActive={path === "/app/spaces"}
+                className="hover:cursor-pointer"
+              >
+                <IconFolder />
+                Spaces
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <Separator />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <Link href={`/app/spaces`} prefetch>
-                  <SidebarMenuButton
-                    isActive={path === "/app/spaces"}
-                    className="hover:cursor-pointer"
-                  >
-                    <IconFolder />
-                    Spaces
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href={`/app`} prefetch>
-                  <SidebarMenuButton
-                    isActive={path === "/app"}
-                    className="hover:cursor-pointer"
-                  >
-                    <IconMessage />
-                    Chat
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <div
-                className={cn(
-                  `hidden h-full w-full flex-col`,
-                  state === "collapsed" ? "" : "block",
-                )}
-              >
-                <SidebarChats threads={threads} currentPath={path} />
-              </div>
+            <SidebarMenu
+              className={cn(
+                `hidden h-full flex-col`,
+                state === "collapsed" ? "" : "block",
+              )}
+            >
+              <SidebarGroupLabel>Your Chats</SidebarGroupLabel>
+              <SidebarChats threads={threads} currentPath={path} />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

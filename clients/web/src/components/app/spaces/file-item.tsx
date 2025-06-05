@@ -29,8 +29,8 @@ export default function FileItem({
 }: FileItemProps) {
   const { label, icon } = getFileType(file.type);
   return (
-    <div className="flex h-16 items-center justify-between rounded-xl border-[1px] p-3 transition-all duration-300 hover:cursor-pointer hover:shadow-md">
-      <div className="flex gap-3">
+    <div className="mb-2 flex h-fit items-center justify-between rounded-xl border-[1px] bg-white p-3 transition-all duration-300 hover:cursor-pointer hover:shadow-md">
+      <div className="flex max-h-full gap-3 overflow-hidden">
         <FileIcon icon={icon} />
         <div className="flex flex-col gap-0.5">
           <h3 className="text-sm font-medium">{file.name}</h3>

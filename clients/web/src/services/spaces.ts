@@ -9,7 +9,18 @@ import { tryCatch } from "@/lib/utils";
 
 export const getSpaces = async () => {
   const { data, error } = await tryCatch(
-    apiFetch<ApiResponse<SpaceResponse[]>>("/api/v1/spaces"),
+    apiFetch<ApiResponse<SpaceResponse<number>[]>>("/api/v1/spaces"),
+  );
+
+  return {
+    data: data ?? null,
+    error: error ?? null,
+  };
+};
+
+export const getSpace = async (id: string) => {
+  const { data, error } = await tryCatch(
+    apiFetch<ApiResponse<SpaceResponse<number>>>(`/api/v1/spaces/${id}`),
   );
 
   return {
@@ -19,10 +30,13 @@ export const getSpaces = async () => {
 };
 
 export const createSpace = async (name: string, icon: string) => {
-  const data = await apiFetch<ApiResponse<SpaceResponse>>(`/api/v1/spaces`, {
-    method: "POST",
-    body: JSON.stringify({ name, icon }),
-  });
+  const data = await apiFetch<ApiResponse<SpaceResponse<number>>>(
+    `/api/v1/spaces`,
+    {
+      method: "POST",
+      body: JSON.stringify({ name, icon }),
+    },
+  );
   return {
     data,
     error: null,

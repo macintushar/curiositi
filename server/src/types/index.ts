@@ -77,6 +77,8 @@ export type Model = {
 
 export type Provider = {
   name: LLM_PROVIDERS;
+  title: string;
+  enabled: boolean;
   models: Model[];
 };
 

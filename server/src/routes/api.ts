@@ -22,6 +22,7 @@ import {
   getFilesHandler,
   getFileHandler,
   deleteFileHandler,
+  getAllFilesHandler,
 } from "@/services/files";
 import { uploadFileHandler } from "@/services/upload";
 import {
@@ -247,6 +248,20 @@ apiRouter.post("/files/upload", zValidator("form", UploadSchema), async (c) => {
   );
   if (error) {
     return c.json({ error: error.message || "File upload failed" }, 500);
+  }
+  return c.json(data);
+});
+
+apiRouter.get("/files/all", async (c) => {
+  const user = c.get("user");
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
+  const { data, error } = await tryCatch(getAllFilesHandler(user.id));
+  if (error) {
+    return c.json({ error: error.message || "Failed to get files" }, 500);
   }
   return c.json(data);
 });

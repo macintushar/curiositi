@@ -1,5 +1,4 @@
 import CreateSpaceDialog from "@/components/app/spaces/create-space";
-import ViewSpaceDialog from "@/components/app/spaces/view-space";
 import LogoLines from "@/components/app/logo-lines";
 
 import { createSpace, getSpaces } from "@/services/spaces";
@@ -7,6 +6,8 @@ import type { createSpaceSchema } from "@/lib/schema";
 
 import { revalidatePath } from "next/cache";
 import type { z } from "zod";
+import Space from "@/components/app/spaces/space";
+import Link from "next/link";
 
 export default async function SpacesPage() {
   const { data, error } = await getSpaces();
@@ -46,7 +47,14 @@ export default async function SpacesPage() {
           <div className="mx-auto grid h-full grid-cols-1 gap-16 overflow-auto pt-7 sm:grid-cols-2 md:grid-cols-3">
             <CreateSpaceDialog handleSubmit={onSubmit} />
             {data?.data?.map((space, index) => (
-              <ViewSpaceDialog space={space} key={index} />
+              <Link href={`/app/spaces/${space.space.id}`} key={index} prefetch>
+                <Space
+                  key={index}
+                  text={space.space.name}
+                  icon={space.space.icon}
+                  fileCount={space.files}
+                />
+              </Link>
             ))}
           </div>
         </div>

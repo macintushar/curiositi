@@ -1,4 +1,9 @@
-import { OLLAMA_BASE_URL } from "@/constants";
+import {
+  ANTHROPIC_ENABLED,
+  OLLAMA_BASE_URL,
+  OPENAI_ENABLED,
+  OPENROUTER_ENABLED,
+} from "@/constants";
 import { Provider, Providers, LLM_PROVIDERS, Model } from "@/types";
 import { Ollama } from "ollama";
 import { tryCatch } from "@/lib/try-catch";
@@ -6,6 +11,8 @@ import { tryCatch } from "@/lib/try-catch";
 export const models: Provider[] = [
   {
     name: LLM_PROVIDERS.OPENAI,
+    title: "OpenAI",
+    enabled: OPENAI_ENABLED,
     models: [
       {
         name: "GPT-4o",
@@ -36,6 +43,8 @@ export const models: Provider[] = [
   },
   {
     name: LLM_PROVIDERS.OPENROUTER,
+    title: "OpenRouter",
+    enabled: OPENROUTER_ENABLED,
     models: [
       {
         name: "Microsoft/Phi-4 Reasoning Plus",
@@ -76,6 +85,8 @@ export const models: Provider[] = [
   },
   {
     name: LLM_PROVIDERS.ANTHROPIC,
+    title: "Anthropic",
+    enabled: ANTHROPIC_ENABLED,
     models: [
       {
         name: "Claude 3.7 Sonnet (20250219)",
@@ -157,6 +168,8 @@ export async function getConfigs(invalidateCache = false): Promise<Providers> {
     providers: [
       {
         name: LLM_PROVIDERS.OLLAMA,
+        title: "Ollama",
+        enabled: true,
         models: await getOllamaModels(invalidateCache),
       },
       ...models,

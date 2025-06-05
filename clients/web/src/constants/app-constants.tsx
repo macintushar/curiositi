@@ -7,6 +7,10 @@ import {
 
 export const ghURL = "https://github.com/macintushar/curiositi";
 
+import CuriositiIcon from "@/assets/icon.svg";
+
+export const CURIOSITI_ICON = CuriositiIcon as unknown as string;
+
 export const profileLinks: ProfileLinkGroup[] = [
   {
     links: [
