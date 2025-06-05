@@ -10,14 +10,14 @@ import { getThreadMessages } from "@/services/chats";
 export default function ThreadPage({
   params,
 }: {
-  params: { threadId: string };
+  params: Promise<{ threadId: string }>;
 }) {
-  console.log(params);
+  const { threadId } = use(params);
   const { data: files, error: filesError } = use(getUsersFiles());
   const { data: spaces, error: spacesError } = use(getSpaces());
   const { data: configs, error: configsError } = use(getConfigs());
   const { data: messages, error: messagesError } = use(
-    getThreadMessages(params.threadId),
+    getThreadMessages(threadId),
   );
 
   if (filesError || spacesError || configsError || messagesError) {

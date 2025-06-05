@@ -12,12 +12,11 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 export default async function Space({
   params,
 }: {
-  params: { spaceId: string };
+  params: Promise<{ spaceId: string }>;
 }) {
-  const { data, error } = await getSpace(params.spaceId);
-  const { data: files, error: filesError } = await getFilesInSpace(
-    params.spaceId,
-  );
+  const { spaceId } = await params;
+  const { data, error } = await getSpace(spaceId);
+  const { data: files, error: filesError } = await getFilesInSpace(spaceId);
 
   if (error || filesError) {
     return (
@@ -43,7 +42,7 @@ export default async function Space({
         </div>
         <div className="flex max-h-full min-h-0 flex-1 flex-col gap-6">
           <UploadFile
-            spaceId={params.spaceId}
+            spaceId={spaceId}
             areFilesInSpace={(files?.data && files.data.length > 0) ?? false}
           />
           <ScrollArea className="flex h-full max-h-full w-full flex-1 flex-col">
