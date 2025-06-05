@@ -8,15 +8,7 @@ type UploadFileProps = {
   spaceId: string;
 };
 
-export default function UploadFile({
-  areFilesInSpace,
-  spaceId,
-}: UploadFileProps) {
-  async function handleUploadFile(file: File) {
-    "use server";
-    console.log("uploading file", file);
-  }
-
+export default function UploadFile({ areFilesInSpace }: UploadFileProps) {
   return (
     <div
       className={`border-sidebar-border bg-primary-foreground hover:bg-muted w-full rounded-[12px] border-[1px] border-dashed p-5 hover:cursor-pointer ${areFilesInSpace ? "h-fit" : "h-full"}`}

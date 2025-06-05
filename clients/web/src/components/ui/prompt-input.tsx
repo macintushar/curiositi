@@ -28,7 +28,9 @@ type PromptInputContextType = {
 const PromptInputContext = createContext<PromptInputContextType>({
   isLoading: false,
   value: "",
-  setValue: () => {},
+  setValue: () => {
+    // do nothing
+  },
   maxHeight: 240,
   onSubmit: undefined,
   disabled: false,
@@ -61,7 +63,7 @@ function PromptInput({
   onSubmit,
   children,
 }: PromptInputProps) {
-  const [internalValue, setInternalValue] = useState(value || "");
+  const [internalValue, setInternalValue] = useState(value ?? "");
 
   const handleChange = (newValue: string) => {
     setInternalValue(newValue);

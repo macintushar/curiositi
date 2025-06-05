@@ -1,42 +1,42 @@
-"use client"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { ChevronDownIcon } from "lucide-react"
+import { cn } from "@/lib/utils";
+import { ChevronDownIcon } from "lucide-react";
 import React, {
   createContext,
   useContext,
   useEffect,
   useRef,
   useState,
-} from "react"
-import { Markdown } from "./markdown"
-import { useTextStream, type Mode } from "./response-stream"
+} from "react";
+import { Markdown } from "./markdown";
+import { useTextStream, type Mode } from "./response-stream";
 
 type ReasoningContextType = {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-}
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+};
 
 const ReasoningContext = createContext<ReasoningContextType | undefined>(
-  undefined
-)
+  undefined,
+);
 
 function useReasoningContext() {
-  const context = useContext(ReasoningContext)
+  const context = useContext(ReasoningContext);
   if (!context) {
     throw new Error(
-      "useReasoningContext must be used within a Reasoning provider"
-    )
+      "useReasoningContext must be used within a Reasoning provider",
+    );
   }
-  return context
+  return context;
 }
 
 export type ReasoningProps = {
-  children: React.ReactNode
-  className?: string
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-}
+  children: React.ReactNode;
+  className?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
 
 function Reasoning({
   children,
@@ -44,16 +44,16 @@ function Reasoning({
   open,
   onOpenChange,
 }: ReasoningProps) {
-  const [internalOpen, setInternalOpen] = useState(true)
-  const isControlled = open !== undefined
-  const isOpen = isControlled ? open : internalOpen
+  const [internalOpen, setInternalOpen] = useState(true);
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : internalOpen;
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!isControlled) {
-      setInternalOpen(newOpen)
+      setInternalOpen(newOpen);
     }
-    onOpenChange?.(newOpen)
-  }
+    onOpenChange?.(newOpen);
+  };
 
   return (
     <ReasoningContext.Provider
@@ -64,20 +64,20 @@ function Reasoning({
     >
       <div className={className}>{children}</div>
     </ReasoningContext.Provider>
-  )
+  );
 }
 
 export type ReasoningTriggerProps = {
-  children: React.ReactNode
-  className?: string
-} & React.HTMLAttributes<HTMLButtonElement>
+  children: React.ReactNode;
+  className?: string;
+} & React.HTMLAttributes<HTMLButtonElement>;
 
 function ReasoningTrigger({
   children,
   className,
   ...props
 }: ReasoningTriggerProps) {
-  const { isOpen, onOpenChange } = useReasoningContext()
+  const { isOpen, onOpenChange } = useReasoningContext();
 
   return (
     <button
@@ -89,53 +89,53 @@ function ReasoningTrigger({
       <div
         className={cn(
           "transform transition-transform",
-          isOpen ? "rotate-180" : ""
+          isOpen ? "rotate-180" : "",
         )}
       >
         <ChevronDownIcon className="size-4" />
       </div>
     </button>
-  )
+  );
 }
 
 export type ReasoningContentProps = {
-  children: React.ReactNode
-  className?: string
-} & React.HTMLAttributes<HTMLDivElement>
+  children: React.ReactNode;
+  className?: string;
+} & React.HTMLAttributes<HTMLDivElement>;
 
 function ReasoningContent({
   children,
   className,
   ...props
 }: ReasoningContentProps) {
-  const contentRef = useRef<HTMLDivElement>(null)
-  const innerRef = useRef<HTMLDivElement>(null)
-  const { isOpen } = useReasoningContext()
+  const contentRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const { isOpen } = useReasoningContext();
 
   useEffect(() => {
-    if (!contentRef.current || !innerRef.current) return
+    if (!contentRef.current || !innerRef.current) return;
 
     const observer = new ResizeObserver(() => {
       if (contentRef.current && innerRef.current && isOpen) {
-        contentRef.current.style.maxHeight = `${innerRef.current.scrollHeight}px`
+        contentRef.current.style.maxHeight = `${innerRef.current.scrollHeight}px`;
       }
-    })
+    });
 
-    observer.observe(innerRef.current)
+    observer.observe(innerRef.current);
 
     if (isOpen) {
-      contentRef.current.style.maxHeight = `${innerRef.current.scrollHeight}px`
+      contentRef.current.style.maxHeight = `${innerRef.current.scrollHeight}px`;
     }
 
-    return () => observer.disconnect()
-  }, [isOpen])
+    return () => observer.disconnect();
+  }, [isOpen]);
 
   return (
     <div
       ref={contentRef}
       className={cn(
         "overflow-hidden transition-[max-height] duration-300 ease-out",
-        className
+        className,
       )}
       style={{
         maxHeight: isOpen ? contentRef.current?.scrollHeight : "0px",
@@ -144,19 +144,19 @@ function ReasoningContent({
     >
       <div ref={innerRef}>{children}</div>
     </div>
-  )
+  );
 }
 
 export type ReasoningResponseProps = {
-  text: string | AsyncIterable<string>
-  className?: string
-  speed?: number
-  mode?: Mode
-  onComplete?: () => void
-  fadeDuration?: number
-  segmentDelay?: number
-  characterChunkSize?: number
-}
+  text: string | AsyncIterable<string>;
+  className?: string;
+  speed?: number;
+  mode?: Mode;
+  onComplete?: () => void;
+  fadeDuration?: number;
+  segmentDelay?: number;
+  characterChunkSize?: number;
+};
 
 function ReasoningResponse({
   text,
@@ -168,7 +168,7 @@ function ReasoningResponse({
   segmentDelay,
   characterChunkSize,
 }: ReasoningResponseProps) {
-  const { isOpen } = useReasoningContext()
+  const { isOpen } = useReasoningContext();
   const { displayedText } = useTextStream({
     textStream: text,
     speed,
@@ -177,13 +177,13 @@ function ReasoningResponse({
     fadeDuration,
     segmentDelay,
     characterChunkSize,
-  })
+  });
 
   return (
     <div
       className={cn(
         "text-muted-foreground prose prose-sm dark:prose-invert text-sm transition-opacity duration-300 ease-out",
-        className
+        className,
       )}
       style={{
         opacity: isOpen ? 1 : 0,
@@ -191,7 +191,7 @@ function ReasoningResponse({
     >
       <Markdown>{displayedText}</Markdown>
     </div>
-  )
+  );
 }
 
-export { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse }
+export { Reasoning, ReasoningTrigger, ReasoningContent, ReasoningResponse };
