@@ -10,15 +10,16 @@ export async function searchHandler({
   model,
   provider,
   thread_id,
-  mode,
-  space_id,
+  space_ids,
+  file_ids,
 }: {
   input: string;
   model: string;
   provider: LLM_PROVIDERS;
   thread_id: string;
   mode: CuriositiAgentMode;
-  space_id?: string;
+  space_ids?: string[];
+  file_ids?: string[];
 }) {
   const history = await db.query.messages.findMany({
     where: eq(messages.threadId, thread_id),
@@ -39,10 +40,18 @@ export async function searchHandler({
   const response = await curiositiAgent(
     input,
     model,
-    mode,
+    history,
+    file_ids,
+    space_ids,
+    true,
     provider,
-    space_id,
-    formattedHistory,
+    {
+      maxDocQueries: 5,
+      maxWebQueries: 5,
+      includeFollowUps: true,
+      prioritizeRecent: true,
+      confidenceThreshold: 0.5,
+    },
   );
 
   await db.insert(messages).values([
@@ -55,10 +64,10 @@ export async function searchHandler({
       role: "assistant",
       content: response.answer,
       threadId: thread_id,
-      documentSearches: response.docQueries,
-      webSearches: response.webQueries,
-      documentSearchResults: response.docResults,
-      webSearchResults: response.webResults,
+      documentSearches: response.contextSources.documentSpaces,
+      webSearches: response.contextSources.webSearches,
+      documentSearchResults: response.contextSources.documentSpaces,
+      webSearchResults: response.contextSources.webSearches,
     },
   ]);
 
@@ -66,9 +75,10 @@ export async function searchHandler({
     data: {
       answer: response.answer,
       metadata: {
-        docQueries: response.docQueries,
-        webQueries: response.webQueries,
-        docResults: response.docResults,
+        docQueries: response.contextSources.documentSpaces,
+        webQueries: response.contextSources.webSearches,
+        docResults: response.contextSources.documentSpaces,
+        webResults: response.contextSources.webSearches,
         strategy: response.strategy,
         reasoning: response.reasoning,
       },
