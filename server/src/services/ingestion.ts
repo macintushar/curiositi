@@ -1,10 +1,17 @@
-import { SUPPORTED_FILE_TYPES } from "@/constants";
+import {
+  OFFICE_FILE_TYPES,
+  PDF_FILE_TYPE,
+  SUPPORTED_FILE_TYPES,
+} from "@/constants";
 import { textSplitter } from "@/lib/utils";
 import {
   addDocumentsToVectorStore,
   generateEmbeddings,
 } from "@/lib/vectorStore";
+import { tryCatch } from "@/lib/try-catch";
+
 import { WebPDFLoader } from "@langchain/community/document_loaders/web/pdf";
+import { parseOfficeAsync } from "officeparser";
 
 async function extractTextFromPdf(fileBuffer: Buffer<ArrayBuffer>) {
   const file = new Blob([fileBuffer]);
@@ -14,6 +21,11 @@ async function extractTextFromPdf(fileBuffer: Buffer<ArrayBuffer>) {
   });
   const docs = await loader.load();
   return docs[0].pageContent;
+}
+
+async function extractTextFromOffice(fileBuffer: Buffer<ArrayBuffer>) {
+  const text = await parseOfficeAsync(fileBuffer);
+  return text;
 }
 
 export async function processAndStoreDocument(
@@ -26,9 +38,9 @@ export async function processAndStoreDocument(
 ): Promise<void> {
   console.log(`Processing ${originalFilename} (${mimeType})...`);
 
-  let text = "";
+  const processFilePromise = async () => {
+    let text = "";
 
-  try {
     if (!SUPPORTED_FILE_TYPES.includes(mimeType)) {
       console.warn(
         `Unsupported file type: ${mimeType}. Skipping ${originalFilename}.`,
@@ -36,8 +48,10 @@ export async function processAndStoreDocument(
       return;
     }
 
-    if (mimeType === "application/pdf") {
+    if (mimeType === PDF_FILE_TYPE) {
       text = await extractTextFromPdf(fileBuffer);
+    } else if (OFFICE_FILE_TYPES.includes(mimeType)) {
+      text = await extractTextFromOffice(fileBuffer);
     } else {
       text = fileBuffer.toString("utf-8");
     }
@@ -70,7 +84,11 @@ export async function processAndStoreDocument(
     }
 
     console.log(`Successfully processed and stored ${originalFilename}.`);
-  } catch (error) {
+  };
+
+  const { error } = await tryCatch(processFilePromise());
+
+  if (error) {
     console.error(`Error processing file ${originalFilename}:`, error);
     throw new Error(`Failed to process file ${originalFilename}`);
   }

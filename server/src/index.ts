@@ -6,6 +6,7 @@ import apiRouter from "@/routes/api";
 
 const app = new Hono();
 import { auth } from "./lib/auth";
+import { TRUSTED_ORIGINS } from "./constants";
 
 app.use("*", logger());
 
@@ -16,14 +17,14 @@ app.get("/", (c) => {
 app.use(
   "*",
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? [
-            "https://curiositi.macintushar.xyz",
-            "https://api.curiositi.macintushar.xyz",
-          ]
-        : "*",
-    allowHeaders: ["Content-Type", "Authorization"],
+    origin: TRUSTED_ORIGINS,
+    allowHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Set-Cookie",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Credentials",
+    ],
     allowMethods: ["POST", "GET", "OPTIONS", "PATCH", "DELETE"],
     exposeHeaders: ["Content-Length"],
     maxAge: 600,

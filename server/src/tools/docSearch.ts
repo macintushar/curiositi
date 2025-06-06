@@ -4,6 +4,7 @@ import {
   getDocumentsFromVectorStore,
   generateEmbeddings,
 } from "@/lib/vectorStore";
+import { tryCatch } from "@/lib/try-catch";
 
 const formatDocumentsWithMetadata = (
   docs: InferSelectModel<typeof documents>[],
@@ -20,7 +21,7 @@ async function searchDocs(query: string, spaceId: string): Promise<string> {
     `Searching documents for query: "${query}"${spaceId ? ` in space: ${spaceId}` : ""}`,
   );
 
-  try {
+  const searchDocsPromise = async () => {
     // Generate embeddings for the query
     const queryEmbeddings = await generateEmbeddings([query]);
     if (
@@ -42,7 +43,11 @@ async function searchDocs(query: string, spaceId: string): Promise<string> {
     }
 
     return formatDocumentsWithMetadata(results);
-  } catch (error: unknown) {
+  };
+
+  const { data, error } = await tryCatch(searchDocsPromise());
+
+  if (error) {
     console.error("Error searching documents:", error);
 
     if (error instanceof Error) {
@@ -50,6 +55,8 @@ async function searchDocs(query: string, spaceId: string): Promise<string> {
     }
     return "An unknown error occurred during document search.";
   }
+
+  return data;
 }
 
 export async function docSearchToolWithSpaceId(query: string, spaceId: string) {
