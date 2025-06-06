@@ -58,10 +58,6 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
-  openaiApiKey: text("openai_api_key"),
-  anthropicApiKey: text("anthropic_api_key"),
-  openRouterApiKey: text("openrouter_api_key"),
-  ollamaUrl: text("ollama_url"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
