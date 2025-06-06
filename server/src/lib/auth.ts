@@ -3,7 +3,11 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
 import * as schema from "@/db/schema";
 import db from "@/db";
-import { BETTER_AUTH_SECRET, BETTER_AUTH_URL } from "@/constants";
+import {
+  BETTER_AUTH_SECRET,
+  BETTER_AUTH_URL,
+  TRUSTED_ORIGINS,
+} from "@/constants";
 
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
@@ -21,10 +25,12 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
   },
+  trustedOrigins: TRUSTED_ORIGINS,
   advanced: {
     defaultCookieAttributes: {
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
     },
   },
 });

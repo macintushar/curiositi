@@ -2,10 +2,16 @@ import {
   getFilesFromDB,
   getFileFromDB,
   deleteFileFromDB,
+  getAllUsersFilesFromDB,
 } from "@/services/queries";
 
 export async function getFilesHandler(space_id: string) {
   const files = await getFilesFromDB(space_id);
+  return { data: files };
+}
+
+export async function getAllFilesHandler(user_id: string) {
+  const files = await getAllUsersFilesFromDB(user_id);
   return { data: files };
 }
 

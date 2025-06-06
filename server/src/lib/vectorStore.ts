@@ -3,6 +3,7 @@ import db from "@/db";
 import { documents } from "@/db/schema";
 import { llmEmbedding } from "@/lib/llms";
 import { and, cosineDistance, eq, gt, sql } from "drizzle-orm";
+import { tryCatch } from "@/lib/try-catch";
 
 export async function addDocumentsToVectorStore(
   chunk: string,
@@ -36,7 +37,7 @@ export async function getDocumentsFromVectorStore(
   const docs = await db
     .select()
     .from(documents)
-    .where(and(gt(similarity, 0.5), eq(documents.spaceId, spaceId)));
+    .where(and(gt(similarity, 0.3), eq(documents.spaceId, spaceId)));
 
   return docs;
 }
@@ -45,7 +46,7 @@ export async function getDocumentsFromVectorStore(
 export const generateEmbeddings = async (
   texts: string[],
 ): Promise<number[][]> => {
-  try {
+  const generateEmbeddingsPromise = async () => {
     const embeddingModel = llmEmbedding(DEFAULT_EMBEDDING_PROVIDER);
 
     if (!embeddingModel) {
@@ -57,8 +58,14 @@ export const generateEmbeddings = async (
     });
 
     return response.embeddings || [];
-  } catch (error) {
+  };
+
+  const { data, error } = await tryCatch(generateEmbeddingsPromise());
+
+  if (error) {
     console.error("Error generating embeddings:", error);
     throw error;
   }
+
+  return data;
 };

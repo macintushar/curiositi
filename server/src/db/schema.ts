@@ -43,6 +43,8 @@ export const spaces = pgTable("spaces", {
     .primaryKey()
     .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
+  icon: text("icon"),
+  description: text("description"),
   createdBy: text("created_by")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -148,4 +150,17 @@ export const messages = pgTable("messages", {
   webSearches: text("web_searches").array(),
   documentSearchResults: text("document_search_results").array(),
   webSearchResults: text("web_search_results").array(),
+});
+
+export const settings = pgTable("settings", {
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  openaiApiKey: text("openai_api_key"),
+  anthropicApiKey: text("anthropic_api_key"),
+  openRouterApiKey: text("openrouter_api_key"),
+  ollamaUrl: text("ollama_url"),
 });
