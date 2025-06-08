@@ -128,6 +128,7 @@ export const threads = pgTable("threads", {
   createdBy: text("created_by")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").default("Untitled"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   spaceId: uuid("space_id").references(() => spaces.id, {
@@ -146,6 +147,8 @@ export const messages = pgTable("messages", {
   threadId: uuid("thread_id")
     .notNull()
     .references(() => threads.id, { onDelete: "cascade" }),
+  model: text("model").notNull(),
+  provider: text("provider").notNull(),
   documentSearches: text("document_searches").array(),
   webSearches: text("web_searches").array(),
   documentSearchResults: text("document_search_results").array(),

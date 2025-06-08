@@ -1,5 +1,3 @@
-CREATE EXTENSION vector;
---> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
@@ -45,6 +43,8 @@ CREATE TABLE "messages" (
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"thread_id" uuid NOT NULL,
+	"model" text NOT NULL,
+	"provider" text NOT NULL,
 	"document_searches" text[],
 	"web_searches" text[],
 	"document_search_results" text[],
@@ -85,6 +85,7 @@ CREATE TABLE "spaces" (
 CREATE TABLE "threads" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"created_by" text NOT NULL,
+	"title" text DEFAULT 'Untitled',
 	"created_at" timestamp with time zone DEFAULT now(),
 	"updated_at" timestamp with time zone DEFAULT now(),
 	"space_id" uuid

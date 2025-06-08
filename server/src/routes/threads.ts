@@ -69,6 +69,7 @@ threadsRouter.post(
     const { id } = c.req.valid("param");
     const { data, error } = await tryCatch(getThreadMessagesHandler(id));
     if (error) {
+      console.error(error);
       return c.json(
         { error: error.message || "Failed to get thread messages" },
         500,
