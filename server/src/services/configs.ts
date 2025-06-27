@@ -102,10 +102,19 @@ export const models: Provider[] = [
   },
   {
     name: LLM_PROVIDERS.ANTHROPIC,
+    title: "Anthropic",
+    enabled: ANTHROPIC_ENABLED,
     models: [
-      "claude-3-7-sonnet-20250219",
-      "claude-3-5-sonnet-20241022",
-      "claude-3-5-sonnet-20240620",
+      {
+        name: "Claude 3.7 Sonnet (20250219)",
+        model: "claude-3-7-sonnet-20250219",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3.5 Sonnet (20241022)",
+        model: "claude-3-5-sonnet-20241022",
+        capabilities: ["completion", "vision"],
+      },
     ],
   },
 ];
