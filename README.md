@@ -1,5 +1,5 @@
 <p align="center">
-   <img src="./clients/web/src/assets/logo.svg" alt="Curiositi Logo" width="200" />
+   <img src="./clients/web/src/assets/logo.svg" alt="Curiositi Logo" width="200" style="fill: #10b981" />
 </p>
 
 Curiositi is an AI-powered assistant that delivers precise, context-aware answers by combining user documents with live web data. It implements a hybrid Retrieval-Augmented Generation (RAG) system to help you find and synthesize information across your files, and the internet.
