@@ -1,7 +1,24 @@
-import MessageInput from "@/components/app/chat/message-input";
+import ChatInput from "@/components/app/chat/chat-input";
 import LogoLines from "@/components/app/logo-lines";
+import { getConfigs } from "@/services/configs";
+import { getUsersFiles } from "@/services/files";
+import { getSpaces } from "@/services/spaces";
+import { use } from "react";
 
 export default function AppPage() {
+  const { data: files, error: filesError } = use(getUsersFiles());
+  const { data: spaces, error: spacesError } = use(getSpaces());
+  const { data: configs, error: configsError } = use(getConfigs());
+
+  if (filesError || spacesError || configsError) {
+    return (
+      <div>
+        Error: {filesError?.message} {spacesError?.message}
+        {configsError?.message}
+      </div>
+    );
+  }
+
   return (
     <div className="h-full max-h-full w-full overflow-auto">
       <div className="flex flex-col items-center gap-8">
@@ -20,7 +37,12 @@ export default function AppPage() {
             </LogoLines>
           </div>
         </div>
-        <MessageInput />
+
+        <ChatInput
+          files={files?.data ?? null}
+          spaces={spaces?.data?.map((space) => space.space) ?? null}
+          configs={configs?.data ?? null}
+        />
       </div>
     </div>
   );

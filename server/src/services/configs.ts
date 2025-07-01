@@ -89,6 +89,16 @@ export const models: Provider[] = [
     enabled: ANTHROPIC_ENABLED,
     models: [
       {
+        name: "Claude Opus 4 (20250514)",
+        model: "claude-opus-4-20250514",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude Sonnet 4 (20250514)",
+        model: "claude-sonnet-4-20250514",
+        capabilities: ["completion", "vision"],
+      },
+      {
         name: "Claude 3.7 Sonnet (20250219)",
         model: "claude-3-7-sonnet-20250219",
         capabilities: ["completion", "vision"],
@@ -98,14 +108,6 @@ export const models: Provider[] = [
         model: "claude-3-5-sonnet-20241022",
         capabilities: ["completion", "vision"],
       },
-    ],
-  },
-  {
-    name: LLM_PROVIDERS.ANTHROPIC,
-    models: [
-      "claude-3-7-sonnet-20250219",
-      "claude-3-5-sonnet-20241022",
-      "claude-3-5-sonnet-20240620",
     ],
   },
 ];

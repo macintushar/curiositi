@@ -1,4 +1,5 @@
 import { env } from "@/env";
+import dayjs from "dayjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -13,6 +14,7 @@ export const apiFetch = async <T>(
   const response = await fetch(`${env.SERVER_URL}${url}`, {
     headers: {
       "Content-Type": "application/json",
+      "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
       Cookie: `better-auth.session_token=${sessionCookie?.value ?? ""}`,
     },
     credentials: "include",

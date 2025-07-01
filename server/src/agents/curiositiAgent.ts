@@ -1,232 +1,340 @@
-import { generateObject, generateText, type Message as AIMessage } from "ai";
-
-import { queryGenPrompt, synthPrompt } from "@/lib/prompts";
-import { QUERY_JSON_SCHEMA, STRATEGY_JSON_SCHEMA } from "@/types/schemas";
-import { docSearchToolWithSpaceId } from "@/tools/docSearch";
-import { webSearchTool } from "@/tools/webSearch";
+import { generateText, generateObject, type Message as AIMessage } from "ai";
+import { llm } from "@/lib/llms";
 import {
   CuriositiAgentMode,
   LLM_PROVIDERS,
   Message as HistoryMessage,
 } from "@/types";
-import { llm } from "@/lib/llms";
+import { QUERY_JSON_SCHEMA } from "@/types/schemas";
+import { docSearchToolWithSpaceId } from "@/tools/docSearch";
+import { webSearchTool } from "@/tools/webSearch";
+import db from "@/db";
+import { documents } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { tryCatch } from "@/lib/try-catch";
 
-type CuriositiAgentResponse = {
-  docQueries: string[];
-  webQueries: string[];
-  docResults: string[];
-  webResults: string[];
-  answer: string;
-  strategy: "direct" | "retrieve" | "error";
+export type CuriositiAgentResponse = {
+  contextSources: {
+    documentSpaces: string[];
+    specificFiles: string[];
+    webSearches: string[];
+  };
   reasoning: string;
+  confidence: number;
+  answer: string;
+  followUpSuggestions: string[];
+  strategy: "comprehensive" | "focused" | "hybrid" | "error";
 };
+
+export interface CuriositiAgentConfig {
+  maxDocQueries?: number;
+  maxWebQueries?: number;
+  includeFollowUps?: boolean;
+  confidenceThreshold?: number;
+  prioritizeRecent?: boolean;
+}
 
 async function curiositiAgent(
   input: string,
   modelName: string,
-  mode: CuriositiAgentMode,
-  provider: LLM_PROVIDERS = LLM_PROVIDERS.OLLAMA,
-  spaceId?: string,
   history: HistoryMessage[] = [],
+  fileIds: string[] = [],
+  spaceIds: string[] = [],
+  enableWebSearch: boolean = true,
+  provider: LLM_PROVIDERS = LLM_PROVIDERS.OLLAMA,
+  config: CuriositiAgentConfig = {},
 ): Promise<CuriositiAgentResponse> {
-  const agentPromise = async (): Promise<CuriositiAgentResponse> => {
-    // Validate that spaceId is provided when mode is "space"
-    if (mode === "space" && !spaceId) {
-      throw new Error("spaceId is required when mode is 'space'");
-    }
+  const {
+    maxDocQueries = 3,
+    maxWebQueries = 2,
+    includeFollowUps = true,
+    prioritizeRecent = true,
+  } = config;
 
+  const agentPromise = async (): Promise<CuriositiAgentResponse> => {
     const llmModel = llm(modelName, provider);
 
-    console.log(
-      `User Question: ${input} | Model: ${modelName} | Provider: ${provider} | SpaceId: ${spaceId}`,
-    );
+    // Step 1: Analyze conversation context and determine generation strategy
+    const contextAnalysisPrompt = `
+Analyze this conversation and question to determine the best information gathering strategy:
 
-    // Determine if we can answer directly or need retrieval
-    const strategyMessages = [
-      {
-        role: "system",
-        content:
-          "You are a senior AI strategy planner determining the best approach to answer questions.",
-      },
-      ...history.map(({ role, content }) => ({ role, content })),
-      { role: "user", content: input },
-    ];
-    const { object: strategyObj } = await generateObject({
+Conversation History:
+${history.map((msg) => `${msg.role}: ${msg.content}`).join("\n")}
+
+Current Question: ${input}
+
+Available Resources:
+- ${spaceIds.length} document spaces
+- ${fileIds.length} specific files
+- Web search ${enableWebSearch ? "enabled" : "disabled"}
+
+Determine:
+1. What type of answer is needed (factual, analytical, creative, comparative)
+2. Which sources would be most valuable
+3. The complexity level of the response required
+4. Key themes from conversation history that should inform the search
+`;
+
+    const strategyAnalysis = await generateText({
       model: llmModel,
-      schema: STRATEGY_JSON_SCHEMA,
-      messages: strategyMessages as Omit<AIMessage, "id">[],
-      temperature: 0.5,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert at analyzing information needs and planning comprehensive research strategies.",
+        },
+        { role: "user", content: contextAnalysisPrompt },
+      ] as Omit<AIMessage, "id">[],
+      temperature: 0.3,
     });
 
-    if (strategyObj.strategy === "direct" && strategyObj.answer) {
-      return {
-        docQueries: [],
-        webQueries: [],
-        docResults: [],
-        webResults: [],
-        answer: strategyObj.answer,
-        strategy: "direct",
-        reasoning: "Direct answer from model knowledge",
-      };
-    }
+    // Step 2: Generate optimized queries based on strategy analysis
+    const queryGenerationPrompt = `
+Based on this analysis: ${strategyAnalysis.text}
 
-    // Generate retrieval queries - modify prompt based on mode
-    const modeSpecificPrompt =
-      mode === "space"
-        ? queryGenPrompt(input)
-        : `Given the user question: "${input}", generate up to 5 web search queries as JSON:\n{\n  "webQueries": ["..."]\n}\n
-Guidelines:
-- Focus on creating effective web search queries to find relevant information online.
-- Ensure queries are specific enough to return useful results but not too narrow.
-- If user instructs to only use the documents, explain that document search is not available in general mode.
-- Output only valid JSON.`;
+And the user question: "${input}"
 
-    const queryMessages = [
-      {
-        role: "system",
-        content:
-          "You are a search query specialist optimizing queries for different information sources.",
-      },
-      ...history.map(({ role, content }) => ({ role, content })),
-      { role: "user", content: modeSpecificPrompt },
-    ];
+Generate optimized search queries (max ${maxDocQueries} for documents, max ${maxWebQueries} for web).
+Consider conversation context and prioritize queries that will give the most comprehensive understanding.
+`;
+
     const { object: queryPlan } = await generateObject({
       model: llmModel,
-      schema: QUERY_JSON_SCHEMA(mode),
-      messages: queryMessages as Omit<AIMessage, "id">[],
+      schema: QUERY_JSON_SCHEMA("space" as CuriositiAgentMode),
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a search query optimization specialist focusing on comprehensive information gathering.",
+        },
+        { role: "user", content: queryGenerationPrompt },
+      ] as Omit<AIMessage, "id">[],
+      temperature: 0.4,
+    });
+
+    const docQueries = (queryPlan.docQueries || []).slice(0, maxDocQueries);
+    const webQueries = (queryPlan.webQueries || []).slice(0, maxWebQueries);
+
+    // Step 3: Gather information from all sources in parallel
+    const informationGathering = await Promise.allSettled([
+      // Document space searches
+      ...spaceIds.flatMap((spaceId) =>
+        docQueries.map(async (query) => {
+          const { data: result, error } = await tryCatch(
+            docSearchToolWithSpaceId(query, spaceId),
+          );
+          return {
+            type: "docSpace" as const,
+            spaceId,
+            query,
+            result: error ? `Error: ${error}` : result,
+            success: !error,
+          };
+        }),
+      ),
+
+      // Specific file retrieval
+      ...fileIds.map(async (fileId) => {
+        const { data: docs, error } = await tryCatch(
+          db.query.documents.findMany({
+            where: eq(documents.fileId, fileId),
+            columns: { filename: true, content: true, createdAt: true },
+            orderBy: prioritizeRecent ? [documents.createdAt] : undefined,
+          }),
+        );
+
+        if (error || !docs || docs.length === 0) {
+          return {
+            type: "specificFile" as const,
+            fileId,
+            result: `Error or no content found for file ${fileId}`,
+            success: false,
+          };
+        }
+
+        const content = docs
+          .map((doc) => `${doc.filename}:\n${doc.content}`)
+          .join("\n---\n");
+
+        return {
+          type: "specificFile" as const,
+          fileId,
+          result: content,
+          success: true,
+        };
+      }),
+
+      // Web searches (if enabled)
+      ...(enableWebSearch
+        ? webQueries.map(async (query) => {
+            const { data: result, error } = await tryCatch(
+              webSearchTool.invoke(query),
+            );
+            return {
+              type: "webSearch" as const,
+              query,
+              result: error
+                ? `Error: ${error}`
+                : typeof result === "string"
+                  ? result
+                  : JSON.stringify(result),
+              success: !error,
+            };
+          })
+        : []),
+    ]);
+
+    // Step 4: Process and categorize results
+    const processedResults = informationGathering
+      .map((result) => (result.status === "fulfilled" ? result.value : null))
+      .filter(Boolean);
+
+    const documentSpaceResults = processedResults
+      .filter((r) => r?.type === "docSpace" && r.success)
+      .map((r) => {
+        if (r && r.type === "docSpace") {
+          return `Space ${r.spaceId} - Query: ${r.query}\n${r.result}`;
+        }
+        return "";
+      })
+      .filter(Boolean);
+
+    const specificFileResults = processedResults
+      .filter((r) => r?.type === "specificFile" && r.success)
+      .map((r) => {
+        if (r && r.type === "specificFile") {
+          return `File ${r.fileId}:\n${r.result}`;
+        }
+        return "";
+      })
+      .filter(Boolean);
+
+    const webSearchResults = processedResults
+      .filter((r) => r?.type === "webSearch" && r.success)
+      .map((r) => {
+        if (r && r.type === "webSearch") {
+          return `Web Query: ${r.query}\n${r.result}`;
+        }
+        return "";
+      })
+      .filter(Boolean);
+
+    // Step 5: Build comprehensive context
+    const allContext = [
+      ...documentSpaceResults,
+      ...specificFileResults,
+      ...webSearchResults,
+    ].join("\n\n---\n\n");
+
+    // Step 6: Generate comprehensive answer with reasoning
+    const generationPrompt = `
+You are an expert AI assistant generating a comprehensive answer based on multiple information sources and conversation context.
+
+Conversation History:
+${history.map((msg) => `${msg.role}: ${msg.content}`).join("\n")}
+
+Information Gathered:
+${allContext}
+
+User Question: ${input}
+
+Generate a comprehensive response that:
+1. Synthesizes information from all available sources
+2. Considers the conversation context and history
+3. Provides clear reasoning for your conclusions
+4. Indicates confidence level in your answer (0.0 to 1.0)
+5. ${includeFollowUps ? "Suggests 2-3 relevant follow-up questions" : ""}
+
+Format your response as:
+REASONING: [Your reasoning process]
+CONFIDENCE: [0.0 to 1.0]
+ANSWER: [Your comprehensive answer]
+${includeFollowUps ? "FOLLOW_UPS: [Numbered list of follow-up suggestions]" : ""}
+`;
+
+    const { text: generatedResponse } = await generateText({
+      model: llmModel,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are an expert AI assistant specializing in comprehensive information synthesis and generation.",
+        },
+        { role: "user", content: generationPrompt },
+      ] as Omit<AIMessage, "id">[],
       temperature: 0.6,
     });
 
-    // Document search worker - only run in space mode
-    const docSearchResults =
-      mode === "space" && spaceId
-        ? await Promise.all(
-            (queryPlan.docQueries || []).map(async (query) => {
-              const { data: result, error } = await tryCatch(
-                docSearchToolWithSpaceId(query, spaceId),
-              );
-              if (error) {
-                console.error(
-                  `Error in doc search for query "${query}":`,
-                  error,
-                );
-                return {
-                  query,
-                  result: "Error retrieving document results",
-                  error: error instanceof Error ? error.message : String(error),
-                };
-              }
-              return { query, result, error: null };
-            }),
-          )
-        : [];
-
-    // Web search worker with error handling
-    const webSearchResults = await Promise.all(
-      (queryPlan.webQueries || []).map(async (query) => {
-        const { data: result, error } = await tryCatch(
-          webSearchTool.invoke(query),
-        );
-        if (error) {
-          console.error(`Error in web search for query "${query}":`, error);
-          return {
-            query,
-            result: "Error retrieving web results",
-            error: error instanceof Error ? error.message : String(error),
-          };
-        }
-        console.log("Searching the web for query:", query);
-        return {
-          query,
-          result: typeof result === "string" ? result : JSON.stringify(result),
-          error: null,
-        };
-      }),
+    // Step 7: Parse the generated response
+    const reasoningMatch = generatedResponse.match(
+      /REASONING:\s*([\s\S]*?)(?=CONFIDENCE:|$)/,
     );
+    const reasoning = reasoningMatch?.[1]?.trim() || "Analysis completed";
+    const confidenceMatch = generatedResponse.match(/CONFIDENCE:\s*([\d.]+)/);
+    const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0.5;
+    const answerMatch = generatedResponse.match(
+      /ANSWER:\s*([\s\S]*?)(?=FOLLOW_UPS:|$)/,
+    );
+    const answer = answerMatch?.[1]?.trim() || generatedResponse;
 
-    // Format results for synthesis, filtering out errors
-    const formattedDocResults = docSearchResults
-      .filter((item) => !item.error)
-      .map((item) => `Query: ${item.query}\n${item.result}`);
+    const followUpSuggestions = includeFollowUps
+      ? (
+          generatedResponse.match(/FOLLOW_UPS:\s*([\s\S]*?)$/)?.[1]?.trim() ||
+          ""
+        )
+          .split("\n")
+          .filter((line) => line.trim())
+          .map((line) => line.replace(/^\d+\.\s*/, "").trim())
+          .filter(Boolean)
+      : [];
 
-    const formattedWebResults = webSearchResults
-      .filter((item) => !item.error)
-      .map((item) => `Query: ${item.query}\n${item.result}`);
-
-    // If all searches failed, provide a fallback answer
-    const hasQueries =
-      (mode === "space" && (queryPlan.docQueries || []).length > 0) ||
-      (queryPlan.webQueries || []).length > 0;
-
+    // Determine strategy used
+    let strategy: CuriositiAgentResponse["strategy"] = "comprehensive";
     if (
-      formattedDocResults.length === 0 &&
-      formattedWebResults.length === 0 &&
-      hasQueries
+      documentSpaceResults.length === 0 &&
+      webSearchResults.length === 0 &&
+      specificFileResults.length === 0
     ) {
-      return {
-        docQueries: mode === "space" ? queryPlan.docQueries || [] : [],
-        webQueries: queryPlan.webQueries || [],
-        docResults: [],
-        webResults: [],
-        answer:
-          "I couldn't find relevant information to answer your question accurately. Please try rephrasing your question or asking something else.",
-        strategy: "retrieve",
-        reasoning: "Information retrieval failed",
-      };
+      strategy = "error";
+    } else if (documentSpaceResults.length > 0 && webSearchResults.length > 0) {
+      strategy = "hybrid";
+    } else {
+      strategy = "focused";
     }
 
-    // === SYNTHESIZER: Final Answer Generation Phase ===
-    // Get the final answer
-    const synthMessages = [
-      {
-        role: "system",
-        content:
-          "You are an expert at synthesizing information from multiple sources into clear, accurate answers.",
-      },
-      ...history.map(({ role, content }) => ({ role, content })),
-      {
-        role: "user",
-        content: synthPrompt(input, formattedDocResults, formattedWebResults),
-      },
-    ];
-    const { text: answer } = await generateText({
-      model: llmModel,
-      messages: synthMessages as Omit<AIMessage, "id">[],
-      temperature: 0.7,
-    });
-
     return {
-      docQueries: mode === "space" ? queryPlan.docQueries || [] : [],
-      webQueries: queryPlan.webQueries || [],
-      docResults: formattedDocResults,
-      webResults: formattedWebResults,
+      contextSources: {
+        documentSpaces: spaceIds,
+        specificFiles: fileIds,
+        webSearches: webQueries,
+      },
+      reasoning,
+      confidence,
       answer,
-      strategy: "retrieve",
-      reasoning: "Answer synthesized from retrieved information",
+      followUpSuggestions,
+      strategy,
     };
   };
 
-  const { data, error } = await tryCatch<CuriositiAgentResponse, Error>(
-    agentPromise(),
-  );
-
+  const { data, error } = await tryCatch(agentPromise());
   if (error) {
-    console.error("Error in curiositiAgent:", error);
-    // Create a new object with the right type
+    console.error("Error in CuriositiAgent:", error);
     return {
-      docQueries: [],
-      webQueries: [],
-      docResults: [],
-      webResults: [],
+      contextSources: {
+        documentSpaces: [],
+        specificFiles: [],
+        webSearches: [],
+      },
+      reasoning: `Error occurred: ${error instanceof Error ? error.message : String(error)}`,
+      confidence: 0.0,
       answer:
-        "I encountered an error while processing your question. Please try again later.",
-      strategy: "error", // This is a valid value for the union type
-      reasoning: error instanceof Error ? error.message : String(error),
-    } as CuriositiAgentResponse; // Type assertion to ensure compatibility
+        "I encountered an error while processing your request. Please try again later.",
+      followUpSuggestions: [],
+      strategy: "error",
+    };
   }
 
-  return data;
+  return data!;
 }
 
 export default curiositiAgent;
