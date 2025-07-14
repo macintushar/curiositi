@@ -59,7 +59,9 @@ export function formatFileSize(size: string) {
     unitIndex++;
   }
 
-  return `${value} ${units[unitIndex]}`;
+  // Format to 2 decimal places if there are decimals
+  const formattedValue = value % 1 === 0 ? value : value.toFixed(2);
+  return `${formattedValue} ${units[unitIndex]}`;
 }
 
 type FileType = {

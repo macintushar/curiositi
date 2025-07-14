@@ -77,3 +77,23 @@ export const deleteFile = async (spaceId: string, fileId: string) => {
 
   return { data, error };
 };
+
+export const uploadFile = async (spaceId: string, file: File) => {
+  const formData = new FormData();
+
+  formData.append("file", file);
+  formData.append("space_id", spaceId);
+
+  const { data, error } = await tryCatch(
+    apiFetch<ApiResponse<MessageResponse & { file: CuriositiFile }>>(
+      `/api/v1/files/upload`,
+      {
+        method: "POST",
+        body: formData,
+      },
+      "json",
+    ),
+  );
+
+  return { data, error };
+};

@@ -1,13 +1,19 @@
 import { revalidatePath } from "next/cache";
-import { IconDotsVertical } from "@tabler/icons-react";
 
-import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 import FileItem from "@/components/app/spaces/file-item";
 import UploadFile from "@/components/app/spaces/upload-file";
+import SpaceActions from "@/components/app/spaces/space-actions";
 
-import { deleteFile, getFilesInSpace, getSpace } from "@/services/spaces";
+import {
+  deleteFile,
+  getFile,
+  getFilesInSpace,
+  getSpace,
+} from "@/services/spaces";
+
 import type { ApiResponse, MessageResponse } from "@/types";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default async function Space({
   params,
@@ -36,9 +42,8 @@ export default async function Space({
               {data?.data.space.icon} {data?.data.space.name}
             </h1>
           </div>
-          <Button variant="ghost" size="icon">
-            <IconDotsVertical />
-          </Button>
+
+          <SpaceActions space={data?.data?.space ?? null} />
         </div>
         <div className="flex max-h-full min-h-0 flex-1 flex-col gap-6">
           <UploadFile
@@ -51,15 +56,29 @@ export default async function Space({
                 file={fileItem}
                 handleGetFile={async () => {
                   "use server";
+                  const { data, error } = await getFile(spaceId, fileItem.id);
                   console.log("downloading file");
+
+                  if (error) {
+                    return {
+                      data: null,
+                      error: error.message || "Error downloading file",
+                    };
+                  }
+
+                  if (data) {
+                    // Convert Response to Blob for client-side usage
+                    const blob = await (data as unknown as Response).blob();
+                    return { data: blob, error: null };
+                  }
+
+                  return { data: null, error: "No file data received" };
                 }}
                 handleDeleteFile={async () => {
                   "use server";
-                  const result = await deleteFile("1", fileItem.id);
+                  const result = await deleteFile(spaceId, fileItem.id);
 
-                  if (result.data?.message) {
-                    revalidatePath("/app/spaces");
-                  }
+                  revalidatePath("/app/spaces");
 
                   return result as ApiResponse<MessageResponse>;
                 }}

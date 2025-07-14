@@ -45,7 +45,13 @@ export default async function SpacesPage() {
             </LogoLines>
           </div>
           <div className="mx-auto grid h-full grid-cols-1 gap-16 overflow-auto pt-7 sm:grid-cols-2 md:grid-cols-3">
-            <CreateSpaceDialog handleSubmit={onSubmit} />
+            <CreateSpaceDialog
+              handleSubmit={onSubmit}
+              title="Create new space"
+              values={{ name: "", icon: "", description: "" }}
+              trigger={<Space text="Create new space" isEmpty />}
+              ctaText="Create"
+            />
             {data?.data?.map((space, index) => (
               <Link href={`/app/spaces/${space.space.id}`} key={index} prefetch>
                 <Space

@@ -37,5 +37,5 @@ export async function deleteFileHandler(id: string, space_id: string) {
     throw new Error("File not found");
   }
 
-  return { data: { message: "File deleted successfully" } };
+  return { message: "File deleted successfully" };
 }

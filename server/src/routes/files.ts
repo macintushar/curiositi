@@ -21,8 +21,10 @@ const filesRouter = new Hono<{
 
 filesRouter.post("/upload", zValidator("form", UploadSchema), async (c) => {
   const formData = await c.req.valid("form");
+
   const file = formData.file;
   const space_id = formData.space_id as string;
+
   const user = c.get("user");
 
   if (!user) {
@@ -43,7 +45,7 @@ filesRouter.post("/upload", zValidator("form", UploadSchema), async (c) => {
     uploadFileHandler(file, space_id, user.id),
   );
   if (error) {
-    return c.json({ error: error.message || "File upload failed" }, 500);
+    return c.json({ error: error.message || "File upload failed" }, 400);
   }
   return c.json(data);
 });
