@@ -35,6 +35,7 @@ apiRouter.use("*", async (c, next) => {
   }
 
   console.log(c.req.raw.headers);
+  console.log(c.req.raw.body);
 
   c.set("user", session.user);
   c.set("session", session.session);

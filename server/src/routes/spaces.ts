@@ -67,7 +67,7 @@ spacesRouter.delete(
       return c.json({ error: error.message || "Failed to delete space" }, 500);
     }
     if (data) {
-      return c.json({ message: "Space deleted successfully" }, 200);
+      return c.json({ data: { message: "Space deleted successfully" } }, 200);
     }
     return c.json({ error: "Failed to delete space" }, 500);
   },

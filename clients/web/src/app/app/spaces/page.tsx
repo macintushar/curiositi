@@ -8,7 +8,6 @@ import { revalidatePath } from "next/cache";
 import type { z } from "zod";
 import Space from "@/components/app/spaces/space";
 import Link from "next/link";
-import { toast } from "sonner";
 
 export default async function SpacesPage() {
   const { data, error } = await getSpaces();
@@ -20,19 +19,29 @@ export default async function SpacesPage() {
       values.icon ?? "",
       values.description ?? "",
     );
+
     if (error) {
       console.error(error);
-      toast.error(error);
+      return { success: false, error: error };
     }
+
     if (data) {
       if (data.error) {
-        toast.error(data.error);
+        return { success: false, error: data.error };
       }
-      if (data.data.space) {
-        toast.success(`Created space ${data.data.space.name}`);
+
+      if (data.data[0]?.id) {
+        revalidatePath("/app/spaces");
+        return {
+          success: true,
+          message: `Created space ${data.data[0].name}`,
+        };
       }
-      revalidatePath("/app/spaces");
     }
+
+    console.log(data);
+
+    return { success: false, error: "Unknown error occurred" };
   };
 
   if (error) {

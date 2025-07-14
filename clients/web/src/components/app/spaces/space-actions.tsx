@@ -11,8 +11,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { deleteSpace } from "@/actions/space";
+import { useRouter } from "next/navigation";
 
 export default function SpaceActions({ space }: { space: Space | null }) {
+  const router = useRouter();
   if (!space) return null;
 
   return (
@@ -24,8 +27,10 @@ export default function SpaceActions({ space }: { space: Space | null }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <CreateSpaceDialog
-          handleSubmit={async () => {
+          handleSubmit={async (values) => {
+            console.log(values);
             toast.success("Space updated successfully");
+            return { success: true, message: "Space updated successfully" };
           }}
           title="Update space"
           ctaText="Update"
@@ -43,7 +48,21 @@ export default function SpaceActions({ space }: { space: Space | null }) {
             </DropdownMenuItem>
           }
         />
-        <DropdownMenuItem variant="destructive" className="cursor-pointer">
+        <DropdownMenuItem
+          variant="destructive"
+          className="cursor-pointer"
+          onClick={async () => {
+            const { data, error } = await deleteSpace(space.id);
+
+            if (error || data?.error) {
+              toast.error(data?.error ?? "Error deleting space");
+            }
+            if (data?.data?.message) {
+              toast.success(data.data.message);
+              router.push("/app/spaces");
+            }
+          }}
+        >
           <IconTrash /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>

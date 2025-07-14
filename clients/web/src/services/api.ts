@@ -8,6 +8,7 @@ export const apiFetch = async <T>(
   url: string,
   options?: RequestInit,
   responseType?: "json" | "direct",
+  additionalHeaders?: Record<string, string>,
 ): Promise<T> => {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get("better-auth.session_token");
@@ -17,6 +18,7 @@ export const apiFetch = async <T>(
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
       Cookie: `better-auth.session_token=${sessionCookie?.value ?? ""}`,
       ...options?.headers,
+      ...additionalHeaders,
     },
     credentials: "include",
     ...options,

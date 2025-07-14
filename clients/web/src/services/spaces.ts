@@ -2,6 +2,7 @@ import type {
   ApiResponse,
   File as CuriositiFile,
   MessageResponse,
+  Space,
   SpaceResponse,
 } from "@/types";
 import { apiFetch } from "./api";
@@ -34,17 +35,37 @@ export const createSpace = async (
   icon: string,
   description: string,
 ) => {
-  const data = await apiFetch<ApiResponse<SpaceResponse<number>>>(
+  const data = await apiFetch<ApiResponse<Space[]>>(
     `/api/v1/spaces`,
     {
       method: "POST",
-      body: JSON.stringify({ name, icon, description }),
+      body: JSON.stringify({
+        name: name,
+        icon: icon,
+        description: description,
+      }),
     },
     "json",
+    {
+      "Content-Type": "application/json",
+    },
   );
   return {
     data,
     error: null,
+  };
+};
+
+export const deleteSpace = async (id: string) => {
+  const { data, error } = await tryCatch(
+    apiFetch<ApiResponse<MessageResponse>>(`/api/v1/spaces/${id}`, {
+      method: "DELETE",
+    }),
+  );
+
+  return {
+    data,
+    error,
   };
 };
 

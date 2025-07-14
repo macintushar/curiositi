@@ -9,6 +9,7 @@ export const handleUpload = async (spaceId: string, file: File) => {
     return response;
   } catch (error) {
     console.error("Upload error:", error);
+    revalidatePath(`/app/spaces`);
     return { data: null, error: error as Error };
   }
 };

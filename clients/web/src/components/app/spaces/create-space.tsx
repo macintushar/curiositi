@@ -26,6 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import type { z } from "zod";
+import { toast } from "sonner";
 
 import { createSpaceSchema } from "@/lib/schema";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,7 +38,11 @@ export default function CreateSpaceDialog({
   trigger,
   ctaText,
 }: {
-  handleSubmit: (values: z.infer<typeof createSpaceSchema>) => void;
+  handleSubmit: (values: z.infer<typeof createSpaceSchema>) => Promise<{
+    success: boolean;
+    error?: string;
+    message?: string;
+  }>;
   title: string;
   values: z.infer<typeof createSpaceSchema>;
   trigger: React.ReactNode;
@@ -50,10 +55,20 @@ export default function CreateSpaceDialog({
     defaultValues: values,
   });
 
-  function handleFormSubmit(values: z.infer<typeof createSpaceSchema>) {
-    handleSubmit(values);
-    setOpen(false);
-    form.reset();
+  async function handleFormSubmit(values: z.infer<typeof createSpaceSchema>) {
+    const result = await handleSubmit(values);
+
+    if (result.success) {
+      if (result.message) {
+        toast.success(result.message);
+      }
+      setOpen(false);
+      form.reset();
+    } else {
+      if (result.error) {
+        toast.error("Error creating space" + JSON.stringify(result.error));
+      }
+    }
   }
 
   return (
