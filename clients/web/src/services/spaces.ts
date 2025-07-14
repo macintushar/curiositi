@@ -29,13 +29,18 @@ export const getSpace = async (id: string) => {
   };
 };
 
-export const createSpace = async (name: string, icon: string) => {
+export const createSpace = async (
+  name: string,
+  icon: string,
+  description: string,
+) => {
   const data = await apiFetch<ApiResponse<SpaceResponse<number>>>(
     `/api/v1/spaces`,
     {
       method: "POST",
-      body: JSON.stringify({ name, icon }),
+      body: JSON.stringify({ name, icon, description }),
     },
+    "json",
   );
   return {
     data,

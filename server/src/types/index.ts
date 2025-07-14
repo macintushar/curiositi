@@ -82,6 +82,7 @@ export type Provider = {
   models: Model[];
 };
 
-export type Providers = {
+export type Configs = {
   providers: Provider[];
+  file_types: string[];
 };

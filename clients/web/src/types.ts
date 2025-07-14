@@ -56,8 +56,9 @@ export type Provider = {
   models: Model[];
 };
 
-export type ProviderResponse = {
+export type Configs = {
   providers: Provider[];
+  file_types: string[];
 };
 
 export type SpaceResponse<T> = {

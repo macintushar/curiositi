@@ -1,10 +1,4 @@
-import type {
-  AllFiles,
-  Context,
-  Model,
-  ProviderResponse,
-  Space,
-} from "@/types";
+import type { AllFiles, Context, Model, Configs, Space } from "@/types";
 import type { SearchTab } from "@/types";
 import { create } from "zustand";
 
@@ -21,7 +15,7 @@ type ChatStore = {
   tab: SearchTab;
   files: AllFiles[];
   spaces: Space[];
-  configs: ProviderResponse | null;
+  configs: Configs | null;
   activeModel: ActiveModel | null;
   setPrompt: (prompt: string) => void;
   setContext: (context: Context[]) => void;
@@ -30,7 +24,7 @@ type ChatStore = {
   setTab: (tab: SearchTab) => void;
   setFiles: (files: AllFiles[]) => void;
   setSpaces: (spaces: Space[]) => void;
-  setConfigs: (configs: ProviderResponse) => void;
+  setConfigs: (configs: Configs) => void;
   setActiveModel: (activeModel: ActiveModel) => void;
 };
 

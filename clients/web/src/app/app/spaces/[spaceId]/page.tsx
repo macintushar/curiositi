@@ -33,6 +33,15 @@ export default async function Space({
     );
   }
 
+  if (data?.error || files?.error || !data?.data?.space) {
+    return (
+      <div>
+        Error: {data?.error}
+        {files?.error}
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full flex-col items-center justify-start p-4">
       <div className="flex h-full w-full flex-col gap-4 md:w-2/3 md:pt-40">

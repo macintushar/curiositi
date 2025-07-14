@@ -50,6 +50,9 @@ spacesRouter.get(
     if (error) {
       return c.json({ error: error.message || "Failed to get space" }, 500);
     }
+    if (!data.data || !data.data.space) {
+      return c.json({ error: "Space not found" }, 404);
+    }
     return c.json(data);
   },
 );

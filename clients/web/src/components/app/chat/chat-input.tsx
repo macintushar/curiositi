@@ -1,6 +1,6 @@
 "use client";
 
-import type { AllFiles, ProviderResponse, Space } from "@/types";
+import type { AllFiles, Configs, Space } from "@/types";
 import MessageInput from "./message-input";
 import useChatStore from "@/stores/useChatStore";
 import { useEffect } from "react";
@@ -12,7 +12,7 @@ export default function ChatInput({
 }: {
   files: AllFiles[] | null;
   spaces: Space[] | null;
-  configs: ProviderResponse | null;
+  configs: Configs | null;
 }) {
   const { setFiles, setSpaces, setConfigs } = useChatStore();
 

@@ -5,31 +5,25 @@
 import "./src/env.js";
 import { env } from "./src/env.js";
 
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import("next").NextConfig} */
-const config = {
-  async rewrites() {
-    return [
-      {
-        source: "/api/v1/:path*",
-        destination: `${env.SERVER_URL}/api/v1/:path*`,
+const config = withSentryConfig(
+  {
+    async rewrites() {
+      return [
+        {
+          source: "/api/v1/:path*",
+          destination: `${env.SERVER_URL}/api/v1/:path*`,
+        },
+      ];
+    },
+    experimental: {
+      serverActions: {
+        bodySizeLimit: "5mb",
       },
-    ];
-  },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: "5mb",
     },
   },
-};
-export default config;
-
-
-// Injected content via Sentry wizard below
-
-const { withSentryConfig } = require("@sentry/nextjs");
-
-module.exports = withSentryConfig(
-  module.exports,
   {
     // For all available options, see:
     // https://www.npmjs.com/package/@sentry/webpack-plugin#options
@@ -60,5 +54,6 @@ module.exports = withSentryConfig(
     // https://docs.sentry.io/product/crons/
     // https://vercel.com/docs/cron-jobs
     automaticVercelMonitors: true,
-  }
+  },
 );
+export default config;

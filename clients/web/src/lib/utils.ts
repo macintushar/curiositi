@@ -9,6 +9,7 @@ import {
   IconFileTypePpt,
   IconFile,
   type Icon,
+  IconMarkdown,
 } from "@tabler/icons-react";
 
 import dayjs from "dayjs";
@@ -90,7 +91,7 @@ export function getFileType(mimeType: string): FileType {
     case "text/csv":
       return { label: "csv", icon: IconFileTypeCsv };
     case "text/markdown":
-      return { label: "md", icon: IconFileTypeTxt };
+      return { label: "md", icon: IconMarkdown };
     default:
       return { label: "unknown", icon: IconFile };
   }

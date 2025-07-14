@@ -56,6 +56,9 @@ export const ANTHROPIC_ENABLED = ANTHROPIC_API_KEY ? true : false;
 // SearXNG
 export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
 
+// Sentry
+export const SENTRY_DSN = process.env.SENTRY_DSN;
+
 // File Types
 
 export const OFFICE_FILE_TYPES = [

@@ -5,6 +5,7 @@ import Image from "next/image";
 import emptySpace from "@/assets/images/add-files.svg";
 import { toast } from "sonner";
 import { handleUpload } from "@/actions/file";
+import useChatStore from "@/stores/useChatStore";
 
 type UploadFileProps = {
   areFilesInSpace: boolean;
@@ -15,9 +16,13 @@ export default function UploadFile({
   areFilesInSpace,
   spaceId,
 }: UploadFileProps) {
+  const { configs } = useChatStore();
+
   const handleClick = async () => {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
+    fileInput.accept = configs?.file_types.join(",") ?? "";
+
     fileInput.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {

@@ -3,8 +3,9 @@ import {
   OLLAMA_BASE_URL,
   OPENAI_ENABLED,
   OPENROUTER_ENABLED,
+  SUPPORTED_FILE_TYPES,
 } from "@/constants";
-import { Provider, Providers, LLM_PROVIDERS, Model } from "@/types";
+import { Provider, Configs, LLM_PROVIDERS, Model } from "@/types";
 import { Ollama } from "ollama";
 import { tryCatch } from "@/lib/try-catch";
 
@@ -173,7 +174,7 @@ export async function getOllamaModels(invalidateCache = false) {
   return data;
 }
 
-export async function getConfigs(invalidateCache = false): Promise<Providers> {
+export async function getConfigs(invalidateCache = false): Promise<Configs> {
   return {
     providers: [
       {
@@ -184,5 +185,6 @@ export async function getConfigs(invalidateCache = false): Promise<Providers> {
       },
       ...models,
     ],
+    file_types: SUPPORTED_FILE_TYPES,
   };
 }

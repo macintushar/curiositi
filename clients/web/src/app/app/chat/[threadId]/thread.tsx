@@ -11,7 +11,7 @@ import MessageContainer from "@/components/app/chat/message-container";
 
 import useChatStore from "@/stores/useChatStore";
 
-import type { AllFiles, ProviderResponse, Space, ThreadMessage } from "@/types";
+import type { AllFiles, Configs, Space, ThreadMessage } from "@/types";
 
 export default function Thread({
   files,
@@ -21,7 +21,7 @@ export default function Thread({
 }: {
   files: AllFiles[] | null;
   spaces: Space[] | null;
-  configs: ProviderResponse | null;
+  configs: Configs | null;
   messages: ThreadMessage[] | null;
 }) {
   const { setFiles, setSpaces, setConfigs } = useChatStore();

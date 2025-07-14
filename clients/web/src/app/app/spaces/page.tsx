@@ -8,17 +8,29 @@ import { revalidatePath } from "next/cache";
 import type { z } from "zod";
 import Space from "@/components/app/spaces/space";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default async function SpacesPage() {
   const { data, error } = await getSpaces();
 
   const onSubmit = async (values: z.infer<typeof createSpaceSchema>) => {
     "use server";
-    const { data, error } = await createSpace(values.name, values.icon ?? "");
+    const { data, error } = await createSpace(
+      values.name,
+      values.icon ?? "",
+      values.description ?? "",
+    );
     if (error) {
       console.error(error);
+      toast.error(error);
     }
     if (data) {
+      if (data.error) {
+        toast.error(data.error);
+      }
+      if (data.data.space) {
+        toast.success(`Created space ${data.data.space.name}`);
+      }
       revalidatePath("/app/spaces");
     }
   };
