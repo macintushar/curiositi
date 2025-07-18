@@ -59,15 +59,20 @@ export async function searchHandler({
       role: "user",
       content: input,
       threadId: thread_id,
+      model,
+      provider,
     },
     {
       role: "assistant",
       content: response.answer,
       threadId: thread_id,
+      model,
+      provider,
       documentSearches: response.contextSources.documentSpaces,
       webSearches: response.contextSources.webSearches,
       documentSearchResults: response.contextSources.documentSpaces,
       webSearchResults: response.contextSources.webSearches,
+      specificFileContent: response.contextSources.specificFiles,
     },
   ]);
 
@@ -79,6 +84,7 @@ export async function searchHandler({
         webQueries: response.contextSources.webSearches,
         docResults: response.contextSources.documentSpaces,
         webResults: response.contextSources.webSearches,
+        specificFileContent: response.contextSources.specificFiles,
         strategy: response.strategy,
         reasoning: response.reasoning,
       },

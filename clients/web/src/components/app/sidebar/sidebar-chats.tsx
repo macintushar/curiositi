@@ -25,7 +25,7 @@ export default function SidebarChats({
             asChild
           >
             <Link href={`/app/chat/${thread.id}`} prefetch>
-              <span>{thread.id}</span>
+              <span>{thread.title}</span>
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>

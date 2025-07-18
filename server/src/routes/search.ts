@@ -34,26 +34,4 @@ searchRouter.post("/", zValidator("json", SearchSchema), async (c) => {
   return c.json(data);
 });
 
-// searchRouter.post(
-//   "/general",
-//   zValidator("json", SearchSchema.omit({ space_id: true })),
-//   async (c) => {
-//     const { input, model, provider, thread_id } = await c.req.valid("json");
-//     const { data, error } = await tryCatch(
-//       searchHandler({
-//         input: input,
-//         model: model,
-//         provider: provider,
-//         thread_id: thread_id,
-//         mode: "general",
-//       }),
-//     );
-
-//     if (error) {
-//       return c.json({ error: error.message || "General search failed" }, 500);
-//     }
-//     return c.json(data);
-//   },
-// );
-
 export default searchRouter;

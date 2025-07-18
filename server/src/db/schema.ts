@@ -153,6 +153,7 @@ export const messages = pgTable("messages", {
   webSearches: text("web_searches").array(),
   documentSearchResults: text("document_search_results").array(),
   webSearchResults: text("web_search_results").array(),
+  specificFileContent: text("specific_file_content").array(),
 });
 
 export const settings = pgTable("settings", {

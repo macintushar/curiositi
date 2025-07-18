@@ -48,7 +48,8 @@ CREATE TABLE "messages" (
 	"document_searches" text[],
 	"web_searches" text[],
 	"document_search_results" text[],
-	"web_search_results" text[]
+	"web_search_results" text[],
+	"specific_file_content" text[]
 );
 --> statement-breakpoint
 CREATE TABLE "session" (

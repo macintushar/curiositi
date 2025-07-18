@@ -56,3 +56,13 @@ export const changePasswordSchema = z
       });
     }
   });
+
+export const SearchSchema = z.object({
+  input: z.string().min(1, '"input" cannot be empty'),
+  model: z.string(),
+  session_id: z.string().min(1, '"session_id" cannot be empty'),
+  provider: z.string(),
+  thread_id: z.string(),
+  space_ids: z.array(z.string()).optional(),
+  file_ids: z.array(z.string()).optional(),
+});

@@ -35,6 +35,7 @@ export default function ThreadPage({
       spaces={spaces?.data?.map((space) => space.space) ?? null}
       configs={configs?.data ?? null}
       messages={messages?.data ?? null}
+      threadId={threadId}
     />
   );
 }

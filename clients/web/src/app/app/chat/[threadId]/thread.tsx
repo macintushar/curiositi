@@ -12,19 +12,30 @@ import MessageContainer from "@/components/app/chat/message-container";
 import useChatStore from "@/stores/useChatStore";
 
 import type { AllFiles, Configs, Space, ThreadMessage } from "@/types";
+import { search } from "@/actions/search";
 
 export default function Thread({
   files,
   spaces,
   configs,
   messages,
+  threadId,
 }: {
   files: AllFiles[] | null;
   spaces: Space[] | null;
   configs: Configs | null;
   messages: ThreadMessage[] | null;
+  threadId: string;
 }) {
-  const { setFiles, setSpaces, setConfigs } = useChatStore();
+  const {
+    setFiles,
+    setSpaces,
+    setConfigs,
+    setIsLoading,
+    prompt,
+    activeModel,
+    context,
+  } = useChatStore();
 
   const [messagesState] = useState<ThreadMessage[]>(messages ?? []);
 
@@ -49,7 +60,37 @@ export default function Thread({
           ))}
         </ChatContainerContent>
       </ChatContainerRoot>
-      <MessageInput />
+      <MessageInput
+        onSubmit={async () => {
+          if (!activeModel || !prompt.trim() || !threadId) {
+            console.error("Missing required fields:", {
+              activeModel,
+              prompt: prompt.trim(),
+              threadId,
+            });
+            return;
+          }
+
+          setIsLoading(true);
+          const data = await search({
+            input: prompt.trim(),
+            model: activeModel.model.name,
+            provider: activeModel.provider_name,
+            thread_id: threadId,
+            space_ids: context
+              .filter((item) => item.type === "space")
+              .map((item) => item.id),
+            file_ids: context
+              .filter((item) => item.type === "file")
+              .map((item) => item.id),
+          });
+
+          if (data?.data?.data) {
+            messagesState.push(data.data.data);
+          }
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

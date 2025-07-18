@@ -58,7 +58,7 @@ threadsRouter.delete(
   },
 );
 
-threadsRouter.post(
+threadsRouter.get(
   "/:id/messages",
   zValidator("param", z.object({ id: z.string() })),
   async (c) => {

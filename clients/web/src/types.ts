@@ -69,6 +69,7 @@ export type SpaceResponse<T> = {
 
 export type Thread = {
   id: string;
+  title: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -86,6 +87,7 @@ export type ThreadMessage = {
   webSearches: string[] | null;
   documentSearchResults: string[] | null;
   webSearchResults: string[] | null;
+  specificFileContent: string[] | null;
 };
 
 export type Context = {

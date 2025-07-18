@@ -1,5 +1,5 @@
 {
-  "id": "4b23091d-13a4-446c-b7ec-cff5c9a7f04c",
+  "id": "454e8c41-e22f-4bba-adad-2e515eaa832b",
   "prevId": "f41f1a65-3428-489b-8145-337caec3d9c1",
   "version": "7",
   "dialect": "postgresql",
@@ -364,6 +364,12 @@
         },
         "web_search_results": {
           "name": "web_search_results",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "specific_file_content": {
+          "name": "specific_file_content",
           "type": "text[]",
           "primaryKey": false,
           "notNull": false
