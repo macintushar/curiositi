@@ -24,7 +24,6 @@ searchRouter.post("/", zValidator("json", SearchSchema), async (c) => {
       file_ids: file_ids,
       provider: provider,
       thread_id: thread_id,
-      mode: "space",
     }),
   );
 

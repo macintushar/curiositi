@@ -71,7 +71,11 @@ export default function Thread({
       <ChatContainerRoot className="h-full w-full flex-1 overflow-y-auto sm:w-2/3">
         <ChatContainerContent className="space-y-5">
           {messagesState.map((message, idx) => (
-            <MessageContainer key={idx} message={message} />
+            <MessageContainer
+              key={idx}
+              message={message}
+              isLastMessage={idx === messagesState.length - 1}
+            />
           ))}
         </ChatContainerContent>
       </ChatContainerRoot>
@@ -105,6 +109,7 @@ export default function Thread({
               specificFileContent: [],
               model: activeModel.model.model,
               provider: activeModel.provider_name,
+              reasoning: null,
             },
           ]);
 

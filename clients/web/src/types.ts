@@ -93,6 +93,7 @@ export type ThreadMessage = {
   confidence: number;
   followUpSuggestions: string[];
   strategy: "comprehensive" | "focused" | "hybrid" | "error";
+  reasoning: string | null;
 };
 
 export type Context = {

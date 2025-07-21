@@ -101,7 +101,6 @@ export type ThreadMessage = {
   documentSearchResults: string[] | null;
   webSearchResults: string[] | null;
   specificFileContent: string[] | null;
-  confidence: number;
   followUpSuggestions: string[];
   strategy: "comprehensive" | "focused" | "hybrid" | "error";
   reasoning: string | null;

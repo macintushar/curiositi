@@ -1,10 +1,10 @@
-import curiositiAgent from "@/agents/curiositiAgent";
+import CuriositiAgent from "@/agents/curiositi-agent";
 import db from "@/db";
 import { messages, threads } from "@/db/schema";
 import { llm } from "@/lib/llms";
 import { tryCatch } from "@/lib/try-catch";
 import { formatHistory } from "@/lib/utils";
-import { CuriositiAgentMode, LLM_PROVIDERS, ThreadMessage } from "@/types";
+import { LLM_PROVIDERS, ThreadMessage } from "@/types";
 import { generateText } from "ai";
 import { eq } from "drizzle-orm";
 
@@ -20,7 +20,6 @@ export async function searchHandler({
   model: string;
   provider: LLM_PROVIDERS;
   thread_id: string;
-  mode: CuriositiAgentMode;
   space_ids?: string[];
   file_ids?: string[];
 }): Promise<{ data: ThreadMessage }> {
@@ -79,22 +78,20 @@ export async function searchHandler({
     console.log("Title generated: ", data?.title);
   }
 
-  const response = await curiositiAgent(
+  const response = await CuriositiAgent({
     input,
-    model,
-    history,
-    file_ids,
-    space_ids,
-    true,
-    provider,
-    {
-      maxDocQueries: 5,
-      maxWebQueries: 5,
-      includeFollowUps: true,
-      prioritizeRecent: true,
-      confidenceThreshold: 0.5,
-    },
-  );
+    modelName: model,
+    history: formattedHistory,
+    fileIds: file_ids || [],
+    spaceIds: space_ids || [],
+    enableWebSearch: true,
+    provider: provider,
+
+    // Optional configuration
+    maxDocQueries: 5,
+    maxWebQueries: 5,
+    prioritizeRecent: true,
+  });
 
   const newMessage = await db
     .insert(messages)
@@ -117,7 +114,6 @@ export async function searchHandler({
         documentSearchResults: response.contextSources.documentSpaces,
         webSearchResults: response.contextSources.webSearches,
         specificFileContent: response.contextSources.specificFiles,
-        confidence: response.confidence,
         followUpSuggestions: response.followUpSuggestions,
         strategy: response.strategy,
         reasoning: response.reasoning,
@@ -142,7 +138,6 @@ export async function searchHandler({
       provider,
       strategy: response.strategy,
       reasoning: response.reasoning,
-      confidence: response.confidence,
       followUpSuggestions: response.followUpSuggestions,
     },
   };

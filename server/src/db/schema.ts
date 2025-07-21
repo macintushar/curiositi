@@ -5,7 +5,6 @@ import {
   uuid,
   boolean,
   vector,
-  integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
@@ -155,7 +154,6 @@ export const messages = pgTable("messages", {
   documentSearchResults: text("document_search_results").array(),
   webSearchResults: text("web_search_results").array(),
   specificFileContent: text("specific_file_content").array(),
-  confidence: integer("confidence").notNull().default(0),
   followUpSuggestions: text("follow_up_suggestions").array(),
   strategy: text("strategy", {
     enum: ["comprehensive", "focused", "hybrid", "error"],

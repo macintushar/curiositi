@@ -14,17 +14,19 @@ import {
   MessageContent,
   Message,
 } from "@/components/ui/message";
-
-import { Button } from "@/components/ui/button";
-import { Icon } from "@/components/themes/logo/logo";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { ThreadMessage } from "@/types";
+import { Separator } from "@/components/ui/separator";
+import { Icon } from "@/components/themes/logo/logo";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+import useChatStore from "@/stores/useChatStore";
+
 import ExportMessage from "./export-message";
 import CopyButton from "../copy-button";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import useChatStore from "@/stores/useChatStore";
 import Suggestions from "./suggestions";
+
+import type { ThreadMessage } from "@/types";
 
 function UserMessage({ message }: { message: string }) {
   return (
@@ -60,7 +62,7 @@ function SourceBadge({
 }
 
 function AssistantMessage({ message }: { message: ThreadMessage }) {
-  const { files } = useChatStore();
+  const { files, configs } = useChatStore();
   return (
     <Tabs defaultValue="answer" className="w-full">
       <TabsList>
@@ -73,13 +75,66 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
           <p className="text-muted-foreground text-sm font-light">Sources</p>
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="answer" className="flex flex-col gap-3">
-        <MessageContent markdown>{message.content}</MessageContent>
+      <div className="flex flex-col gap-3">
+        <TabsContent value="answer">
+          <MessageContent markdown>{message.content}</MessageContent>
+        </TabsContent>
+        <TabsContent value="sources">
+          <div className="flex w-full flex-col space-y-6">
+            {message.reasoning && (
+              <div className="text-muted-foreground flex flex-col">
+                <div className="flex items-center gap-2">
+                  <IconSparkles className="size-5" />
+                  <p className="font-serif text-lg font-medium">Reasoning</p>
+                </div>
+                <div className="text-muted-foreground border-l-2 border-l-slate-200 pl-2 text-sm">
+                  {message.reasoning}
+                </div>
+              </div>
+            )}
+            {message.documentSearches &&
+              message.documentSearches.length > 0 && (
+                <SourceBadge
+                  title="Documents:"
+                  search={message.documentSearches}
+                  Icon={IconFileSearch}
+                />
+              )}
+            {message.webSearches && message.webSearches.length > 0 && (
+              <SourceBadge
+                title="Web:"
+                search={message.webSearches}
+                Icon={IconWorldSearch}
+              />
+            )}
+            {message.specificFileContent &&
+              message.specificFileContent.length > 0 && (
+                <SourceBadge
+                  title="Specific Files:"
+                  search={message.specificFileContent.map(
+                    (file) => files.find((f) => f.id === file)?.name ?? file,
+                  )}
+                  Icon={IconFile}
+                />
+              )}
+          </div>
+        </TabsContent>
         <MessageActions className="flex justify-between">
           <MessageAction tooltip="Export" delayDuration={100}>
             <ExportMessage message={message.content} />
           </MessageAction>
           <MessageActions>
+            {message.model && (
+              <MessageAction
+                tooltip={`Generated with ${configs?.providers.find((p) => p.name === message.provider)?.models.find((m) => m.model === message.model)?.name} by ${
+                  configs?.providers.find((p) => p.name === message.provider)
+                    ?.title
+                }`}
+                delayDuration={100}
+              >
+                <IconSparkles className="size-4" />
+              </MessageAction>
+            )}
             <MessageAction tooltip="Copy" delayDuration={100}>
               <CopyButton text={message.content} />
             </MessageAction>
@@ -90,50 +145,20 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
             </MessageAction>
           </MessageActions>
         </MessageActions>
-      </TabsContent>
-      <TabsContent value="sources">
-        <div className="flex w-full flex-col space-y-6">
-          {message.model && (
-            <div className="text-muted-foreground flex items-center gap-2">
-              <IconSparkles className="size-4" />
-              Generated with {message.model} by {message.provider}
-            </div>
-          )}
-          {message.documentSearches && message.documentSearches.length > 0 && (
-            <SourceBadge
-              title="Documents:"
-              search={message.documentSearches}
-              Icon={IconFileSearch}
-            />
-          )}
-          {message.webSearches && message.webSearches.length > 0 && (
-            <SourceBadge
-              title="Web:"
-              search={message.webSearches}
-              Icon={IconWorldSearch}
-            />
-          )}
-          {message.specificFileContent &&
-            message.specificFileContent.length > 0 && (
-              <SourceBadge
-                title="Specific Files:"
-                search={message.specificFileContent.map(
-                  (file) => files.find((f) => f.id === file)?.name ?? file,
-                )}
-                Icon={IconFile}
-              />
-            )}
-        </div>
-      </TabsContent>
+      </div>
     </Tabs>
   );
 }
 
 type MessageContainerProps = {
   message: ThreadMessage;
+  isLastMessage: boolean;
 };
 
-export default function MessageContainer({ message }: MessageContainerProps) {
+export default function MessageContainer({
+  message,
+  isLastMessage,
+}: MessageContainerProps) {
   return (
     <Message className="flex flex-col gap-2">
       {message.role === "user" ? (
@@ -142,9 +167,11 @@ export default function MessageContainer({ message }: MessageContainerProps) {
         <AssistantMessage message={message} />
       )}
       <Separator orientation="horizontal" className="w-full" />
-      {message.role === "assistant" && message.followUpSuggestions && (
-        <Suggestions suggestions={message.followUpSuggestions} />
-      )}
+      {isLastMessage &&
+        message.role === "assistant" &&
+        message.followUpSuggestions && (
+          <Suggestions suggestions={message.followUpSuggestions} />
+        )}
     </Message>
   );
 }

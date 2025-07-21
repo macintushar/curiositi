@@ -50,7 +50,6 @@ CREATE TABLE "messages" (
 	"document_search_results" text[],
 	"web_search_results" text[],
 	"specific_file_content" text[],
-	"confidence" integer DEFAULT 0 NOT NULL,
 	"follow_up_suggestions" text[],
 	"strategy" text DEFAULT 'comprehensive',
 	"reasoning" text
