@@ -34,6 +34,7 @@ export default function Thread({
     setSpaces,
     setConfigs,
     setIsLoading,
+    setPrompt,
     prompt,
     activeModel,
     context,
@@ -67,8 +68,8 @@ export default function Thread({
   ]);
 
   return (
-    <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2 sm:px-0">
-      <ChatContainerRoot className="h-full w-full flex-1 overflow-y-auto sm:w-2/3">
+    <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2">
+      <ChatContainerRoot className="h-full w-full max-w-3xl flex-1 overflow-y-auto">
         <ChatContainerContent className="space-y-5">
           {messagesState.map((message, idx) => (
             <MessageContainer
@@ -141,6 +142,7 @@ export default function Thread({
             setMessagesState([...messagesState, data.data.data]);
           }
           setIsLoading(false);
+          setPrompt("");
         }}
       />
     </div>
