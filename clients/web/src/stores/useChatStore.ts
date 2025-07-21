@@ -1,5 +1,7 @@
 import type { AllFiles, Context, Model, Configs, Space } from "@/types";
 import type { SearchTab } from "@/types";
+
+import { persist } from "zustand/middleware";
 import { create } from "zustand";
 
 type ActiveModel = {
@@ -28,25 +30,32 @@ type ChatStore = {
   setActiveModel: (activeModel: ActiveModel) => void;
 };
 
-const useChatStore = create<ChatStore>((set) => ({
-  prompt: "",
-  context: [],
-  isLoading: false,
-  search: "",
-  tab: "all",
-  files: [],
-  spaces: [],
-  configs: null,
-  activeModel: null,
-  setPrompt: (prompt) => set({ prompt }),
-  setContext: (context) => set({ context }),
-  setIsLoading: (isLoading) => set({ isLoading }),
-  setSearch: (search) => set({ search }),
-  setTab: (tab) => set({ tab }),
-  setFiles: (files) => set({ files }),
-  setSpaces: (spaces) => set({ spaces }),
-  setConfigs: (configs) => set({ configs }),
-  setActiveModel: (activeModel) => set({ activeModel }),
-}));
+const useChatStore = create(
+  persist<ChatStore>(
+    (set) => ({
+      prompt: "",
+      context: [],
+      isLoading: false,
+      search: "",
+      tab: "all",
+      files: [],
+      spaces: [],
+      configs: null,
+      activeModel: null,
+      setPrompt: (prompt) => set({ prompt }),
+      setContext: (context) => set({ context }),
+      setIsLoading: (isLoading) => set({ isLoading }),
+      setSearch: (search) => set({ search }),
+      setTab: (tab) => set({ tab }),
+      setFiles: (files) => set({ files }),
+      setSpaces: (spaces) => set({ spaces }),
+      setConfigs: (configs) => set({ configs }),
+      setActiveModel: (activeModel) => set({ activeModel }),
+    }),
+    {
+      name: "curiositi-chat-store",
+    },
+  ),
+);
 
 export default useChatStore;
