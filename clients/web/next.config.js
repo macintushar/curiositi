@@ -11,6 +11,8 @@ import { withSentryConfig } from "@sentry/nextjs";
 /** @type {import("next").NextConfig} */
 const config = withSentryConfig(
   {
+    // Enable standalone output for Docker
+    output: "standalone",
     async rewrites() {
       return [
         {

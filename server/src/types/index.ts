@@ -13,7 +13,6 @@ export enum EMBEDDING_PROVIDERS {
 }
 
 export enum VECTOR_STORES {
-  CHROMA = "chroma",
   POSTGRES = "postgres",
 }
 
