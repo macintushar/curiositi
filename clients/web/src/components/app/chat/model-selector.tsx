@@ -44,13 +44,13 @@ export default function ModelSelector() {
 
   useEffect(() => {
     const provider = configs?.providers.find((provider) => provider.enabled);
-    if (provider) {
+    if (provider && !activeModel) {
       setActiveModel({
         provider_name: provider.name,
         model: provider.models[0]!,
       });
     }
-  }, [configs, setActiveModel]);
+  }, [activeModel, configs, setActiveModel]);
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
