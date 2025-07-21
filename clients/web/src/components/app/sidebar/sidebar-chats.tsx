@@ -120,6 +120,7 @@ function ThreadList({
           <SidebarMenuButton
             isActive={currentPath === `/app/chat/${thread.id}`}
             className="h-fit w-full"
+            variant="outline"
             asChild
           >
             <div>
