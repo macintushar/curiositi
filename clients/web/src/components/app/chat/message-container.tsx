@@ -2,6 +2,7 @@ import {
   IconFile,
   IconFileSearch,
   IconRefresh,
+  IconSparkles,
   IconWorld,
   IconWorldSearch,
   type Icon as IconType,
@@ -23,6 +24,7 @@ import CopyButton from "../copy-button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import useChatStore from "@/stores/useChatStore";
+import Suggestions from "./suggestions";
 
 function UserMessage({ message }: { message: string }) {
   return (
@@ -91,6 +93,12 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
       </TabsContent>
       <TabsContent value="sources">
         <div className="flex w-full flex-col space-y-6">
+          {message.model && (
+            <div className="text-muted-foreground flex items-center gap-2">
+              <IconSparkles className="size-4" />
+              Generated with {message.model} by {message.provider}
+            </div>
+          )}
           {message.documentSearches && message.documentSearches.length > 0 && (
             <SourceBadge
               title="Documents:"
@@ -134,6 +142,9 @@ export default function MessageContainer({ message }: MessageContainerProps) {
         <AssistantMessage message={message} />
       )}
       <Separator orientation="horizontal" className="w-full" />
+      {message.role === "assistant" && message.followUpSuggestions && (
+        <Suggestions suggestions={message.followUpSuggestions} />
+      )}
     </Message>
   );
 }

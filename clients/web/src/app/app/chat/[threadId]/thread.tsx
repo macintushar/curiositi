@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import {
   ChatContainerRoot,
@@ -13,6 +13,8 @@ import useChatStore from "@/stores/useChatStore";
 
 import type { AllFiles, Configs, Space, ThreadMessage } from "@/types";
 import { search } from "@/actions/search";
+import useThreadStore from "@/stores/useThreadStore";
+import { toast } from "sonner";
 
 export default function Thread({
   files,
@@ -37,7 +39,8 @@ export default function Thread({
     context,
   } = useChatStore();
 
-  const [messagesState] = useState<ThreadMessage[]>(messages ?? []);
+  const { messages: messagesState, setMessages: setMessagesState } =
+    useThreadStore();
 
   useEffect(() => {
     if (files) {
@@ -49,7 +52,19 @@ export default function Thread({
     if (configs) {
       setConfigs(configs);
     }
-  }, [files, setFiles, spaces, setSpaces, configs, setConfigs]);
+    if (messages) {
+      setMessagesState(messages);
+    }
+  }, [
+    files,
+    setFiles,
+    spaces,
+    setSpaces,
+    configs,
+    setConfigs,
+    messages,
+    setMessagesState,
+  ]);
 
   return (
     <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2 sm:px-0">
@@ -71,10 +86,32 @@ export default function Thread({
             return;
           }
 
+          setMessagesState([
+            ...messagesState,
+            {
+              role: "user",
+              content: prompt.trim(),
+              id: crypto.randomUUID(),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              threadId,
+              documentSearches: [],
+              webSearches: [],
+              documentSearchResults: [],
+              webSearchResults: [],
+              confidence: 0,
+              followUpSuggestions: [],
+              strategy: "comprehensive",
+              specificFileContent: [],
+              model: activeModel.model.model,
+              provider: activeModel.provider_name,
+            },
+          ]);
+
           setIsLoading(true);
           const data = await search({
             input: prompt.trim(),
-            model: activeModel.model.name,
+            model: activeModel.model.model,
             provider: activeModel.provider_name,
             thread_id: threadId,
             space_ids: context
@@ -85,8 +122,18 @@ export default function Thread({
               .map((item) => item.id),
           });
 
+          console.log("data", data);
+
+          if (data.error) {
+            toast.error(data.error);
+          }
+
+          if (data.data?.error) {
+            toast.error(data.data.error);
+          }
+
           if (data?.data?.data) {
-            messagesState.push(data.data.data);
+            setMessagesState([...messagesState, data.data.data]);
           }
           setIsLoading(false);
         }}

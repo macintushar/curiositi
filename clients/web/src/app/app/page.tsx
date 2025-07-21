@@ -1,8 +1,10 @@
 import ChatInput from "@/components/app/chat/chat-input";
 import LogoLines from "@/components/app/logo-lines";
+
 import { getConfigs } from "@/services/configs";
 import { getUsersFiles } from "@/services/files";
 import { getSpaces } from "@/services/spaces";
+
 import { use } from "react";
 
 export default function AppPage() {

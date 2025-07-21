@@ -243,7 +243,7 @@ Generate a comprehensive response that:
 2. Considers the conversation context and history
 3. Provides clear reasoning for your conclusions
 4. Indicates confidence level in your answer (0.0 to 1.0)
-5. ${includeFollowUps ? "Suggests 2-3 relevant follow-up questions" : ""}
+${includeFollowUps ? "5. Suggests 2-3 relevant follow-up questions" : ""}
 
 Format your response as:
 REASONING: [Your reasoning process]

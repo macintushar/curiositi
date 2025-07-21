@@ -30,13 +30,13 @@ export async function search({
     space_ids,
     file_ids,
   );
+  revalidatePath(`/app/chat/${thread_id}`);
   if (error) {
     return {
       data: null,
       error: error.message,
     };
   }
-  revalidatePath(`/app/chat/${thread_id}`);
   return {
     data: data,
     error: null,

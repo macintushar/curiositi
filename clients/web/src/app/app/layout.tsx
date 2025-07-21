@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="bg-muted flex h-screen max-h-screen min-h-screen w-full flex-col gap-[16px] overflow-clip p-[16px]">
+      <div className="bg-background flex h-screen max-h-screen min-h-screen w-full flex-col gap-[16px] overflow-clip p-[16px]">
         <Header />
         <div className="flex min-h-0 flex-1 gap-3">
           <AppSidebar threads={threads?.data ?? null} />

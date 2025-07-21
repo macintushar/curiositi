@@ -1,5 +1,5 @@
 {
-  "id": "454e8c41-e22f-4bba-adad-2e515eaa832b",
+  "id": "abdaddab-f4d5-49f9-a386-8d2e9686feb6",
   "prevId": "f41f1a65-3428-489b-8145-337caec3d9c1",
   "version": "7",
   "dialect": "postgresql",
@@ -371,6 +371,32 @@
         "specific_file_content": {
           "name": "specific_file_content",
           "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "follow_up_suggestions": {
+          "name": "follow_up_suggestions",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "strategy": {
+          "name": "strategy",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'comprehensive'"
+        },
+        "reasoning": {
+          "name": "reasoning",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         }

@@ -1,6 +1,7 @@
 import {
   ANTHROPIC_ENABLED,
   OLLAMA_BASE_URL,
+  OLLAMA_CAPABILITIES,
   OPENAI_ENABLED,
   OPENROUTER_ENABLED,
   SUPPORTED_FILE_TYPES,
@@ -139,14 +140,17 @@ export async function getOllamaModels(invalidateCache = false) {
         async (model) =>
           await ollama.show({ model: model.name }).then((res) => ({
             name: model.name,
-            // @ts-expect-error capabilities is not typed
             capabilities: res.capabilities as string[],
           })),
       ),
     );
 
     const chatModels = allModels
-      .filter((model) => model.capabilities.includes("completion"))
+      .filter((model) =>
+        OLLAMA_CAPABILITIES.every((capability) =>
+          model.capabilities.includes(capability),
+        ),
+      )
       .map((model) => ({
         name: model.name,
         model: model.name,

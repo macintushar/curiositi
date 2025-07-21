@@ -70,7 +70,7 @@ export function ContextItem({
   return (
     <div
       className={cn(
-        "border-border hover:bg-background flex max-w-full cursor-pointer items-center justify-between gap-2 border bg-white p-3",
+        "border-border hover:bg-background flex max-w-full cursor-pointer items-center justify-between gap-2 border p-3",
         roundedTop && "rounded-t-xl",
         roundedBottom && "rounded-b-xl",
       )}

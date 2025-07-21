@@ -38,7 +38,7 @@ threadsRouter.post("/", async (c) => {
   if (error) {
     return c.json({ error: error.message || "Failed to create thread" }, 500);
   }
-  return c.json(data);
+  return c.json({ data: data.data[0] });
 });
 
 threadsRouter.delete(

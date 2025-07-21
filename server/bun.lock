@@ -19,7 +19,7 @@
         "hono": "^4.7.9",
         "langchain": "^0.3.25",
         "officeparser": "^5.1.1",
-        "ollama": "^0.5.15",
+        "ollama": "^0.5.16",
         "ollama-ai-provider": "^1.2.0",
         "pdf-parse": "^1.1.1",
         "pg": "^8.16.0",
@@ -1040,7 +1040,7 @@
 
     "officeparser": ["officeparser@5.1.1", "", { "dependencies": { "@xmldom/xmldom": "^0.8.10", "concat-stream": "^2.0.0", "file-type": "^16.5.4", "node-ensure": "^0.0.0", "yauzl": "^3.1.3" }, "bin": { "officeparser": "officeParser.js" } }, "sha512-trBCPmYQDFUCmch6YBxHhMFkDyhTl+vG8PDQHPOwRyeCDKnrrKpph2W7og7hg5T5RRF0yeyaOMasN7GZWbYuCA=="],
 
-    "ollama": ["ollama@0.5.15", "", { "dependencies": { "whatwg-fetch": "^3.6.20" } }, "sha512-TSaZSJyP7MQJFjSmmNsoJiriwa3U+/UJRw6+M8aucs5dTsaWNZsBIGpDb5rXnW6nXxJBB/z79gZY8IaiIQgelQ=="],
+    "ollama": ["ollama@0.5.16", "", { "dependencies": { "whatwg-fetch": "^3.6.20" } }, "sha512-OEbxxOIUZtdZgOaTPAULo051F5y+Z1vosxEYOoABPnQKeW7i4O8tJNlxCB+xioyoorVqgjkdj+TA1f1Hy2ug/w=="],
 
     "ollama-ai-provider": ["ollama-ai-provider@1.2.0", "", { "dependencies": { "@ai-sdk/provider": "^1.0.0", "@ai-sdk/provider-utils": "^2.0.0", "partial-json": "0.1.7" }, "peerDependencies": { "zod": "^3.0.0" }, "optionalPeers": ["zod"] }, "sha512-jTNFruwe3O/ruJeppI/quoOUxG7NA6blG3ZyQj3lei4+NnJo7bi3eIRWqlVpRlu/mbzbFXeJSBuYQWF6pzGKww=="],
 
@@ -1493,6 +1493,8 @@
     "body-parser/qs": ["qs@6.14.0", "", { "dependencies": { "side-channel": "^1.1.0" } }, "sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w=="],
 
     "chalk/ansi-styles": ["ansi-styles@4.3.0", "", { "dependencies": { "color-convert": "^2.0.1" } }, "sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg=="],
+
+    "chromadb/ollama": ["ollama@0.5.15", "", { "dependencies": { "whatwg-fetch": "^3.6.20" } }, "sha512-TSaZSJyP7MQJFjSmmNsoJiriwa3U+/UJRw6+M8aucs5dTsaWNZsBIGpDb5rXnW6nXxJBB/z79gZY8IaiIQgelQ=="],
 
     "chromadb-default-embed/@huggingface/jinja": ["@huggingface/jinja@0.1.3", "", {}, "sha512-9KsiorsdIK8+7VmlamAT7Uh90zxAhC/SeKaKc80v58JhtPYuwaJpmR/ST7XAUxrHAFqHTCoTH5aJnJDwSL6xIQ=="],
 

@@ -24,11 +24,14 @@ export async function deleteThreadHandler(threadId: string) {
   const deletedThread = await db
     .delete(threads)
     .where(eq(threads.id, threadId));
-  return {
-    data: {
-      message: deletedThread,
-    },
-  };
+
+  if (deletedThread.rowCount === 1) {
+    return {
+      data: {
+        message: "Thread deleted successfully.",
+      },
+    };
+  }
 }
 
 export async function getThreadMessagesHandler(threadId: string) {

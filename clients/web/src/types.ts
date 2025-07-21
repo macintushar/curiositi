@@ -88,6 +88,11 @@ export type ThreadMessage = {
   documentSearchResults: string[] | null;
   webSearchResults: string[] | null;
   specificFileContent: string[] | null;
+  model: string;
+  provider: string;
+  confidence: number;
+  followUpSuggestions: string[];
+  strategy: "comprehensive" | "focused" | "hybrid" | "error";
 };
 
 export type Context = {
@@ -102,3 +107,5 @@ export type AllFiles = File & {
   spaceName: string;
   spaceIcon: string;
 };
+
+export type SettingsTab = "profile" | "models" | "integrations";

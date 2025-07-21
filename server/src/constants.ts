@@ -79,3 +79,6 @@ export const SUPPORTED_FILE_TYPES = [
   ...TEXT_FILE_TYPES,
   ...OFFICE_FILE_TYPES,
 ];
+
+// Ollama Capabilities
+export const OLLAMA_CAPABILITIES = ["completion", "tools"];
