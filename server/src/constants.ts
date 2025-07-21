@@ -6,7 +6,7 @@ export const SERVER_PORT = process.env.SERVER_PORT || 3030;
 // Default Providers
 export const DEFAULT_EMBEDDING_PROVIDER =
   (process.env.DEFAULT_EMBEDDING_PROVIDER as EMBEDDING_PROVIDERS) ||
-  EMBEDDING_PROVIDERS.OLLAMA;
+  EMBEDDING_PROVIDERS.OPENAI;
 
 // Host
 export const HOST =
