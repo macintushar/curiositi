@@ -24,6 +24,7 @@ const config = withSentryConfig(
         bodySizeLimit: "5mb",
       },
     },
+    turbopack: {},
   },
   {
     // For all available options, see:
