@@ -31,7 +31,10 @@ import type { ThreadMessage } from "@/types";
 function UserMessage({ message }: { message: string }) {
   return (
     <div className="w-full">
-      <MessageContent className="font-serif text-4xl font-medium" markdown>
+      <MessageContent
+        className="text-brand font-serif text-4xl font-medium"
+        markdown
+      >
         {message}
       </MessageContent>
     </div>

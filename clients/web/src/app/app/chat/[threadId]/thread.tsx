@@ -16,6 +16,7 @@ import { search } from "@/actions/search";
 import useThreadStore from "@/stores/useThreadStore";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
+import { ScrollButton } from "@/components/ui/scroll-button";
 
 export default function Thread({
   files,
@@ -91,6 +92,9 @@ export default function Thread({
             </div>
           )}
         </ChatContainerContent>
+        <div className="absolute right-12 bottom-50">
+          <ScrollButton />
+        </div>
       </ChatContainerRoot>
       <MessageInput
         onSubmit={async () => {

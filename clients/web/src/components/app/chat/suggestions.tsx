@@ -18,7 +18,7 @@ export default function Suggestions({
           key={suggestion}
         >
           <span>{suggestion}</span>
-          <IconPlus className="text-brand size-4" />
+          <IconPlus className="text-brand size-9 sm:size-4" />
         </div>
       ))}
     </div>

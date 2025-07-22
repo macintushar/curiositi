@@ -129,7 +129,9 @@ function ThreadList({
                 href={`/app/chat/${thread.id}`}
                 className="flex w-full items-center justify-between"
               >
-                <span className="w-full">{thread.title}</span>
+                <span className="w-full truncate">
+                  {thread.title.length > 0 ? thread.title : "Untitled"}
+                </span>
                 <ThreadActions
                   thread={thread}
                   nav={(path) => router.push(path)}
