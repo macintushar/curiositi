@@ -1,4 +1,5 @@
 import {
+  IconAlertCircle,
   IconFile,
   IconFileSearch,
   IconRefresh,
@@ -15,6 +16,7 @@ import {
   Message,
 } from "@/components/ui/message";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Icon } from "@/components/themes/logo/logo";
 import { Button } from "@/components/ui/button";
@@ -67,6 +69,20 @@ function SourceBadge({
 function AssistantMessage({ message }: { message: ThreadMessage }) {
   const { files, configs } = useChatStore();
 
+  if (message.strategy === "error") {
+    return (
+      <Alert variant="destructive">
+        <IconAlertCircle />
+        <AlertTitle>
+          {message.content.length > 0
+            ? message.content
+            : "There was an error generating the response from the LLM. Please try again."}
+        </AlertTitle>
+        <AlertDescription>{message.reasoning}</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <Tabs defaultValue="answer" className="w-full">
       <TabsList>
@@ -84,7 +100,7 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
           <MessageContent markdown>{message.content}</MessageContent>
         </TabsContent>
         <TabsContent value="sources">
-          <div className="flex w-full flex-col space-y-6">
+          <div className="mt-2 flex w-full flex-col space-y-6">
             {message.reasoning && (
               <div className="text-muted-foreground flex flex-col">
                 <div className="text-brand flex items-center gap-1">
@@ -93,7 +109,7 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
                     Reasoning
                   </p>
                 </div>
-                <div className="text-muted-foreground border-l-2 border-l-slate-200 pl-2 text-sm">
+                <div className="text-muted-foreground border-l-muted border-l-2 pl-4 text-sm">
                   {message.reasoning}
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import type { LucideIcon } from "lucide-react";
+import type { Icon } from "@tabler/icons-react";
+
 import Link from "next/link";
 import React from "react";
 
@@ -12,7 +13,7 @@ type PricingPlanCardProps = {
   isPopular?: boolean;
   ctaText: string;
   CtaExtra?: React.ReactNode;
-  CtaIcon?: LucideIcon;
+  CtaIcon?: Icon;
   ctaVariant?: "default" | "outline";
   ctaHref?: string;
   ctaHrefExternal?: boolean;

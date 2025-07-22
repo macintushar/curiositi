@@ -6,6 +6,7 @@ import { tryCatch } from "@/lib/try-catch";
 import { formatHistory } from "@/lib/utils";
 import { LLM_PROVIDERS, ThreadMessage } from "@/types";
 import { generateObject } from "ai";
+import { User } from "better-auth/*";
 import { eq } from "drizzle-orm";
 import z from "zod";
 
@@ -16,6 +17,8 @@ export async function searchHandler({
   thread_id,
   space_ids,
   file_ids,
+  user,
+  userTime,
 }: {
   input: string;
   model: string;
@@ -23,6 +26,8 @@ export async function searchHandler({
   thread_id: string;
   space_ids?: string[];
   file_ids?: string[];
+  user: User;
+  userTime: string;
 }): Promise<{ data: ThreadMessage }> {
   const history = await db.query.messages.findMany({
     where: eq(messages.threadId, thread_id),
@@ -103,6 +108,9 @@ export async function searchHandler({
     maxDocQueries: 5,
     maxWebQueries: 5,
     prioritizeRecent: true,
+
+    user,
+    userTime,
   });
 
   const newMessage = await db

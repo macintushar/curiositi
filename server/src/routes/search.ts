@@ -16,6 +16,13 @@ searchRouter.post("/", zValidator("json", SearchSchema), async (c) => {
   const { input, model, space_ids, file_ids, provider, thread_id } =
     await c.req.valid("json");
 
+  const user = await c.get("user");
+  const userTime = await c.req.header("X-User-Timezone");
+
+  if (!user) {
+    return c.json({ error: "Unauthorized" }, 401);
+  }
+
   const { data, error } = await tryCatch(
     searchHandler({
       input: input,
@@ -24,6 +31,8 @@ searchRouter.post("/", zValidator("json", SearchSchema), async (c) => {
       file_ids: file_ids,
       provider: provider,
       thread_id: thread_id,
+      user: user,
+      userTime: userTime ?? "",
     }),
   );
 

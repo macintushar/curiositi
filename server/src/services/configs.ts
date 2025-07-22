@@ -49,33 +49,18 @@ export const models: Provider[] = [
     enabled: OPENROUTER_ENABLED,
     models: [
       {
-        name: "Microsoft/Phi-4 Reasoning Plus",
-        model: "microsoft/phi-4-reasoning-plus:free",
+        name: "MoonshotAI/Kimi-K2",
+        model: "moonshotai/kimi-k2:free",
         capabilities: ["completion"],
       },
       {
-        name: "Meta/Llama-4 Maverick",
-        model: "meta-llama/llama-4-maverick:free",
-        capabilities: ["completion"],
-      },
-      {
-        name: "Meta/Llama-4 Scout",
-        model: "meta-llama/llama-4-scout:free",
-        capabilities: ["completion"],
-      },
-      {
-        name: "OpenRouter/Deepseek-r1",
-        model: "deepseek/deepseek-r1:free",
+        name: "OpenRouter/Deepseek-r1 (0528)",
+        model: "deepseek/deepseek-r1-0528:free",
         capabilities: ["completion"],
       },
       {
         name: "OpenRouter/Deepseek-r1 (Llama-70B distilled)",
         model: "deepseek/deepseek-r1-distill-llama-70b:free",
-        capabilities: ["completion"],
-      },
-      {
-        name: "OpenRouter/Deepseek-r1 (Qwen-32B distilled)",
-        model: "deepseek/deepseek-r1-distill-qwen-32b:free",
         capabilities: ["completion"],
       },
       {

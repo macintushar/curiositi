@@ -12,6 +12,7 @@ import db from "@/db";
 import { documents } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { tryCatch } from "@/lib/try-catch";
+import { User } from "better-auth/*";
 
 export type CuriositiAgentConfig = {
   input: string; // User's question or request
@@ -26,6 +27,9 @@ export type CuriositiAgentConfig = {
   maxDocQueries?: number; // Max document queries (default: 3)
   maxWebQueries?: number; // Max web queries (default: 2)
   prioritizeRecent?: boolean; // Prioritize recent documents
+
+  user: User;
+  userTime: string;
 };
 
 export type CuriositiAgentResponse = {
@@ -70,6 +74,12 @@ export default async function CuriositiAgent(
     maxWebQueries,
   });
 
+  const userMetadata = `
+  User Metadata:
+  - User's Name: ${config.user.name}
+  - User Time: ${config.userTime}
+  `;
+
   const agentPromise = async (): Promise<CuriositiAgentResponse> => {
     const llmModel = llm(modelName, provider);
 
@@ -79,6 +89,8 @@ export default async function CuriositiAgent(
 
     const contextAnalysisPrompt = `
 Analyze this conversation and question to determine the best information gathering strategy:
+
+${userMetadata}
 
 Conversation History:
 ${history.map((msg) => `${msg.role}: ${msg.content}`).join("\n")}
@@ -374,6 +386,8 @@ Generate queries that will give the most complete answer to the user's question.
 
     const generationPrompt = `
 You are an expert AI assistant generating a comprehensive answer based on multiple information sources and conversation context.
+
+${userMetadata}
 
 Conversation History:
 ${history.map((msg) => `${msg.role}: ${msg.content}`).join("\n")}

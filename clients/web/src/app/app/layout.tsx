@@ -11,7 +11,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { data: threads, error: threadsError } = use(getThreads());
 
   if (threadsError) {
-    return <div>Error: {threadsError?.message}</div>;
+    throw new Error("Data Fetch Failed");
   }
 
   return (

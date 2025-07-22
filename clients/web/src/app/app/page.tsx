@@ -13,12 +13,7 @@ export default function AppPage() {
   const { data: configs, error: configsError } = use(getConfigs());
 
   if (filesError || spacesError || configsError) {
-    return (
-      <div>
-        Error: {filesError?.message} {spacesError?.message}
-        {configsError?.message}
-      </div>
-    );
+    throw new Error("Data Fetch Failed");
   }
 
   return (
