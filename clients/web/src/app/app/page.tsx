@@ -6,6 +6,7 @@ import LogoLines from "@/components/app/logo-lines";
 import { getConfigs } from "@/services/configs";
 import { getUsersFiles } from "@/services/files";
 import { getSpaces } from "@/services/spaces";
+import GlobalError from "../global-error";
 
 export default function AppPage() {
   const { data: files, error: filesError } = use(getUsersFiles());
@@ -13,7 +14,18 @@ export default function AppPage() {
   const { data: configs, error: configsError } = use(getConfigs());
 
   if (filesError || spacesError || configsError) {
-    throw new Error("Data Fetch Failed");
+    return (
+      <GlobalError
+        error={
+          filesError || spacesError || configsError
+            ? new Error(
+                `Error: ${filesError?.message} ${spacesError?.message} ${configsError?.message}`,
+              )
+            : new Error("Unknown error occurred")
+        }
+        reset={() => void 0}
+      />
+    );
   }
 
   return (
