@@ -14,6 +14,7 @@ import {
 } from "@/services/spaces";
 
 import type { ApiResponse, MessageResponse } from "@/types";
+import GlobalError from "@/app/global-error";
 
 export default async function Space({
   params,
@@ -26,10 +27,13 @@ export default async function Space({
 
   if (error || filesError) {
     return (
-      <div>
-        Error: {error?.message}
-        {filesError?.message}
-      </div>
+      <GlobalError
+        error={
+          error || filesError
+            ? new Error(`Error: ${error?.message} ${filesError?.message}`)
+            : new Error("Unknown error occurred")
+        }
+      />
     );
   }
 

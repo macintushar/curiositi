@@ -6,12 +6,13 @@ import Section from "@/components/app/section";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 import { getThreads } from "@/services/chats";
+import GlobalError from "../global-error";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { data: threads, error: threadsError } = use(getThreads());
 
   if (threadsError) {
-    return <div>Error: {threadsError.message}</div>;
+    return <GlobalError error={threadsError} />;
   }
 
   return (

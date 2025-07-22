@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import type { z } from "zod";
 import Space from "@/components/app/spaces/space";
 import Link from "next/link";
+import GlobalError from "@/app/global-error";
 
 export default async function SpacesPage() {
   const { data, error } = await getSpaces();
@@ -45,7 +46,7 @@ export default async function SpacesPage() {
   };
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <GlobalError error={error} />;
   }
 
   return (
