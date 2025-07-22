@@ -69,85 +69,101 @@ function SourceBadge({
 function AssistantMessage({ message }: { message: ThreadMessage }) {
   const { files, configs } = useChatStore();
 
-  if (message.strategy === "error") {
-    return (
-      <Alert variant="destructive">
-        <IconAlertCircle />
-        <AlertTitle>
-          {message.content.length > 0
-            ? message.content
-            : "There was an error generating the response from the LLM. Please try again."}
-        </AlertTitle>
-        <AlertDescription>{message.reasoning}</AlertDescription>
-      </Alert>
-    );
-  }
+  const isError = message.strategy === "error";
+
+  const errorTitle =
+    message.content.length > 0
+      ? message.content
+      : "There was an error generating the response from the LLM. Please try again.";
+  const errorDescription = message.reasoning;
 
   return (
     <Tabs defaultValue="answer" className="w-full">
       <TabsList>
-        <TabsTrigger value="answer">
+        <TabsTrigger value="answer" disabled={isError}>
           <Icon className="size-6" />
           <p className="text-muted-foreground text-sm font-light">Answer</p>
         </TabsTrigger>
-        <TabsTrigger value="sources">
+        <TabsTrigger value="sources" disabled={isError}>
           <IconWorld className="text-muted-foreground size-4" />
           <p className="text-muted-foreground text-sm font-light">Sources</p>
         </TabsTrigger>
       </TabsList>
       <div className="flex flex-col gap-3">
-        <TabsContent value="answer">
-          <MessageContent markdown>{message.content}</MessageContent>
-        </TabsContent>
-        <TabsContent value="sources">
-          <div className="mt-2 flex w-full flex-col space-y-6">
-            {message.reasoning && (
-              <div className="text-muted-foreground flex flex-col">
-                <div className="text-brand flex items-center gap-1">
-                  <IconSparkles className="size-5 stroke-1" />
-                  <p className="font-serif text-xl font-medium italic">
-                    Reasoning
-                  </p>
-                </div>
-                <div className="text-muted-foreground border-l-muted border-l-2 pl-4 text-sm">
-                  {message.reasoning}
-                </div>
-              </div>
-            )}
-            {message.documentSearches &&
-              message.documentSearches.length > 0 && (
-                <SourceBadge
-                  title="Documents:"
-                  search={message.documentSearches}
-                  Icon={IconFileSearch}
-                />
-              )}
-            {message.webSearches && message.webSearches.length > 0 && (
-              <SourceBadge
-                title="Web:"
-                search={message.webSearches}
-                Icon={IconWorldSearch}
-              />
-            )}
-            {message.specificFileContent &&
-              message.specificFileContent.length > 0 && (
-                <SourceBadge
-                  title="Specific Files:"
-                  search={message.specificFileContent.map(
-                    (file) => files.find((f) => f.id === file)?.name ?? file,
+        {!isError ? (
+          <>
+            <TabsContent value="answer">
+              <MessageContent
+                components={{
+                  ol: ({ children }) => (
+                    <ol className="flex flex-col gap-3">{children}</ol>
+                  ),
+                  li: ({ children }) => <li className="p-1.5">{children}</li>,
+                  p: ({ children }) => <p className="p-1.5">{children}</p>,
+                }}
+                markdown
+              >
+                {message.content}
+              </MessageContent>
+            </TabsContent>
+            <TabsContent value="sources">
+              <div className="mt-2 flex w-full flex-col space-y-6">
+                {message.reasoning && (
+                  <div className="text-muted-foreground flex flex-col">
+                    <div className="text-brand flex items-center gap-1">
+                      <IconSparkles className="size-5 stroke-1" />
+                      <p className="font-serif text-xl font-medium italic">
+                        Reasoning
+                      </p>
+                    </div>
+                    <div className="text-muted-foreground border-l-muted border-l-2 pl-4 text-sm">
+                      {message.reasoning}
+                    </div>
+                  </div>
+                )}
+                {message.documentSearches &&
+                  message.documentSearches.length > 0 && (
+                    <SourceBadge
+                      title="Documents:"
+                      search={message.documentSearches}
+                      Icon={IconFileSearch}
+                    />
                   )}
-                  Icon={IconFile}
-                />
-              )}
-          </div>
-        </TabsContent>
+                {message.webSearches && message.webSearches.length > 0 && (
+                  <SourceBadge
+                    title="Web:"
+                    search={message.webSearches}
+                    Icon={IconWorldSearch}
+                  />
+                )}
+                {message.specificFileContent &&
+                  message.specificFileContent.length > 0 && (
+                    <SourceBadge
+                      title="Specific Files:"
+                      search={message.specificFileContent.map(
+                        (file) =>
+                          files.find((f) => f.id === file)?.name ?? file,
+                      )}
+                      Icon={IconFile}
+                    />
+                  )}
+              </div>
+            </TabsContent>
+          </>
+        ) : (
+          <Alert variant="destructive">
+            <IconAlertCircle />
+            <AlertTitle>{errorTitle}</AlertTitle>
+            <AlertDescription>{errorDescription}</AlertDescription>
+          </Alert>
+        )}
         <MessageActions className="flex justify-between px-1">
           <MessageAction
             tooltip="Export this message as Markdown or Text"
             side="top"
             delayDuration={100}
           >
-            <ExportMessage message={message.content} />
+            <ExportMessage message={message.content} disabled={isError} />
           </MessageAction>
           <MessageActions>
             {message.model && (

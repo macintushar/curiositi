@@ -31,7 +31,6 @@ export default function ThreadPage({
               )
             : new Error("Unknown error occurred")
         }
-        reset={() => void 0}
       />
     );
   }

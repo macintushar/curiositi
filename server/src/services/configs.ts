@@ -19,27 +19,57 @@ export const models: Provider[] = [
       {
         name: "GPT-4o",
         model: "gpt-4o",
-        capabilities: ["completion", "vision"],
+        capabilities: ["completion", "vision", "audio", "video"],
       },
       {
         name: "GPT-4o-mini",
         model: "gpt-4o-mini",
+        capabilities: ["completion", "vision", "audio"],
+      },
+      {
+        name: "GPT-4.1",
+        model: "gpt-4.1",
         capabilities: ["completion", "vision"],
       },
       {
-        name: "o3-mini",
-        model: "o3-mini",
-        capabilities: ["completion"],
+        name: "GPT-4.1-mini",
+        model: "gpt-4.1-mini",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "o1",
+        model: "o1",
+        capabilities: ["completion", "vision", "reasoning"],
       },
       {
         name: "o3",
         model: "o3",
-        capabilities: ["completion", "vision"],
+        capabilities: ["completion", "vision", "reasoning"],
+      },
+      {
+        name: "o3-mini",
+        model: "o3-mini",
+        capabilities: ["completion", "reasoning"],
       },
       {
         name: "o4-mini",
         model: "o4-mini",
+        capabilities: ["completion", "vision", "reasoning"],
+      },
+      {
+        name: "GPT‑4 Turbo",
+        model: "gpt-4-turbo",
         capabilities: ["completion", "vision"],
+      },
+      {
+        name: "GPT‑4",
+        model: "gpt-4",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "GPT‑3.5 Turbo",
+        model: "gpt-3.5-turbo",
+        capabilities: ["completion"],
       },
     ],
   },
@@ -93,6 +123,26 @@ export const models: Provider[] = [
       {
         name: "Claude 3.5 Sonnet (20241022)",
         model: "claude-3-5-sonnet-20241022",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3.5 Haiku (20241022)",
+        model: "claude-3-5-haiku-20241022",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3.5 Sonnet (20240620)",
+        model: "claude-3-5-sonnet-20240620",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3 Haiku (20240307)",
+        model: "claude-3-haiku-20240307",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3 Opus (20240229)",
+        model: "claude-3-opus-20240229",
         capabilities: ["completion", "vision"],
       },
     ],

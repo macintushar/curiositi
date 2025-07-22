@@ -1,8 +1,9 @@
 import {
-  IconCheck,
   IconChevronDown,
   IconBrandOpenai,
   IconSparkles,
+  IconBrain,
+  IconEye,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
@@ -22,20 +23,59 @@ import {
 
 import useChatStore from "@/stores/useChatStore";
 import { cn } from "@/lib/utils";
+import TablerIcon from "../tabler-icon";
 
-function ProviderIcon({ providerName }: { providerName: string }) {
+function ProviderIcon({
+  providerName,
+  className,
+}: {
+  providerName: string;
+  className?: string;
+}) {
   switch (providerName) {
     case "openai":
-      return <IconBrandOpenai className="size-4" />;
+      return <TablerIcon Icon={IconBrandOpenai} className={className} />;
     case "anthropic":
-      return <AnthropicLogo className="size-4" />;
+      return <AnthropicLogo className={cn("size-4", className)} />;
     case "ollama":
-      return <OllamaLogo className="size-4" />;
+      return <OllamaLogo className={cn("size-4", className)} />;
     case "openrouter":
-      return <OpenRouterLogo className="size-4" />;
+      return <OpenRouterLogo className={cn("size-4", className)} />;
     default:
-      return <IconSparkles className="size-4" />;
+      return <TablerIcon Icon={IconSparkles} className={className} />;
   }
+}
+
+function ModelCapability({ capability }: { capability: string }) {
+  switch (capability) {
+    case "reasoning":
+      return (
+        <TablerIcon
+          Icon={IconBrain}
+          className="size-5 rounded-md bg-purple-800 p-0.5 text-white"
+        />
+      );
+    case "vision":
+      return (
+        <TablerIcon
+          Icon={IconEye}
+          className="bg-brand/10 text-brand size-5 rounded-md p-1"
+        />
+      );
+
+    default:
+      return <></>;
+  }
+}
+
+function ModelCapabilities({ capabilities }: { capabilities: string[] }) {
+  return (
+    <div className="flex items-center gap-1">
+      {capabilities.map((capability) => (
+        <ModelCapability key={capability} capability={capability} />
+      ))}
+    </div>
+  );
 }
 
 export default function ModelSelector() {
@@ -85,20 +125,25 @@ export default function ModelSelector() {
                 key={idx}
                 disabled={!provider.enabled}
                 className={cn(
-                  "flex cursor-pointer items-center justify-between",
+                  "data-[active=true]:text-brand data-[active=true]:bg-brand/10 flex cursor-pointer items-center justify-between",
                   !provider.enabled && "cursor-not-allowed",
                 )}
+                data-active={activeModel?.model.name === model.name}
                 onClick={() =>
                   setActiveModel({ provider_name: provider.name, model })
                 }
               >
                 <div className="flex max-w-full items-center gap-2">
-                  <ProviderIcon providerName={provider.name} />
+                  <ProviderIcon
+                    providerName={provider.name}
+                    className={cn(
+                      "size-5",
+                      activeModel?.model.name === model.name && "text-brand",
+                    )}
+                  />
                   <span className="truncate">{model.name}</span>
                 </div>
-                {activeModel?.model.name === model.name && (
-                  <IconCheck className="size-4" />
-                )}
+                <ModelCapabilities capabilities={model.capabilities} />
               </DropdownMenuItem>
             ))}
             {idx !== configs?.providers.length - 1 && <DropdownMenuSeparator />}

@@ -24,14 +24,12 @@ type SidebarChatsProps = {
 
 type GroupedThreads = {
   today: Thread[];
-  yesterday: Thread[];
-  older: Thread[];
+  past7Days: Thread[];
 };
 
 function groupThreadsByTime(threads: Thread[]): GroupedThreads {
   const now = dayjs();
   const today = now.startOf("day");
-  const yesterday = now.subtract(1, "day").startOf("day");
 
   return threads.reduce<GroupedThreads>(
     (groups, thread) => {
@@ -39,24 +37,24 @@ function groupThreadsByTime(threads: Thread[]): GroupedThreads {
 
       if (threadDate.isSame(today, "day")) {
         groups.today.push(thread);
-      } else if (threadDate.isSame(yesterday, "day")) {
-        groups.yesterday.push(thread);
       } else {
-        groups.older.push(thread);
+        groups.past7Days.push(thread);
       }
 
       return groups;
     },
-    { today: [], yesterday: [], older: [] },
+    { today: [], past7Days: [] },
   );
 }
 
 function ThreadActions({
   thread,
   nav,
+  isActive,
 }: {
   thread: Thread;
   nav: (path: string) => void;
+  isActive: boolean;
 }) {
   return (
     <DropdownMenu>
@@ -69,7 +67,11 @@ function ThreadActions({
             e.stopPropagation();
           }}
         >
-          <IconDotsVertical className="text-muted-foreground size-3.5" />
+          <IconDotsVertical
+            className={
+              isActive ? "text-brand" : "text-muted-foreground size-3.5"
+            }
+          />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
@@ -118,37 +120,30 @@ function ThreadList({
     <div className="flex flex-col gap-1">
       {threads.map((thread) => (
         <SidebarMenuItem key={thread.id}>
-          <SidebarMenuButton
-            isActive={currentPath === `/app/chat/${thread.id}`}
-            className="h-fit w-full"
-            variant="outline"
-            asChild
+          <Link
+            href={`/app/chat/${thread.id}`}
+            className="flex w-full items-center justify-between"
           >
-            <div>
-              <Link
-                href={`/app/chat/${thread.id}`}
-                className="flex w-full items-center justify-between"
-              >
+            <SidebarMenuButton
+              isActive={currentPath === `/app/chat/${thread.id}`}
+              className="h-fit w-full data-[active=true]:font-normal"
+              variant="outline"
+              asChild
+            >
+              <div>
                 <span className="w-full truncate">
                   {thread.title.length > 0 ? thread.title : "Untitled"}
                 </span>
                 <ThreadActions
                   thread={thread}
                   nav={(path) => router.push(path)}
+                  isActive={currentPath === `/app/chat/${thread.id}`}
                 />
-              </Link>
-            </div>
-          </SidebarMenuButton>
+              </div>
+            </SidebarMenuButton>
+          </Link>
         </SidebarMenuItem>
       ))}
-    </div>
-  );
-}
-
-function SectionHeader({ title }: { title: string }) {
-  return (
-    <div className="text-muted-foreground px-2 py-1 text-xs font-medium">
-      {title}
     </div>
   );
 }
@@ -164,7 +159,7 @@ function ThreadGroup({
 }) {
   return (
     <div className="flex flex-col">
-      <SectionHeader title={title} />
+      <div className="text-muted-foreground px-2 py-1 text-xs">{title}</div>
       <ThreadList threads={threads} currentPath={currentPath} />
     </div>
   );
@@ -194,18 +189,10 @@ export default function SidebarChats({
         />
       )}
 
-      {groupedThreads.yesterday.length > 0 && (
+      {groupedThreads.past7Days.length > 0 && (
         <ThreadGroup
-          title="Yesterday"
-          threads={groupedThreads.yesterday}
-          currentPath={currentPath}
-        />
-      )}
-
-      {groupedThreads.older.length > 0 && (
-        <ThreadGroup
-          title="Older"
-          threads={groupedThreads.older}
+          title="Past 7 days"
+          threads={groupedThreads.past7Days}
           currentPath={currentPath}
         />
       )}

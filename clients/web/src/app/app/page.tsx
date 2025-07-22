@@ -23,7 +23,6 @@ export default function AppPage() {
               )
             : new Error("Unknown error occurred")
         }
-        reset={() => void 0}
       />
     );
   }
