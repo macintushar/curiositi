@@ -11,6 +11,8 @@
   --font-serif:
     var(--font-instrument-serif), ui-serif, serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --font-emoji: var(--font-noto-emoji), "Noto Color Emoji";
 }
 
 @theme inline {
@@ -143,8 +145,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-muted;
-    @apply selection:text-secondary selection:bg-brand/60;
+    @apply selection:bg-brand/60 selection:text-white;
+    @apply bg-background text-foreground;
   }
 }
 
@@ -153,10 +155,34 @@
     text-wrap: balance;
   }
   .text-gradient {
-    @apply from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-transparent;
+    @apply from-brand to-brand/70 bg-gradient-to-r bg-clip-text text-transparent;
   }
 }
 
+/* Scrollbar */
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--background);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+/* Keyframes */
 @keyframes typing {
   0%,
   100% {
@@ -281,35 +307,5 @@
   }
   100% {
     opacity: 1;
-  }
-}
-
-/* width */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: var(--background);
-  border-radius: 5px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted-foreground);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }

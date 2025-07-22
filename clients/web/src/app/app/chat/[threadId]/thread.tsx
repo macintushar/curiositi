@@ -15,6 +15,7 @@ import type { AllFiles, Configs, Space, ThreadMessage } from "@/types";
 import { search } from "@/actions/search";
 import useThreadStore from "@/stores/useThreadStore";
 import { toast } from "sonner";
+import { Loader } from "@/components/ui/loader";
 
 export default function Thread({
   files,
@@ -35,6 +36,7 @@ export default function Thread({
     setConfigs,
     setIsLoading,
     setPrompt,
+    isLoading,
     prompt,
     activeModel,
     context,
@@ -69,7 +71,7 @@ export default function Thread({
 
   return (
     <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2">
-      <ChatContainerRoot className="h-full w-full max-w-3xl flex-1 overflow-y-auto">
+      <ChatContainerRoot className="h-full w-full max-w-4xl flex-1 overflow-y-auto">
         <ChatContainerContent className="space-y-5">
           {messagesState.map((message, idx) => (
             <MessageContainer
@@ -78,6 +80,16 @@ export default function Thread({
               isLastMessage={idx === messagesState.length - 1}
             />
           ))}
+          {isLoading && (
+            <div className="flex h-64 w-full">
+              <Loader
+                variant="text-shimmer"
+                text="Curiositi is thinking..."
+                size="lg"
+                className="font-serif text-xl italic"
+              />
+            </div>
+          )}
         </ChatContainerContent>
       </ChatContainerRoot>
       <MessageInput

@@ -15,7 +15,7 @@ export default function AuthLayout({
     <div className="flex h-screen max-h-screen min-h-screen flex-col gap-[16px] p-[16px]">
       <Section>
         <div className="flex h-full w-full">
-          <div className="flex w-full flex-col gap-16 px-6 md:px-10">
+          <div className="flex w-full flex-col px-6 md:px-10">
             <LogoLines description={description}>
               <h1 className="w-xs text-center font-serif text-4xl">
                 <span className="text-brand">

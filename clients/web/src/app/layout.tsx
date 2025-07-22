@@ -5,7 +5,11 @@ import { webMetaData } from "@/constants/landing-constants";
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
-import { Instrument_Sans, Instrument_Serif } from "next/font/google";
+import {
+  Instrument_Sans,
+  Instrument_Serif,
+  Noto_Color_Emoji,
+} from "next/font/google";
 
 export const metadata: Metadata = {
   title: webMetaData.siteName,
@@ -22,13 +26,21 @@ export const metadata: Metadata = {
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   variable: "--font-instrument-sans",
 });
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
+  style: ["normal", "italic"],
   weight: "400",
   variable: "--font-instrument-serif",
+});
+
+const notoEmoji = Noto_Color_Emoji({
+  subsets: ["emoji"],
+  weight: "400",
+  variable: "--font-noto-emoji",
 });
 
 export default function RootLayout({
@@ -37,7 +49,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${instrumentSans.variable} ${instrumentSerif.variable}`}
+      className={`${instrumentSans.variable} ${instrumentSerif.variable} ${notoEmoji.variable}`}
       suppressHydrationWarning
     >
       <body>

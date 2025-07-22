@@ -70,6 +70,7 @@ export default function MessageInput({ onSubmit }: MessageInputProps) {
               <ModelSelector />
               <Button
                 size="icon"
+                className="bg-brand"
                 disabled={!prompt.trim() || isLoading}
                 onClick={onSubmit}
               >

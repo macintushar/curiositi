@@ -49,6 +49,7 @@ export default function ExportMessage({ message }: { message: string }) {
           <DropdownMenuItem
             key={option.label}
             onClick={() => handleExport(option.type, option.extension)}
+            className="cursor-pointer"
           >
             <option.icon className="size-4" /> {option.label}
           </DropdownMenuItem>

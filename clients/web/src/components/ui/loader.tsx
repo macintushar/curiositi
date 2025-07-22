@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 
-export interface LoaderProps {
+export type LoaderProps = {
   variant?:
     | "circular"
     | "classic"
@@ -20,7 +20,7 @@ export interface LoaderProps {
   size?: "sm" | "md" | "lg";
   text?: string;
   className?: string;
-}
+};
 
 export function CircularLoader({
   className,

@@ -31,7 +31,7 @@ import type { ThreadMessage } from "@/types";
 function UserMessage({ message }: { message: string }) {
   return (
     <div className="w-full">
-      <MessageContent className="text-2xl font-medium" markdown>
+      <MessageContent className="font-serif text-4xl font-medium" markdown>
         {message}
       </MessageContent>
     </div>
@@ -63,6 +63,7 @@ function SourceBadge({
 
 function AssistantMessage({ message }: { message: ThreadMessage }) {
   const { files, configs } = useChatStore();
+
   return (
     <Tabs defaultValue="answer" className="w-full">
       <TabsList>
@@ -83,9 +84,11 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
           <div className="flex w-full flex-col space-y-6">
             {message.reasoning && (
               <div className="text-muted-foreground flex flex-col">
-                <div className="flex items-center gap-2">
-                  <IconSparkles className="size-5" />
-                  <p className="font-serif text-lg font-medium">Reasoning</p>
+                <div className="text-brand flex items-center gap-1">
+                  <IconSparkles className="size-5 stroke-1" />
+                  <p className="font-serif text-xl font-medium italic">
+                    Reasoning
+                  </p>
                 </div>
                 <div className="text-muted-foreground border-l-2 border-l-slate-200 pl-2 text-sm">
                   {message.reasoning}
@@ -119,8 +122,12 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
               )}
           </div>
         </TabsContent>
-        <MessageActions className="flex justify-between">
-          <MessageAction tooltip="Export" delayDuration={100}>
+        <MessageActions className="flex justify-between px-1">
+          <MessageAction
+            tooltip="Export this message as Markdown or Text"
+            side="top"
+            delayDuration={100}
+          >
             <ExportMessage message={message.content} />
           </MessageAction>
           <MessageActions>
@@ -132,14 +139,16 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
                 }`}
                 delayDuration={100}
               >
-                <IconSparkles className="size-4" />
+                <Button variant="ghost" className="rounded-md">
+                  <IconSparkles className="size-5" />
+                </Button>
               </MessageAction>
             )}
             <MessageAction tooltip="Copy" delayDuration={100}>
               <CopyButton text={message.content} />
             </MessageAction>
             <MessageAction tooltip="Rewrite" delayDuration={100}>
-              <Button variant="ghost" className="rounded-md">
+              <Button variant="ghost" className="rounded-md" disabled>
                 <IconRefresh className="size-4" />
               </Button>
             </MessageAction>

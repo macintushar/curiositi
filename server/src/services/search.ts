@@ -5,8 +5,9 @@ import { llm } from "@/lib/llms";
 import { tryCatch } from "@/lib/try-catch";
 import { formatHistory } from "@/lib/utils";
 import { LLM_PROVIDERS, ThreadMessage } from "@/types";
-import { generateText } from "ai";
+import { generateObject } from "ai";
 import { eq } from "drizzle-orm";
+import z from "zod";
 
 export async function searchHandler({
   input,
@@ -46,27 +47,38 @@ export async function searchHandler({
     },
   });
 
-  if (history.length === 0 || thread?.title === "Untitled") {
+  if (
+    thread?.title === "Untitled" ||
+    thread?.title?.length === 0 ||
+    thread?.title === null
+  ) {
     console.log("Generating title");
 
     const generateTitle = async () => {
-      const { text } = await generateText({
+      const { object } = await generateObject({
         model: llm(model, provider),
+        schema: z.object({
+          title: z
+            .string()
+            .min(3)
+            .max(30)
+            .describe("The title of the chat thread"),
+        }),
         system: `You are a helpful assistant that generates titles for chat threads. 
         The title should be a single sentence that captures the main idea of the chat thread. 
         Give only the title, no other text. The title should be no more than 30 characters. 
         The title should be in the same language as the message. Do not include any other text in your response. 
         Do not generate a title that is too generic or vague. Do not give more than one title.`,
         prompt: `Generate a title for a chat thread based on this message: ${input}. ${formattedHistory.length > 0 ? `The previous messages are: ${formattedHistory.map((h) => h.content).join("\n")}` : ""}`,
-        maxTokens: 30,
       });
+
       await db
         .update(threads)
-        .set({ title: text })
+        .set({ title: object.title.length > 0 ? object.title : "Untitled" })
         .where(eq(threads.id, thread_id));
 
       return {
-        title: text,
+        title: object.title.length > 0 ? object.title : "Untitled",
       };
     };
 

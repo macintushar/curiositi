@@ -13,7 +13,7 @@ import { documents } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { tryCatch } from "@/lib/try-catch";
 
-export interface CuriositiAgentConfig {
+export type CuriositiAgentConfig = {
   input: string; // User's question or request
   modelName: string; // LLM model to use
   history: HistoryMessage[]; // Conversation context
@@ -26,9 +26,9 @@ export interface CuriositiAgentConfig {
   maxDocQueries?: number; // Max document queries (default: 3)
   maxWebQueries?: number; // Max web queries (default: 2)
   prioritizeRecent?: boolean; // Prioritize recent documents
-}
+};
 
-export interface CuriositiAgentResponse {
+export type CuriositiAgentResponse = {
   contextSources: {
     documentSpaces: string[]; // Spaces searched
     specificFiles: string[]; // Files analyzed
@@ -38,7 +38,7 @@ export interface CuriositiAgentResponse {
   answer: string; // Main response
   followUpSuggestions: string[]; // Related questions
   strategy: "comprehensive" | "focused" | "hybrid" | "error"; // Strategy used
-}
+};
 
 export default async function CuriositiAgent(
   config: CuriositiAgentConfig,
@@ -391,7 +391,7 @@ Generate a comprehensive response that:
 3. Provides clear reasoning for your conclusions
 4. Cross-references information when possible
 5. Acknowledges limitations or uncertainties
-6. Suggests 2-3 relevant follow-up questions
+6. Suggests 2-3 relevant follow-up questions that the user can ask to get more information. It needs to be from the user's perspective.
 
 Focus on providing accurate, well-reasoned answers based on the available information.
 `;

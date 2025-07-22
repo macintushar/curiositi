@@ -1,27 +1,20 @@
-import Image from "next/image";
 import type React from "react";
 
-import logo from "@/assets/icons/icon-lines.svg";
+import IconLines from "@/assets/icons/icon-lines";
 
 export default function LogoLines({
   children,
   description,
 }: {
   children: React.ReactNode;
-  description: string;
+  description?: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center">
-      <Image
-        src={logo as string}
-        alt="Curiositi"
-        height={372}
-        width={768}
-        priority
-      />
-      <div className="flex flex-col items-center gap-2">
+    <div className="relative flex items-center justify-center">
+      <IconLines />
+      <div className="absolute inset-x-0 bottom-20 flex flex-col items-center justify-end gap-2 pb-4">
         {children}
-        <p className="text-muted-foreground text-sm text-balance">
+        <p className="text-muted-foreground text-center text-sm text-balance">
           {description}
         </p>
       </div>

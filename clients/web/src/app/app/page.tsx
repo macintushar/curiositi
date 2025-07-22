@@ -1,11 +1,11 @@
+import { use } from "react";
+
 import ChatInput from "@/components/app/chat/chat-input";
 import LogoLines from "@/components/app/logo-lines";
 
 import { getConfigs } from "@/services/configs";
 import { getUsersFiles } from "@/services/files";
 import { getSpaces } from "@/services/spaces";
-
-import { use } from "react";
 
 export default function AppPage() {
   const { data: files, error: filesError } = use(getUsersFiles());
@@ -26,7 +26,7 @@ export default function AppPage() {
       <div className="flex flex-col items-center gap-8">
         <div className="flex w-fit flex-col gap-12">
           <div className="text-primary flex w-full flex-col items-center gap-2">
-            <LogoLines description="">
+            <LogoLines>
               <h1 className="w-sm text-center font-serif text-4xl">
                 <span className="text-brand">
                   <span className="italic">Find</span> what you need,

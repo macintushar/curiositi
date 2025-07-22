@@ -15,6 +15,7 @@ import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { deleteThreadAction } from "@/actions/thread";
 import { toast } from "sonner";
+import Link from "next/link";
 
 type SidebarChatsProps = {
   threads: Thread[] | null;
@@ -124,18 +125,16 @@ function ThreadList({
             asChild
           >
             <div>
-              <div
+              <Link
+                href={`/app/chat/${thread.id}`}
                 className="flex w-full items-center justify-between"
-                onClick={() => {
-                  router.push(`/app/chat/${thread.id}`);
-                }}
               >
                 <span className="w-full">{thread.title}</span>
-              </div>
-              <ThreadActions
-                thread={thread}
-                nav={(path) => router.push(path)}
-              />
+                <ThreadActions
+                  thread={thread}
+                  nav={(path) => router.push(path)}
+                />
+              </Link>
             </div>
           </SidebarMenuButton>
         </SidebarMenuItem>

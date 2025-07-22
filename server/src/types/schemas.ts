@@ -73,5 +73,14 @@ export const AGENT_RESPONSE_SCHEMA = z.object({
     .array(z.string())
     .min(1)
     .max(3)
-    .describe("2-3 relevant follow-up questions"),
+    .describe(
+      "2-3 relevant follow-up questions that the user can ask to get more information. It needs to be from the user's perspective.",
+    ),
+});
+
+export const RegenerateSchema = z.object({
+  thread_id: z.string().min(1, '"thread_id" cannot be empty'),
+  model: z.string(),
+  provider: ProviderSchema,
+  message_id: z.string().min(1, '"message_id" cannot be empty'),
 });

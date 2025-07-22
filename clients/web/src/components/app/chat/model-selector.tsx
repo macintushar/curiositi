@@ -101,7 +101,7 @@ export default function ModelSelector() {
                 )}
               </DropdownMenuItem>
             ))}
-            <DropdownMenuSeparator />
+            {idx !== configs?.providers.length - 1 && <DropdownMenuSeparator />}
           </div>
         ))}
       </DropdownMenuContent>

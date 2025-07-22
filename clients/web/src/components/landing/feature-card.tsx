@@ -2,12 +2,12 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import React from "react";
 
-interface FeatureCardProps {
+type FeatureCardProps = {
   icon: React.ReactNode;
   title: string;
   description: string;
   link: string;
-}
+};
 
 export function FeatureCard({
   icon,

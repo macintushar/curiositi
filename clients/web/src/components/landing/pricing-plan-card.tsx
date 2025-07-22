@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-interface PricingPlanCardProps {
+type PricingPlanCardProps = {
   title: string;
   description: string;
   price: string;
@@ -17,7 +17,7 @@ interface PricingPlanCardProps {
   ctaHref?: string;
   ctaHrefExternal?: boolean;
   className?: string;
-}
+};
 
 const CheckIcon = () => (
   <svg
