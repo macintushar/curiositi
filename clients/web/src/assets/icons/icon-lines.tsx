@@ -52,8 +52,8 @@ export default function IconLines() {
           gradientUnits="userSpaceOnUse"
           gradientTransform="translate(384 118.655) rotate(90) scale(290.411 464.084)"
         >
-          <stop stop-color="#D9D9D9" />
-          <stop offset="1" stop-color="#D9D9D9" stop-opacity="0" />
+          <stop stopColor="#D9D9D9" />
+          <stop offset="1" stopColor="#D9D9D9" stopOpacity="0" />
         </radialGradient>
       </defs>
     </svg>
