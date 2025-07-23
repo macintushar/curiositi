@@ -6,6 +6,7 @@ import {
   IconGlobe,
   IconBolt,
   IconMessage,
+  IconBrandGithubFilled,
 } from "@tabler/icons-react";
 
 import { Section } from "@/components/landing/section";
@@ -17,7 +18,6 @@ import { PricingPlanCard } from "@/components/landing/pricing-plan-card";
 import { Button } from "@/components/ui/button";
 
 import agentFlowImage from "@/assets/images/agent-flow.png";
-import GithubIcon from "@/assets/icons/github-icon";
 import Header from "@/views/landing/header";
 import Footer from "@/views/landing/footer";
 
@@ -244,7 +244,12 @@ export default function LandingPage() {
                 "Own your data, forever",
               ]}
               ctaText="GitHub"
-              CtaExtra={<GithubIcon />}
+              ctaVariant="default"
+              CtaExtra={
+                <div className="flex items-center rounded-full bg-white p-0.5">
+                  <IconBrandGithubFilled className="text-black" />
+                </div>
+              }
               ctaHref={ghURL}
               className="w-full md:w-1/3"
               ctaHrefExternal
