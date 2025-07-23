@@ -9,6 +9,8 @@ import {
   TRUSTED_ORIGINS,
 } from "@/constants";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
   baseURL: BETTER_AUTH_URL,
@@ -33,7 +35,7 @@ export const auth = betterAuth({
         name: "session_token",
       },
     },
-    cookiePrefix: "curiositi",
+    cookiePrefix: isProduction ? "__Secure-" : "" + "curiositi",
     defaultCookieAttributes: {
       sameSite: "none",
       secure: true,
