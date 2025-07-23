@@ -22,43 +22,58 @@ import { Button } from "@/components/ui/button";
 
 import EmojiPicker from "@/components/emoji-picker";
 
-import Space from "./space";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import type { z } from "zod";
+import { toast } from "sonner";
 
 import { createSpaceSchema } from "@/lib/schema";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function CreateSpaceDialog({
   handleSubmit,
+  title,
+  values,
+  trigger,
+  ctaText,
 }: {
-  handleSubmit: (values: z.infer<typeof createSpaceSchema>) => void;
+  handleSubmit: (values: z.infer<typeof createSpaceSchema>) => Promise<{
+    success: boolean;
+    error?: string;
+    message?: string;
+  }>;
+  title: string;
+  values: z.infer<typeof createSpaceSchema>;
+  trigger: React.ReactNode;
+  ctaText: string;
 }) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<z.infer<typeof createSpaceSchema>>({
     resolver: zodResolver(createSpaceSchema),
-    defaultValues: {
-      name: "",
-      icon: "",
-      description: "",
-    },
+    defaultValues: values,
   });
 
-  function handleFormSubmit(values: z.infer<typeof createSpaceSchema>) {
-    handleSubmit(values);
-    setOpen(false);
-    form.reset();
+  async function handleFormSubmit(values: z.infer<typeof createSpaceSchema>) {
+    const result = await handleSubmit(values);
+
+    if (result.success) {
+      if (result.message) {
+        toast.success(result.message);
+      }
+      setOpen(false);
+      form.reset();
+    } else {
+      if (result.error) {
+        toast.error("Error creating space" + JSON.stringify(result.error));
+      }
+    }
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <Space text="Create new space" isEmpty />
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <Form {...form}>
           <form
@@ -66,7 +81,7 @@ export default function CreateSpaceDialog({
             className="space-y-8"
           >
             <DialogHeader>
-              <DialogTitle>Create new space</DialogTitle>
+              <DialogTitle>{title}</DialogTitle>
             </DialogHeader>
             <div className="flex flex-col space-y-5">
               <FormField
@@ -124,7 +139,7 @@ export default function CreateSpaceDialog({
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">Create</Button>
+              <Button type="submit">{ctaText}</Button>
             </DialogFooter>
           </form>
         </Form>

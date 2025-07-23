@@ -13,7 +13,6 @@ export enum EMBEDDING_PROVIDERS {
 }
 
 export enum VECTOR_STORES {
-  CHROMA = "chroma",
   POSTGRES = "postgres",
 }
 
@@ -82,6 +81,26 @@ export type Provider = {
   models: Model[];
 };
 
-export type Providers = {
+export type Configs = {
   providers: Provider[];
+  file_types: string[];
+};
+
+export type ThreadMessage = {
+  id: string;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  content: string;
+  role: "user" | "assistant" | "system";
+  threadId: string;
+  model: string;
+  provider: string;
+  documentSearches: string[] | null;
+  webSearches: string[] | null;
+  documentSearchResults: string[] | null;
+  webSearchResults: string[] | null;
+  specificFileContent: string[] | null;
+  followUpSuggestions: string[];
+  strategy: "comprehensive" | "focused" | "hybrid" | "error";
+  reasoning: string | null;
 };

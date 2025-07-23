@@ -6,6 +6,7 @@ import { getSpaces } from "@/services/spaces";
 import { getConfigs } from "@/services/configs";
 import { getUsersFiles } from "@/services/files";
 import { getThreadMessages } from "@/services/chats";
+import GlobalError from "@/app/global-error";
 
 export default function ThreadPage({
   params,
@@ -22,10 +23,15 @@ export default function ThreadPage({
 
   if (filesError || spacesError || configsError || messagesError) {
     return (
-      <div>
-        Error: {filesError?.message} {spacesError?.message}{" "}
-        {configsError?.message} {messagesError?.message}
-      </div>
+      <GlobalError
+        error={
+          filesError || spacesError || configsError || messagesError
+            ? new Error(
+                `Error: ${filesError?.message} ${spacesError?.message} ${configsError?.message} ${messagesError?.message}`,
+              )
+            : new Error("Unknown error occurred")
+        }
+      />
     );
   }
 
@@ -35,6 +41,7 @@ export default function ThreadPage({
       spaces={spaces?.data?.map((space) => space.space) ?? null}
       configs={configs?.data ?? null}
       messages={messages?.data ?? null}
+      threadId={threadId}
     />
   );
 }

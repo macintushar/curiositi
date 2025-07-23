@@ -6,6 +6,7 @@ import {
 } from "@tabler/icons-react";
 
 export const ghURL = "https://github.com/macintushar/curiositi";
+export const mcpURL = "https://modelcontextprotocol.io/introduction";
 
 import CuriositiIcon from "@/assets/icon.svg";
 

@@ -1,10 +1,10 @@
 import React from "react";
 
-interface HowItWorksStepProps {
+type HowItWorksStepProps = {
   stepNumber: number;
   title: string;
   description: string;
-}
+};
 
 export function HowItWorksStep({
   stepNumber,

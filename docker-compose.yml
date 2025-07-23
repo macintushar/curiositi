@@ -7,26 +7,61 @@ services:
       - "3030:3030"
     volumes:
       - ./server/src:/app/src
+      - ./server/drizzle:/app/drizzle
     environment:
+      - NODE_ENV=development
+      - SERVER_PORT=3030
       - DATABASE_URL=postgres://user:password@postgres:5432/mydb
       - SEARXNG_URL=http://searxng:8080
-      - CHROMA_URL=http://chromadb:8000
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - BETTER_AUTH_SECRET=your-secret-key-here-change-in-production
+      - UI_HOST=http://localhost:3040
+      - DEFAULT_EMBEDDING_PROVIDER=OLLAMA
+      # Optional API keys - add as needed
+      # - OPENROUTER_API_KEY=your-key-here
+      # - OPENAI_API_KEY=your-key-here
+      # - ANTHROPIC_API_KEY=your-key-here
+      # - SENTRY_DSN=your-sentry-dsn-here
     depends_on:
       postgres:
         condition: service_healthy
+      searxng:
+        condition: service_started
     command: sh -c "bun run db:migrate && bun run start"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3030/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
   web-ui:
     build:
       context: ./clients/web
       dockerfile: Dockerfile
+      args:
+        - SKIP_ENV_VALIDATION=1
     ports:
       - "3040:3040"
     volumes:
-      - ./clients/web:/app/clients/web
+      - ./clients/web/src:/app/src
+      - ./clients/web/public:/app/public
+      # Exclude node_modules from volume mount
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - SERVER_URL=http://server:3030
+      - BASE_URL=http://localhost:3040
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3040
+      - NEXT_PUBLIC_SERVER_URL=http://localhost:3030
+      - SKIP_ENV_VALIDATION=1
+      # Optional for production
+      # - SENTRY_AUTH_TOKEN=your-sentry-token-here
     depends_on:
-      - server
+      server:
+        condition: service_healthy
+    restart: unless-stopped
 
   searxng:
     image: searxng/searxng:latest
@@ -34,22 +69,19 @@ services:
       - "8095:8080"
     volumes:
       - searxng_data:/etc/searxng:rw
-
-  chromadb:
-    image: chromadb/chroma:latest
-    ports:
-      - "8090:8000"
-    volumes:
-      - chromadb_data:/chroma_data
+    environment:
+      - SEARXNG_HOSTNAME=searxng
+    restart: unless-stopped
 
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: mydb
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -57,8 +89,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-  chromadb_data:
-  searxng_data: 
+    driver: local
+  searxng_data:
+    driver: local
