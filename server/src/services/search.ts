@@ -66,7 +66,7 @@ export async function searchHandler({
           title: z
             .string()
             .min(3)
-            .max(30)
+            .max(50)
             .describe("The title of the chat thread"),
         }),
         system: `You are a helpful assistant that generates titles for chat threads. 
