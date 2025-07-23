@@ -34,7 +34,7 @@ export default function TabControl() {
           key={tab.value}
           variant="ghost"
           className={cn(
-            "w-32 justify-start text-start text-sm font-light",
+            "w-32 cursor-pointer justify-start text-start text-sm font-light",
             currentTab === tab.value && "font-medium",
           )}
           onClick={() => setTab(tab.value)}
