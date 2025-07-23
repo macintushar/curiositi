@@ -5,7 +5,7 @@ import { env } from "./env";
 export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request, {
     cookieName: "session_token",
-    cookiePrefix: "curiositi",
+    cookiePrefix: "__Secure-curiositi",
   });
 
   const cookie = request.cookies;
