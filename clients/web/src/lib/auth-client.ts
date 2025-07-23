@@ -7,6 +7,9 @@ import { nextCookies } from "better-auth/next-js";
 export const authClient = createAuthClient({
   baseURL: env.NEXT_PUBLIC_SERVER_URL,
   plugins: [nextCookies()],
+  advanced: {
+    useSecureCookies: true,
+  },
 });
 
 export const { signIn, signOut, signUp, useSession, getSession } = authClient;
