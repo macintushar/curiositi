@@ -26,7 +26,14 @@ export const auth = betterAuth({
     requireEmailVerification: false,
   },
   trustedOrigins: TRUSTED_ORIGINS,
+  appName: "Curiositi",
   advanced: {
+    cookies: {
+      sessionToken: {
+        name: "session_token",
+      },
+    },
+    cookiePrefix: "curiositi",
     defaultCookieAttributes: {
       sameSite: "none",
       secure: true,
