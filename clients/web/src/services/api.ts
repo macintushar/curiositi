@@ -11,12 +11,18 @@ export const apiFetch = async <T>(
   additionalHeaders?: Record<string, string>,
 ): Promise<T> => {
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("better-auth.session_token");
+
+  const cookieName =
+    env.NODE_ENV === "production"
+      ? "__Secure-better-auth.session_token"
+      : "better-auth.session_token";
+
+  const sessionCookie = cookieStore.get(cookieName);
 
   const response = await fetch(`${env.SERVER_URL}${url}`, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
-      Cookie: `better-auth.session_token=${sessionCookie?.value ?? ""}`,
+      Cookie: `${cookieName}=${sessionCookie?.value ?? ""}`,
       ...options?.headers,
       ...additionalHeaders,
     },
