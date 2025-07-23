@@ -5,6 +5,9 @@ import { env } from "./env";
 export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
 
+  console.log(request);
+  console.log(sessionCookie);
+
   if (!sessionCookie) {
     console.log(env.NODE_ENV);
     console.log("No session cookie found");

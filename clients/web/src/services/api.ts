@@ -17,7 +17,7 @@ export const apiFetch = async <T>(
       ? "__Secure-better-auth.session_token"
       : "better-auth.session_token";
 
-  const sessionCookie = cookieStore.get("better-auth.session_token");
+  const sessionCookie = cookieStore.get(cookieName);
 
   const response = await fetch(`${env.SERVER_URL}${url}`, {
     headers: {
