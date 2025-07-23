@@ -1,10 +1,12 @@
 import {
   ANTHROPIC_ENABLED,
   OLLAMA_BASE_URL,
+  OLLAMA_CAPABILITIES,
   OPENAI_ENABLED,
   OPENROUTER_ENABLED,
+  SUPPORTED_FILE_TYPES,
 } from "@/constants";
-import { Provider, Providers, LLM_PROVIDERS, Model } from "@/types";
+import { Provider, Configs, LLM_PROVIDERS, Model } from "@/types";
 import { Ollama } from "ollama";
 import { tryCatch } from "@/lib/try-catch";
 
@@ -17,27 +19,57 @@ export const models: Provider[] = [
       {
         name: "GPT-4o",
         model: "gpt-4o",
-        capabilities: ["completion", "vision"],
+        capabilities: ["completion", "vision", "audio", "video"],
       },
       {
         name: "GPT-4o-mini",
         model: "gpt-4o-mini",
+        capabilities: ["completion", "vision", "audio"],
+      },
+      {
+        name: "GPT-4.1",
+        model: "gpt-4.1",
         capabilities: ["completion", "vision"],
       },
       {
-        name: "o3-mini",
-        model: "o3-mini",
-        capabilities: ["completion"],
+        name: "GPT-4.1-mini",
+        model: "gpt-4.1-mini",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "o1",
+        model: "o1",
+        capabilities: ["completion", "vision", "reasoning"],
       },
       {
         name: "o3",
         model: "o3",
-        capabilities: ["completion", "vision"],
+        capabilities: ["completion", "vision", "reasoning"],
+      },
+      {
+        name: "o3-mini",
+        model: "o3-mini",
+        capabilities: ["completion", "reasoning"],
       },
       {
         name: "o4-mini",
         model: "o4-mini",
+        capabilities: ["completion", "vision", "reasoning"],
+      },
+      {
+        name: "GPT‑4 Turbo",
+        model: "gpt-4-turbo",
         capabilities: ["completion", "vision"],
+      },
+      {
+        name: "GPT‑4",
+        model: "gpt-4",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "GPT‑3.5 Turbo",
+        model: "gpt-3.5-turbo",
+        capabilities: ["completion"],
       },
     ],
   },
@@ -47,33 +79,18 @@ export const models: Provider[] = [
     enabled: OPENROUTER_ENABLED,
     models: [
       {
-        name: "Microsoft/Phi-4 Reasoning Plus",
-        model: "microsoft/phi-4-reasoning-plus:free",
+        name: "MoonshotAI/Kimi-K2",
+        model: "moonshotai/kimi-k2:free",
         capabilities: ["completion"],
       },
       {
-        name: "Meta/Llama-4 Maverick",
-        model: "meta-llama/llama-4-maverick:free",
-        capabilities: ["completion"],
-      },
-      {
-        name: "Meta/Llama-4 Scout",
-        model: "meta-llama/llama-4-scout:free",
-        capabilities: ["completion"],
-      },
-      {
-        name: "OpenRouter/Deepseek-r1",
-        model: "deepseek/deepseek-r1:free",
+        name: "OpenRouter/Deepseek-r1 (0528)",
+        model: "deepseek/deepseek-r1-0528:free",
         capabilities: ["completion"],
       },
       {
         name: "OpenRouter/Deepseek-r1 (Llama-70B distilled)",
         model: "deepseek/deepseek-r1-distill-llama-70b:free",
-        capabilities: ["completion"],
-      },
-      {
-        name: "OpenRouter/Deepseek-r1 (Qwen-32B distilled)",
-        model: "deepseek/deepseek-r1-distill-qwen-32b:free",
         capabilities: ["completion"],
       },
       {
@@ -89,6 +106,16 @@ export const models: Provider[] = [
     enabled: ANTHROPIC_ENABLED,
     models: [
       {
+        name: "Claude Opus 4 (20250514)",
+        model: "claude-opus-4-20250514",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude Sonnet 4 (20250514)",
+        model: "claude-sonnet-4-20250514",
+        capabilities: ["completion", "vision"],
+      },
+      {
         name: "Claude 3.7 Sonnet (20250219)",
         model: "claude-3-7-sonnet-20250219",
         capabilities: ["completion", "vision"],
@@ -98,14 +125,26 @@ export const models: Provider[] = [
         model: "claude-3-5-sonnet-20241022",
         capabilities: ["completion", "vision"],
       },
-    ],
-  },
-  {
-    name: LLM_PROVIDERS.ANTHROPIC,
-    models: [
-      "claude-3-7-sonnet-20250219",
-      "claude-3-5-sonnet-20241022",
-      "claude-3-5-sonnet-20240620",
+      {
+        name: "Claude 3.5 Haiku (20241022)",
+        model: "claude-3-5-haiku-20241022",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3.5 Sonnet (20240620)",
+        model: "claude-3-5-sonnet-20240620",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3 Haiku (20240307)",
+        model: "claude-3-haiku-20240307",
+        capabilities: ["completion", "vision"],
+      },
+      {
+        name: "Claude 3 Opus (20240229)",
+        model: "claude-3-opus-20240229",
+        capabilities: ["completion", "vision"],
+      },
     ],
   },
 ];
@@ -136,14 +175,17 @@ export async function getOllamaModels(invalidateCache = false) {
         async (model) =>
           await ollama.show({ model: model.name }).then((res) => ({
             name: model.name,
-            // @ts-expect-error capabilities is not typed
             capabilities: res.capabilities as string[],
           })),
       ),
     );
 
     const chatModels = allModels
-      .filter((model) => model.capabilities.includes("completion"))
+      .filter((model) =>
+        OLLAMA_CAPABILITIES.every((capability) =>
+          model.capabilities.includes(capability),
+        ),
+      )
       .map((model) => ({
         name: model.name,
         model: model.name,
@@ -171,7 +213,7 @@ export async function getOllamaModels(invalidateCache = false) {
   return data;
 }
 
-export async function getConfigs(invalidateCache = false): Promise<Providers> {
+export async function getConfigs(invalidateCache = false): Promise<Configs> {
   return {
     providers: [
       {
@@ -182,5 +224,6 @@ export async function getConfigs(invalidateCache = false): Promise<Providers> {
       },
       ...models,
     ],
+    file_types: SUPPORTED_FILE_TYPES,
   };
 }

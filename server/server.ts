@@ -5,7 +5,14 @@ import {
   SERVER_PORT,
   DATABASE_URL,
   DEFAULT_EMBEDDING_PROVIDER,
+  SENTRY_DSN,
 } from "./src/constants";
+
+import * as Sentry from "@sentry/bun";
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+});
 
 try {
   Bun.serve({
@@ -21,4 +28,5 @@ try {
   );
 } catch (error) {
   console.error(error);
+  Sentry.captureException(error);
 }

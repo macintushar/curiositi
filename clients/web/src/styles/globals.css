@@ -11,6 +11,8 @@
   --font-serif:
     var(--font-instrument-serif), ui-serif, serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --font-emoji: var(--font-noto-emoji), "Noto Color Emoji";
 }
 
 @theme inline {
@@ -106,13 +108,13 @@
 .dark {
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
-  --card: oklch(0.216 0.006 56.043);
+  --card: oklch(0.147 0.004 49.25);
   --card-foreground: oklch(0.985 0.001 106.423);
-  --popover: oklch(0.216 0.006 56.043);
+  --popover: oklch(0.147 0.004 49.25);
   --popover-foreground: oklch(0.985 0.001 106.423);
-  --primary: oklch(0.923 0.003 48.717);
+  --primary: oklch(69.6% 0.17 162.48);
   --primary-foreground: oklch(0.216 0.006 56.043);
-  --secondary: oklch(0.268 0.007 34.298);
+  --secondary: oklch(0.147 0.004 49.25);
   --secondary-foreground: oklch(0.985 0.001 106.423);
   --muted: oklch(0.268 0.007 34.298);
   --muted-foreground: oklch(0.709 0.01 56.259);
@@ -127,11 +129,11 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.216 0.006 56.043);
+  --sidebar: oklch(0.147 0.004 49.25);
   --sidebar-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(69.6% 0.17 162.48);
   --sidebar-primary-foreground: oklch(0.985 0.001 106.423);
-  --sidebar-accent: oklch(0.88 0.007 34.298);
+  --sidebar-accent: oklch(0.37 0.01 68);
   --sidebar-accent-foreground: oklch(69.6% 0.17 162.48);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.553 0.013 58.071);
@@ -143,8 +145,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-muted;
-    @apply selection:text-secondary selection:bg-brand/60;
+    @apply selection:bg-brand/60 selection:text-white;
+    @apply bg-background text-foreground;
   }
 }
 
@@ -153,10 +155,34 @@
     text-wrap: balance;
   }
   .text-gradient {
-    @apply from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-transparent;
+    @apply from-brand to-brand/70 bg-gradient-to-r bg-clip-text text-transparent;
   }
 }
 
+/* Scrollbar */
+
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--background);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
+/* Keyframes */
 @keyframes typing {
   0%,
   100% {
@@ -281,35 +307,5 @@
   }
   100% {
     opacity: 1;
-  }
-}
-
-/* width */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: var(--background);
-  border-radius: 5px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-muted-foreground);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
   }
 }

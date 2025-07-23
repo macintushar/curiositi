@@ -1,10 +1,10 @@
 import React from "react";
 
-interface UseCaseCardProps {
+type UseCaseCardProps = {
   icon: React.ReactNode;
   title: string;
   description: string;
-}
+};
 
 export function UseCaseCard({ icon, title, description }: UseCaseCardProps) {
   return (

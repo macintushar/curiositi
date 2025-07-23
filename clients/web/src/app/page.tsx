@@ -1,6 +1,13 @@
 import Image from "next/image";
 
-import { Search, FileText, Globe, Zap, MessageSquare } from "lucide-react";
+import {
+  IconSearch,
+  IconFileText,
+  IconGlobe,
+  IconBolt,
+  IconMessage,
+  IconBrandGithubFilled,
+} from "@tabler/icons-react";
 
 import { Section } from "@/components/landing/section";
 import { FeatureCard } from "@/components/landing/feature-card";
@@ -11,7 +18,6 @@ import { PricingPlanCard } from "@/components/landing/pricing-plan-card";
 import { Button } from "@/components/ui/button";
 
 import agentFlowImage from "@/assets/images/agent-flow.png";
-import GithubIcon from "@/assets/icons/github-icon";
 import Header from "@/views/landing/header";
 import Footer from "@/views/landing/footer";
 
@@ -30,7 +36,7 @@ export default function LandingPage() {
                 <span>Introducing Curiositi!</span>
                 <span>🎉</span>
               </div>
-              <h1 className="text-primary font-serif text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-6xl">
+              <h1 className="text-brand font-serif text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-6xl">
                 <span className="text-gradient">Get answers</span> from your
                 documents and the web
               </h1>
@@ -59,7 +65,7 @@ export default function LandingPage() {
                 <div className="bg-card relative h-full rounded-lg border-0 p-6">
                   <div className="flex h-full flex-col">
                     <div className="mb-6 flex items-center gap-2">
-                      <Search className="text-muted-foreground h-5 w-5" />
+                      <IconSearch className="text-muted-foreground h-5 w-5" />
                       <div className="bg-background flex-1 rounded-full px-4 py-2 text-sm">
                         How does RAG improve AI responses?
                       </div>
@@ -86,7 +92,7 @@ export default function LandingPage() {
                         variant="secondary"
                         className="rounded-full"
                       >
-                        <FileText className="mr-1 h-4 w-4" />
+                        <IconFileText className="mr-1 h-4 w-4" />
                         Your Documents
                       </Button>
                       <Button
@@ -94,7 +100,7 @@ export default function LandingPage() {
                         variant="secondary"
                         className="rounded-full"
                       >
-                        <Globe className="mr-1 h-4 w-4" />
+                        <IconGlobe className="mr-1 h-4 w-4" />
                         Web Data
                       </Button>
                     </div>
@@ -118,19 +124,19 @@ export default function LandingPage() {
         >
           <div className="mx-auto grid max-w-5xl items-start gap-8 py-12 md:grid-cols-3">
             <FeatureCard
-              icon={<FileText className="h-6 w-6" />}
+              icon={<IconFileText className="h-6 w-6" />}
               title="Document Intelligence"
               description="Upload your documents, PDFs, spreadsheets, and presentations for instant insights and answers."
               link="#"
             />
             <FeatureCard
-              icon={<Globe className="h-6 w-6" />}
+              icon={<IconGlobe className="h-6 w-6" />}
               title="Live Web Data"
               description="Access real-time information from the web to complement your documents with the latest data."
               link="#"
             />
             <FeatureCard
-              icon={<Zap className="h-6 w-6" />}
+              icon={<IconBolt className="h-6 w-6" />}
               title="Hybrid RAG System"
               description="Our advanced Retrieval-Augmented Generation system ensures precise, contextual answers every time."
               link="#"
@@ -197,17 +203,17 @@ export default function LandingPage() {
         >
           <div className="mx-auto grid max-w-5xl gap-8 py-12 md:grid-cols-3">
             <UseCaseCard
-              icon={<MessageSquare className="h-6 w-6" />}
+              icon={<IconMessage className="h-6 w-6" />}
               title="Research & Analysis"
               description="Use Curiositi to analyze documents and find connections across multiple sources, saving hours of manual work."
             />
             <UseCaseCard
-              icon={<MessageSquare className="h-6 w-6" />}
+              icon={<IconMessage className="h-6 w-6" />}
               title="Knowledge Management"
               description="Use Curiositi to make their internal knowledge bases accessible and actionable for all employees."
             />
             <UseCaseCard
-              icon={<MessageSquare className="h-6 w-6" />}
+              icon={<IconMessage className="h-6 w-6" />}
               title="Study & Research"
               description="Use Curiositi to research topics and generate content backed by accurate, up-to-date information based on their lectures, textbooks, and other documents."
             />
@@ -238,7 +244,12 @@ export default function LandingPage() {
                 "Own your data, forever",
               ]}
               ctaText="GitHub"
-              CtaExtra={<GithubIcon />}
+              ctaVariant="default"
+              CtaExtra={
+                <div className="flex items-center rounded-full bg-white p-0.5">
+                  <IconBrandGithubFilled className="text-black" />
+                </div>
+              }
               ctaHref={ghURL}
               className="w-full md:w-1/3"
               ctaHrefExternal

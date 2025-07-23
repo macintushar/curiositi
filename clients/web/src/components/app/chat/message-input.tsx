@@ -20,9 +20,12 @@ import ModelSelector from "./model-selector";
 
 import useChatStore from "@/stores/useChatStore";
 
-export default function MessageInput() {
-  const { prompt, isLoading, context, setContext, setPrompt, setIsLoading } =
-    useChatStore();
+type MessageInputProps = {
+  onSubmit?: () => void;
+};
+
+export default function MessageInput({ onSubmit }: MessageInputProps) {
+  const { prompt, isLoading, context, setContext, setPrompt } = useChatStore();
 
   return (
     <div className="bg-primary-foreground mx-auto flex h-fit w-full max-w-3xl flex-col gap-2 rounded-3xl p-1 pt-2">
@@ -53,19 +56,13 @@ export default function MessageInput() {
         isLoading={false}
         value={prompt}
         onValueChange={setPrompt}
-        onSubmit={() => {
-          setIsLoading(true);
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 1000);
-          console.log(prompt);
-        }}
+        onSubmit={onSubmit}
         className="border-input relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
       >
         <div className="flex flex-col">
           <PromptInputTextarea
             placeholder="Ask anything..."
-            className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3]"
+            className="min-h-[44px] bg-blue-300 pt-3 pl-4 text-base leading-[1.3]"
           />
 
           <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
@@ -73,14 +70,9 @@ export default function MessageInput() {
               <ModelSelector />
               <Button
                 size="icon"
+                className="bg-brand"
                 disabled={!prompt.trim() || isLoading}
-                onClick={() => {
-                  setIsLoading(true);
-                  setTimeout(() => {
-                    setIsLoading(false);
-                  }, 1000);
-                  console.log(prompt);
-                }}
+                onClick={onSubmit}
               >
                 {!isLoading ? (
                   <IconArrowUp />

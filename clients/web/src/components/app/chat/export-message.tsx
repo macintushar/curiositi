@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import {
   IconFileExport,
   IconFileTypeTxt,
@@ -26,7 +27,17 @@ const exportOptions = [
   },
 ];
 
-export default function ExportMessage({ message }: { message: string }) {
+type ExportMessageProps = {
+  message: string;
+  disabled?: boolean;
+  className?: string;
+};
+
+export default function ExportMessage({
+  message,
+  disabled = false,
+  className,
+}: ExportMessageProps) {
   function handleExport(format: string, extension: string) {
     const blob = new Blob([message], { type: format });
     const url = URL.createObjectURL(blob);
@@ -39,7 +50,11 @@ export default function ExportMessage({ message }: { message: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="rounded-md">
+        <Button
+          variant="ghost"
+          className={cn("rounded-md", className)}
+          disabled={disabled}
+        >
           <IconFileExport className="size-4" />
           Export
         </Button>
@@ -49,6 +64,7 @@ export default function ExportMessage({ message }: { message: string }) {
           <DropdownMenuItem
             key={option.label}
             onClick={() => handleExport(option.type, option.extension)}
+            className="cursor-pointer"
           >
             <option.icon className="size-4" /> {option.label}
           </DropdownMenuItem>

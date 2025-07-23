@@ -9,6 +9,7 @@ import {
   IconFileTypePpt,
   IconFile,
   type Icon,
+  IconMarkdown,
 } from "@tabler/icons-react";
 
 import dayjs from "dayjs";
@@ -59,7 +60,9 @@ export function formatFileSize(size: string) {
     unitIndex++;
   }
 
-  return `${value} ${units[unitIndex]}`;
+  // Format to 2 decimal places if there are decimals
+  const formattedValue = value % 1 === 0 ? value : value.toFixed(2);
+  return `${formattedValue} ${units[unitIndex]}`;
 }
 
 type FileType = {
@@ -88,7 +91,7 @@ export function getFileType(mimeType: string): FileType {
     case "text/csv":
       return { label: "csv", icon: IconFileTypeCsv };
     case "text/markdown":
-      return { label: "md", icon: IconFileTypeTxt };
+      return { label: "md", icon: IconMarkdown };
     default:
       return { label: "unknown", icon: IconFile };
   }

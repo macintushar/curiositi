@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconFolder, IconPlus } from "@tabler/icons-react";
+import { IconFolders, IconFoldersFilled, IconPlus } from "@tabler/icons-react";
 
 import {
   Sidebar,
@@ -34,6 +34,8 @@ export default function AppSidebar({ threads }: AppSidebarProps) {
   const { state } = useSidebar();
   const path = usePathname();
 
+  const isSpaces = path === "/app/spaces";
+
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader>
@@ -42,7 +44,7 @@ export default function AppSidebar({ threads }: AppSidebarProps) {
             <Link href={`/app`} prefetch>
               <Button
                 variant="outline"
-                className="w-full cursor-pointer truncate"
+                className="w-full cursor-pointer truncate font-light"
               >
                 <IconPlus />
                 {state === "collapsed" ? "" : "New Thread"}
@@ -52,10 +54,10 @@ export default function AppSidebar({ threads }: AppSidebarProps) {
           <SidebarMenuItem>
             <Link href={`/app/spaces`} prefetch>
               <SidebarMenuButton
-                isActive={path === "/app/spaces"}
-                className="hover:cursor-pointer"
+                isActive={isSpaces}
+                className="py-5 hover:cursor-pointer"
               >
-                <IconFolder />
+                {isSpaces ? <IconFoldersFilled /> : <IconFolders />}
                 Spaces
               </SidebarMenuButton>
             </Link>

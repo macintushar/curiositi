@@ -58,10 +58,6 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
-  openaiApiKey: text("openai_api_key"),
-  anthropicApiKey: text("anthropic_api_key"),
-  openRouterApiKey: text("openrouter_api_key"),
-  ollamaUrl: text("ollama_url"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
 });
@@ -132,6 +128,7 @@ export const threads = pgTable("threads", {
   createdBy: text("created_by")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").default("Untitled"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   spaceId: uuid("space_id").references(() => spaces.id, {
@@ -150,10 +147,18 @@ export const messages = pgTable("messages", {
   threadId: uuid("thread_id")
     .notNull()
     .references(() => threads.id, { onDelete: "cascade" }),
+  model: text("model").notNull(),
+  provider: text("provider").notNull(),
   documentSearches: text("document_searches").array(),
   webSearches: text("web_searches").array(),
   documentSearchResults: text("document_search_results").array(),
   webSearchResults: text("web_search_results").array(),
+  specificFileContent: text("specific_file_content").array(),
+  followUpSuggestions: text("follow_up_suggestions").array(),
+  strategy: text("strategy", {
+    enum: ["comprehensive", "focused", "hybrid", "error"],
+  }).default("comprehensive"),
+  reasoning: text("reasoning"),
 });
 
 export const settings = pgTable("settings", {

@@ -4,12 +4,12 @@ import { processAndStoreDocument } from "@/services/ingestion";
 import { createHash } from "crypto";
 import { tryCatch } from "@/lib/try-catch";
 
-interface FileUpload {
+type FileUpload = {
   name: string;
   type: string;
   size: number;
   arrayBuffer: () => Promise<ArrayBuffer>;
-}
+};
 
 export async function uploadFileHandler(
   file: FileUpload,

@@ -3,9 +3,10 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { EyeClosedIcon, EyeIcon } from "lucide-react";
+
 import { Button } from "./button";
 import { useState } from "react";
+import { IconEye, IconEyeClosed } from "@tabler/icons-react";
 
 function HiddenInput({ className, ...props }: React.ComponentProps<"input">) {
   "use client";
@@ -35,9 +36,9 @@ function HiddenInput({ className, ...props }: React.ComponentProps<"input">) {
         }}
       >
         {isVisible ? (
-          <EyeClosedIcon className="h-4 w-4" />
+          <IconEyeClosed className="h-4 w-4" />
         ) : (
-          <EyeIcon className="h-4 w-4" />
+          <IconEye className="h-4 w-4" />
         )}
       </Button>
     </div>

@@ -1,3 +1,28 @@
+"use client";
+
+import IntegrationsTab from "./integrations-tab";
+import ModelsTab from "./models-tab";
+import ProfileTab from "./profile-tab";
+import TabControl from "./tab-control";
+import useSettingsStore from "@/stores/useSettingsStore";
+
 export default function SettingsPage() {
-  return <div>Settingss</div>;
+  const { tab } = useSettingsStore();
+  return (
+    <div className="flex h-full flex-col items-center justify-start overflow-y-auto p-4">
+      <div className="flex h-full w-full flex-col gap-4 xl:w-2/3">
+        <div className="flex items-center justify-between">
+          <h1 className="text-brand font-serif text-4xl font-medium">
+            Settings
+          </h1>
+        </div>
+        <div className="flex flex-col gap-4 lg:flex-row">
+          <TabControl />
+          {tab === "profile" && <ProfileTab />}
+          {tab === "models" && <ModelsTab />}
+          {tab === "integrations" && <IntegrationsTab />}
+        </div>
+      </div>
+    </div>
+  );
 }

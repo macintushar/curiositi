@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import React from "react";
 
-interface FeatureCardProps {
+type FeatureCardProps = {
   icon: React.ReactNode;
   title: string;
   description: string;
   link: string;
-}
+};
 
 export function FeatureCard({
   icon,
@@ -29,7 +29,7 @@ export function FeatureCard({
           href={link}
           className="text-primary inline-flex items-center text-sm font-medium"
         >
-          Learn more <ArrowRight className="ml-1 h-4 w-4" />
+          Learn more <IconArrowRight className="ml-1 h-4 w-4" />
         </Link>
       </div>
     </div>

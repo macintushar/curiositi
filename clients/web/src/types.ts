@@ -56,8 +56,9 @@ export type Provider = {
   models: Model[];
 };
 
-export type ProviderResponse = {
+export type Configs = {
   providers: Provider[];
+  file_types: string[];
 };
 
 export type SpaceResponse<T> = {
@@ -68,6 +69,7 @@ export type SpaceResponse<T> = {
 
 export type Thread = {
   id: string;
+  title: string;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -85,6 +87,13 @@ export type ThreadMessage = {
   webSearches: string[] | null;
   documentSearchResults: string[] | null;
   webSearchResults: string[] | null;
+  specificFileContent: string[] | null;
+  model: string;
+  provider: string;
+  confidence: number;
+  followUpSuggestions: string[];
+  strategy: "comprehensive" | "focused" | "hybrid" | "error";
+  reasoning: string | null;
 };
 
 export type Context = {
@@ -99,3 +108,5 @@ export type AllFiles = File & {
   spaceName: string;
   spaceIcon: string;
 };
+
+export type SettingsTab = "profile" | "models" | "integrations";

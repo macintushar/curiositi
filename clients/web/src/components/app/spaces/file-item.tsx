@@ -3,9 +3,25 @@
 import { Button } from "@/components/ui/button";
 
 import { formatFileSize, formatTimestamp, getFileType } from "@/lib/utils";
-import type { ApiResponse, File, MessageResponse } from "@/types";
+
+import type {
+  ApiResponse,
+  File as CuriositiFile,
+  MessageResponse,
+} from "@/types";
+
+type FileDownloadResult =
+  | {
+      data: Blob;
+      error: null;
+    }
+  | {
+      data: null;
+      error: string;
+    };
 
 import { IconDownload, IconTrashX, type Icon } from "@tabler/icons-react";
+
 import { toast } from "sonner";
 
 export function FileIcon({ icon: FileTypeIcon }: { icon: Icon }) {
@@ -17,8 +33,8 @@ export function FileIcon({ icon: FileTypeIcon }: { icon: Icon }) {
 }
 
 type FileItemProps = {
-  file: File;
-  handleGetFile: () => void;
+  file: CuriositiFile;
+  handleGetFile: () => Promise<FileDownloadResult>;
   handleDeleteFile: () => Promise<ApiResponse<MessageResponse>>;
 };
 
@@ -28,8 +44,9 @@ export default function FileItem({
   handleDeleteFile,
 }: FileItemProps) {
   const { label, icon } = getFileType(file.type);
+
   return (
-    <div className="mb-2 flex h-fit items-center justify-between rounded-xl border-[1px] bg-white p-3 transition-all duration-300 hover:cursor-pointer hover:shadow-md">
+    <div className="dark:bg-sidebar mb-2 flex h-fit items-center justify-between rounded-xl border-[1px] bg-white p-3 transition-all duration-300 hover:cursor-pointer hover:shadow-md">
       <div className="flex max-h-full gap-3 overflow-hidden">
         <FileIcon icon={icon} />
         <div className="flex flex-col gap-0.5">
@@ -44,7 +61,16 @@ export default function FileItem({
         <Button
           className="size-7 hover:cursor-pointer"
           variant="ghost"
-          onClick={() => handleGetFile()}
+          onClick={async () => {
+            const file = await handleGetFile();
+            console.log("file", file);
+            if (file.data) {
+              const url = URL.createObjectURL(file.data);
+              window.open(url, "_blank");
+            } else if (file.error) {
+              toast.error(file.error);
+            }
+          }}
         >
           <IconDownload className="text-brand size-4" />
         </Button>
@@ -52,14 +78,16 @@ export default function FileItem({
           className="size-7 hover:cursor-pointer"
           variant="ghost"
           onClick={async () => {
-            const data = await handleDeleteFile();
+            const { data, error } = await handleDeleteFile();
 
-            if (data.data.message) {
-              toast.success(data.data.message);
+            console.log("data", data);
+
+            if (data.message) {
+              toast.success(data.message);
             }
 
-            if (data.error) {
-              toast.error(data.error);
+            if (error) {
+              toast.error(error);
             }
           }}
         >

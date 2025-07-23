@@ -6,7 +6,7 @@ export const SERVER_PORT = process.env.SERVER_PORT || 3030;
 // Default Providers
 export const DEFAULT_EMBEDDING_PROVIDER =
   (process.env.DEFAULT_EMBEDDING_PROVIDER as EMBEDDING_PROVIDERS) ||
-  EMBEDDING_PROVIDERS.OLLAMA;
+  EMBEDDING_PROVIDERS.OPENAI;
 
 // Host
 export const HOST =
@@ -56,6 +56,9 @@ export const ANTHROPIC_ENABLED = ANTHROPIC_API_KEY ? true : false;
 // SearXNG
 export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
 
+// Sentry
+export const SENTRY_DSN = process.env.SENTRY_DSN;
+
 // File Types
 
 export const OFFICE_FILE_TYPES = [
@@ -76,3 +79,6 @@ export const SUPPORTED_FILE_TYPES = [
   ...TEXT_FILE_TYPES,
   ...OFFICE_FILE_TYPES,
 ];
+
+// Ollama Capabilities
+export const OLLAMA_CAPABILITIES = ["completion"];
