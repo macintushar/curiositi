@@ -9,6 +9,7 @@ export const authClient = createAuthClient({
   plugins: [nextCookies()],
   advanced: {
     useSecureCookies: true,
+    cookiePrefix: "curiositi",
   },
 });
 
