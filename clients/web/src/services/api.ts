@@ -10,19 +10,20 @@ export const apiFetch = async <T>(
   responseType?: "json" | "direct",
   additionalHeaders?: Record<string, string>,
 ): Promise<T> => {
-  const cookieStore = await cookies();
+  const cookieStore = (await cookies())
+    .getAll()
+    .map((c) => `${c.name}=${c.value}`)
+    .join("; ");
 
   const response = await fetch(`${env.SERVER_URL}${url}`, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
-      Cookie: cookieStore
-        .getAll()
-        .map((c) => `${c.name}=${c.value}`)
-        .join("; "),
+      Cookie: cookieStore,
       ...options?.headers,
       ...additionalHeaders,
     },
     credentials: "include",
+    mode: "cors",
     body: options?.body,
     ...options,
   });
