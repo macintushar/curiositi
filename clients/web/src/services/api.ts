@@ -12,12 +12,13 @@ export const apiFetch = async <T>(
 ): Promise<T> => {
   const cookieStore = await cookies();
 
-  const sessionCookie = cookieStore.get("__Secure-curiositi.session_token");
-
   const response = await fetch(`${env.SERVER_URL}${url}`, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
-      Cookie: `__Secure-curiositi.session_token=${sessionCookie?.value ?? ""}`,
+      Cookie: cookieStore
+        .getAll()
+        .map((c) => `${c.name}=${c.value}`)
+        .join("; "),
       ...options?.headers,
       ...additionalHeaders,
     },
