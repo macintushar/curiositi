@@ -1,10 +1,15 @@
-import { cn } from "@/lib/utils";
-import { marked } from "marked";
 import { memo, useId, useMemo } from "react";
+
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
+import { marked } from "marked";
+
+import { cn } from "@/lib/utils";
 import { CodeBlock, CodeBlockCode } from "./code-block";
+import { useTheme } from "next-themes";
 
 export type MarkdownProps = {
   children: string;
@@ -30,6 +35,8 @@ const INITIAL_COMPONENTS: Partial<Components> = {
       !props.node?.position?.start.line ||
       props.node?.position?.start.line === props.node?.position?.end.line;
 
+    const { theme } = useTheme();
+
     if (isInline) {
       return (
         <span
@@ -47,8 +54,16 @@ const INITIAL_COMPONENTS: Partial<Components> = {
     const language = extractLanguage(className);
 
     return (
-      <CodeBlock className={className}>
-        <CodeBlockCode code={children as string} language={language} />
+      <CodeBlock
+        className={className}
+        language={language}
+        text={children as string}
+      >
+        <CodeBlockCode
+          code={children as string}
+          theme={theme === "dark" ? "github-dark" : "github-light"}
+          language={language}
+        />
       </CodeBlock>
     );
   },
@@ -67,7 +82,7 @@ const MemoizedMarkdownBlock = memo(
   }) {
     return (
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks]}
+        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath, rehypeKatex]}
         components={components}
       >
         {content}
