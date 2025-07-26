@@ -29,6 +29,11 @@ import CopyButton from "../copy-button";
 import Suggestions from "./suggestions";
 
 import type { ThreadMessage } from "@/types";
+import {
+  Reasoning,
+  ReasoningContent,
+  ReasoningTrigger,
+} from "@/components/ui/reasoning";
 
 function UserMessage({ message }: { message: string }) {
   return (
@@ -93,33 +98,24 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
         {!isError ? (
           <>
             <TabsContent value="answer">
-              <MessageContent
-                components={{
-                  ol: ({ children }) => (
-                    <ol className="flex flex-col gap-3">{children}</ol>
-                  ),
-                  li: ({ children }) => <li className="p-1.5">{children}</li>,
-                  p: ({ children }) => <p className="p-1.5">{children}</p>,
-                }}
-                markdown
-              >
-                {message.content}
-              </MessageContent>
+              <MessageContent markdown>{message.content}</MessageContent>
             </TabsContent>
             <TabsContent value="sources">
               <div className="mt-2 flex w-full flex-col space-y-6">
                 {message.reasoning && (
-                  <div className="text-muted-foreground flex flex-col">
-                    <div className="text-brand flex items-center gap-1">
-                      <IconSparkles className="size-5 stroke-1" />
-                      <p className="font-serif text-xl font-medium italic">
-                        Reasoning
-                      </p>
-                    </div>
-                    <div className="text-muted-foreground border-l-muted border-l-2 pl-4 text-sm">
+                  <Reasoning>
+                    <ReasoningTrigger className="text-muted-foreground">
+                      <div className="text-brand flex items-center gap-1">
+                        <IconSparkles className="size-5 stroke-1" />
+                        <p className="font-serif text-xl font-medium italic">
+                          Reasoning
+                        </p>
+                      </div>
+                    </ReasoningTrigger>
+                    <ReasoningContent className="text-muted-foreground border-l-muted border-l-2 pl-4 text-sm">
                       {message.reasoning}
-                    </div>
-                  </div>
+                    </ReasoningContent>
+                  </Reasoning>
                 )}
                 {message.documentSearches &&
                   message.documentSearches.length > 0 && (
