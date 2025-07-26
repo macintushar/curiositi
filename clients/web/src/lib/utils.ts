@@ -96,3 +96,17 @@ export function getFileType(mimeType: string): FileType {
       return { label: "unknown", icon: IconFile };
   }
 }
+
+export async function handleCopy(
+  text: string,
+  setCopied?: (copied: boolean) => void,
+) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setCopied?.(true);
+    setTimeout(() => setCopied?.(false), 2000);
+  }
+}
