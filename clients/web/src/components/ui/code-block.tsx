@@ -3,22 +3,40 @@
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
+import CopyButton from "../app/copy-button";
 
 export type CodeBlockProps = {
   children?: React.ReactNode;
   className?: string;
+  language?: string;
+  text?: string;
 } & React.HTMLProps<HTMLDivElement>;
 
-function CodeBlock({ children, className, ...props }: CodeBlockProps) {
+function CodeBlock({
+  children,
+  className,
+  language,
+  text,
+  ...props
+}: CodeBlockProps) {
   return (
     <div
       className={cn(
-        "not-prose flex w-full flex-col overflow-clip border",
-        "border-border bg-card text-card-foreground rounded-xl",
+        "not-prose my-2 flex w-full flex-col overflow-clip border",
+        "border-border text-card-foreground rounded-xl",
         className,
       )}
       {...props}
     >
+      <div className="flex items-center justify-between px-2 py-1 text-xs">
+        <p className="text-muted-foreground font-mono">{language ?? "Code"}</p>
+        <CopyButton
+          className="size-5 rounded-sm p-1"
+          iconSize="size-3"
+          variant="outline"
+          text={text?.trim() ?? "No code provided to copy"}
+        />
+      </div>
       {children}
     </div>
   );
@@ -54,11 +72,12 @@ function CodeBlockCode({
   }, [code, language, theme]);
 
   const classNames = cn(
-    "w-full overflow-x-auto text-[13px] [&>pre]:px-4 [&>pre]:py-4",
+    "w-full overflow-x-auto text-xs [&>pre]:px-4 [&>pre]:py-4",
     className,
   );
 
   // SSR fallback: render plain code if not hydrated yet
+
   return highlightedHtml ? (
     <div
       className={classNames}
