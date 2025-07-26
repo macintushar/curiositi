@@ -67,6 +67,12 @@ export default function GlobalError({
                     Contact Support
                   </Button>
                 </div>
+                <div>
+                  Error Info:
+                  <pre>
+                    <code>{JSON.stringify(error, null, 4)}</code>
+                  </pre>
+                </div>
               </div>
             </div>
           </main>
