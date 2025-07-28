@@ -107,6 +107,8 @@ export default function Thread({
             return;
           }
 
+          setPrompt("");
+
           setMessagesState([
             ...messagesState,
             {
@@ -146,17 +148,18 @@ export default function Thread({
 
           if (data.error) {
             toast.error(data.error);
+            setPrompt(prompt.trim());
           }
 
           if (data.data?.error) {
             toast.error(data.data.error);
+            setPrompt(prompt.trim());
           }
 
           if (data?.data?.data) {
             setMessagesState([...messagesState, data.data.data]);
           }
           setIsLoading(false);
-          setPrompt("");
         }}
       />
     </div>
