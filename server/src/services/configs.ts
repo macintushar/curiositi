@@ -2,6 +2,7 @@ import {
   ANTHROPIC_ENABLED,
   OLLAMA_BASE_URL,
   OLLAMA_CAPABILITIES,
+  OLLAMA_ENABLED,
   OPENAI_ENABLED,
   OPENROUTER_ENABLED,
   SUPPORTED_FILE_TYPES,
@@ -200,6 +201,10 @@ export async function getOllamaModels(invalidateCache = false) {
 
     return chatModels;
   };
+
+  if (!OLLAMA_ENABLED) {
+    return [];
+  }
 
   const { data, error } = await tryCatch(fetchModelsPromise());
 
