@@ -224,7 +224,7 @@ export async function getConfigs(invalidateCache = false): Promise<Configs> {
       {
         name: LLM_PROVIDERS.OLLAMA,
         title: "Ollama",
-        enabled: true,
+        enabled: OLLAMA_ENABLED,
         models: await getOllamaModels(invalidateCache),
       },
       ...models,
