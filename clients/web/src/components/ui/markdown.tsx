@@ -106,9 +106,6 @@ function MarkdownComponent({
   const blockId = id ?? generatedId;
   const blocks = useMemo(() => parseMarkdownIntoBlocks(children), [children]);
 
-  const tokens = marked.parse(children);
-  console.log(tokens);
-
   return (
     <div className={className}>
       {blocks.map((block, index) => (
