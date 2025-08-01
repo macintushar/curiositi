@@ -3,7 +3,6 @@ import {
   IconBrandOpenai,
   IconSparkles,
   IconBrain,
-  IconEye,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
@@ -24,6 +23,11 @@ import {
 import useChatStore from "@/stores/useChatStore";
 import { cn } from "@/lib/utils";
 import TablerIcon from "../tabler-icon";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function ProviderIcon({
   providerName,
@@ -49,18 +53,17 @@ function ProviderIcon({
 function ModelCapability({ capability }: { capability: string }) {
   switch (capability) {
     case "reasoning":
+    case "thinking":
       return (
-        <TablerIcon
-          Icon={IconBrain}
-          className="size-5 rounded-md bg-purple-800 p-0.5 text-white"
-        />
-      );
-    case "vision":
-      return (
-        <TablerIcon
-          Icon={IconEye}
-          className="bg-brand/10 text-brand size-5 rounded-md p-1"
-        />
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger>
+            <TablerIcon
+              Icon={IconBrain}
+              className="size-5 rounded-md bg-purple-800 p-0.5 text-white"
+            />
+          </TooltipTrigger>
+          <TooltipContent>Supports reasoning capabilities</TooltipContent>
+        </Tooltip>
       );
 
     default:

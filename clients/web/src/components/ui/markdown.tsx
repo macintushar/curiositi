@@ -5,11 +5,23 @@ import remarkBreaks from "remark-breaks";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
+
+import { IconDownload } from "@tabler/icons-react";
+import { useTheme } from "next-themes";
 import { marked } from "marked";
 
 import { cn } from "@/lib/utils";
 import { CodeBlock, CodeBlockCode } from "./code-block";
-import { useTheme } from "next-themes";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "./table";
+import { Button } from "./button";
+import TablerIcon from "../app/tabler-icon";
 
 export type MarkdownProps = {
   children: string;
@@ -61,7 +73,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
       >
         <CodeBlockCode
           code={children as string}
-          theme={theme === "dark" ? "github-dark" : "github-light"}
+          theme={theme === "dark" ? "tokyo-night" : "light-plus"}
           language={language}
         />
       </CodeBlock>
@@ -69,6 +81,37 @@ const INITIAL_COMPONENTS: Partial<Components> = {
   },
   pre: function PreComponent({ children }) {
     return <>{children}</>;
+  },
+  table: function TableComponent({ children }) {
+    return (
+      <div className="border-border group relative my-2 rounded-lg border">
+        <Table>{children}</Table>
+        {/* TODO: Add download button */}
+        <div className="absolute right-0 bottom-[-15px] opacity-0 group-hover:opacity-100">
+          <Button variant="outline" className="w-fit p-1">
+            <TablerIcon Icon={IconDownload} />
+          </Button>
+        </div>
+      </div>
+    );
+  },
+  tr: function TrComponent({ children }) {
+    return <TableRow>{children}</TableRow>;
+  },
+  td: function TdComponent({ children }) {
+    return <TableCell>{children}</TableCell>;
+  },
+  th: function ThComponent({ children }) {
+    return <TableHead>{children}</TableHead>;
+  },
+  tbody: function TbodyComponent({ children }) {
+    return <TableBody>{children}</TableBody>;
+  },
+  caption: function CaptionComponent({ children }) {
+    return <TableCaption>{children}</TableCaption>;
+  },
+  p: function PComponent({ children, className }) {
+    return <p className={cn("leading-8", className)}>{children}</p>;
   },
 };
 

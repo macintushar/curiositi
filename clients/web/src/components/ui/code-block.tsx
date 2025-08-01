@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import React, { useEffect, useState } from "react";
 import { codeToHtml } from "shiki";
 import CopyButton from "../app/copy-button";
+import CodeLanguageIcon from "./code-language-icon";
 
 export type CodeBlockProps = {
   children?: React.ReactNode;
@@ -29,7 +30,12 @@ function CodeBlock({
       {...props}
     >
       <div className="flex items-center justify-between px-2 py-1 text-xs">
-        <p className="text-muted-foreground font-mono">{language ?? "Code"}</p>
+        <div className="flex items-center gap-1">
+          <CodeLanguageIcon language={language ?? "code"} />
+          <p className="text-muted-foreground font-mono">
+            {language ?? "Code"}
+          </p>
+        </div>
         <CopyButton
           className="size-5 rounded-sm p-1"
           iconSize="size-3"
@@ -52,7 +58,7 @@ export type CodeBlockCodeProps = {
 function CodeBlockCode({
   code,
   language = "tsx",
-  theme = "github-light",
+  theme = "light-plus",
   className,
   ...props
 }: CodeBlockCodeProps) {
@@ -65,7 +71,10 @@ function CodeBlockCode({
         return;
       }
 
-      const html = await codeToHtml(code, { lang: language, theme });
+      const html = await codeToHtml(code, {
+        lang: language,
+        theme,
+      });
       setHighlightedHtml(html);
     }
     void highlight();
