@@ -19,6 +19,7 @@ configsRouter.post(
     const { invalidate_cache } = await c.req.valid("json");
     const { data, error } = await tryCatch(getConfigs(invalidate_cache));
     if (error) {
+      console.error(error);
       return c.json({ error: error.message || "Failed to get configs" }, 500);
     }
     return c.json({ data });

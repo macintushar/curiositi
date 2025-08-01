@@ -2,6 +2,7 @@ import {
   ANTHROPIC_ENABLED,
   OLLAMA_BASE_URL,
   OLLAMA_CAPABILITIES,
+  OLLAMA_ENABLED,
   OPENAI_ENABLED,
   OPENROUTER_ENABLED,
   SUPPORTED_FILE_TYPES,
@@ -201,6 +202,10 @@ export async function getOllamaModels(invalidateCache = false) {
     return chatModels;
   };
 
+  if (!OLLAMA_ENABLED) {
+    return [];
+  }
+
   const { data, error } = await tryCatch(fetchModelsPromise());
 
   if (error) {
@@ -219,7 +224,7 @@ export async function getConfigs(invalidateCache = false): Promise<Configs> {
       {
         name: LLM_PROVIDERS.OLLAMA,
         title: "Ollama",
-        enabled: true,
+        enabled: OLLAMA_ENABLED,
         models: await getOllamaModels(invalidateCache),
       },
       ...models,

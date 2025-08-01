@@ -37,6 +37,7 @@ export const OLLAMA_BASE_URL =
   process.env.OLLAMA_BASE_URL || "http://localhost:11434";
 export const OLLAMA_EMBEDDING_MODEL =
   process.env.OLLAMA_EMBEDDING_MODEL || "snowflake-arctic-embed2:latest";
+export const OLLAMA_ENABLED = OLLAMA_BASE_URL ? true : false;
 
 // OpenRouter
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";

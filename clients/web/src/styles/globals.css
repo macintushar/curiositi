@@ -173,7 +173,7 @@
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: var(--background);
+  background: var(--sidebar-border);
   border-radius: 5px;
 }
 

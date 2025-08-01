@@ -12,15 +12,16 @@ export const apiFetch = async <T>(
   responseType?: "json" | "direct",
   additionalHeaders?: Record<string, string>,
 ): Promise<T> => {
-  const cookieStore = (await cookies())
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join("; ");
+  const cookie = await cookies();
+  console.log(cookie);
 
   const response = await fetch(`${env.SERVER_URL}${url}`, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
-      Cookie: cookieStore,
+      Cookie: cookie
+        .getAll()
+        .map((c) => `${c.name}=${c.value}`)
+        .join("; "),
       ...options?.headers,
       ...additionalHeaders,
     },

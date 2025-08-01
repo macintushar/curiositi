@@ -25,7 +25,7 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <div className="bg-background text-foreground flex min-h-screen flex-col">
+        <div className="bg-background text-foreground flex min-h-screen max-w-screen min-w-screen flex-col">
           <main className="flex flex-1 items-center justify-center py-12 md:py-16 lg:py-24">
             <div className="container px-4 md:px-6">
               <div className="mx-auto max-w-2xl space-y-8 text-center">
@@ -71,6 +71,12 @@ export default function GlobalError({
                   Error Info:
                   <pre>
                     <code>{JSON.stringify(error, null, 4)}</code>
+                  </pre>
+                </div>
+                <div>
+                  Error Digest:
+                  <pre>
+                    <code>{error.digest}</code>
                   </pre>
                 </div>
               </div>
