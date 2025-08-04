@@ -3,7 +3,14 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "env": [
+        "SERVER_URL",
+        "BASE_URL",
+        "PORT",
+        "NEXT_PUBLIC_BASE_URL",
+        "NEXT_PUBLIC_SERVER_URL"
+      ]
     },
     "dev": {
       "persistent": true,
