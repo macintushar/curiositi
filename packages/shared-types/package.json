@@ -1,0 +1,12 @@
+{
+  "name": "@curiositi/types",
+  "version": "1.0.0",
+  "main": "./types.ts",
+  "types": "./types.ts",
+  "exports": {
+    ".": "./types.ts"
+  },
+  "dependencies": {
+    "typescript": "latest"
+  }
+}
