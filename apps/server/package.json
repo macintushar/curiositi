@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "bun run --hot server.ts",
     "start": "bun run server.ts",
-    "build": "echo 'Server is built-in, no build step needed'",
+    "build": "bun run server.ts",
     "lint": "eslint .",
     "typecheck": "echo 'TypeScript checking temporarily disabled'",
     "format": "prettier --write .",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
-    "@types/bun": "latest",
+    "@types/bun": "1.2.16",
     "@types/pg": "^8.15.4",
     "drizzle-kit": "^0.31.4",
     "eslint": "^9.31.0",
