@@ -2,7 +2,7 @@ import app from "./src";
 import {
   OLLAMA_BASE_URL,
   SEARXNG_URL,
-  SERVER_PORT,
+  PORT,
   DATABASE_URL,
   DEFAULT_EMBEDDING_PROVIDER,
   SENTRY_DSN,
@@ -16,10 +16,10 @@ Sentry.init({
 
 try {
   Bun.serve({
-    port: SERVER_PORT,
+    port: PORT,
     fetch: app.fetch,
   });
-  console.log("Server is running on port", SERVER_PORT);
+  console.log("Server is running on port", PORT);
   console.log(
     `Ollama URL: ${OLLAMA_BASE_URL}
     SearXNG URL: ${SEARXNG_URL}

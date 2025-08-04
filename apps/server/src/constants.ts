@@ -1,7 +1,7 @@
 import { EMBEDDING_PROVIDERS } from "./types";
 
 // Server
-export const SERVER_PORT = process.env.SERVER_PORT || 3030;
+export const PORT = process.env.PORT || 3030;
 
 // Default Providers
 export const DEFAULT_EMBEDDING_PROVIDER =
@@ -12,7 +12,7 @@ export const DEFAULT_EMBEDDING_PROVIDER =
 export const HOST =
   process.env.NODE_ENV === "production"
     ? "https://api.curiositi.macintushar.xyz"
-    : `http://localhost:${SERVER_PORT}`;
+    : `http://localhost:${PORT}`;
 
 export const UI_HOST = process.env.UI_HOST || "http://localhost:3040";
 
