@@ -4,3 +4,8 @@ chromadb_data
 
 .env
 .env.local
+
+**/node_modules
+
+# Turborepo
+.turbo
