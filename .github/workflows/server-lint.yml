@@ -4,11 +4,11 @@ on:
   push:
     branches: ["main"]
     paths:
-      - "server/**"
+      - "apps/server/**"
   pull_request:
     branches: ["main"]
     paths:
-      - "server/**"
+      - "apps/server/**"
 
 jobs:
   lint:
@@ -25,8 +25,8 @@ jobs:
 
       - name: Install dependencies
         run: bun install
-        working-directory: ./server
+        working-directory: ./apps/server
 
       - name: Run Prettier Lint
         run: bunx prettier --check . # Run prettier from the server directory context
-        working-directory: ./server
+        working-directory: ./apps/server
