@@ -14,12 +14,18 @@ import { eq } from "drizzle-orm";
 import { tryCatch } from "@/lib/try-catch";
 import { User } from "better-auth/*";
 
+export type SpaceMetadata = {
+  id: string;
+  name: string;
+  description?: string;
+};
+
 export type CuriositiAgentConfig = {
   input: string; // User's question or request
   modelName: string; // LLM model to use
   history: HistoryMessage[]; // Conversation context
   fileIds: string[]; // Specific files to analyze
-  spaceIds: string[]; // Document spaces to search
+  spaces: SpaceMetadata[]; // Document spaces with metadata
   enableWebSearch: boolean; // Whether to include web searches
   provider: LLM_PROVIDERS; // LLM provider (OpenAI, Anthropic, etc.)
 
@@ -53,7 +59,7 @@ export default async function CuriositiAgent(
     modelName,
     history = [],
     fileIds = [],
-    spaceIds = [],
+    spaces = [],
     enableWebSearch = true,
     provider = LLM_PROVIDERS.OLLAMA,
     maxDocQueries = 3,
@@ -68,7 +74,7 @@ export default async function CuriositiAgent(
     input: input.substring(0, 100) + (input.length > 100 ? "..." : ""),
     historyLength: history.length,
     fileIdsCount: fileIds.length,
-    spaceIdsCount: spaceIds.length,
+    spacesCount: spaces.length,
     enableWebSearch,
     maxDocQueries,
     maxWebQueries,
@@ -87,6 +93,13 @@ export default async function CuriositiAgent(
     console.log(`[CuriositiAgent] Step 1: Starting context analysis`);
     const step1Start = Date.now();
 
+    const spacesInfo = spaces
+      .map(
+        (space) =>
+          `- "${space.name}"${space.description ? ` (${space.description})` : ""} (ID: ${space.id})`,
+      )
+      .join("\n");
+
     const contextAnalysisPrompt = `
 Analyze this conversation and question to determine the best information gathering strategy:
 
@@ -98,7 +111,8 @@ ${history.map((msg) => `${msg.role}: ${msg.content}`).join("\n")}
 Current Question: ${input}
 
 Available Resources:
-- ${spaceIds.length} document spaces: ${spaceIds.join(", ")}
+- ${spaces.length} document spaces:
+${spacesInfo}
 - ${fileIds.length} specific files: ${fileIds.join(", ")}
 - Web search ${enableWebSearch ? "enabled" : "disabled"}
 
@@ -108,6 +122,7 @@ Determine:
 3. The complexity level of the response required
 4. Key themes from conversation history that should inform the search strategy
 5. Whether this requires comprehensive coverage or focused expertise
+6. Which spaces are most relevant based on their names and descriptions
 
 Provide your analysis focusing on information strategy and source prioritization.
 `;
@@ -147,6 +162,8 @@ Based on this strategic analysis: ${JSON.stringify(strategyAnalysis)}
 
 And the user question: "${input}"
 
+Available spaces: ${spaces.map((s) => `"${s.name}"${s.description ? ` (${s.description})` : ""}`).join(", ")}
+
 Generate optimized search queries (max ${maxDocQueries} for documents, max ${maxWebQueries} for web).
 
 Guidelines:
@@ -155,6 +172,7 @@ Guidelines:
 - Consider conversation context and user intent
 - Prioritize queries that will provide comprehensive understanding
 - Make queries specific enough to find relevant information but broad enough to capture context
+- Consider the nature of each space (name and description) when generating queries
 
 Generate queries that will give the most complete answer to the user's question.
 `;
@@ -190,13 +208,13 @@ Generate queries that will give the most complete answer to the user's question.
     const step3Start = Date.now();
 
     const totalSearches =
-      spaceIds.length * docQueries.length +
+      spaces.length * docQueries.length +
       fileIds.length +
       (enableWebSearch ? webQueries.length : 0);
     console.log(
       `[CuriositiAgent] Executing ${totalSearches} parallel searches`,
       {
-        docSpaceSearches: spaceIds.length * docQueries.length,
+        docSpaceSearches: spaces.length * docQueries.length,
         fileRetrieval: fileIds.length,
         webSearches: enableWebSearch ? webQueries.length : 0,
       },
@@ -204,16 +222,17 @@ Generate queries that will give the most complete answer to the user's question.
 
     const informationGathering = await Promise.allSettled([
       // Document space searches (parallel across spaces and queries)
-      ...spaceIds.flatMap((spaceId) =>
+      ...spaces.flatMap((space) =>
         docQueries.map(async (query) => {
           const searchStart = Date.now();
           const { data: result, error } = await tryCatch(
-            docSearchToolWithSpaceId(query, spaceId),
+            docSearchToolWithSpaceId(query, space.id),
           );
           const searchDuration = Date.now() - searchStart;
 
           console.log(`[CuriositiAgent] Doc search result`, {
-            spaceId,
+            spaceId: space.id,
+            spaceName: space.name,
             query: query.substring(0, 50) + (query.length > 50 ? "..." : ""),
             success: !error,
             duration: `${searchDuration}ms`,
@@ -222,7 +241,8 @@ Generate queries that will give the most complete answer to the user's question.
 
           return {
             type: "docSpace" as const,
-            spaceId,
+            spaceId: space.id,
+            spaceName: space.name,
             query,
             result: error ? `Error: ${error}` : result,
             success: !error,
@@ -317,7 +337,7 @@ Generate queries that will give the most complete answer to the user's question.
       .filter((r) => r?.type === "docSpace" && r.success)
       .map((r) => {
         if (r && r.type === "docSpace") {
-          return `Space ${r.spaceId} - Query: ${r.query}\n${r.result}`;
+          return `Space "${r.spaceName}" (${r.spaceId}) - Query: ${r.query}\n${r.result}`;
         }
         return "";
       })
@@ -398,6 +418,8 @@ ${allContext}
 User Question: ${input}
 
 Strategy Analysis: ${JSON.stringify(strategyAnalysis)}
+
+Available Spaces: ${spaces.map((s) => `"${s.name}"${s.description ? ` (${s.description})` : ""}`).join(", ")}
 
 Generate a comprehensive response that:
 1. Synthesizes information from all available sources
@@ -482,7 +504,7 @@ Focus on providing accurate, well-reasoned answers based on the available inform
 
     return {
       contextSources: {
-        documentSpaces: spaceIds,
+        documentSpaces: spaces.map((s) => s.id),
         specificFiles: fileIds,
         webSearches: webQueries,
       },
@@ -507,7 +529,7 @@ Focus on providing accurate, well-reasoned answers based on the available inform
         input: input.substring(0, 100) + (input.length > 100 ? "..." : ""),
         historyLength: history.length,
         fileIdsCount: fileIds.length,
-        spaceIdsCount: spaceIds.length,
+        spacesCount: spaces.length,
       },
     });
 

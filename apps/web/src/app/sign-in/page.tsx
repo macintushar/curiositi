@@ -23,9 +23,11 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import AuthLayout from "@/views/auth/auth-layout";
+import { useState } from "react";
 
 export default function SignIn() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -38,6 +40,7 @@ export default function SignIn() {
   async function onSubmit(values: z.infer<typeof signInSchema>) {
     const { email, password } = values;
     try {
+      setIsLoading(true);
       const response = await authClient.signIn.email({
         email,
         password,
@@ -53,6 +56,8 @@ export default function SignIn() {
     } catch (error) {
       console.error(error);
       toast.error("An error occurred while signing in. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
   return (
@@ -98,7 +103,12 @@ export default function SignIn() {
               />
             </div>
 
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              isLoading={isLoading}
+              loadingText="Signing in..."
+            >
               Sign In
             </Button>
           </div>
