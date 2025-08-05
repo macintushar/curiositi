@@ -209,10 +209,8 @@ export async function getOllamaModels(invalidateCache = false) {
   const { data, error } = await tryCatch(fetchModelsPromise());
 
   if (error) {
-    if (ollamaModelsCache) {
-      return ollamaModelsCache;
-    }
-    throw error;
+    console.warn("Failed to fetch Ollama models:", error.message);
+    return ollamaModelsCache || [];
   }
 
   return data;
