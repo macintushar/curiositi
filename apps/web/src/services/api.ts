@@ -15,6 +15,8 @@ export const apiFetch = async <T>(
   const cookie = await cookies();
   console.log(cookie);
 
+  console.log(cookie.getAll());
+
   const response = await fetch(`${env.SERVER_URL}${url}`, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,

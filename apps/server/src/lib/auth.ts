@@ -7,6 +7,7 @@ import {
   BETTER_AUTH_SECRET,
   BETTER_AUTH_URL,
   TRUSTED_ORIGINS,
+  COOKIE_DOMAIN,
 } from "@/constants";
 
 export const auth = betterAuth({
@@ -33,6 +34,7 @@ export const auth = betterAuth({
       sameSite: "None",
       secure: true,
       partitioned: true,
+      ...(COOKIE_DOMAIN && { domain: COOKIE_DOMAIN }),
     },
     useSecureCookies: true,
   },
