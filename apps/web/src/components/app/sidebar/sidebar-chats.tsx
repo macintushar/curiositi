@@ -127,7 +127,8 @@ function ThreadList({
             <SidebarMenuButton
               isActive={currentPath === `/app/chat/${thread.id}`}
               className="h-fit w-full data-[active=true]:font-normal"
-              variant="outline"
+              variant="default"
+              tooltip={thread.title.length > 0 ? thread.title : "Untitled"}
               asChild
             >
               <div>

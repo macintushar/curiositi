@@ -30,7 +30,7 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "curiositi",
     defaultCookieAttributes: {
-      sameSite: "none",
+      sameSite: "None",
       secure: true,
       partitioned: true,
     },

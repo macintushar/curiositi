@@ -22,10 +22,16 @@ export default function UploadFile({
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = configs?.file_types.join(",") ?? "";
+    fileInput.size = 1024 * 1024 * 5; // 5MB
 
     fileInput.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
+        if (file.size > 1024 * 1024 * 5) {
+          toast.error("File size must be less than 5MB");
+          return;
+        }
+
         const response = await handleUpload(spaceId, file);
         if (response.error) {
           toast.error(response.error.message);

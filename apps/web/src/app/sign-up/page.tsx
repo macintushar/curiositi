@@ -22,9 +22,11 @@ import Link from "next/link";
 import AuthLayout from "@/views/auth/auth-layout";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignUp() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
@@ -39,6 +41,7 @@ export default function SignUp() {
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
     const { email, password, name } = values;
     try {
+      setIsLoading(true);
       const response = await authClient.signUp.email({
         email,
         password,
@@ -54,6 +57,8 @@ export default function SignUp() {
     } catch (error) {
       console.error(error);
       toast.error("An error occurred while signing up. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   }
   return (
@@ -128,6 +133,7 @@ export default function SignUp() {
                 )}
               />
             </div>
+            {/* TODO: Add profile picture upload support */}
             {/* <div className="grid gap-2">
             <FormField
               control={form.control}
@@ -148,7 +154,12 @@ export default function SignUp() {
               )}
             />
           </div> */}
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              isLoading={isLoading}
+              loadingText="Signing up..."
+            >
               Sign Up
             </Button>
           </div>

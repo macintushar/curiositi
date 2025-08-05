@@ -1,13 +1,13 @@
 import CuriositiAgent from "@/agents/curiositi-agent";
 import db from "@/db";
-import { messages, threads } from "@/db/schema";
+import { messages, threads, spaces } from "@/db/schema";
 import { llm } from "@/lib/llms";
 import { tryCatch } from "@/lib/try-catch";
 import { formatHistory } from "@/lib/utils";
 import { LLM_PROVIDERS, ThreadMessage } from "@/types";
 import { generateObject } from "ai";
 import { User } from "better-auth/*";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import z from "zod";
 
 export async function searchHandler({
@@ -95,12 +95,38 @@ export async function searchHandler({
     console.log("Title generated: ", data?.title);
   }
 
+  // Fetch space metadata if space_ids are provided
+  let spaceMetadata: Array<{ id: string; name: string; description?: string }> =
+    [];
+  if (space_ids && space_ids.length > 0) {
+    const { data: spacesData, error: spacesError } = await tryCatch(
+      db.query.spaces.findMany({
+        where: inArray(spaces.id, space_ids),
+        columns: {
+          id: true,
+          name: true,
+          description: true,
+        },
+      }),
+    );
+
+    if (spacesError) {
+      console.error("Error fetching space metadata:", spacesError);
+    } else {
+      spaceMetadata = (spacesData || []).map((space) => ({
+        id: space.id,
+        name: space.name,
+        description: space.description || undefined,
+      }));
+    }
+  }
+
   const response = await CuriositiAgent({
     input,
     modelName: model,
     history: formattedHistory,
     fileIds: file_ids || [],
-    spaceIds: space_ids || [],
+    spaces: spaceMetadata,
     enableWebSearch: true,
     provider: provider,
 
