@@ -18,6 +18,12 @@ export const UI_HOST = process.env.UI_HOST || "http://localhost:3040";
 
 export const TRUSTED_ORIGINS = ["https://curiositi.macintushar.xyz", UI_HOST];
 
+// Cookie Domain for cross-subdomain sharing
+export const COOKIE_DOMAIN =
+  process.env.NODE_ENV === "production"
+    ? ".curiositi.macintushar.xyz"
+    : undefined;
+
 // Database
 export const DATABASE_URL =
   process.env.DATABASE_URL || "postgres://user:pass@localhost:5432/dbname";

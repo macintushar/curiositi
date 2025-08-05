@@ -1,11 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 import { env } from "./env";
+import { COOKIE_DOMAIN } from "./constants/auth";
 
 export async function middleware(request: NextRequest) {
   const sessionCookie = getSessionCookie(request, {
     cookieName: "session_token",
     cookiePrefix: "curiositi",
+    ...(COOKIE_DOMAIN && { domain: COOKIE_DOMAIN }),
   });
 
   const cookie = request.cookies;
