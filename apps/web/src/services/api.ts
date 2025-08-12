@@ -1,7 +1,5 @@
 "use server";
 
-import { env } from "@/env";
-
 import dayjs from "dayjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -13,11 +11,8 @@ export const apiFetch = async <T>(
   additionalHeaders?: Record<string, string>,
 ): Promise<T> => {
   const cookie = await cookies();
-  console.log(cookie);
 
-  console.log(cookie.getAll());
-
-  const response = await fetch(`${env.SERVER_URL}${url}`, {
+  const response = await fetch(`http://localhost:3040${url}`, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
       Cookie: cookie
@@ -32,6 +27,8 @@ export const apiFetch = async <T>(
     body: options?.body,
     ...options,
   });
+
+  console.log("res", response);
 
   if (!response.ok && response.status !== 400) {
     if (response.status === 401) {

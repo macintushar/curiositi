@@ -1,15 +1,10 @@
 import {
   ANTHROPIC_ENABLED,
-  OLLAMA_BASE_URL,
-  OLLAMA_CAPABILITIES,
-  OLLAMA_ENABLED,
   OPENAI_ENABLED,
   OPENROUTER_ENABLED,
   SUPPORTED_FILE_TYPES,
 } from "@/constants";
-import { Provider, Configs, LLM_PROVIDERS, Model } from "@/types";
-import { Ollama } from "ollama";
-import { tryCatch } from "@/lib/try-catch";
+import { Provider, Configs, LLM_PROVIDERS } from "@/types";
 
 export const models: Provider[] = [
   {
@@ -150,83 +145,9 @@ export const models: Provider[] = [
   },
 ];
 
-// Cache for Ollama models
-let ollamaModelsCache: Model[] | null = null;
-let ollamaModelsCacheTime: number = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
-
-export async function getOllamaModels(invalidateCache = false) {
-  const now = Date.now();
-
-  // Return cached result if available and not expired
-  if (
-    ollamaModelsCache &&
-    !invalidateCache &&
-    now - ollamaModelsCacheTime < CACHE_TTL
-  ) {
-    return ollamaModelsCache;
-  }
-
-  const fetchModelsPromise = async () => {
-    const ollama = new Ollama({ host: OLLAMA_BASE_URL });
-    const models = await ollama.list();
-
-    const allModels = await Promise.all(
-      models.models.map(
-        async (model) =>
-          await ollama.show({ model: model.name }).then((res) => ({
-            name: model.name,
-            capabilities: res.capabilities as string[],
-          })),
-      ),
-    );
-
-    const chatModels = allModels
-      .filter((model) =>
-        OLLAMA_CAPABILITIES.every((capability) =>
-          model.capabilities.includes(capability),
-        ),
-      )
-      .map((model) => ({
-        name: model.name,
-        model: model.name,
-        capabilities: model.capabilities,
-      }));
-
-    // Update cache
-    ollamaModelsCache = chatModels;
-    ollamaModelsCacheTime = now;
-
-    console.log("Fetching Ollama models");
-
-    return chatModels;
-  };
-
-  if (!OLLAMA_ENABLED) {
-    return [];
-  }
-
-  const { data, error } = await tryCatch(fetchModelsPromise());
-
-  if (error) {
-    console.warn("Failed to fetch Ollama models:", error.message);
-    return ollamaModelsCache || [];
-  }
-
-  return data;
-}
-
-export async function getConfigs(invalidateCache = false): Promise<Configs> {
+export async function getConfigs(): Promise<Configs> {
   return {
-    providers: [
-      {
-        name: LLM_PROVIDERS.OLLAMA,
-        title: "Ollama",
-        enabled: OLLAMA_ENABLED,
-        models: await getOllamaModels(invalidateCache),
-      },
-      ...models,
-    ],
+    providers: [...models],
     file_types: SUPPORTED_FILE_TYPES,
   };
 }

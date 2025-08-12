@@ -26,8 +26,6 @@
     "hono": "^4.8.5",
     "langchain": "^0.3.30",
     "officeparser": "^5.2.0",
-    "ollama": "^0.5.16",
-    "ollama-ai-provider": "^1.2.0",
     "pdf-parse": "^1.1.1",
     "pg": "^8.16.3",
     "zod": "^3.25.76"
