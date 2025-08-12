@@ -1,8 +1,11 @@
 {
   "name": "curiositi",
   "version": "0.1.0",
-  "private": true,
+  "devDependencies": {
+    "turbo": "^2.5.5"
+  },
   "packageManager": "bun@1.0.0",
+  "private": true,
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
@@ -14,11 +17,11 @@
     "db:migrate": "turbo db:migrate",
     "db:studio": "turbo db:studio"
   },
-  "devDependencies": {
-    "turbo": "^2.5.5"
-  },
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@better-fetch/fetch": "^1.1.18"
+  }
 }

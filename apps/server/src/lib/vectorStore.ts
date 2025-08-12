@@ -42,7 +42,6 @@ export async function getDocumentsFromVectorStore(
   return docs;
 }
 
-// Helper function to generate embeddings using Ollama
 export const generateEmbeddings = async (
   texts: string[],
 ): Promise<number[][]> => {

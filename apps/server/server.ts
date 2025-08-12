@@ -1,6 +1,5 @@
 import app from "./src";
 import {
-  OLLAMA_BASE_URL,
   SEARXNG_URL,
   PORT,
   DATABASE_URL,
@@ -21,8 +20,7 @@ try {
   });
   console.log("Server is running on port", PORT);
   console.log(
-    `Ollama URL: ${OLLAMA_BASE_URL}
-    SearXNG URL: ${SEARXNG_URL}
+    `SearXNG URL: ${SEARXNG_URL}
     Database URL: ${DATABASE_URL}
     Default Embedding Provider: ${DEFAULT_EMBEDDING_PROVIDER}`,
   );

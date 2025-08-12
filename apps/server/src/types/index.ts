@@ -2,13 +2,11 @@ export type CuriositiAgentMode = "general" | "space";
 
 export enum LLM_PROVIDERS {
   OPENROUTER = "openrouter",
-  OLLAMA = "ollama",
   OPENAI = "openai",
   ANTHROPIC = "anthropic",
 }
 
 export enum EMBEDDING_PROVIDERS {
-  OLLAMA = "ollama",
   OPENAI = "openai",
 }
 
