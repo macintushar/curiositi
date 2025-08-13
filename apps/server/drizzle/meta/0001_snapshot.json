@@ -1,5 +1,5 @@
 {
-  "id": "387b0649-bb0e-4edd-b74f-aa565b800116",
+  "id": "dbf5d1e6-ce08-4d67-855e-890e6e807c52",
   "prevId": "f41f1a65-3428-489b-8145-337caec3d9c1",
   "version": "7",
   "dialect": "postgresql",
@@ -530,12 +530,6 @@
         },
         "openrouter_api_key": {
           "name": "openrouter_api_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ollama_url": {
-          "name": "ollama_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false

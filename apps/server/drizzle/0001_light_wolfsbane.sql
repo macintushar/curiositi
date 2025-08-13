@@ -72,8 +72,7 @@ CREATE TABLE "settings" (
 	"user_id" text NOT NULL,
 	"openai_api_key" text,
 	"anthropic_api_key" text,
-	"openrouter_api_key" text,
-	"ollama_url" text
+	"openrouter_api_key" text
 );
 --> statement-breakpoint
 CREATE TABLE "spaces" (
