@@ -16,16 +16,6 @@ export async function addOrUpdateApiKey(
     const encryptedKey = encrypt(updateValue.apiKey);
 
     switch (provider) {
-      case LLM_PROVIDERS.OLLAMA:
-        await db
-          .update(settings)
-          .set({ ollamaUrl: updateValue.url })
-          .where(eq(settings.userId, userId));
-
-        updated = true;
-
-        break;
-
       case LLM_PROVIDERS.OPENAI:
         await db
           .update(settings)
