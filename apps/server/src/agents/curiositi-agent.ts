@@ -61,7 +61,7 @@ export default async function CuriositiAgent(
     fileIds = [],
     spaces = [],
     enableWebSearch = true,
-    provider = LLM_PROVIDERS.OLLAMA,
+    provider = LLM_PROVIDERS.OPENAI,
     maxDocQueries = 3,
     maxWebQueries = 2,
     prioritizeRecent = true,
