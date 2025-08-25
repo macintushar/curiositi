@@ -14,13 +14,11 @@ export const HOST =
 
 export const UI_HOST = process.env.UI_HOST || "http://localhost:3040";
 
-export const TRUSTED_ORIGINS = ["https://curiositi.macintushar.xyz", UI_HOST];
+export const TRUSTED_ORIGINS = ["https://curiositi.xyz", UI_HOST];
 
 // Cookie Domain for cross-subdomain sharing
 export const COOKIE_DOMAIN =
-  process.env.NODE_ENV === "production"
-    ? ".curiositi.macintushar.xyz"
-    : undefined;
+  process.env.NODE_ENV === "production" ? ".curiositi.xyz" : undefined;
 
 // Database
 export const DATABASE_URL =
