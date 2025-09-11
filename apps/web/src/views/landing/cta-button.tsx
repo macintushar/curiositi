@@ -24,7 +24,7 @@ export default function CTAButton() {
         {isPending ? (
           <IconLoader className="animate-spin" />
         ) : authed ? (
-          "Dashboard"
+          "Go to App"
         ) : (
           "Get Started"
         )}
