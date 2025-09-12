@@ -3,9 +3,13 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { env } from "./env";
 
 Sentry.init({
-  dsn: "https://670ec91836f695c48fe4b52d28266b4d@o4507595405721600.ingest.us.sentry.io/4509666986295296",
+  dsn: env.NEXT_PUBLIC_SENTRY_DSN as string,
+
+  // enable only if SENTRY_DSN is set
+  enabled: env.NEXT_PUBLIC_SENTRY_DSN !== undefined,
 
   // Add optional integrations for additional features
   integrations: [Sentry.replayIntegration()],
