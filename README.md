@@ -1,150 +1,179 @@
 <p align="center">
-   <img src="./apps/web/src/assets/logo.svg" alt="Curiositi Logo" width="200" style="fill: #10b981" />
+  <img src="./apps/web/src/assets/logo.svg" alt="Curiositi Logo" width="180" />
 </p>
 
-# Curiositi
+## Curiositi
 
-A modern AI-powered knowledge management platform built with Next.js, Bun, and Turborepo.
+An AI-powered knowledge workspace. Upload documents, organize them into spaces, and chat with an agent that searches your docs and the web. Built with Next.js, Bun, Hono, Drizzle ORM, and Turborepo.
 
-## 🏗️ Architecture
-
-This repository uses **Turborepo** for efficient monorepo management with the following structure:
+### Monorepo layout
 
 ```
 curiositi/
-├── apps/
-│   ├── web/          # Next.js frontend application
-│   └── server/       # Bun-based backend server
-├── packages/         # Shared libraries (future use)
-├── turbo.json        # Turborepo configuration
-└── package.json      # Root workspace configuration
+├─ apps/
+│  ├─ web/            # Next.js 15 app router UI
+│  └─ server/         # Bun + Hono API server
+├─ packages/
+│  └─ shared-types/   # Shared TS types
+├─ docs/              # Docs & assets
+└─ turbo.json         # Turborepo config
 ```
 
-## 🚀 Quick Start
+### Features
+
+- Auth via better-auth with secure cross-subdomain cookies
+- Spaces: create/delete spaces to group files
+- File upload: PDF, Office, text; server extracts text and chunks it
+- Vector search: OpenAI embeddings stored in Postgres `vector` via Drizzle
+- Chat: agent composes answers using doc retrieval and web search
+- Config API exposes enabled model providers and supported file types
+- Sentry optional instrumentation
+
+---
+
+## Getting started
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) (recommended) or Node.js 18+
-- [Turborepo](https://turbo.build/) (installed automatically)
+- Bun 1.x (recommended)
+- PostgreSQL 16+ with `pgvector` extension
 
-### Development
-
-1. **Install dependencies:**
-
-   ```bash
-   bun install
-   ```
-
-2. **Start development servers:**
-
-   ```bash
-   bun run dev
-   ```
-
-   This starts both the web app (port 3040) and server concurrently.
-
-3. **Run specific tasks:**
-
-   ```bash
-   # Build all applications
-   bun run build
-
-   # Type checking
-   bun run typecheck
-
-   # Linting
-   bun run lint
-
-   # Formatting
-   bun run format
-
-   # Database operations
-   bun run db:generate
-   bun run db:migrate
-   bun run db:studio
-   ```
-
-## 📦 Available Scripts
-
-### Root Level (Turborepo)
-
-- `bun run build` - Build all applications
-- `bun run dev` - Start development servers
-- `bun run lint` - Lint all packages
-- `bun run typecheck` - Type check all packages
-- `bun run format` - Format all code
-- `bun run db:*` - Database operations
-
-### Web App (`apps/web`)
-
-- `bun run dev` - Start Next.js development server
-- `bun run build` - Build for production
-- `bun run start` - Start production server
-- `bun run lint` - Run ESLint
-- `bun run typecheck` - Run TypeScript compiler
-
-### Server (`apps/server`)
-
-- `bun run dev` - Start Bun development server with hot reload
-- `bun run start` - Start production server
-- `bun run db:generate` - Generate database migrations
-- `bun run db:migrate` - Run database migrations
-- `bun run db:studio` - Open Drizzle Studio
-
-## 🔧 Turborepo Features
-
-### Caching
-
-Turborepo automatically caches build outputs, making subsequent builds much faster. The cache is stored in `.turbo/`.
-
-### Parallel Execution
-
-Tasks run in parallel across all packages, significantly reducing build times.
-
-### Dependency Graph
-
-Turborepo understands the dependency graph between packages and runs tasks in the correct order.
-
-## 🏛️ Project Structure
-
-```
-curiositi/
-├── apps/
-│   ├── web/                 # Next.js frontend
-│   │   ├── src/
-│   │   ├── public/
-│   │   └── package.json
-│   └── server/              # Bun backend
-│       ├── src/
-│       ├── drizzle/
-│       └── package.json
-├── packages/                # Shared libraries (future)
-├── docs/                   # Documentation
-├── docker-compose.yml      # Docker services
-├── turbo.json             # Turborepo configuration
-└── package.json           # Root workspace
-```
-
-## 🐳 Docker
-
-The project includes Docker Compose for local development:
+### Install
 
 ```bash
-docker-compose up -d
+bun install
 ```
 
-This starts PostgreSQL and other required services.
+### Environment
 
-## 📚 Documentation
+Set these variables (dev defaults shown where present). The server refuses to start without `BETTER_AUTH_SECRET`.
 
-- [Getting Started Guide](docs/getting-started.md)
-- [Contributing Guidelines](docs/CONTRIBUTING.md)
-- [Roadmap](docs/ROADMAP.md)
+- Server (`apps/server`)
 
-## 🤝 Contributing
+  - `PORT` (default 3030)
+  - `DATABASE_URL` (postgres connection string)
+  - `BETTER_AUTH_SECRET` (required)
+  - `UI_HOST` (default http://localhost:3040)
+  - `SEARXNG_URL` (default http://localhost:8095)
+  - `OPENROUTER_API_KEY` (optional)
+  - `OPENAI_API_KEY` (optional; used for LLM and embeddings)
+  - `OPENAI_EMBEDDING_MODEL` (default text-embedding-3-small)
+  - `ANTHROPIC_API_KEY` (optional)
+  - `SENTRY_DSN` (optional)
 
-Please read our [Contributing Guidelines](docs/CONTRIBUTING.md) before submitting pull requests.
+- Web (`apps/web`)
+  - `SERVER_URL` (e.g. http://localhost:3030)
+  - `BASE_URL` (e.g. http://localhost:3040)
+  - `NEXT_PUBLIC_SERVER_URL` (same as above, exposed)
+  - `NEXT_PUBLIC_BASE_URL` (same as above, exposed)
+  - `SENTRY_AUTH_TOKEN` (optional)
+  - `SENTRY_DSN` (optional)
 
-## 📄 License
+### Database
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+Enable pgvector and run migrations:
+
+```bash
+# From repo root
+bun run db:migrate
+```
+
+`apps/server/drizzle/0000_good_secret_warriors.sql` ensures `vector` extension exists.
+
+### Develop
+
+Run both apps via turborepo:
+
+```bash
+bun run dev
+```
+
+Or individually:
+
+```bash
+# API server
+cd apps/server
+bun run dev
+
+# Web app
+cd apps/web
+bun run dev
+```
+
+The web app rewrites `/api/v1/*` to `SERVER_URL` (see `apps/web/next.config.js`).
+
+### Build & start
+
+```bash
+# All packages
+bun run build
+bun run start
+```
+
+---
+
+## API overview (Hono, base `/api/v1`)
+
+All routes require auth cookies issued by better-auth (`/api/auth/*` handled by server). Common 401 on missing session.
+
+- `POST /search`
+
+  - body: `{ input, model, provider, thread_id, space_ids?, file_ids? }`
+  - returns: assistant `ThreadMessage`; creates title if needed and stores messages
+
+- `GET /threads`
+- `POST /threads` (create)
+- `DELETE /threads/:id`
+- `GET /threads/:id/messages`
+
+- `GET /spaces`
+- `POST /spaces` (name, icon?, description?)
+- `GET /spaces/:id`
+- `DELETE /spaces/:id`
+
+- `GET /files/all` (current user)
+- `GET /files/:space_id`
+- `POST /files/:space_id/:id` (download)
+- `DELETE /files/:space_id/:id`
+- `POST /files/upload` (multipart: file, space_id)
+
+- `POST /configs` → providers and supported file types
+
+- `GET /user/settings` → stored API keys
+- `POST /user/settings` → upsert provider key `{ provider, api_key?, url? }`
+- `GET /user/keys`, `POST /user/keys` → same as settings (legacy)
+
+---
+
+## Docker compose
+
+This repo ships a compose stack for dev:
+
+```bash
+docker compose up -d
+```
+
+Services:
+
+- `server` (Bun API) on 3030
+- `web-ui` (Next.js) on 3040
+- `postgres` with persistent volume and healthcheck
+- `searxng` meta-search (optional web search) on 8095
+
+The server runs `bun run db:migrate` on start. Mounts hot-reload volumes for development.
+
+---
+
+## Scripts
+
+Root (turbo): `build`, `dev`, `lint`, `typecheck`, `format`, `db:generate`, `db:migrate`, `db:studio`
+
+Server: `dev`, `start`, `db:generate`, `db:migrate`, `db:studio`
+
+Web: `dev`, `build`, `start`, `lint`, `typecheck`, `preview`
+
+---
+
+## License
+
+MIT. See `LICENSE.md`.
