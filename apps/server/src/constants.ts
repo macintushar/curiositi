@@ -9,7 +9,7 @@ export const DEFAULT_EMBEDDING_PROVIDER = EMBEDDING_PROVIDERS.OPENAI;
 // Host
 export const HOST =
   process.env.NODE_ENV === "production"
-    ? "https://api.curiositi.macintushar.xyz"
+    ? "https://api.curiositi.xyz"
     : `http://localhost:${PORT}`;
 
 export const UI_HOST = process.env.UI_HOST || "http://localhost:3040";
