@@ -4,7 +4,7 @@ import type { NavLink } from "@/types";
 export const webMetaData = {
   siteName: "Curiositi",
   description: "Curiositi is an AI-powered search engine for your data.",
-  url: env.BASE_URL,
+  url: env.NEXT_PUBLIC_BASE_URL,
 };
 
 export const ghURL = "https://github.com/macintushar/curiositi";

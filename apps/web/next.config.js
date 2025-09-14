@@ -17,7 +17,7 @@ const config = withSentryConfig(
       return [
         {
           source: "/api/v1/:path*",
-          destination: `${env.SERVER_URL}/api/v1/:path*`,
+          destination: `${env.NEXT_PUBLIC_SERVER_URL}/api/v1/:path*`,
         },
       ];
     },
