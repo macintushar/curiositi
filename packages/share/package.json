@@ -1,10 +1,10 @@
 {
-  "name": "@curiositi/types",
+  "name": "@curiositi/share",
   "version": "1.0.0",
   "main": "./types.ts",
   "types": "./types.ts",
   "exports": {
-    ".": "./types.ts"
+    "types": "./types.ts"
   },
   "dependencies": {
     "typescript": "latest"
