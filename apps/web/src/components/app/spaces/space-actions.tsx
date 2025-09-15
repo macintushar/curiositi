@@ -11,11 +11,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { deleteSpace } from "@/actions/space";
+import { useDeleteSpace } from "@/hooks/use-spaces";
 import { useRouter } from "next/navigation";
 
 export default function SpaceActions({ space }: { space: Space | null }) {
   const router = useRouter();
+  const deleteSpaceMutation = useDeleteSpace();
+
   if (!space) return null;
 
   return (
@@ -51,19 +53,21 @@ export default function SpaceActions({ space }: { space: Space | null }) {
         <DropdownMenuItem
           variant="destructive"
           className="cursor-pointer"
-          onClick={async () => {
-            const { data, error } = await deleteSpace(space.id);
-
-            if (error || data?.error) {
-              toast.error(data?.error ?? "Error deleting space");
-            }
-            if (data?.data?.message) {
-              toast.success(data.data.message);
-              router.push("/app/spaces");
-            }
+          onClick={() => {
+            deleteSpaceMutation.mutate(space.id, {
+              onSuccess: () => {
+                toast.success("Space deleted successfully");
+                router.push("/app/spaces");
+              },
+              onError: (error) => {
+                toast.error(error.message ?? "Error deleting space");
+              },
+            });
           }}
+          disabled={deleteSpaceMutation.isPending}
         >
-          <IconTrash /> Delete
+          <IconTrash />{" "}
+          {deleteSpaceMutation.isPending ? "Deleting..." : "Delete"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

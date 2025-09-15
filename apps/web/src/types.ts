@@ -110,3 +110,5 @@ export type AllFiles = File & {
 };
 
 export type SettingsTab = "profile" | "models" | "integrations";
+
+export type Theme = "dark" | "light" | "system";

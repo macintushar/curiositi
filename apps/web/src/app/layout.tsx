@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/lib/query-client";
 
 import { webMetaData } from "@/constants/landing-constants";
 import "@/styles/globals.css";
@@ -53,15 +54,17 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster richColors />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster richColors />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

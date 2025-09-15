@@ -7,6 +7,7 @@ import type {
 } from "@/types";
 import { apiFetch } from "./api";
 import { tryCatch } from "@/lib/utils";
+import { clientApiFetch } from "./client-fetch";
 
 export const getSpaces = async () => {
   const { data, error } = await tryCatch(
@@ -82,7 +83,7 @@ export const getFilesInSpace = async (id: string) => {
 
 export const getFile = async (spaceId: string, fileId: string) => {
   const { data, error } = await tryCatch(
-    apiFetch<File>(
+    clientApiFetch<File>(
       `/api/v1/files/${spaceId}/${fileId}`,
       {
         method: "POST",

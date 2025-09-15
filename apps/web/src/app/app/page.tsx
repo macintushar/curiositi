@@ -1,17 +1,29 @@
-import { use } from "react";
+"use client";
 
 import ChatInput from "@/components/app/chat/chat-input";
 import LogoLines from "@/components/app/logo-lines";
 
-import { getConfigs } from "@/services/configs";
-import { getUsersFiles } from "@/services/files";
-import { getSpaces } from "@/services/spaces";
+import { useConfigs } from "@/hooks/use-configs";
+import { useUserFiles } from "@/hooks/use-files";
+import { useSpaces } from "@/hooks/use-spaces";
 import GlobalError from "../global-error";
 
 export default function AppPage() {
-  const { data: files, error: filesError } = use(getUsersFiles());
-  const { data: spaces, error: spacesError } = use(getSpaces());
-  const { data: configs, error: configsError } = use(getConfigs());
+  const {
+    data: files,
+    error: filesError,
+    isLoading: filesLoading,
+  } = useUserFiles();
+  const {
+    data: spaces,
+    error: spacesError,
+    isLoading: spacesLoading,
+  } = useSpaces();
+  const {
+    data: configs,
+    error: configsError,
+    isLoading: configsLoading,
+  } = useConfigs();
 
   if (filesError || spacesError || configsError) {
     return (
@@ -26,6 +38,8 @@ export default function AppPage() {
       />
     );
   }
+
+  const isLoading = filesLoading || spacesLoading || configsLoading;
 
   return (
     <div className="h-full max-h-full w-full overflow-auto">
@@ -50,6 +64,7 @@ export default function AppPage() {
           files={files?.data ?? null}
           spaces={spaces?.data?.map((space) => space.space) ?? null}
           configs={configs?.data ?? null}
+          isLoading={isLoading}
         />
       </div>
     </div>

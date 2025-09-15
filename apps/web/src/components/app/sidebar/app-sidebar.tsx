@@ -28,9 +28,10 @@ import type { Thread } from "@/types";
 
 type AppSidebarProps = {
   threads: Thread[] | null;
+  isLoading?: boolean;
 };
 
-export default function AppSidebar({ threads }: AppSidebarProps) {
+export default function AppSidebar({ threads, isLoading }: AppSidebarProps) {
   const { state } = useSidebar();
   const path = usePathname();
 
@@ -75,7 +76,11 @@ export default function AppSidebar({ threads }: AppSidebarProps) {
               )}
             >
               <SidebarGroupLabel>Your Chats</SidebarGroupLabel>
-              <SidebarChats threads={threads} currentPath={path} />
+              <SidebarChats
+                threads={threads}
+                currentPath={path}
+                isLoading={isLoading}
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

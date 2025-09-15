@@ -22,10 +22,21 @@ import useChatStore from "@/stores/useChatStore";
 
 type MessageInputProps = {
   onSubmit?: () => void;
+  isLoading?: boolean;
 };
 
-export default function MessageInput({ onSubmit }: MessageInputProps) {
-  const { prompt, isLoading, context, setContext, setPrompt } = useChatStore();
+export default function MessageInput({
+  onSubmit,
+  isLoading: externalLoading,
+}: MessageInputProps) {
+  const {
+    prompt,
+    isLoading: storeLoading,
+    context,
+    setContext,
+    setPrompt,
+  } = useChatStore();
+  const isLoading = externalLoading ?? storeLoading;
 
   return (
     <div className="bg-primary-foreground mx-auto flex h-fit w-full max-w-3xl flex-col gap-2 rounded-3xl p-1 pt-2">

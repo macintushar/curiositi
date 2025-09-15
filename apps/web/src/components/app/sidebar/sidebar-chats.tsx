@@ -13,13 +13,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import { deleteThreadAction } from "@/actions/thread";
+import { useDeleteThread } from "@/hooks/use-threads";
 import { toast } from "sonner";
 import Link from "next/link";
 
 type SidebarChatsProps = {
   threads: Thread[] | null;
   currentPath: string;
+  isLoading?: boolean;
 };
 
 type GroupedThreads = {
@@ -56,6 +57,8 @@ function ThreadActions({
   nav: (path: string) => void;
   isActive: boolean;
 }) {
+  const deleteThreadMutation = useDeleteThread();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -79,29 +82,20 @@ function ThreadActions({
           variant="destructive"
           onClick={async (e) => {
             e.stopPropagation();
-            toast.loading("Deleting thread...");
-            const res = await deleteThreadAction(thread.id);
-            toast.dismiss();
-            if (res.error) {
-              toast.error(res.error.message);
-            }
-            if (res.data) {
-              if (res.data.error) {
-                toast.error(res.data.error);
-              }
-              if (res.data.data.message) {
-                toast.success(res.data.data.message);
+            deleteThreadMutation.mutate(thread.id, {
+              onSuccess: () => {
+                toast.success("Thread deleted successfully");
                 nav("/app");
-              } else {
-                toast.error("Failed to delete thread");
-              }
-            } else {
-              toast.error("Failed to delete thread");
-            }
+              },
+              onError: (error) => {
+                toast.error(error.message || "Failed to delete thread");
+              },
+            });
           }}
+          disabled={deleteThreadMutation.isPending}
         >
           <IconTrash className="size-4" />
-          Delete
+          {deleteThreadMutation.isPending ? "Deleting..." : "Delete"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -169,9 +163,22 @@ function ThreadGroup({
 export default function SidebarChats({
   threads,
   currentPath,
+  isLoading,
 }: SidebarChatsProps) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="text-muted-foreground text-sm">Loading threads...</div>
+      </div>
+    );
+  }
+
   if (!threads || threads.length === 0) {
-    return null;
+    return (
+      <div className="flex items-center justify-center p-4">
+        <div className="text-muted-foreground text-sm">No threads yet</div>
+      </div>
+    );
   }
 
   const sortedThreads = threads.sort((a, b) => {

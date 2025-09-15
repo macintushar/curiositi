@@ -16,8 +16,8 @@ const config = withSentryConfig(
     async rewrites() {
       return [
         {
-          source: "/api/v1/:path*",
-          destination: `${env.NEXT_PUBLIC_SERVER_URL}/api/v1/:path*`,
+          source: "/server/:path*",
+          destination: `${env.NEXT_PUBLIC_SERVER_URL}/:path*`,
         },
       ];
     },

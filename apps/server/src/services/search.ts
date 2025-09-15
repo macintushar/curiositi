@@ -60,8 +60,9 @@ export async function searchHandler({
     console.log("Generating title");
 
     const generateTitle = async () => {
+      const titleLLM = llm("gpt-4.1-mini", LLM_PROVIDERS.OPENAI);
       const { object } = await generateObject({
-        model: llm(model, provider),
+        model: titleLLM,
         schema: z.object({
           title: z
             .string()
