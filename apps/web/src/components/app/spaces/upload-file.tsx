@@ -4,8 +4,9 @@ import Image from "next/image";
 
 import emptySpace from "@/assets/images/add-files.svg";
 import { toast } from "sonner";
-import { handleUpload } from "@/actions/file";
 import useChatStore from "@/stores/useChatStore";
+import { useUploadFile } from "@/hooks/use-spaces";
+import { PulseLoader } from "@/components/ui/loader";
 
 type UploadFileProps = {
   areFilesInSpace: boolean;
@@ -17,9 +18,11 @@ export default function UploadFile({
   spaceId,
 }: UploadFileProps) {
   const { configs } = useChatStore();
+  const { mutate: uploadFile, isPending, data, error } = useUploadFile();
 
   const handleClick = async () => {
     const fileInput = document.createElement("input");
+    fileInput.disabled = isPending;
     fileInput.type = "file";
     fileInput.accept = configs?.file_types.join(",") ?? "";
     fileInput.size = 1024 * 1024 * 5; // 5MB
@@ -32,16 +35,18 @@ export default function UploadFile({
           return;
         }
 
-        const response = await handleUpload(spaceId, file);
-        if (response.error) {
-          toast.error(response.error.message);
+        uploadFile({ spaceId, file });
+
+        if (error) {
+          toast.error(error.message);
         }
-        if (response.data) {
-          if (response.data.data && response.data.data.message) {
-            toast.success(response.data.data.message);
+
+        if (data) {
+          if (data.data && data.data.message) {
+            toast.success(data.data.message);
           }
-          if (response.data.error) {
-            toast.error(response.data.error);
+          if (data.error) {
+            toast.error(data.error);
           }
         }
       }
@@ -54,7 +59,9 @@ export default function UploadFile({
       onClick={handleClick}
       className={`border-sidebar-border bg-primary-foreground hover:bg-muted w-full rounded-[12px] border-[1px] border-dashed p-5 hover:cursor-pointer ${areFilesInSpace ? "h-fit" : "h-full"}`}
     >
-      {areFilesInSpace ? (
+      {isPending ? (
+        <PulseLoader />
+      ) : areFilesInSpace ? (
         <div className="flex h-full items-center justify-center gap-2">
           <IconFilePlus className="text-muted-foreground h-5 w-5" />
           <p className="text-muted-foreground">Add documents</p>

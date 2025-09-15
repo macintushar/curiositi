@@ -3,6 +3,7 @@ import {
   IconBrandOpenai,
   IconSparkles,
   IconBrain,
+  IconCoinOff,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
@@ -65,6 +66,21 @@ function ModelCapability({ capability }: { capability: string }) {
           <TooltipContent>Supports reasoning capabilities</TooltipContent>
         </Tooltip>
       );
+    case "free":
+      return (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger>
+            <TablerIcon
+              Icon={IconCoinOff}
+              className="size-5 rounded-md bg-green-800 p-0.5 text-white"
+            />
+          </TooltipTrigger>
+          <TooltipContent>
+            This model uses free inference provided by the provider. Performance
+            may be limited.
+          </TooltipContent>
+        </Tooltip>
+      );
 
     default:
       return <></>;
@@ -114,7 +130,7 @@ export default function ModelSelector() {
           />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="max-h-80 max-w-sm">
+      <DropdownMenuContent align="start" className="max-h-80 w-xs max-w-sm">
         {configs?.providers.map((provider, idx) => (
           <div key={idx}>
             <DropdownMenuLabel

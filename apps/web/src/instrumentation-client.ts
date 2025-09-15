@@ -6,7 +6,7 @@ import * as Sentry from "@sentry/nextjs";
 import { env } from "./env";
 
 Sentry.init({
-  dsn: env.NEXT_PUBLIC_SENTRY_DSN as string,
+  dsn: env.NEXT_PUBLIC_SENTRY_DSN!,
 
   // enable only if SENTRY_DSN is set
   enabled: env.NEXT_PUBLIC_SENTRY_DSN !== undefined,

@@ -3,6 +3,7 @@
 import dayjs from "dayjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { env } from "../env.js";
 
 export const apiFetch = async <T>(
   url: string,
@@ -12,7 +13,7 @@ export const apiFetch = async <T>(
 ): Promise<T> => {
   const cookie = await cookies();
 
-  const response = await fetch(`http://localhost:3040${url}`, {
+  const response = await fetch(env.NEXT_PUBLIC_BASE_URL + "/server" + url, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
       Cookie: cookie

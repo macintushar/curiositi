@@ -37,6 +37,7 @@ export default function CreateSpaceDialog({
   values,
   trigger,
   ctaText,
+  isLoading,
 }: {
   handleSubmit: (values: z.infer<typeof createSpaceSchema>) => Promise<{
     success: boolean;
@@ -47,6 +48,7 @@ export default function CreateSpaceDialog({
   values: z.infer<typeof createSpaceSchema>;
   trigger: React.ReactNode;
   ctaText: string;
+  isLoading?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -135,11 +137,17 @@ export default function CreateSpaceDialog({
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" onClick={() => form.reset()}>
+                <Button
+                  variant="outline"
+                  onClick={() => form.reset()}
+                  disabled={isLoading}
+                >
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit">{ctaText}</Button>
+              <Button type="submit" disabled={isLoading}>
+                {ctaText}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

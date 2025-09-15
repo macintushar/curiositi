@@ -7,13 +7,12 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, getFileType } from "@/lib/utils";
 
 import useChatStore from "@/stores/useChatStore";
 import type { AllFiles, Space } from "@/types";
 
 import {
-  IconFile,
   IconFileText,
   IconFolder,
   IconPlus,
@@ -110,7 +109,7 @@ function ContextTabList({
               label={item.name}
               roundedTop={idx === 0}
               roundedBottom={idx === fileItems.length - 1}
-              Icon={IconFile}
+              Icon={getFileType(item.type).icon}
               isSelected={context.some(
                 (c) => c.id === item.id && c.type === "file",
               )}
