@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "bun run --hot server.ts",
     "start": "bun run server.ts",
-    "build": "bun run server.ts",
+    "build": "",
     "lint": "eslint .",
     "typecheck": "echo 'TypeScript checking temporarily disabled'",
     "format": "prettier --write .",
