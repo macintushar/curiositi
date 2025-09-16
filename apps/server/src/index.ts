@@ -182,7 +182,7 @@ app.get("/", async (c) => {
 app.get("/health", (c) => {
   return c.json({
     status: "ok",
-    origins: TRUSTED_ORIGINS,
+    message: "Curiositi API Server is running",
   });
 });
 
