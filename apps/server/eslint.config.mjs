@@ -6,6 +6,9 @@ import eslintConfigPrettier from "eslint-config-prettier/flat";
 
 export default defineConfig([
   {
+    ignores: ["eslint.config.mjs"],
+  },
+  {
     files: ["**/*.{js,mjs,cjs,ts}"],
     plugins: { js },
     extends: ["js/recommended"],
@@ -14,6 +17,16 @@ export default defineConfig([
     files: ["**/*.{js,mjs,cjs,ts}"],
     languageOptions: { globals: globals.node },
   },
-  tseslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["eslint.config.mjs"],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
   eslintConfigPrettier,
 ]);
