@@ -15,7 +15,7 @@ import {
 export const metadata: Metadata = {
   title: webMetaData.siteName,
   description: webMetaData.description,
-  icons: [{ rel: "icon", url: "/favicon.svg" }],
+  icons: [{ rel: "icon", url: "/favicon.ico" }],
   openGraph: {
     title: webMetaData.siteName,
     description: webMetaData.description,

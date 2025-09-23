@@ -13,7 +13,7 @@ export const apiFetch = async <T>(
 ): Promise<T> => {
   const cookie = await cookies();
 
-  const response = await fetch(env.NEXT_PUBLIC_BASE_URL + "/server" + url, {
+  const response = await fetch(env.NEXT_PUBLIC_SERVER_URL + url, {
     headers: {
       "X-User-Timezone": `${dayjs().format("YYYY-MM-DD HH:mm:ss Z")} ${Intl.DateTimeFormat().resolvedOptions().timeZone}`,
       Cookie: cookie

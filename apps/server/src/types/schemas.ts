@@ -1,6 +1,5 @@
-import { LLM_PROVIDERS } from "@/types";
+import { LLM_PROVIDERS, CuriositiAgentMode } from "@curiositi/share/types";
 import { z } from "zod";
-import { CuriositiAgentMode } from ".";
 
 export const ProviderSchema = z.nativeEnum(LLM_PROVIDERS);
 
