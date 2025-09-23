@@ -1,6 +1,10 @@
 import { generateObject, type Message as AIMessage } from "ai";
 import { llm } from "@/lib/llms";
-import { LLM_PROVIDERS, Message as HistoryMessage } from "@/types";
+import {
+  LLM_PROVIDERS,
+  Message as HistoryMessage,
+  CuriositiAgentResponse,
+} from "@curiositi/share/types";
 import {
   QUERY_JSON_SCHEMA,
   STRATEGY_ANALYSIS_SCHEMA,
@@ -36,18 +40,6 @@ export type CuriositiAgentConfig = {
 
   user: User;
   userTime: string;
-};
-
-export type CuriositiAgentResponse = {
-  contextSources: {
-    documentSpaces: string[]; // Spaces searched
-    specificFiles: string[]; // Files analyzed
-    webSearches: string[]; // Web queries executed
-  };
-  reasoning: string; // Explanation of approach
-  answer: string; // Main response
-  followUpSuggestions: string[]; // Related questions
-  strategy: "comprehensive" | "focused" | "hybrid" | "error"; // Strategy used
 };
 
 export default async function CuriositiAgent(

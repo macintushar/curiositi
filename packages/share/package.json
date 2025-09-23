@@ -4,7 +4,8 @@
   "main": "./types.ts",
   "types": "./types.ts",
   "exports": {
-    "types": "./types.ts"
+    ".": "./types.ts",
+    "./types": "./types.ts"
   },
   "dependencies": {
     "typescript": "latest"
