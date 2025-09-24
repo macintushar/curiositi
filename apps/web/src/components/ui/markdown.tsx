@@ -48,7 +48,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
       !props.node?.position?.start.line ||
       props.node?.position?.start.line === props.node?.position?.end.line;
 
-    const { theme } = useTheme();
+    const { resolvedTheme } = useTheme();
 
     if (isInline) {
       return (
@@ -74,11 +74,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
       >
         <CodeBlockCode
           code={children as string}
-          theme={
-            theme === "dark" || theme === "system"
-              ? "vitesse-dark"
-              : "vitesse-light"
-          }
+          theme={resolvedTheme === "dark" ? "vitesse-dark" : "vitesse-light"}
           language={language}
         />
       </CodeBlock>
