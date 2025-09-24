@@ -3,6 +3,7 @@
 import type { z } from "zod";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { authClient } from "@/lib/auth-client";
@@ -16,9 +17,11 @@ export default function ChangePassword() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  if (!token || token === null || token === undefined) {
-    router.push("/reset-password");
-  }
+  useEffect(() => {
+    if (!token || token === null || token === undefined) {
+      router.push("/reset-password");
+    }
+  }, [token, router]);
 
   async function onSubmit(values: z.infer<typeof changePasswordSchema>) {
     if (!token || token === null || token === undefined) {
