@@ -50,7 +50,7 @@ export default function ChangePassword() {
   }
 
   return (
-    <AuthLayout description="Enter your current password and set a new one">
+    <AuthLayout description="Set a new password">
       <div className="grid gap-6">
         <PasswordChangeForm onSubmit={onSubmit} split />
         <div className="text-center text-sm">

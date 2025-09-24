@@ -82,6 +82,22 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
       : "There was an error generating the response from the LLM. Please try again.";
   const errorDescription = message.reasoning;
 
+  const model =
+    configs?.providers
+      .find((p) => p.name === (message.provider as LLM_PROVIDERS))
+      ?.models.find((m) => m.model === message.model)?.name ??
+    message.model ??
+    "unknown model";
+
+  const provider =
+    configs?.providers.find(
+      (p) => p.name === (message.provider as LLM_PROVIDERS),
+    )?.title ??
+    message.provider ??
+    "unknown provider";
+
+  const generatedTooltipText = `Generated with ${model} by ${provider}`;
+
   return (
     <Tabs defaultValue="answer" className="w-full">
       <TabsList>
@@ -163,14 +179,7 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
           </MessageAction>
           <MessageActions>
             {message.model && (
-              <MessageAction
-                tooltip={`Generated with ${configs?.providers.find((p) => p.name === (message.provider as LLM_PROVIDERS))?.models.find((m) => m.model === message.model)?.name} by ${
-                  configs?.providers.find(
-                    (p) => p.name === (message.provider as LLM_PROVIDERS),
-                  )?.title
-                }`}
-                delayDuration={100}
-              >
+              <MessageAction tooltip={generatedTooltipText} delayDuration={100}>
                 <Button variant="ghost" className="rounded-md">
                   <IconSparkles className="size-5" />
                 </Button>

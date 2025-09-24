@@ -42,9 +42,14 @@ export default function ForgotPassword() {
         redirectTo: `${env.NEXT_PUBLIC_BASE_URL}/reset-password/change-password`,
       });
       if (error) {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(
+          "An error occurred while resetting your password. Please try again.",
+        );
       } else {
-        toast.success("Password reset email sent");
+        toast.success(
+          "If an account exists for that email, a reset link has been sent.",
+        );
       }
     } catch (error) {
       console.error(error);
