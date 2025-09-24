@@ -1,0 +1,59 @@
+import { Resend } from "resend";
+import { User } from "better-auth/*";
+
+import { RESEND_API_KEY, UI_HOST } from "@/constants";
+import PasswordReset from "@/templates/password-reset";
+import VerifyAccount from "@/templates/verify-account";
+
+const resend = new Resend(RESEND_API_KEY as string);
+
+export async function sendEmail(to: string, subject: string, body: string) {
+  const { data, error } = await resend.emails.send({
+    from: "Curiositi <noreply@mailer.curiositi.xyz>",
+    to,
+    subject,
+    html: body,
+  });
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+export async function sendVerificationEmail({
+  user,
+  url,
+}: {
+  user: User;
+  url: string;
+  token: string;
+}) {
+  await sendEmail(
+    user.email,
+    "Verify your Email | Curiositi",
+    VerifyAccount({
+      url,
+      name: user.name,
+      baseUrl: UI_HOST,
+    }),
+  );
+}
+
+export async function sendResetPasswordEmail({
+  user,
+  url,
+}: {
+  user: User;
+  url: string;
+  token: string;
+}) {
+  await sendEmail(
+    user.email,
+    "Reset your Password | Curiositi",
+    PasswordReset({
+      url,
+      name: user.name,
+      baseUrl: UI_HOST,
+    }),
+  );
+}

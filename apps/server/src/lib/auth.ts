@@ -8,7 +8,9 @@ import {
   BETTER_AUTH_URL,
   TRUSTED_ORIGINS,
   COOKIE_DOMAIN,
+  ENABLE_EMAIL_VERIFICATION,
 } from "@/constants";
+import { sendResetPasswordEmail, sendVerificationEmail } from "./email";
 
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
@@ -24,8 +26,22 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: false,
+    requireEmailVerification: ENABLE_EMAIL_VERIFICATION,
+    sendResetPassword: async ({ user, url, token }) => {
+      await sendResetPasswordEmail({ user, url, token }).catch((error) => {
+        console.error(error);
+      });
+    },
   },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url, token }) => {
+      await sendVerificationEmail({ user, url, token }).catch((error) => {
+        console.error(error);
+      });
+    },
+    sendOnSignUp: true,
+  },
+
   trustedOrigins: TRUSTED_ORIGINS,
   appName: "Curiositi",
   advanced: {

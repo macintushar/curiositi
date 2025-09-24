@@ -23,6 +23,7 @@ import AuthLayout from "@/views/auth/auth-layout";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { env } from "@/env";
 
 export default function SignUp() {
   const router = useRouter();
@@ -46,11 +47,29 @@ export default function SignUp() {
         email,
         password,
         name,
+        callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/app`,
       });
 
       if (response.data?.user) {
         toast.success("Signed up successfully");
         router.push("/app");
+      } else if (response.error?.code === "EMAIL_NOT_VERIFIED") {
+        toast.error("Email not verified. Please verify your email.", {
+          action: {
+            label: "Verify email",
+            onClick: () => {
+              const response = authClient.sendVerificationEmail({
+                email,
+                callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/app`,
+              });
+              toast.promise(response, {
+                loading: "Sending verification email",
+                success: "Verification email sent",
+                error: "Failed to send verification email",
+              });
+            },
+          },
+        });
       } else {
         toast.error(response.error?.message ?? "Failed to sign up");
       }
@@ -110,6 +129,7 @@ export default function SignUp() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
+
                     <FormControl>
                       <HiddenInput {...field} />
                     </FormControl>

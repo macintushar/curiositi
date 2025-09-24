@@ -18,7 +18,9 @@ export const TRUSTED_ORIGINS = ["https://curiositi.xyz", UI_HOST];
 
 // Cookie Domain for cross-subdomain sharing
 export const COOKIE_DOMAIN =
-  process.env.NODE_ENV === "production" ? ".curiositi.xyz" : undefined;
+  process.env.NODE_ENV === "production"
+    ? process.env.COOKIE_DOMAIN || ".curiositi.xyz"
+    : undefined;
 
 // Database
 export const DATABASE_URL =
@@ -33,6 +35,17 @@ if (!process.env.BETTER_AUTH_SECRET) {
 
 export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
 export const BETTER_AUTH_URL = HOST;
+export const ENABLE_EMAIL_VERIFICATION =
+  process.env.ENABLE_EMAIL_VERIFICATION === "true" || false;
+export const ENABLE_SIGNUP = process.env.ENABLE_SIGNUP === "true" || false;
+export const RESEND_API_KEY = process.env.RESEND_API_KEY;
+export const RESEND_ENABLED = RESEND_API_KEY ? true : false;
+
+if (ENABLE_EMAIL_VERIFICATION && !RESEND_API_KEY) {
+  throw new Error(
+    "RESEND_API_KEY is not set, refusing to start without a Resend API key. Set ENABLE_EMAIL_VERIFICATION to false to disable email verification.",
+  );
+}
 
 // OpenRouter
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";

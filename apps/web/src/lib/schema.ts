@@ -1,6 +1,13 @@
 import { z } from "zod";
 
-const nameString = z.string().min(1, { message: "Name is required" });
+export const nameString = z.string().min(1, { message: "Name is required" });
+export const emailString = z
+  .string()
+  .email({ message: "Invalid email address" });
+
+export const emailSchema = z.object({
+  email: emailString,
+});
 
 export const nameSchema = z.object({
   name: nameString,
@@ -13,7 +20,7 @@ export const password = z
 export const signUpSchema = z
   .object({
     name: nameString,
-    email: z.string().email({ message: "Invalid email address" }),
+    email: emailString,
     password: password,
     confirmPassword: password,
     profilePicture: z.instanceof(File).optional(),
@@ -29,7 +36,7 @@ export const signUpSchema = z
   });
 
 export const signInSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  email: emailString,
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" }),

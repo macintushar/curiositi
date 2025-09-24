@@ -24,6 +24,7 @@ import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import AuthLayout from "@/views/auth/auth-layout";
 import { useState } from "react";
+import { env } from "@/env";
 
 export default function SignIn() {
   const router = useRouter();
@@ -50,6 +51,23 @@ export default function SignIn() {
       if (response.data?.user) {
         toast.success("Signed in successfully");
         router.push("/app");
+      } else if (response.error?.code === "EMAIL_NOT_VERIFIED") {
+        toast.error("Email not verified. Please verify your email.", {
+          action: {
+            label: "Verify email",
+            onClick: () => {
+              const response = authClient.sendVerificationEmail({
+                email,
+                callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/app`,
+              });
+              toast.promise(response, {
+                loading: "Sending verification email",
+                success: "Verification email sent",
+                error: "Failed to send verification email",
+              });
+            },
+          },
+        });
       } else {
         toast.error(response.error?.message ?? "Failed to sign in");
       }
@@ -93,7 +111,17 @@ export default function SignIn() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Password</FormLabel>
+
+                      <Link
+                        href="/reset-password"
+                        className="text-muted-foreground text-sm underline-offset-4 hover:underline"
+                      >
+                        Forgot your password?
+                      </Link>
+                    </div>
+
                     <FormControl>
                       <HiddenInput {...field} />
                     </FormControl>
