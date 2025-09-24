@@ -28,7 +28,7 @@ import ExportMessage from "./export-message";
 import CopyButton from "../copy-button";
 import Suggestions from "./suggestions";
 
-import type { ThreadMessage } from "@/types";
+import type { LLM_PROVIDERS, ThreadMessage } from "@/types";
 import {
   Reasoning,
   ReasoningContent,
@@ -164,9 +164,10 @@ function AssistantMessage({ message }: { message: ThreadMessage }) {
           <MessageActions>
             {message.model && (
               <MessageAction
-                tooltip={`Generated with ${configs?.providers.find((p) => p.name === message.provider)?.models.find((m) => m.model === message.model)?.name} by ${
-                  configs?.providers.find((p) => p.name === message.provider)
-                    ?.title
+                tooltip={`Generated with ${configs?.providers.find((p) => p.name === (message.provider as LLM_PROVIDERS))?.models.find((m) => m.model === message.model)?.name} by ${
+                  configs?.providers.find(
+                    (p) => p.name === (message.provider as LLM_PROVIDERS),
+                  )?.title
                 }`}
                 delayDuration={100}
               >
