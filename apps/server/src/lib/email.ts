@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { User } from "better-auth/*";
+import { User } from "better-auth";
 
 import { RESEND_API_KEY } from "@/constants";
 import PasswordReset from "@/templates/password-reset";
@@ -27,7 +27,6 @@ export async function sendVerificationEmail({
 }: {
   user: User;
   url: string;
-  token: string;
 }) {
   await sendEmail(
     user.email,
@@ -45,7 +44,6 @@ export async function sendResetPasswordEmail({
 }: {
   user: User;
   url: string;
-  token: string;
 }) {
   await sendEmail(
     user.email,

@@ -31,8 +31,8 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: ENABLE_EMAIL_VERIFICATION,
-    sendResetPassword: async ({ user, url, token }) => {
-      await sendResetPasswordEmail({ user, url, token }).catch((error) => {
+    sendResetPassword: async ({ user, url }) => {
+      await sendResetPasswordEmail({ user, url }).catch((error) => {
         console.error(error);
       });
     },
@@ -43,8 +43,8 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }) => {
-      await sendVerificationEmail({ user, url, token }).catch((error) => {
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendVerificationEmail({ user, url }).catch((error) => {
         console.error(error);
       });
     },
