@@ -56,19 +56,18 @@ export default function Thread({
     if (configs) {
       setConfigs(configs);
     }
-    if (messages) {
+  }, [files, setFiles, spaces, setSpaces, configs, setConfigs]);
+
+  // Only initialize/replace messages from server when the store is empty
+  // or when the incoming list has more items (i.e., new data from server)
+  useEffect(() => {
+    if (
+      messages &&
+      (messagesState.length === 0 || messages.length > messagesState.length)
+    ) {
       setMessagesState(messages);
     }
-  }, [
-    files,
-    setFiles,
-    spaces,
-    setSpaces,
-    configs,
-    setConfigs,
-    messages,
-    setMessagesState,
-  ]);
+  }, [messages, messagesState.length, setMessagesState]);
 
   return (
     <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2">
@@ -110,7 +109,7 @@ export default function Thread({
           setPrompt("");
 
           setMessagesState([
-            ...messagesState,
+            ...useThreadStore.getState().messages,
             {
               role: "user",
               content: prompt.trim(),
@@ -156,8 +155,13 @@ export default function Thread({
             setPrompt(prompt.trim());
           }
 
+          console.log(data.data?.data, messagesState);
+
           if (data?.data?.data) {
-            setMessagesState([...messagesState, data.data.data]);
+            setMessagesState([
+              ...useThreadStore.getState().messages,
+              data.data.data,
+            ]);
           }
           setIsLoading(false);
         }}
