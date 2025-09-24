@@ -62,8 +62,9 @@ function SourceBadge({
       <p className="text-sm font-medium">{title}</p>
       <div className="flex flex-wrap gap-2">
         {search.map((s) => (
-          <Badge variant="outline" key={s}>
-            <Icon /> {s}
+          <Badge variant="outline" className="max-w-full" key={s}>
+            <Icon />
+            <span className="truncate">{s}</span>
           </Badge>
         ))}
       </div>
