@@ -10,7 +10,11 @@ import {
   COOKIE_DOMAIN,
   ENABLE_EMAIL_VERIFICATION,
 } from "@/constants";
-import { sendResetPasswordEmail, sendVerificationEmail } from "./email";
+import {
+  sendPasswordSuccessfullyResetEmail,
+  sendResetPasswordEmail,
+  sendVerificationEmail,
+} from "./email";
 
 export const auth = betterAuth({
   secret: BETTER_AUTH_SECRET,
@@ -29,6 +33,11 @@ export const auth = betterAuth({
     requireEmailVerification: ENABLE_EMAIL_VERIFICATION,
     sendResetPassword: async ({ user, url, token }) => {
       await sendResetPasswordEmail({ user, url, token }).catch((error) => {
+        console.error(error);
+      });
+    },
+    onPasswordReset: async ({ user }) => {
+      await sendPasswordSuccessfullyResetEmail({ user }).catch((error) => {
         console.error(error);
       });
     },

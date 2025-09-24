@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 import { User } from "better-auth/*";
 
-import { RESEND_API_KEY, UI_HOST } from "@/constants";
+import { RESEND_API_KEY } from "@/constants";
 import PasswordReset from "@/templates/password-reset";
 import VerifyAccount from "@/templates/verify-account";
 
@@ -34,7 +34,6 @@ export async function sendVerificationEmail({
     VerifyAccount({
       url,
       name: user.name,
-      baseUrl: UI_HOST,
     }),
   );
 }
@@ -53,7 +52,18 @@ export async function sendResetPasswordEmail({
     PasswordReset({
       url,
       name: user.name,
-      baseUrl: UI_HOST,
     }),
+  );
+}
+
+export async function sendPasswordSuccessfullyResetEmail({
+  user,
+}: {
+  user: User;
+}) {
+  await sendEmail(
+    user.email,
+    "Password successfully reset | Curiositi",
+    "Password successfully reset",
   );
 }
