@@ -1,14 +1,20 @@
 import { Resend } from "resend";
 import { User } from "better-auth";
 
-import { RESEND_API_KEY } from "@/constants";
+import { RESEND_API_KEY, RESEND_ENABLED } from "@/constants";
 import PasswordReset from "@/templates/password-reset";
 import VerifyAccount from "@/templates/verify-account";
 import PasswordSuccessfullyReset from "@/templates/password-succesful-reset";
 
-const resend = new Resend(RESEND_API_KEY as string);
+const resend = new Resend((RESEND_API_KEY as string) || "");
 
 export async function sendEmail(to: string, subject: string, body: string) {
+  if (!RESEND_ENABLED) {
+    console.warn(
+      `[email] RESEND disabled; skipping email to=${to} subject="${subject}"`,
+    );
+    return;
+  }
   const { data, error } = await resend.emails.send({
     from: "Curiositi <noreply@mailer.curiositi.xyz>",
     to,
