@@ -58,16 +58,13 @@ export default function Thread({
     }
   }, [files, setFiles, spaces, setSpaces, configs, setConfigs]);
 
-  // Only initialize/replace messages from server when the store is empty
-  // or when the incoming list has more items (i.e., new data from server)
   useEffect(() => {
-    if (
-      messages &&
-      (messagesState.length === 0 || messages.length > messagesState.length)
-    ) {
+    if (messages) {
       setMessagesState(messages);
+    } else {
+      setMessagesState([]);
     }
-  }, [messages, messagesState.length, setMessagesState]);
+  }, [threadId, messages, setMessagesState]);
 
   return (
     <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2">
