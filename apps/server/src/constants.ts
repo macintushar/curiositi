@@ -41,7 +41,7 @@ export const ENABLE_SIGNUP = process.env.ENABLE_SIGNUP === "true" || false;
 export const RESEND_API_KEY = process.env.RESEND_API_KEY;
 export const RESEND_ENABLED = RESEND_API_KEY ? true : false;
 
-if (ENABLE_EMAIL_VERIFICATION && !RESEND_API_KEY) {
+if (ENABLE_EMAIL_VERIFICATION === true && !RESEND_API_KEY) {
   throw new Error(
     "RESEND_API_KEY is not set, refusing to start without a Resend API key. Set ENABLE_EMAIL_VERIFICATION to false to disable email verification.",
   );

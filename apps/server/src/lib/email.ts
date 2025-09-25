@@ -6,7 +6,7 @@ import PasswordReset from "@/templates/password-reset";
 import VerifyAccount from "@/templates/verify-account";
 import PasswordSuccessfullyReset from "@/templates/password-succesful-reset";
 
-const resend = new Resend((RESEND_API_KEY as string) || "");
+const resend = new Resend((RESEND_API_KEY as string) || "re_123");
 
 export async function sendEmail(to: string, subject: string, body: string) {
   if (!RESEND_ENABLED) {

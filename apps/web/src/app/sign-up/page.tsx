@@ -47,7 +47,7 @@ export default function SignUp() {
         email,
         password,
         name,
-        callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/app`,
+        callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/sign-in`,
       });
 
       if (response.data?.user) {
@@ -60,7 +60,7 @@ export default function SignUp() {
             onClick: () => {
               const response = authClient.sendVerificationEmail({
                 email,
-                callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/app`,
+                callbackURL: `${env.NEXT_PUBLIC_BASE_URL}/sign-in`,
               });
               toast.promise(response, {
                 loading: "Sending verification email",

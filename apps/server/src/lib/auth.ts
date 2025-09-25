@@ -9,6 +9,7 @@ import {
   TRUSTED_ORIGINS,
   COOKIE_DOMAIN,
   ENABLE_EMAIL_VERIFICATION,
+  ENABLE_SIGNUP,
 } from "@/constants";
 import {
   sendPasswordSuccessfullyResetEmail,
@@ -29,7 +30,7 @@ export const auth = betterAuth({
     },
   }),
   emailAndPassword: {
-    enabled: true,
+    enabled: ENABLE_SIGNUP,
     requireEmailVerification: ENABLE_EMAIL_VERIFICATION,
     sendResetPassword: async ({ user, url }) => {
       await sendResetPasswordEmail({ user, url }).catch((error) => {
