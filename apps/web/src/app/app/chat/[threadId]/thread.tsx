@@ -152,8 +152,6 @@ export default function Thread({
             setPrompt(prompt.trim());
           }
 
-          console.log(data.data?.data, messagesState);
-
           if (data?.data?.data) {
             setMessagesState([
               ...useThreadStore.getState().messages,
