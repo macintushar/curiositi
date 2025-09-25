@@ -35,9 +35,11 @@ if (!process.env.BETTER_AUTH_SECRET) {
 
 export const BETTER_AUTH_SECRET = process.env.BETTER_AUTH_SECRET;
 export const BETTER_AUTH_URL = HOST;
+
 export const ENABLE_EMAIL_VERIFICATION =
   process.env.ENABLE_EMAIL_VERIFICATION === "true" || false;
-export const ENABLE_SIGNUP = process.env.ENABLE_SIGNUP === "true" || false;
+export const ENABLE_SIGNUP = process.env.ENABLE_SIGNUP !== "false";
+
 export const RESEND_API_KEY = process.env.RESEND_API_KEY;
 export const RESEND_ENABLED = RESEND_API_KEY ? true : false;
 
