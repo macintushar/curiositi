@@ -49,7 +49,8 @@ export const auth = betterAuth({
         console.error(error);
       });
     },
-    sendOnSignUp: true,
+    sendOnSignUp: ENABLE_EMAIL_VERIFICATION,
+    autoSignInAfterVerification: true,
   },
 
   trustedOrigins: TRUSTED_ORIGINS,

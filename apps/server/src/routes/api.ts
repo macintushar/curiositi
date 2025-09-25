@@ -22,8 +22,6 @@ apiRouter.basePath("/api/v1");
 apiRouter.use("*", async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
 
-  console.log(c.req.raw.headers);
-
   if (!session) {
     c.set("user", null);
     c.set("session", null);

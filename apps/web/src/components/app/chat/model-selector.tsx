@@ -111,6 +111,10 @@ export default function ModelSelector() {
     }
   }, [activeModel, configs, setActiveModel]);
 
+  const availableProviders = configs?.providers.filter(
+    (provider) => provider.enabled,
+  );
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
@@ -131,48 +135,45 @@ export default function ModelSelector() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-80 w-xs max-w-sm">
-        {configs?.providers
-          .filter((provider) => provider.enabled)
-          .map((provider, idx) => (
-            <div key={idx}>
-              <DropdownMenuLabel
+        {availableProviders?.map((provider, idx) => (
+          <div key={idx}>
+            <DropdownMenuLabel
+              key={idx}
+              className="text-muted-foreground text-xs"
+            >
+              {provider.title}
+            </DropdownMenuLabel>
+            {provider.models.map((model, idx) => (
+              <DropdownMenuItem
                 key={idx}
-                className="text-muted-foreground text-xs"
+                disabled={!provider.enabled}
+                className={cn(
+                  "data-[active=true]:text-brand data-[active=true]:bg-brand/10 flex cursor-pointer items-center justify-between",
+                  !provider.enabled && "cursor-not-allowed",
+                )}
+                data-active={activeModel?.model.name === model.name}
+                onClick={() =>
+                  setActiveModel({ provider_name: provider.name, model })
+                }
               >
-                {provider.title}
-              </DropdownMenuLabel>
-              {provider.models.map((model, idx) => (
-                <DropdownMenuItem
-                  key={idx}
-                  disabled={!provider.enabled}
-                  className={cn(
-                    "data-[active=true]:text-brand data-[active=true]:bg-brand/10 flex cursor-pointer items-center justify-between",
-                    !provider.enabled && "cursor-not-allowed",
-                  )}
-                  data-active={activeModel?.model.name === model.name}
-                  onClick={() =>
-                    setActiveModel({ provider_name: provider.name, model })
-                  }
-                >
-                  <div className="flex max-w-full items-center gap-2">
-                    <ProviderIcon
-                      providerName={provider.name}
-                      className={cn(
-                        "size-5",
-                        activeModel?.model.name === model.name && "text-brand",
-                      )}
-                    />
-                    <span className="truncate">{model.name}</span>
-                  </div>
-                  <ModelCapabilities capabilities={model.capabilities} />
-                </DropdownMenuItem>
-              ))}
-              {idx !==
-                configs?.providers.filter((provider) => provider.enabled)
-                  .length -
-                  1 && <DropdownMenuSeparator />}
-            </div>
-          ))}
+                <div className="flex max-w-full items-center gap-2">
+                  <ProviderIcon
+                    providerName={provider.name}
+                    className={cn(
+                      "size-5",
+                      activeModel?.model.name === model.name && "text-brand",
+                    )}
+                  />
+                  <span className="truncate">{model.name}</span>
+                </div>
+                <ModelCapabilities capabilities={model.capabilities} />
+              </DropdownMenuItem>
+            ))}
+            {idx !== availableProviders?.length - 1 && (
+              <DropdownMenuSeparator />
+            )}
+          </div>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
