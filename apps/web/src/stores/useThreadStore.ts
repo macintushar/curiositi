@@ -6,6 +6,7 @@ type ThreadStore = {
   messages: ThreadMessage[];
   setMessages: (messages: ThreadMessage[]) => void;
   setThreads: (threads: Thread[]) => void;
+  clearMessages: () => void;
 };
 
 const useThreadStore = create<ThreadStore>((set) => ({
@@ -13,6 +14,7 @@ const useThreadStore = create<ThreadStore>((set) => ({
   threads: [],
   setMessages: (messages) => set({ messages }),
   setThreads: (threads) => set({ threads }),
+  clearMessages: () => set({ messages: [] }),
 }));
 
 export default useThreadStore;

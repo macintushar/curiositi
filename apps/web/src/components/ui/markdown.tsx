@@ -22,6 +22,7 @@ import {
 } from "./table";
 import { Button } from "./button";
 import TablerIcon from "../app/tabler-icon";
+import Link from "next/link";
 
 export type MarkdownProps = {
   children: string;
@@ -47,7 +48,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
       !props.node?.position?.start.line ||
       props.node?.position?.start.line === props.node?.position?.end.line;
 
-    const { theme } = useTheme();
+    const { resolvedTheme } = useTheme();
 
     if (isInline) {
       return (
@@ -73,7 +74,7 @@ const INITIAL_COMPONENTS: Partial<Components> = {
       >
         <CodeBlockCode
           code={children as string}
-          theme={theme === "dark" ? "tokyo-night" : "light-plus"}
+          theme={resolvedTheme === "dark" ? "vitesse-dark" : "vitesse-light"}
           language={language}
         />
       </CodeBlock>
@@ -112,6 +113,26 @@ const INITIAL_COMPONENTS: Partial<Components> = {
   },
   p: function PComponent({ children, className }) {
     return <p className={cn("leading-8", className)}>{children}</p>;
+  },
+  a: function AComponent({ children, href, className }) {
+    return (
+      <Link href={href ?? ""} className={cn("text-blue-500", className)}>
+        {children}
+      </Link>
+    );
+  },
+  ul: function UlComponent({ children, className }) {
+    return (
+      <ul className={cn("list-inside list-disc", className)}>{children}</ul>
+    );
+  },
+  ol: function OlComponent({ children, className }) {
+    return (
+      <ol className={cn("list-inside list-decimal", className)}>{children}</ol>
+    );
+  },
+  li: function LiComponent({ children, className }) {
+    return <li className={className}>{children}</li>;
   },
 };
 

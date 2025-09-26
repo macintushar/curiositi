@@ -29,8 +29,6 @@ export const apiFetch = async <T>(
     ...options,
   });
 
-  console.log("res", response);
-
   if (!response.ok && response.status !== 400) {
     if (response.status === 401) {
       redirect("/sign-in");

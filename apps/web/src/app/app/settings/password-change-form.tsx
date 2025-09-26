@@ -14,11 +14,14 @@ import {
 import { HiddenInput } from "@/components/ui/hidden-input";
 
 import { changePasswordSchema } from "@/lib/schema";
+import { cn } from "@/lib/utils";
 
 export default function PasswordChangeForm({
   onSubmit,
+  split = false,
 }: {
   onSubmit: (data: z.infer<typeof changePasswordSchema>) => void;
+  split?: boolean;
 }) {
   const form = useForm<z.infer<typeof changePasswordSchema>>({
     resolver: zodResolver(changePasswordSchema),
@@ -49,7 +52,7 @@ export default function PasswordChangeForm({
             control={form.control}
             name="newPassword"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className={cn(split && "col-span-2")}>
                 <FormLabel>New Password</FormLabel>
                 <FormControl>
                   <HiddenInput {...field} />
@@ -63,7 +66,7 @@ export default function PasswordChangeForm({
             control={form.control}
             name="confirmNewPassword"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className={cn(split && "col-span-2")}>
                 <FormLabel>Confirm New Password</FormLabel>
                 <FormControl>
                   <HiddenInput {...field} />
@@ -74,7 +77,7 @@ export default function PasswordChangeForm({
             )}
           />
         </div>
-        <Button type="submit" className="w-fit">
+        <Button type="submit" className={cn("w-fit", split && "w-full")}>
           Submit
         </Button>
       </form>
