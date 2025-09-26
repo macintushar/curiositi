@@ -48,8 +48,26 @@ export default function SpaceActions({
                 return { success: false, error: error.message };
               }
               if (data) {
-                void refetch();
-                return { success: true, message: "Space updated successfully" };
+                const payload: unknown = data?.data;
+                let hasUpdatedRecord = false;
+
+                if (Array.isArray(payload)) {
+                  hasUpdatedRecord = payload.length > 0;
+                } else if (payload && typeof payload === "object") {
+                  const obj = payload as Record<string, unknown>;
+                  hasUpdatedRecord =
+                    "id" in obj || "space" in obj || "updatedAt" in obj;
+                }
+
+                if (hasUpdatedRecord) {
+                  void refetch();
+                  return {
+                    success: true,
+                    message: "Space updated successfully",
+                  };
+                }
+
+                return { success: false, error: "No space was updated" };
               }
             } catch (error) {
               const message =

@@ -265,5 +265,9 @@ export async function updateSpaceInDB(
     throw error;
   }
 
+  if (!data || data.length === 0) {
+    throw new Error("Space not found");
+  }
+
   return data;
 }
