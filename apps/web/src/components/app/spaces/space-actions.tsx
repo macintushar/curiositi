@@ -29,9 +29,12 @@ export default function SpaceActions({ space }: { space: Space | null }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <CreateSpaceDialog
-          handleSubmit={async () => {
-            toast.success("Space updated successfully");
-            return { success: true, message: "Space updated successfully" };
+          handleSubmit={async (values) => {
+            if (values.name) {
+              toast.success("Space updated successfully");
+              return { success: true, message: "Space updated successfully" };
+            }
+            return { success: false, error: "Name is required" };
           }}
           title="Update space"
           ctaText="Update"

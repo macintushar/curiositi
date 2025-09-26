@@ -81,6 +81,7 @@ export function PricingPlanCard({
         <Link
           href={ctaHref ?? "#"}
           target={ctaHrefExternal ? "_blank" : "_self"}
+          rel={ctaHrefExternal ? "noopener noreferrer" : undefined}
           className="w-full"
         >
           <Button
