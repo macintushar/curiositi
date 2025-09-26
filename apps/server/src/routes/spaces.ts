@@ -86,7 +86,7 @@ spacesRouter.put(
     const { id } = c.req.valid("param");
     const { name, icon, description } = await c.req.valid("json");
     const { data, error } = await tryCatch(
-      updateSpaceHandler(id, name, icon ?? null, description ?? null, user.id),
+      updateSpaceHandler(id, name, icon, description, user.id),
     );
     if (error) {
       return c.json({ error: error.message || "Failed to update space" }, 500);

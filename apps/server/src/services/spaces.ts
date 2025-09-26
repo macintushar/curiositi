@@ -38,8 +38,8 @@ export async function deleteSpaceHandler(id: string) {
 export async function updateSpaceHandler(
   id: string,
   name: string,
-  icon: string | null,
-  description: string | null,
+  icon: string | null | undefined,
+  description: string | null | undefined,
   userId: string,
 ) {
   const data = await updateSpaceInDB(id, name, icon, description, userId);

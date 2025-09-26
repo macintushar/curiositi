@@ -246,14 +246,28 @@ export async function deleteSpaceFromDB(id: string) {
 export async function updateSpaceInDB(
   id: string,
   name: string,
-  icon: string | null,
-  description: string | null,
+  icon: string | null | undefined,
+  description: string | null | undefined,
   userId: string,
 ) {
   const updateSpacePromise = async () => {
+    // Build update object with only defined fields
+    const updateData: {
+      name: string;
+      icon?: string | null;
+      description?: string | null;
+    } = { name };
+
+    if (icon !== undefined) {
+      updateData.icon = icon;
+    }
+    if (description !== undefined) {
+      updateData.description = description;
+    }
+
     const space = await db
       .update(spaces)
-      .set({ name, icon, description })
+      .set(updateData)
       .where(and(eq(spaces.id, id), eq(spaces.createdBy, userId)))
       .returning();
     return space;
