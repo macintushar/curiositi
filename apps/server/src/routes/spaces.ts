@@ -3,12 +3,13 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { tryCatch } from "@/lib/try-catch";
-import { CreateSpaceSchema } from "@/types/schemas";
+import { CreateSpaceSchema, UpdateSpaceSchema } from "@/types/schemas";
 import {
   getSpacesHandler,
   createSpaceHandler,
   getSpaceHandler,
   deleteSpaceHandler,
+  updateSpaceHandler,
 } from "@/services/spaces";
 
 const spacesRouter = new Hono<{
@@ -70,6 +71,27 @@ spacesRouter.delete(
       return c.json({ data: { message: "Space deleted successfully" } }, 200);
     }
     return c.json({ error: "Failed to delete space" }, 500);
+  },
+);
+
+spacesRouter.put(
+  "/:id",
+  zValidator("param", z.object({ id: z.string() })),
+  zValidator("json", UpdateSpaceSchema),
+  async (c) => {
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+    const { id } = c.req.valid("param");
+    const { name, icon, description } = await c.req.valid("json");
+    const { data, error } = await tryCatch(
+      updateSpaceHandler(id, name, icon, description, user.id),
+    );
+    if (error) {
+      return c.json({ error: error.message || "Failed to update space" }, 500);
+    }
+    return c.json(data);
   },
 );
 

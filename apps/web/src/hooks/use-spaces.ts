@@ -99,9 +99,17 @@ export function useCreateSpace() {
         spaceKeys.lists(),
         (old: ApiResponse<SpaceResponse<number>[]> | undefined) => {
           if (!old?.data || !newSpace?.data) return old;
+          const createdSpaces = newSpace.data;
+          const createdAsResponses: SpaceResponse<number>[] = createdSpaces.map(
+            (created) => ({
+              space: created,
+              user: null,
+              files: 0,
+            }),
+          );
           return {
             ...old,
-            data: [...old.data, ...newSpace.data],
+            data: [...old.data, ...createdAsResponses],
           };
         },
       );

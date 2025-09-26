@@ -42,15 +42,10 @@ export default function SpacesPage() {
       },
     );
     if (createSpaceMutation.isSuccess) {
-      if (createSpaceMutation.data?.data?.[0]?.id) {
-        return {
-          success: true,
-          message: `Created space ${createSpaceMutation.data?.data?.[0]?.name}`,
-        };
-      }
-      return { success: false, error: "Unknown error occurred" };
+      return { success: true, message: "Space created successfully" };
+    } else {
+      return { success: false, error: "Failed to create space" };
     }
-    return { success: false, error: "Failed to create space" };
   };
 
   if (error) {
