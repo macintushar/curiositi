@@ -33,21 +33,30 @@ export const auth = betterAuth({
     enabled: ENABLE_SIGNUP,
     requireEmailVerification: ENABLE_EMAIL_VERIFICATION,
     sendResetPassword: async ({ user, url }) => {
-      await sendResetPasswordEmail({ user, url }).catch((error) => {
-        console.error(error);
-      });
+      try {
+        await sendResetPasswordEmail({ user, url });
+      } catch (error) {
+        console.error("[email] Error sending reset password email", error);
+      }
     },
     onPasswordReset: async ({ user }) => {
-      await sendPasswordSuccessfullyResetEmail({ user }).catch((error) => {
-        console.error(error);
-      });
+      try {
+        await sendPasswordSuccessfullyResetEmail({ user });
+      } catch (error) {
+        console.error(
+          "[email] Error sending password successfully reset email",
+          error,
+        );
+      }
     },
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
-      await sendVerificationEmail({ user, url }).catch((error) => {
-        console.error(error);
-      });
+      try {
+        await sendVerificationEmail({ user, url });
+      } catch (error) {
+        console.error("[email] Error sending verification email", error);
+      }
     },
     sendOnSignUp: ENABLE_EMAIL_VERIFICATION,
     autoSignInAfterVerification: true,
