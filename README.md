@@ -222,4 +222,4 @@ We welcome issues, discussions, and PRs!
 
 ## License
 
-MIT — see [`LICENSE.md`](./LICENSE.md).
+Elastic V2 — see [`LICENSE.md`](./LICENSE.md).
