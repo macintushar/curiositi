@@ -253,6 +253,7 @@ export default function LandingPage() {
               ctaHref={ghURL}
               className="w-full md:w-1/3"
               ctaHrefExternal
+              isPopular
             />
           </div>
         </Section>

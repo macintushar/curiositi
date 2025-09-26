@@ -39,8 +39,6 @@ export async function sendMessage(
   space_ids: string[],
   file_ids: string[],
 ) {
-  console.log(input, model, provider, thread_id, space_ids, file_ids);
-
   const { data, error } = await tryCatch(
     apiFetch<ApiResponse<ThreadMessage>>(
       `/api/v1/search`,

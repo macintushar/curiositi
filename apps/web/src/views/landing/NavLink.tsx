@@ -11,6 +11,7 @@ export default function NavLink({
   label: string;
 }) {
   const currentPath = usePathname();
+
   return (
     <Link
       href={href}

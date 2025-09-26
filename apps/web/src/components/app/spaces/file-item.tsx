@@ -63,7 +63,6 @@ export default function FileItem({
           variant="ghost"
           onClick={async () => {
             const file = await handleGetFile();
-            console.log("file", file);
             if (file.data) {
               const url = URL.createObjectURL(file.data);
               window.open(url, "_blank");
@@ -79,8 +78,6 @@ export default function FileItem({
           variant="ghost"
           onClick={async () => {
             const { data, error } = await handleDeleteFile();
-
-            console.log("data", data);
 
             if (data.message) {
               toast.success(data.message);
