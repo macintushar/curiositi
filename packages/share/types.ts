@@ -1,6 +1,4 @@
-// ============================================================================
 // API Response Types
-// ============================================================================
 
 export type ApiResponse<T> = {
   data: T;
@@ -11,9 +9,7 @@ export type MessageResponse = {
   message: string;
 };
 
-// ============================================================================
 // Core Entity Types
-// ============================================================================
 
 export type Space = {
   id: string;
@@ -63,9 +59,7 @@ export type ThreadMessage = {
   reasoning: string | null;
 };
 
-// ============================================================================
 // Configuration Types
-// ============================================================================
 
 export enum LLM_PROVIDERS {
   OPENROUTER = "openrouter",
@@ -100,9 +94,7 @@ export type Configs = {
   file_types: string[];
 };
 
-// ============================================================================
 // Agent Types
-// ============================================================================
 
 export type CuriositiAgentMode = "general" | "space";
 
@@ -127,9 +119,7 @@ export type CuriositiAgentResponse = {
   reasoning: string;
 };
 
-// ============================================================================
 // Composite Response Types
-// ============================================================================
 
 export type SpaceResponse<T> = {
   space: Space;
@@ -142,9 +132,7 @@ export type AllFiles = File & {
   spaceIcon: string;
 };
 
-// ============================================================================
 // UI/Component Types
-// ============================================================================
 
 export type NavLink = {
   href: string;

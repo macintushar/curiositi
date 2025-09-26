@@ -2,11 +2,63 @@
   <img src="./apps/web/src/assets/logo.svg" alt="Curiositi Logo" width="180" />
 </p>
 
-## Curiositi
+<h1 align="center">Curiositi — Open‑Source AI Knowledge Workspace</h1>
 
-An AI-powered knowledge workspace. Upload documents, organize them into spaces, and chat with an agent that searches your docs and the web. Built with Next.js, Bun, Hono, Drizzle ORM, and Turborepo.
+<p align="center">
+Upload documents, organize them into spaces, and chat with an agent that answers using your knowledge and the web.
+</p>
 
-### Monorepo layout
+<p align="center">
+  <a href="https://github.com/macintushar/curiositi/stargazers"><img src="https://img.shields.io/github/stars/macintushar/curiositi?style=for-the-badge" alt="GitHub stars"></a>
+  <a href="https://github.com/macintushar/curiositi/graphs/commit-activity"><img src="https://img.shields.io/github/commit-activity/m/macintushar/curiositi?style=for-the-badge" alt="Commit activity"></a>
+  <a href="./LICENSE.md"><img src="https://img.shields.io/badge/licence-Elastic_V2-blue?style=for-the-badge" alt="License"></a>
+</p>
+
+<p align="center">
+  <a href="./docs/getting-started.md"><strong>Docs</strong></a>
+  •
+  <a href="./docs/ROADMAP.md">Roadmap</a>
+  •
+  <a href="https://github.com/macintushar/curiositi/issues/new/choose">Report an issue</a>
+  •
+  <a href="https://github.com/macintushar/curiositi/discussions">Discussions</a>
+</p>
+
+<hr />
+
+## Why Curiositi?
+
+Curiositi is a private, self‑hostable Retrieval‑Augmented Generation (RAG) workspace. It lets teams unify unstructured knowledge, search it with vector embeddings, optionally enrich with web results, and generate reasoned answers with modern LLMs — all with secure authentication and a clean UI.
+
+⭐ If you like the project, consider giving it a star. It helps a ton!
+
+## Features
+
+- **Secure auth**: better‑auth with cross‑subdomain cookies; optional email verification via Resend.
+- **Spaces**: create/delete spaces to organize files and scope retrieval.
+- **File ingestion**: PDF, Office, Markdown/CSV/TXT; automatic text extraction, chunking, and embeddings.
+- **Vector search**: OpenAI embeddings in Postgres using `pgvector` via Drizzle.
+- **RAG chat**: an agent plans queries, searches your docs and the web in parallel, then synthesizes an answer with reasoning and follow‑ups.
+- **Web search**: SearXNG meta‑search integration.
+- **Providers**: OpenAI, Anthropic, and OpenRouter; configurable per‑user API keys.
+- **Configs API**: surfaces enabled providers and supported file types to the UI.
+- **Observability**: optional Sentry instrumentation.
+
+### Supported file types
+
+- PDF (`application/pdf`)
+- Office: `docx`, `pptx`, `xlsx`, `odt`, `odp`, `ods`
+- Text: `text/plain`, `text/csv`, `text/markdown`
+
+### Model providers and examples
+
+- **OpenAI**: `gpt-4o`, `gpt-4o-mini`, `gpt-5`, `gpt-5-mini`, `o3`, `o4-mini`
+- **Anthropic**: `claude-opus-4-1`, `claude-sonnet-4`, `claude-3-5-sonnet`
+- **OpenRouter**: curated/free models via OpenRouter
+
+---
+
+## Monorepo layout
 
 ```
 curiositi/
@@ -14,29 +66,25 @@ curiositi/
 │  ├─ web/            # Next.js 15 app router UI
 │  └─ server/         # Bun + Hono API server
 ├─ packages/
-│  └─ shared-types/   # Shared TS types
+│  └─ share/          # Shared TS types
 ├─ docs/              # Docs & assets
 └─ turbo.json         # Turborepo config
 ```
 
-### Features
+## Architecture (high level)
 
-- Auth via better-auth with secure cross-subdomain cookies
-- Spaces: create/delete spaces to group files
-- File upload: PDF, Office, text; server extracts text and chunks it
-- Vector search: OpenAI embeddings stored in Postgres `vector` via Drizzle
-- Chat: agent composes answers using doc retrieval and web search
-- Config API exposes enabled model providers and supported file types
-- Sentry optional instrumentation
+<p align="center">
+  <img src="./docs/curiositi-flow.png" alt="Curiositi architecture overview" width="720" />
+</p>
 
 ---
 
-## Getting started
+## Getting Started
 
 ### Prerequisites
 
-- Bun 1.x (recommended)
-- PostgreSQL 16+ with `pgvector` extension
+- Bun 1.2.0+
+- PostgreSQL 16+ with `pgvector` extension enabled
 
 ### Install
 
@@ -78,7 +126,7 @@ Enable pgvector and run migrations:
 bun run db:migrate
 ```
 
-`apps/server/drizzle/0000_good_secret_warriors.sql` ensures `vector` extension exists.
+`apps/server/drizzle/0000_good_secret_warriors.sql` ensures the `vector` extension exists.
 
 ### Develop
 
@@ -112,9 +160,28 @@ bun run start
 
 ---
 
+## Quick start with Docker Compose
+
+This repo ships a compose stack for development:
+
+```bash
+docker compose up -d
+```
+
+Services:
+
+- `server` (Bun API) on 3030
+- `web-ui` (Next.js) on 3040
+- `postgres` with persistent volume and healthcheck
+- `searxng` meta‑search (optional web search) on 8095
+
+The server runs `bun run db:migrate` on start and mounts hot‑reload volumes for development.
+
+---
+
 ## API overview (Hono, base `/api/v1`)
 
-All routes require auth cookies issued by better-auth (`/api/auth/*` handled by server). Common 401 on missing session.
+All routes require auth cookies issued by better‑auth (`/api/auth/*` handled by server). Common 401 on missing session.
 
 - `POST /search`
 
@@ -145,35 +212,14 @@ All routes require auth cookies issued by better-auth (`/api/auth/*` handled by 
 
 ---
 
-## Docker compose
+## Contributing
 
-This repo ships a compose stack for dev:
+We welcome issues, discussions, and PRs!
 
-```bash
-docker compose up -d
-```
-
-Services:
-
-- `server` (Bun API) on 3030
-- `web-ui` (Next.js) on 3040
-- `postgres` with persistent volume and healthcheck
-- `searxng` meta-search (optional web search) on 8095
-
-The server runs `bun run db:migrate` on start. Mounts hot-reload volumes for development.
-
----
-
-## Scripts
-
-Root (turbo): `build`, `dev`, `lint`, `typecheck`, `format`, `db:generate`, `db:migrate`, `db:studio`
-
-Server: `dev`, `start`, `db:generate`, `db:migrate`, `db:studio`
-
-Web: `dev`, `build`, `start`, `lint`, `typecheck`, `preview`
-
----
+- Read the [Code of Conduct](./CODE_OF_CONDUCT.md)
+- See the [Contributing Guide](./docs/CONTRIBUTING.md)
+- Check the [Roadmap](./docs/ROADMAP.md)
 
 ## License
 
-MIT. See `LICENSE.md`.
+MIT — see [`LICENSE.md`](./LICENSE.md).

@@ -242,3 +242,28 @@ export async function deleteSpaceFromDB(id: string) {
 
   return data;
 }
+
+export async function updateSpaceInDB(
+  id: string,
+  name: string,
+  icon: string | null,
+  description: string | null,
+) {
+  const updateSpacePromise = async () => {
+    const space = await db
+      .update(spaces)
+      .set({ name, icon, description })
+      .where(eq(spaces.id, id))
+      .returning();
+    return space;
+  };
+
+  const { data, error } = await tryCatch(updateSpacePromise());
+
+  if (error) {
+    console.error("Error updating space in DB:", error);
+    throw error;
+  }
+
+  return data;
+}

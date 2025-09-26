@@ -13,8 +13,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useDeleteSpace } from "@/hooks/use-spaces";
 import { useRouter } from "next/navigation";
+import { updateSpace } from "@/services/spaces";
 
-export default function SpaceActions({ space }: { space: Space | null }) {
+export default function SpaceActions({
+  space,
+  refetch,
+}: {
+  space: Space | null;
+  refetch: () => void;
+}) {
   const router = useRouter();
   const deleteSpaceMutation = useDeleteSpace();
 
@@ -30,11 +37,26 @@ export default function SpaceActions({ space }: { space: Space | null }) {
       <DropdownMenuContent align="end">
         <CreateSpaceDialog
           handleSubmit={async (values) => {
-            if (values.name) {
-              toast.success("Space updated successfully");
-              return { success: true, message: "Space updated successfully" };
+            try {
+              const { data, error } = await updateSpace(
+                space.id,
+                values.name,
+                values.icon,
+                values.description,
+              );
+              if (error) {
+                return { success: false, error: error.message };
+              }
+              if (data) {
+                void refetch();
+                return { success: true, message: "Space updated successfully" };
+              }
+            } catch (error) {
+              const message =
+                error instanceof Error ? error.message : String(error);
+              return { success: false, error: message };
             }
-            return { success: false, error: "Name is required" };
+            return { success: false, error: "Unknown error occurred" };
           }}
           title="Update space"
           ctaText="Update"

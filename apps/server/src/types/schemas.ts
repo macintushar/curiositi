@@ -35,6 +35,12 @@ export const CreateSpaceSchema = z.object({
   description: z.string().optional(),
 });
 
+export const UpdateSpaceSchema = z.object({
+  name: z.string().min(1, '"name" cannot be empty'),
+  icon: z.string().optional(),
+  description: z.string().optional(),
+});
+
 export const AddOrUpdateApiKeySchema = z.object({
   provider: ProviderSchema,
   api_key: z.string().optional(),
