@@ -78,21 +78,22 @@ export function PricingPlanCard({
         </ul>
       </CardContent>
       <CardFooter>
-        <Link
-          href={ctaHref ?? "#"}
-          target={ctaHrefExternal ? "_blank" : "_self"}
-          rel={ctaHrefExternal ? "noopener noreferrer" : undefined}
-          className="w-full"
+        <Button
+          variant={ctaVariant}
+          className={`w-full rounded-full ${ctaHrefExternal ? "cursor-pointer" : ""}`}
+          asChild
         >
-          <Button
-            variant={ctaVariant}
-            className={`w-full rounded-full ${ctaHrefExternal ? "cursor-pointer" : ""}`}
+          <Link
+            href={ctaHref ?? "#"}
+            target={ctaHrefExternal ? "_blank" : "_self"}
+            rel={ctaHrefExternal ? "noopener noreferrer" : undefined}
+            className="w-full"
           >
             {CtaIcon && <CtaIcon className="h-4 w-4" />}
             {CtaExtra && CtaExtra}
             {ctaText}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
   );
