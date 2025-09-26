@@ -111,6 +111,10 @@ export default function ModelSelector() {
     }
   }, [activeModel, configs, setActiveModel]);
 
+  const availableProviders = configs?.providers.filter(
+    (provider) => provider.enabled,
+  );
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
@@ -131,7 +135,7 @@ export default function ModelSelector() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-80 w-xs max-w-sm">
-        {configs?.providers.map((provider, idx) => (
+        {availableProviders?.map((provider, idx) => (
           <div key={idx}>
             <DropdownMenuLabel
               key={idx}
@@ -165,7 +169,9 @@ export default function ModelSelector() {
                 <ModelCapabilities capabilities={model.capabilities} />
               </DropdownMenuItem>
             ))}
-            {idx !== configs?.providers.length - 1 && <DropdownMenuSeparator />}
+            {idx !== availableProviders?.length - 1 && (
+              <DropdownMenuSeparator />
+            )}
           </div>
         ))}
       </DropdownMenuContent>

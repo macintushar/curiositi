@@ -25,6 +25,7 @@ import SidebarChats from "./sidebar-chats";
 
 import { cn } from "@/lib/utils";
 import type { Thread } from "@/types";
+import useThreadStore from "@/stores/useThreadStore";
 
 type AppSidebarProps = {
   threads: Thread[] | null;
@@ -34,6 +35,8 @@ type AppSidebarProps = {
 export default function AppSidebar({ threads, isLoading }: AppSidebarProps) {
   const { state } = useSidebar();
   const path = usePathname();
+
+  const { clearMessages } = useThreadStore();
 
   const isSpaces = path === "/app/spaces";
 
@@ -46,6 +49,9 @@ export default function AppSidebar({ threads, isLoading }: AppSidebarProps) {
               <Button
                 variant="outline"
                 className="w-full cursor-pointer truncate font-light"
+                onClick={() => {
+                  clearMessages();
+                }}
               >
                 <IconPlus />
                 {state === "collapsed" ? "" : "New Thread"}

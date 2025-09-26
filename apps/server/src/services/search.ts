@@ -43,8 +43,6 @@ export async function searchHandler({
 
   const formattedHistory = formatHistory(history);
 
-  console.log(formattedHistory, history);
-
   const thread = await db.query.threads.findFirst({
     where: eq(threads.id, thread_id),
     columns: {
@@ -57,8 +55,6 @@ export async function searchHandler({
     thread?.title?.length === 0 ||
     thread?.title === null
   ) {
-    console.log("Generating title");
-
     const generateTitle = async () => {
       const titleLLM = llm("gpt-4.1-mini", LLM_PROVIDERS.OPENAI);
       const { object } = await generateObject({
@@ -88,12 +84,10 @@ export async function searchHandler({
       };
     };
 
-    const { data, error } = await tryCatch(generateTitle());
+    const { error } = await tryCatch(generateTitle());
     if (error) {
       console.error("Error generating title: ", error);
     }
-
-    console.log("Title generated: ", data?.title);
   }
 
   // Fetch space metadata if space_ids are provided
@@ -171,8 +165,8 @@ export async function searchHandler({
   return {
     data: {
       id: newMessage[1].id,
-      createdAt: newMessage[1].createdAt,
-      updatedAt: newMessage[1].updatedAt,
+      createdAt: newMessage[1].createdAt?.toString() ?? "",
+      updatedAt: newMessage[1].updatedAt?.toString() ?? "",
       content: response.answer,
       role: "assistant",
       threadId: thread_id,

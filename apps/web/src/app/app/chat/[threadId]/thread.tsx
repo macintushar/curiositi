@@ -56,19 +56,15 @@ export default function Thread({
     if (configs) {
       setConfigs(configs);
     }
+  }, [files, setFiles, spaces, setSpaces, configs, setConfigs]);
+
+  useEffect(() => {
     if (messages) {
       setMessagesState(messages);
+    } else {
+      setMessagesState([]);
     }
-  }, [
-    files,
-    setFiles,
-    spaces,
-    setSpaces,
-    configs,
-    setConfigs,
-    messages,
-    setMessagesState,
-  ]);
+  }, [threadId, messages, setMessagesState]);
 
   return (
     <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2">
@@ -110,7 +106,7 @@ export default function Thread({
           setPrompt("");
 
           setMessagesState([
-            ...messagesState,
+            ...useThreadStore.getState().messages,
             {
               role: "user",
               content: prompt.trim(),
@@ -157,7 +153,10 @@ export default function Thread({
           }
 
           if (data?.data?.data) {
-            setMessagesState([...messagesState, data.data.data]);
+            setMessagesState([
+              ...useThreadStore.getState().messages,
+              data.data.data,
+            ]);
           }
           setIsLoading(false);
         }}
