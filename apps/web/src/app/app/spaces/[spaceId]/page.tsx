@@ -24,6 +24,7 @@ export default function Space({
     data: files,
     error: filesError,
     isPending: filesPending,
+    refetch: refetchFiles,
   } = useFilesInSpace(spaceId);
   const deleteFileMutation = useDeleteFile();
 
@@ -72,7 +73,7 @@ export default function Space({
           <UploadFile
             spaceId={spaceId}
             areFilesInSpace={(files?.data && files.data.length > 0) ?? false}
-            refetch={refetch}
+            refetch={refetchFiles}
           />
           <ScrollArea className="flex h-full max-h-full w-full flex-1 flex-col">
             {files?.data.map((fileItem) => (

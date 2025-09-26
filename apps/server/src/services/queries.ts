@@ -248,12 +248,13 @@ export async function updateSpaceInDB(
   name: string,
   icon: string | null,
   description: string | null,
+  userId: string,
 ) {
   const updateSpacePromise = async () => {
     const space = await db
       .update(spaces)
       .set({ name, icon, description })
-      .where(eq(spaces.id, id))
+      .where(and(eq(spaces.id, id), eq(spaces.createdBy, userId)))
       .returning();
     return space;
   };

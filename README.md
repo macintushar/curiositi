@@ -60,7 +60,7 @@ Curiositi is a private, self‑hostable Retrieval‑Augmented Generation (RAG) w
 
 ## Monorepo layout
 
-```
+```text
 curiositi/
 ├─ apps/
 │  ├─ web/            # Next.js 15 app router UI

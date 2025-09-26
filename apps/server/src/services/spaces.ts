@@ -40,7 +40,8 @@ export async function updateSpaceHandler(
   name: string,
   icon: string | null,
   description: string | null,
+  userId: string,
 ) {
-  const data = await updateSpaceInDB(id, name, icon, description);
+  const data = await updateSpaceInDB(id, name, icon, description, userId);
   return { data };
 }

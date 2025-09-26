@@ -79,10 +79,14 @@ spacesRouter.put(
   zValidator("param", z.object({ id: z.string() })),
   zValidator("json", UpdateSpaceSchema),
   async (c) => {
+    const user = c.get("user");
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
     const { id } = c.req.valid("param");
     const { name, icon, description } = await c.req.valid("json");
     const { data, error } = await tryCatch(
-      updateSpaceHandler(id, name, icon ?? null, description ?? null),
+      updateSpaceHandler(id, name, icon ?? null, description ?? null, user.id),
     );
     if (error) {
       return c.json({ error: error.message || "Failed to update space" }, 500);
