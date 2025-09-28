@@ -5,7 +5,7 @@
 <h1 align="center">Curiositi — Open‑Source AI Knowledge Workspace</h1>
 
 <p align="center">
-Upload documents, organize them into spaces, and chat with an agent that answers using your knowledge and the web.
+  Upload documents, organize them into spaces, and chat with an agent that answers using your knowledge and the web.
 </p>
 
 <p align="center">
@@ -15,9 +15,9 @@ Upload documents, organize them into spaces, and chat with an agent that answers
 </p>
 
 <p align="center">
-  <a href="./docs/getting-started.md"><strong>Docs</strong></a>
+  <a href="https://docs.curiositi.xyz"><strong>Docs</strong></a>
   •
-  <a href="./docs/ROADMAP.md">Roadmap</a>
+  <a href="https://docs.curiositi.xyz/docs/roadmap">Roadmap</a>
   •
   <a href="https://github.com/macintushar/curiositi/issues/new/choose">Report an issue</a>
   •
@@ -58,28 +58,41 @@ Curiositi is a private, self‑hostable Retrieval‑Augmented Generation (RAG) w
 
 ---
 
-## Monorepo layout
+## Codebase Overview
 
-```text
-curiositi/
-├─ apps/
-│  ├─ web/            # Next.js 15 app router UI
-│  └─ server/         # Bun + Hono API server
-├─ packages/
-│  └─ share/          # Shared TS types
-├─ docs/              # Docs & assets
-└─ turbo.json         # Turborepo config
-```
+The Curiositi project is structured as a monorepo, containing several key components:
 
-## Architecture (high level)
+- **apps/web**: This is the Next.js 15 app router UI, responsible for the frontend interface of Curiositi.
+- **apps/server**: This is the Bun + Hono API server, handling backend operations and API requests.
+- **apps/docs**: Contains the Docusaurus documentation for Curiositi, providing comprehensive guides and references.
+- **packages/share**: Houses shared TypeScript types used across different parts of the application.
 
-<p align="center">
-  <img src="./docs/curiositi-flow.png" alt="Curiositi architecture overview" width="720" />
-</p>
+### Key Features
+
+- **Spaces**: Manage and organize files into spaces for better retrieval and management.
+- **File Ingestion**: Supports various file types including PDF, Office documents, and text files, with automatic text extraction and chunking.
+- **Vector Search**: Utilizes OpenAI embeddings stored in Postgres using `pgvector` for efficient search capabilities.
+- **RAG Chat**: An agent that plans queries, searches documents and the web, and synthesizes answers with reasoning.
+- **Web Search**: Integration with SearXNG for meta-search capabilities.
+- **Providers**: Supports OpenAI, Anthropic, and OpenRouter, with configurable API keys per user.
+- **Observability**: Optional Sentry instrumentation for monitoring and logging.
+
+### Roadmap
+
+The roadmap has been moved to the [documentation site](https://docs.curiositi.xyz/docs/roadmap) for better accessibility and updates.
 
 ---
 
 ## Getting Started
+
+### Documentation
+
+For comprehensive guides and detailed information about setting up and using Curiositi, please refer to our [Documentation](https://docs.curiositi.xyz). The documentation covers:
+
+- **[Getting Started](https://docs.curiositi.xyz/docs/getting-started)**: Step-by-step instructions to set up your environment and start using Curiositi.
+- **[Overview](https://docs.curiositi.xyz/docs/overview)**: Detailed descriptions of the features available in Curiositi.
+- **[API Reference](https://docs.curiositi.xyz/docs/api)**: In-depth information about the API endpoints and how to interact with them.
+- **[Contributing](https://docs.curiositi.xyz/docs/contributing)**: Guidelines for contributing to the project.
 
 ### Prerequisites
 
@@ -91,31 +104,6 @@ curiositi/
 ```bash
 bun install
 ```
-
-### Environment
-
-Set these variables (dev defaults shown where present). The server refuses to start without `BETTER_AUTH_SECRET`.
-
-- Server (`apps/server`)
-
-  - `PORT` (default 3030)
-  - `DATABASE_URL` (postgres connection string)
-  - `BETTER_AUTH_SECRET` (required)
-  - `UI_HOST` (default http://localhost:3040)
-  - `SEARXNG_URL` (default http://localhost:8095)
-  - `OPENROUTER_API_KEY` (optional)
-  - `OPENAI_API_KEY` (optional; used for LLM and embeddings)
-  - `OPENAI_EMBEDDING_MODEL` (default text-embedding-3-small)
-  - `ANTHROPIC_API_KEY` (optional)
-  - `SENTRY_DSN` (optional)
-
-- Web (`apps/web`)
-  - `SERVER_URL` (e.g. http://localhost:3030)
-  - `BASE_URL` (e.g. http://localhost:3040)
-  - `NEXT_PUBLIC_SERVER_URL` (same as above, exposed)
-  - `NEXT_PUBLIC_BASE_URL` (same as above, exposed)
-  - `SENTRY_AUTH_TOKEN` (optional)
-  - `SENTRY_DSN` (optional)
 
 ### Database
 
@@ -222,8 +210,8 @@ All routes require auth cookies issued by better‑auth (`/api/auth/*` handled b
 We welcome issues, discussions, and PRs!
 
 - Read the [Code of Conduct](./CODE_OF_CONDUCT.md)
-- See the [Contributing Guide](./docs/CONTRIBUTING.md)
-- Check the [Roadmap](./docs/ROADMAP.md)
+- See the [Contributing Guide](https://docs.curiositi.xyz/docs/contributing)
+- Check the [Roadmap](https://docs.curiositi.xyz/docs/roadmap)
 
 ## License
 

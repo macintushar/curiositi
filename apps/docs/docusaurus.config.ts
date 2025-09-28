@@ -15,7 +15,7 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: "https://your-docusaurus-site.example.com",
+  url: "https://docs.curiositi.xyz",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
@@ -70,11 +70,21 @@ const config: Config = {
           type: "docSidebar",
           sidebarId: "tutorialSidebar",
           position: "left",
-          label: "Documentation",
+          label: "📚 Documentation",
+        },
+        {
+          href: "/docs/contributing",
+          label: "🤝 Contribute",
+          position: "left",
+        },
+        {
+          href: "/docs/roadmap",
+          label: "🚀 Roadmap",
+          position: "left",
         },
         {
           href: "https://curiositi.xyz",
-          label: "Cloud",
+          label: "🌐 Cloud",
           position: "right",
         },
         {
