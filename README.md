@@ -31,7 +31,9 @@ curiositi/
 
 ---
 
-## Getting started
+### Getting started
+
+For detailed instructions, please visit our [Docs](https://docs.curiositi.xyz).
 
 ### Prerequisites
 
