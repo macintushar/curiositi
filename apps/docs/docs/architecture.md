@@ -16,18 +16,6 @@ This document provides a formal architectural reference for Curiositi.
 - **Bun:** Primary runtime for server and scripts (fast startup, TS native).
 - **Node-Compatible:** Next.js runs in its own environment (can be Bun or Node depending on deployment target; ensure feature parity for APIs used).
 
-## Backend Layers
-
-```
-┌──────────────┐   ┌──────────────┐   ┌────────────────┐
-│ Routes (Hono)│→→│ Services      │→→│ Domain Utilities │
-└──────────────┘   └──────────────┘   └────────────────┘
-       ↓                    ↓                  ↓
- Authentication       Vector / Ingestion   LLM Providers
-       ↓                    ↓                  ↓
-   Session Vars        Embeddings Store     External APIs
-```
-
 ### Routing
 
 Located in `apps/server/src/routes`. Each file exports a sub-router mounted under `/api/v1` in `api.ts`. Middleware injects authenticated `user` and `session` context.
@@ -50,7 +38,7 @@ Encapsulate domain logic (`services/*`). Example: `ingestion.ts` handles extract
 
 ## Frontend Layers
 
-```
+```text
 Next.js App Router
   ├─ actions/ (server actions for mutations)
   ├─ services/ (client API wrappers)

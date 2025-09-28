@@ -4,26 +4,26 @@ All variables are defined per application. Required indicates local development 
 
 ## Server (`apps/server`)
 
-| Variable                    | Required        | Description                                          |
-| --------------------------- | --------------- | ---------------------------------------------------- |
-| `PORT`                      | Yes             | API listen port (default 3030)                       |
-| `NODE_ENV`                  | Yes             | Environment mode (development/production)            |
-| `UI_HOST`                   | Yes             | Origin of the web UI for CORS + redirects            |
-| `COOKIE_DOMAIN`             | Dev optional    | Domain for auth cookies (set for multi-subdomain)    |
-| `HOST`                      | Yes             | Public base URL of server (used in links/emails)     |
-| `DATABASE_URL`              | Yes             | Postgres connection string                           |
-| `BETTER_AUTH_SECRET`        | Yes             | Secret for session / token signing                   |
-| `ENABLE_EMAIL_VERIFICATION` | Yes             | Toggle email verification flow                       |
-| `ENABLE_SIGNUP`             | Yes             | Gate public signups                                  |
-| `RESEND_API_KEY`            | If verification | Resend email provider API key                        |
-| `OPENROUTER_API_KEY`        | Optional        | OpenRouter LLM access                                |
-| `OPENAI_API_KEY`            | Optional        | OpenAI model + embeddings                            |
-| `OPENAI_EMBEDDING_MODEL`    | Optional        | Embedding model id (default: text-embedding-3-small) |
-| `ANTHROPIC_API_KEY`         | Optional        | Anthropic models                                     |
-| `SEARXNG_URL`               | Optional        | Self-hosted meta search endpoint for web search      |
-| `SENTRY_DSN`                | Optional        | Error monitoring (server)                            |
-| `BUN_VERSION`               | Deploy          | Pin Bun version in some platforms                    |
-| `NODE_VERSION`              | Deploy          | Fallback node version for build layers               |
+| Variable                    | Required                               | Description                                                |
+| --------------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| `PORT`                      | Yes                                    | API listen port (default 3030)                             |
+| `NODE_ENV`                  | Yes                                    | Environment mode (development/production)                  |
+| `UI_HOST`                   | Yes                                    | Origin of the web UI for CORS + redirects                  |
+| `COOKIE_DOMAIN`             | Optional                               | Cookie domain (set when using multi-subdomain in dev/prod) |
+| `HOST`                      | Yes                                    | Public base URL of server (used in links/emails)           |
+| `DATABASE_URL`              | Yes                                    | Postgres connection string                                 |
+| `BETTER_AUTH_SECRET`        | Yes                                    | Secret for session / token signing                         |
+| `ENABLE_EMAIL_VERIFICATION` | Yes                                    | Toggle email verification flow                             |
+| `ENABLE_SIGNUP`             | Yes                                    | Gate public signups                                        |
+| `RESEND_API_KEY`            | Yes, if ENABLE_EMAIL_VERIFICATION=true | Resend email provider API key                              |
+| `OPENROUTER_API_KEY`        | Optional                               | OpenRouter LLM access                                      |
+| `OPENAI_API_KEY`            | Optional                               | OpenAI model + embeddings                                  |
+| `OPENAI_EMBEDDING_MODEL`    | Optional                               | Embedding model id (default: text-embedding-3-small)       |
+| `ANTHROPIC_API_KEY`         | Optional                               | Anthropic models                                           |
+| `SEARXNG_URL`               | Optional                               | Self-hosted meta search endpoint for web search            |
+| `SENTRY_DSN`                | Optional                               | Error monitoring (server)                                  |
+| `BUN_VERSION`               | Deploy                                 | Pin Bun version in some platforms                          |
+| `NODE_VERSION`              | Deploy                                 | Fallback node version for build layers                     |
 
 ## Web (`apps/web`)
 

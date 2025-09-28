@@ -281,9 +281,7 @@ blockquote {
 }
 
 /* Table styling */
-.markdown table {
-  border: 1px solid var(--border);
-}
+
 .markdown table th {
   background: var(--muted);
   color: var(--foreground);

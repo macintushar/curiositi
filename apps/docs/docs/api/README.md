@@ -21,7 +21,7 @@ All routes use a session cookie (Better Auth). If unauthenticated, a 401 respons
 
 ### List Threads
 
-```
+```http
 GET /api/v1/threads
 ```
 
@@ -35,7 +35,7 @@ Response:
 
 ### Create Thread
 
-```
+```http POST
 POST /api/v1/threads
 ```
 
@@ -47,7 +47,7 @@ Response:
 
 ### Delete Thread
 
-```
+```http DELETE
 DELETE /api/v1/threads/:id
 ```
 
@@ -59,7 +59,7 @@ Response:
 
 ### Get Thread Messages
 
-```
+```http GET
 GET /api/v1/threads/:id/messages
 ```
 
@@ -73,7 +73,7 @@ Response (simplified):
 
 ### Execute Search / Retrieval + Generation
 
-```
+```http
 POST /api/v1/search
 Content-Type: application/json
 ```
@@ -104,13 +104,13 @@ Response (example):
 
 ### List Spaces
 
-```
+```http GET
 GET /api/v1/spaces
 ```
 
 ### Create Space
 
-```
+```http POST
 POST /api/v1/spaces
 Content-Type: application/json
 ```
@@ -123,13 +123,13 @@ Body:
 
 ### Get Space
 
-```
+```http GET
 GET /api/v1/spaces/:id
 ```
 
 ### Delete Space
 
-```
+```http DELETE
 DELETE /api/v1/spaces/:id
 ```
 
@@ -139,26 +139,26 @@ DELETE /api/v1/spaces/:id
 
 Multipart form:
 
-```
+```http POST
 POST /api/v1/files/upload
 Form fields: file=<binary>, space_id=<space>
 ```
 
 ### Get All Files (User Scoped)
 
-```
+```http GET
 GET /api/v1/files/all
 ```
 
 ### List Files in Space
 
-```
+```http GET
 GET /api/v1/files/:space_id
 ```
 
 ### Download File Content
 
-```
+```http POST
 POST /api/v1/files/:space_id/:id
 ```
 
@@ -166,7 +166,7 @@ Returns raw file bytes with appropriate headers.
 
 ### Delete File
 
-```
+```http DELETE
 DELETE /api/v1/files/:space_id/:id
 ```
 
@@ -174,13 +174,13 @@ DELETE /api/v1/files/:space_id/:id
 
 ### Get API Keys (Settings)
 
-```
+```http GET
 GET /api/v1/user/settings
 ```
 
 ### Add/Update API Key (Settings)
 
-```
+```http POST
 POST /api/v1/user/settings
 Content-Type: application/json
 ```
@@ -193,13 +193,13 @@ Body:
 
 ### List Keys (Raw)
 
-```
+```http GET
 GET /api/v1/user/keys
 ```
 
 ### Add/Update Key (Alternate Endpoint)
 
-```
+```http POST
 POST /api/v1/user/keys
 ```
 
@@ -207,7 +207,7 @@ POST /api/v1/user/keys
 
 ### Fetch Configs
 
-```
+```http POST
 POST /api/v1/configs
 ```
 
