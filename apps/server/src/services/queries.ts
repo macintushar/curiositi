@@ -242,3 +242,47 @@ export async function deleteSpaceFromDB(id: string) {
 
   return data;
 }
+
+export async function updateSpaceInDB(
+  id: string,
+  name: string,
+  icon: string | null | undefined,
+  description: string | null | undefined,
+  userId: string,
+) {
+  const updateSpacePromise = async () => {
+    // Build update object with only defined fields
+    const updateData: {
+      name: string;
+      icon?: string | null;
+      description?: string | null;
+    } = { name };
+
+    if (icon !== undefined) {
+      updateData.icon = icon;
+    }
+    if (description !== undefined) {
+      updateData.description = description;
+    }
+
+    const space = await db
+      .update(spaces)
+      .set(updateData)
+      .where(and(eq(spaces.id, id), eq(spaces.createdBy, userId)))
+      .returning();
+    return space;
+  };
+
+  const { data, error } = await tryCatch(updateSpacePromise());
+
+  if (error) {
+    console.error("Error updating space in DB:", error);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error("Space not found");
+  }
+
+  return data;
+}

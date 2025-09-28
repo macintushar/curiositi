@@ -57,6 +57,32 @@ export const createSpace = async (
   };
 };
 
+export const updateSpace = async (
+  id: string,
+  name: string,
+  icon?: string,
+  description?: string,
+) => {
+  const { data, error } = await tryCatch(
+    apiFetch<ApiResponse<Space[]>>(
+      `/api/v1/spaces/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ name, icon, description }),
+      },
+      "json",
+      {
+        "Content-Type": "application/json",
+      },
+    ),
+  );
+
+  return {
+    data,
+    error,
+  };
+};
+
 export const deleteSpace = async (id: string) => {
   const { data, error } = await tryCatch(
     apiFetch<ApiResponse<MessageResponse>>(`/api/v1/spaces/${id}`, {
