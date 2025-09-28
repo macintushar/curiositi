@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import type { NavLink } from "@/types";
+import { docsURL, ghURL } from "./app-constants";
 
 export const webMetaData = {
   siteName: "Curiositi",
@@ -7,19 +8,20 @@ export const webMetaData = {
   url: env.NEXT_PUBLIC_BASE_URL,
 };
 
-export const ghURL = "https://github.com/macintushar/curiositi";
-
 export const navLinks: NavLink[] = [
-  { href: "/#features", label: "Features", isExternal: false },
-  { href: "/#how-it-works", label: "How It Works", isExternal: false },
-  { href: "/#use-cases", label: "Use Cases", isExternal: false },
-  { href: "/#pricing", label: "Pricing", isExternal: false },
+  { href: "/", label: "Home", isExternal: false },
   { href: "/faq", label: "FAQ", isExternal: false },
+  { href: docsURL, label: "Docs", isExternal: true },
 ];
 
 export const footerLinks: NavLink[] = [
   { href: "/#features", label: "Features", isExternal: false },
   { href: "/faq", label: "FAQ", isExternal: false },
+  {
+    href: docsURL,
+    label: "Docs",
+    isExternal: true,
+  },
   {
     href: ghURL,
     label: "GitHub",
