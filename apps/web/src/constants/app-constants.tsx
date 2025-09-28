@@ -10,7 +10,7 @@ import {
 export const ghURL = "https://github.com/macintushar/curiositi";
 export const mcpURL = "https://modelcontextprotocol.io/introduction";
 export const docsURL =
-  env.NODE_ENV === "production"
+  env.NEXT_PUBLIC_BASE_URL !== "http://localhost:3040"
     ? "https://docs.curiositi.xyz"
     : "http://localhost:3035";
 
@@ -28,22 +28,26 @@ export const profileLinks: ProfileLinkGroup[] = [
         label: "Settings",
         isLinkExternal: false,
       },
+    ],
+  },
+  {
+    links: [
       {
         url: docsURL,
         icon: <IconBook className="size-4" />,
         label: "Documentation",
         isLinkExternal: true,
       },
-    ],
-  },
-  {
-    links: [
       {
         url: "/",
         icon: <IconWorld className="size-4" />,
         label: "Homepage",
         isLinkExternal: false,
       },
+    ],
+  },
+  {
+    links: [
       {
         url: ghURL,
         icon: <IconBrandGithub className="size-4" />,
