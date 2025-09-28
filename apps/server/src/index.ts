@@ -198,7 +198,7 @@ app.use(
       "Access-Control-Allow-Credentials",
       "Cookie",
     ],
-    allowMethods: ["POST", "GET", "OPTIONS", "PATCH", "DELETE"],
+    allowMethods: ["POST", "GET", "OPTIONS", "PATCH", "DELETE", "PUT"],
     exposeHeaders: ["Content-Length", "Set-Cookie"],
     maxAge: 600,
     credentials: true,

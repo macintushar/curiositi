@@ -75,7 +75,7 @@ export default function CreateSpaceDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger className="w-full">{trigger}</DialogTrigger>
       <DialogContent>
         <Form {...form}>
           <form

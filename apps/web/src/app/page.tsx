@@ -246,7 +246,7 @@ export default function LandingPage() {
               ctaText="GitHub"
               ctaVariant="default"
               CtaExtra={
-                <div className="flex items-center rounded-full bg-white p-0.5">
+                <div className="flex items-center justify-center rounded-full bg-white p-0.5">
                   <IconBrandGithubFilled className="text-black" />
                 </div>
               }

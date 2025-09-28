@@ -3,6 +3,7 @@ import {
   getSpaceFromDB,
   addSpaceToDB,
   deleteSpaceFromDB,
+  updateSpaceInDB,
 } from "@/services/queries";
 
 export async function getSpacesHandler() {
@@ -31,5 +32,16 @@ export async function getSpaceHandler(id: string) {
 
 export async function deleteSpaceHandler(id: string) {
   const data = await deleteSpaceFromDB(id);
+  return { data };
+}
+
+export async function updateSpaceHandler(
+  id: string,
+  name: string,
+  icon: string | null | undefined,
+  description: string | null | undefined,
+  userId: string,
+) {
+  const data = await updateSpaceInDB(id, name, icon, description, userId);
   return { data };
 }
