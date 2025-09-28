@@ -110,6 +110,11 @@ bun run build
 bun run start
 ```
 
+```bash
+cp ./apps/server/.env.example ./apps/server/.env
+cp ./apps/web/.env.example ./apps/web/.env
+```
+
 ---
 
 ## API overview (Hono, base `/api/v1`)

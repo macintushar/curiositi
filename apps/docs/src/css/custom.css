@@ -1,0 +1,232 @@
+@tailwind preflight;
+@tailwind utilities;
+
+
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  /* Core palette mirrored from web app (light mode) */
+  --background: oklch(0.97 0 0);
+  --foreground: oklch(0.22 0.01 56.06);
+  --card: oklch(0.97 0 0);
+  --card-foreground: oklch(0.22 0.01 56.06);
+  --popover: oklch(0.97 0 0);
+  --popover-foreground: oklch(0.22 0.01 56.06);
+  --primary: oklch(0.43 0.09 166.91);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.38 0.07 168.93);
+  --muted: oklch(0.92 0 49.03);
+  --muted-foreground: oklch(0.55 0.01 58.09);
+  --accent: oklch(0.92 0 49.03);
+  --accent-foreground: oklch(0.22 0.01 56.06);
+  --destructive: oklch(0.58 0.24 28.48);
+  --border: oklch(0.92 0 49.03);
+  --input: oklch(0.92 0 49.03);
+  --ring: oklch(0.72 0.01 56.3);
+  --brand: oklch(43.2% 0.095 166.913);
+
+  /* Bridge to Infima */
+  --ifm-color-primary: var(--primary);
+  --ifm-color-primary-dark: oklch(0.39 0.085 166.91);
+  --ifm-color-primary-darker: oklch(0.36 0.08 166.91);
+  --ifm-color-primary-darkest: oklch(0.32 0.07 166.91);
+  --ifm-color-primary-light: oklch(0.47 0.10 166.91);
+  --ifm-color-primary-lighter: oklch(0.52 0.11 166.91);
+  --ifm-color-primary-lightest: oklch(0.58 0.12 166.91);
+
+  --ifm-background-color: var(--background);
+  --ifm-background-surface-color: var(--card);
+  --ifm-background-alt: var(--popover);
+  --ifm-font-color-base: var(--foreground);
+  --ifm-font-color-secondary: var(--muted-foreground);
+  --ifm-link-color: var(--primary);
+  --ifm-navbar-background-color: var(--background);
+  --ifm-footer-background-color: var(--background);
+  --ifm-color-emphasis-200: var(--border);
+  --ifm-toc-border-color: var(--border);
+  --docusaurus-highlighted-code-line-bg: oklch(0.92 0 49.03 / 0.6);
+  --ifm-code-font-size: 95%;
+
+  /* Fonts */
+  --ifm-font-family-base: var(--font-instrument-sans, 'Instrument Sans', system-ui, sans-serif);
+  --ifm-font-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --ifm-heading-font-family: var(--font-instrument-serif, 'Instrument Serif', Georgia, serif);
+}
+
+/* Heading typography override */
+:root h1, :root h2, :root h3, :root h4, :root h5, :root h6 {
+  font-family: var(--ifm-heading-font-family);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--primary);
+}
+
+/* Accent text utility */
+.accent-text { color: #022c22; }
+[data-theme='dark'] .accent-text { color: #10b981; }
+
+body {
+  font-family: var(--ifm-font-family-base);
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+.navbar, .footer {
+  background: var(--ifm-navbar-background-color) !important;
+}
+.footer {
+  border-top: 1px solid var(--border);
+  padding-top: 2rem;
+}
+.footer__title {
+  color: var(--muted-foreground);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.footer a {
+  color: var(--ifm-link-color);
+  transition: color .2s ease;
+}
+.footer a:hover {
+  color: var(--ifm-color-primary-light);
+  text-decoration: none;
+}
+.footer__bottom {
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  color: var(--ifm-font-color-secondary);
+  font-size: 0.8rem;
+}
+
+.markdown a {
+  color: var(--ifm-link-color);
+}
+
+.sidebar, .menu__list-item a {
+  color: var(--ifm-font-color-secondary);
+}
+
+.menu__list-item a.menu__link--active, .menu__list-item a:hover {
+  color: var(--ifm-color-primary);
+}
+
+/* --- Component Harmonization (using shared tokens) --- */
+.button, .button.button--primary, .theme-edit-this-page, .pagination-nav__link {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid var(--border);
+  transition: background .25s, box-shadow .25s, transform .15s;
+}
+.button:hover, .button.button--primary:hover, .pagination-nav__link:hover {
+  background: oklch(0.47 0.10 166.91);
+  text-decoration: none;
+}
+.button:active {
+  transform: translateY(1px);
+}
+
+.navbar__title, .navbar__brand strong, .navbar__item.navbar__link--active {
+  color: var(--primary);
+}
+
+code, pre code {
+  font-family: var(--ifm-font-family-monospace);
+  background: var(--muted);
+  color: var(--accent-foreground);
+}
+
+pre {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 4px -2px oklch(0 0 0 / 0.25);
+}
+
+blockquote {
+  border-left: 4px solid var(--primary);
+  background: oklch(0.97 0 0 / 0.6);
+  padding: 0.75rem 1rem;
+}
+[data-theme='dark'] blockquote {
+  background: oklch(0.22 0.01 56.06 / 0.06);
+}
+
+/* Table styling */
+.markdown table {
+  border: 1px solid var(--border);
+}
+.markdown table th {
+  background: var(--muted);
+  color: var(--foreground);
+}
+.markdown table td, .markdown table th {
+  border: 1px solid var(--border);
+}
+
+/* Alerts override */
+.alert--primary {
+  --ifm-alert-background-color: var(--primary);
+  --ifm-alert-border-color: var(--primary);
+  --ifm-alert-color: var(--primary-foreground);
+}
+
+/* Gradient utility classes removed (simplified solid color design) */
+
+
+/* Dark mode palette overrides */
+[data-theme='dark'] {
+  --background: oklch(0.147 0.004 49.25);
+  --foreground: oklch(0.985 0.001 106.423);
+  --card: oklch(0.147 0.004 49.25);
+  --card-foreground: oklch(0.985 0.001 106.423);
+  --popover: oklch(0.147 0.004 49.25);
+  --popover-foreground: oklch(0.985 0.001 106.423);
+  --primary: oklch(69.6% 0.17 162.48);
+  --primary-foreground: oklch(0.216 0.006 56.043);
+  --secondary: oklch(0.147 0.004 49.25);
+  --secondary-foreground: oklch(0.985 0.001 106.423);
+  --muted: oklch(0.268 0.007 34.298);
+  --muted-foreground: oklch(0.709 0.01 56.259);
+  --accent: oklch(0.268 0.007 34.298);
+  --accent-foreground: oklch(0.985 0.001 106.423);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.553 0.013 58.071);
+  --brand: oklch(69.6% 0.17 162.48);
+
+  /* Bridge to Infima */
+  --ifm-color-primary: var(--primary);
+  --ifm-color-primary-dark: oklch(0.62 0.16 162.48);
+  --ifm-color-primary-darker: oklch(0.56 0.14 162.48);
+  --ifm-color-primary-darkest: oklch(0.50 0.12 162.48);
+  --ifm-color-primary-light: oklch(0.74 0.19 162.48);
+  --ifm-color-primary-lighter: oklch(0.80 0.20 162.48);
+  --ifm-color-primary-lightest: oklch(0.86 0.21 162.48);
+
+  --ifm-background-color: var(--background);
+  --ifm-background-surface-color: var(--card);
+  --ifm-background-alt: var(--popover);
+  --ifm-font-color-base: var(--foreground);
+  --ifm-font-color-secondary: var(--muted-foreground);
+  --ifm-link-color: var(--primary);
+  --ifm-navbar-background-color: var(--background);
+  --ifm-footer-background-color: var(--background);
+  --ifm-color-emphasis-200: var(--border);
+  --ifm-toc-border-color: var(--border);
+  --docusaurus-highlighted-code-line-bg: oklch(0.37 0.01 68 / 0.35);
+}
+
+[data-theme='dark'] h1, [data-theme='dark'] h2, [data-theme='dark'] h3, [data-theme='dark'] h4, [data-theme='dark'] h5, [data-theme='dark'] h6 {
+  font-family: var(--ifm-heading-font-family);
+  color: var(--primary);
+}
