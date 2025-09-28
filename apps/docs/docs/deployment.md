@@ -67,6 +67,7 @@ docker run --rm -p 3030:3030 \
 | Render / Railway | Suitable for Bun server & Postgres                                                                                    |
 | Docker Compose   | Local integrated stack (DB + server + web)                                                                            |
 | Kubernetes       | Scale server horizontally; ensure sticky session not required (session cookie approach stateless if storage external) |
+| Self-Hosting     | Complete control over infrastructure; see [Self-Hosting Guide](self-hosting.md) for detailed setup                    |
 
 ## Scaling Considerations
 

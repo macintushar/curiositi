@@ -62,7 +62,7 @@ const features = [
   {
     title: "Deployment Ready",
     description:
-      "Docker + compose + Bun. Run locally or deploy to your infra in minutes.",
+      "Docker + compose + Bun. Run locally, self-host, or deploy to your infra in minutes.",
     to: "/docs/deployment",
     icon: <IconBrandDocker size={24} />,
   },
@@ -70,6 +70,7 @@ const features = [
 
 const quickLinks = [
   { label: "Getting Started", to: "/docs/getting-started" },
+  { label: "Self-Hosting", to: "/docs/self-hosting" },
   { label: "Architecture", to: "/docs/architecture" },
   { label: "API Reference", to: "/docs/api" },
   { label: "Ingestion", to: "/docs/ingestion" },
@@ -260,7 +261,7 @@ bun run dev`}
               orchestration; Next.js 15 for the web UI; Postgres + pgvector for
               embeddings; and a pluggable LLM/embedding layer. Retrieval blends
               vector similarity, space/file filters and optional web search
-              (SearXNG) before answer generation.
+              (Firecrawl) before answer generation.
             </p>
             <p>
               See the <Link to="/docs/architecture">Architecture</Link> and{" "}

@@ -39,7 +39,7 @@ Curiositi is a private, self‑hostable Retrieval‑Augmented Generation (RAG) w
 - **File ingestion**: PDF, Office, Markdown/CSV/TXT; automatic text extraction, chunking, and embeddings.
 - **Vector search**: OpenAI embeddings in Postgres using `pgvector` via Drizzle.
 - **RAG chat**: an agent plans queries, searches your docs and the web in parallel, then synthesizes an answer with reasoning and follow‑ups.
-- **Web search**: SearXNG meta‑search integration.
+- **Web search**: Firecrawl search integration.
 - **Providers**: OpenAI, Anthropic, and OpenRouter; configurable per‑user API keys.
 - **Configs API**: surfaces enabled providers and supported file types to the UI.
 - **Observability**: optional Sentry instrumentation.
@@ -73,7 +73,7 @@ The Curiositi project is structured as a monorepo, containing several key compon
 - **File Ingestion**: Supports various file types including PDF, Office documents, and text files, with automatic text extraction and chunking.
 - **Vector Search**: Utilizes OpenAI embeddings stored in Postgres using `pgvector` for efficient search capabilities.
 - **RAG Chat**: An agent that plans queries, searches documents and the web, and synthesizes answers with reasoning.
-- **Web Search**: Integration with SearXNG for meta-search capabilities.
+- **Web Search**: Integration with Firecrawl for web search and content extraction.
 - **Providers**: Supports OpenAI, Anthropic, and OpenRouter, with configurable API keys per user.
 - **Observability**: Optional Sentry instrumentation for monitoring and logging.
 
@@ -166,7 +166,7 @@ Services:
 - `server` (Bun API) on 3030
 - `web-ui` (Next.js) on 3040
 - `postgres` with persistent volume and healthcheck
-- `searxng` meta‑search (optional web search) on 8095
+- Firecrawl API integration for web search and content extraction
 
 The server runs `bun run db:migrate` on start and mounts hot‑reload volumes for development.
 

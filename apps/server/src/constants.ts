@@ -64,8 +64,8 @@ export const OPENAI_ENABLED = OPENAI_API_KEY ? true : false;
 export const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 export const ANTHROPIC_ENABLED = ANTHROPIC_API_KEY ? true : false;
 
-// SearXNG
-export const SEARXNG_URL = process.env.SEARXNG_URL || "http://localhost:8095";
+// Firecrawl
+export const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY;
 
 // Sentry
 export const SENTRY_DSN = process.env.SENTRY_DSN;
