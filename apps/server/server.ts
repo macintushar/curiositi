@@ -1,6 +1,6 @@
 import app from "./src";
 import {
-  SEARXNG_URL,
+  FIRECRAWL_API_KEY,
   PORT,
   DATABASE_URL,
   DEFAULT_EMBEDDING_PROVIDER,
@@ -20,7 +20,7 @@ try {
   });
   console.log("Server is running on port", PORT);
   console.log(
-    `SearXNG URL: ${SEARXNG_URL}
+    `Firecrawl API Key: ${FIRECRAWL_API_KEY ? "Configured" : "Not configured"}
     Database URL: ${DATABASE_URL}
     Default Embedding Provider: ${DEFAULT_EMBEDDING_PROVIDER}`,
   );

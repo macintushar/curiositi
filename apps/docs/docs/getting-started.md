@@ -7,7 +7,7 @@ A formal setup guide for developers and OSS contributors.
 - Bun >= 1.0 (monorepo scripts & server runtime)
 - Node.js >= 20 (tooling compatibility if needed)
 - Git, Docker (optional for DB), Postgres instance
-- (Optional) Sentry account, LLM provider keys (OpenAI, Anthropic, OpenRouter)
+- (Optional) Sentry account, LLM provider keys (OpenAI, Anthropic, OpenRouter), Firecrawl API key
 
 ## 2. Clone & Install
 
@@ -58,6 +58,8 @@ NEXT_PUBLIC_SERVER_URL=http://localhost:3030
 ```
 
 Add provider keys when testing embeddings / model inference.
+
+For web search functionality, see the [Self-Hosting Guide](self-hosting.md) for Firecrawl configuration options.
 
 ## 5. Database Setup
 

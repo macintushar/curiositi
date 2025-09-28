@@ -41,7 +41,7 @@ export const faqs: FAQ[] = [
   {
     question: "How does the Retrieval-Augmented Generation (RAG) system work?",
     answer:
-      "The agent determines whether to answer directly or retrieve context. In space mode, it searches your uploaded documents; in general mode, it queries the web via SearXNG, then synthesizes a final response.",
+      "The agent determines whether to answer directly or retrieve context. In space mode, it searches your uploaded documents; in general mode, it queries the web via Firecrawl, then synthesizes a final response.",
   },
   {
     question: "How do I perform a search?",

@@ -12,7 +12,6 @@ services:
       - NODE_ENV=development
       - SERVER_PORT=3030
       - DATABASE_URL=postgres://user:password@postgres:5432/mydb
-      - SEARXNG_URL=http://searxng:8080
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - BETTER_AUTH_SECRET=your-secret-key-here-change-in-production
       - UI_HOST=http://localhost:3040
@@ -25,8 +24,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      searxng:
-        condition: service_started
     command: sh -c "bun run db:migrate && bun run start"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3030/"]
@@ -63,16 +60,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  searxng:
-    image: searxng/searxng:latest
-    ports:
-      - "8095:8080"
-    volumes:
-      - searxng_data:/etc/searxng:rw
-    environment:
-      - SEARXNG_HOSTNAME=searxng
-    restart: unless-stopped
-
   postgres:
     image: postgres:16-alpine
     ports:
@@ -93,6 +80,4 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-  searxng_data:
     driver: local

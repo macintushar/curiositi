@@ -11,7 +11,7 @@ Curiositi blends **vector similarity**, lightweight metadata filtering, and opti
 1. **Ingestion** – Files are uploaded, text is extracted (PDF/Office/plain), chunked, and embedded.
 2. **Storage** – Chunks + embeddings persisted in Postgres using the `vector` type (pgvector extension).
 3. **Query** – A user message triggers: embedding of the query -> vector similarity search -> optional keyword / metadata refinement.
-4. **Web Augmentation (Optional)** – If enabled, a SearXNG meta-search fetches fresh snippets which are normalized and scored.
+4. **Web Augmentation (Optional)** – If enabled, Firecrawl search fetches fresh web content which is normalized and scored. See the [Self-Hosting Guide](self-hosting.md) for Firecrawl configuration options.
 5. **Context Assembly** – Top document chunks + (optional) web results are merged, deduplicated, and truncated to model token budget.
 6. **Generation** – An LLM produces the final answer citing which sources were used when possible.
 

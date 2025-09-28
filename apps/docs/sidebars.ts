@@ -20,6 +20,7 @@ const sidebars: SidebarsConfig = {
     "env",
     "architecture",
     "deployment",
+    "self-hosting",
     "styling",
     "search",
     {
