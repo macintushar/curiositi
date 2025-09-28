@@ -21,7 +21,7 @@ import agentFlowImage from "@/assets/images/agent-flow.png";
 import Header from "@/views/landing/header";
 import Footer from "@/views/landing/footer";
 
-import { ghURL } from "@/constants/landing-constants";
+import { ghURL } from "@/constants/app-constants";
 
 export default function LandingPage() {
   return (
