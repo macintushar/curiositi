@@ -11,20 +11,6 @@ Curiositi is an Elastic-licensed, developer-focused knowledge and AI interaction
 - **User Spaces & File Scoping:** Logical isolation for retrieval and access.
 - **Extensible API Layer:** Hono-based modular routing with Zod validation.
 
-## High-Level Architecture
-
-```text
-┌───────────────────────── Monorepo (Turbo + Bun) ─────────────────────────┐
-│ apps/                                                                    │
-│   web/ (Next.js 15, Tailwind)  → UI + Auth + Chat + File UX              │
-│   server/ (Bun + Hono)        → API, Auth, Ingestion, Search, LLM Proxy  │
-│   docs/ (Docusaurus)          → This documentation                       │
-│ packages/                                                                │
-│   share/ → Shared types/utilities                                        │
-│ Postgres + Vector Layer (in-memory / custom store integration)           │
-└──────────────────────────────────────────────────────────────────────────┘
-```
-
 ## Technology Stack
 
 - **Runtime:** Bun (scripts + server) / Node-compatible environment.

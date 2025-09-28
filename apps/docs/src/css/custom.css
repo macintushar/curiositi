@@ -32,6 +32,21 @@
   --ring: oklch(0.72 0.01 56.3);
   --brand: oklch(43.2% 0.095 166.913);
 
+  /* Derived color tokens with alpha values */
+  --primary-5: color-mix(in srgb, var(--primary) 5%, transparent);
+  --primary-10: color-mix(in srgb, var(--primary) 10%, transparent);
+  --primary-15: color-mix(in srgb, var(--primary) 15%, transparent);
+  --primary-20: color-mix(in srgb, var(--primary) 20%, transparent);
+  --primary-25: color-mix(in srgb, var(--primary) 25%, transparent);
+  --primary-35: color-mix(in srgb, var(--primary) 35%, transparent);
+  --primary-40: color-mix(in srgb, var(--primary) 40%, transparent);
+  --primary-50: color-mix(in srgb, var(--primary) 50%, transparent);
+  --primary-60: color-mix(in srgb, var(--primary) 60%, transparent);
+  --primary-80: color-mix(in srgb, var(--primary) 80%, transparent);
+  --primary-90: color-mix(in srgb, var(--primary) 90%, transparent);
+  --background-50: color-mix(in srgb, var(--background) 50%, transparent);
+  --border-40: color-mix(in srgb, var(--border) 40%, transparent);
+
   /* Bridge to Infima */
   --ifm-color-primary: var(--primary);
   --ifm-color-primary-dark: oklch(0.39 0.085 166.91);
@@ -309,6 +324,21 @@ blockquote {
   --ring: oklch(0.553 0.013 58.071);
   --brand: oklch(69.6% 0.17 162.48);
 
+  /* Derived color tokens with alpha values (dark mode) */
+  --primary-5: color-mix(in srgb, var(--primary) 5%, transparent);
+  --primary-10: color-mix(in srgb, var(--primary) 10%, transparent);
+  --primary-15: color-mix(in srgb, var(--primary) 15%, transparent);
+  --primary-20: color-mix(in srgb, var(--primary) 20%, transparent);
+  --primary-25: color-mix(in srgb, var(--primary) 25%, transparent);
+  --primary-35: color-mix(in srgb, var(--primary) 35%, transparent);
+  --primary-40: color-mix(in srgb, var(--primary) 40%, transparent);
+  --primary-50: color-mix(in srgb, var(--primary) 50%, transparent);
+  --primary-60: color-mix(in srgb, var(--primary) 60%, transparent);
+  --primary-80: color-mix(in srgb, var(--primary) 80%, transparent);
+  --primary-90: color-mix(in srgb, var(--primary) 90%, transparent);
+  --background-50: color-mix(in srgb, var(--background) 50%, transparent);
+  --border-40: color-mix(in srgb, var(--border) 40%, transparent);
+
   /* Bridge to Infima */
   --ifm-color-primary: var(--primary);
   --ifm-color-primary-dark: oklch(0.62 0.16 162.48);
@@ -425,16 +455,16 @@ blockquote {
   padding: 0.75rem 2rem !important;
   font-weight: 500 !important;
   transition: all 0.2s ease !important;
-  box-shadow: 0 4px 14px 0 var(--primary) / 25% !important;
+  box-shadow: 0 4px 14px 0 var(--primary-25) !important;
   display: inline-flex !important;
   align-items: center !important;
   gap: 0.5rem !important;
 }
 
 .hero-button-primary:hover {
-  background: var(--primary) / 90% !important;
+  background: var(--primary-90) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 6px 20px 0 var(--primary) / 35% !important;
+  box-shadow: 0 6px 20px 0 var(--primary-35) !important;
 }
 
 .hero-button-secondary {
@@ -491,7 +521,7 @@ blockquote {
 }
 
 .feature-icon {
-  background: var(--primary) / 10% !important;
+  background: var(--primary-10) !important;
   color: var(--primary) !important;
   width: 3rem !important;
   height: 3rem !important;
@@ -504,7 +534,7 @@ blockquote {
 }
 
 .feature-card:hover .feature-icon {
-  background: var(--primary) / 15% !important;
+  background: var(--primary-15) !important;
   transform: scale(1.05) !important;
 }
 
@@ -515,15 +545,15 @@ blockquote {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--primary), var(--primary) / 60%);
+  background: linear-gradient(90deg, var(--primary), var(--primary-60));
   transform: scaleX(0);
   transition: transform 0.2s ease;
 }
 
 .feature-card:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px -5px var(--primary) / 10% !important;
-  border-color: var(--primary) / 20% !important;
+  box-shadow: 0 8px 25px -5px var(--primary-10) !important;
+  border-color: var(--primary-20) !important;
 }
 
 .feature-card:hover::before {
@@ -597,8 +627,8 @@ blockquote {
 
 .quick-link-card:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px -5px var(--primary) / 10% !important;
-  border-color: var(--primary) / 20% !important;
+  box-shadow: 0 8px 25px -5px var(--primary-10) !important;
+  border-color: var(--primary-20) !important;
   text-decoration: none !important;
 }
 
@@ -624,7 +654,7 @@ pre {
   background: var(--card) !important;
   border: 1px solid var(--border) !important;
   border-radius: 0.75rem !important;
-  box-shadow: 0 4px 6px -1px var(--primary) / 5% !important;
+  box-shadow: 0 4px 6px -1px var(--primary-5) !important;
   padding: 1.5rem !important;
   overflow-x: auto !important;
   position: relative !important;
@@ -644,7 +674,7 @@ pre code {
 }
 
 .section-badge {
-  background: var(--primary) / 10% !important;
+  background: var(--primary-10) !important;
   color: var(--primary) !important;
   margin-bottom: 0.5rem !important;
   display: inline-flex !important;
@@ -724,7 +754,7 @@ pre code {
   overflow: hidden;
   border-radius: 0.75rem;
   border: 1px solid var(--border);
-  box-shadow: 0 8px 25px -5px var(--primary) / 10%;
+  box-shadow: 0 8px 25px -5px var(--primary-10);
   background: var(--card);
 }
 
@@ -735,7 +765,7 @@ pre code {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--primary) / 5% 0%, transparent 50%);
+  background: linear-gradient(135deg, var(--primary-5) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -762,7 +792,7 @@ pre code {
 
 .demo-content {
   padding: 1.5rem;
-  background: var(--background) / 50%;
+  background: var(--background-50);
   margin: 0;
 }
 
@@ -774,7 +804,7 @@ pre code {
 }
 
 .demo-sources {
-  border-top: 1px solid var(--border) / 40%;
+  border-top: 1px solid var(--border-40);
   padding-top: 1rem;
 }
 
@@ -827,7 +857,7 @@ pre code {
 
 .architecture-content a:hover,
 .community-content a:hover {
-  color: var(--primary) / 80% !important;
+  color: var(--primary-80) !important;
   text-decoration: underline !important;
 }
 
@@ -864,7 +894,7 @@ a {
 
 .markdown a:hover,
 a:hover {
-  color: var(--primary) / 80% !important;
+  color: var(--primary-80) !important;
   text-decoration: underline !important;
 }
 
@@ -882,7 +912,7 @@ a:hover {
 }
 
 .button--primary:hover {
-  background: var(--primary) / 90% !important;
+  background: var(--primary-90) !important;
   transform: translateY(-1px) !important;
 }
 

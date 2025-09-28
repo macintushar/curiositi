@@ -105,6 +105,7 @@ export default function Home(): ReactNode {
               <Link
                 className="button button--primary button--lg hero-button-primary"
                 to="https://curiositi.xyz"
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 <span>Try Curiositi Cloud</span>
@@ -119,6 +120,8 @@ export default function Home(): ReactNode {
               <Link
                 className="button button--outline button--lg hero-button-outline"
                 to="https://github.com/macintushar/curiositi"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <IconBrandGithub size={16} />
                 GitHub Repo
