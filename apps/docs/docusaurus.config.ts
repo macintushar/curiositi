@@ -73,10 +73,6 @@ const config: Config = {
           label: "Documentation",
         },
         {
-          type: "search",
-          position: "right",
-        },
-        {
           href: "https://curiositi.xyz",
           label: "Cloud",
           position: "right",
@@ -130,20 +126,7 @@ const config: Config = {
     },
   } satisfies Preset.ThemeConfig,
 
-  plugins: [
-    [
-      require.resolve("@easyops-cn/docusaurus-search-local"),
-      {
-        indexDocs: true,
-        indexBlog: false,
-        indexPages: true,
-        hashed: true,
-        docsRouteBasePath: "/docs",
-        highlightSearchTermsOnTargetPage: true,
-        searchResultContextMaxLength: 60,
-      },
-    ],
-  ],
+  plugins: [],
 };
 
 export default config;

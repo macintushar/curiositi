@@ -5,7 +5,8 @@
   "types": "./types.ts",
   "exports": {
     ".": "./types.ts",
-    "./types": "./types.ts"
+    "./types": "./types.ts",
+    "./utils": "./utils.ts"
   },
   "dependencies": {
     "typescript": "latest"
