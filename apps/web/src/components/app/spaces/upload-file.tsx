@@ -1,24 +1,25 @@
 "use client";
-import { IconFilePlus } from "@tabler/icons-react";
+import { IconFilePlus, IconFileUpload } from "@tabler/icons-react";
 import Image from "next/image";
 
 import emptySpace from "@/assets/images/add-files.svg";
 import { toast } from "sonner";
 import useChatStore from "@/stores/useChatStore";
 import { useUploadFile } from "@/hooks/use-spaces";
-import { PulseLoader } from "@/components/ui/loader";
 
 type UploadFileProps = {
   areFilesInSpace: boolean;
   spaceId: string;
+  refetch: () => void;
 };
 
 export default function UploadFile({
   areFilesInSpace,
   spaceId,
+  refetch,
 }: UploadFileProps) {
   const { configs } = useChatStore();
-  const { mutate: uploadFile, isPending, data, error } = useUploadFile();
+  const { mutate: uploadFile, data, isPending, error } = useUploadFile();
 
   const handleClick = async () => {
     const fileInput = document.createElement("input");
@@ -39,14 +40,17 @@ export default function UploadFile({
 
         if (error) {
           toast.error(error.message);
+          void refetch();
         }
 
         if (data) {
           if (data.data && data.data.message) {
             toast.success(data.data.message);
+            void refetch();
           }
           if (data.error) {
             toast.error(data.error);
+            void refetch();
           }
         }
       }
@@ -60,7 +64,10 @@ export default function UploadFile({
       className={`border-sidebar-border bg-primary-foreground hover:bg-muted w-full rounded-[12px] border-[1px] border-dashed p-5 hover:cursor-pointer ${areFilesInSpace ? "h-fit" : "h-full"}`}
     >
       {isPending ? (
-        <PulseLoader />
+        <div className="flex h-full animate-pulse items-center justify-center gap-2">
+          <IconFileUpload className="text-muted-foreground size-5" />
+          <p className="text-muted-foreground">Uploading</p>
+        </div>
       ) : areFilesInSpace ? (
         <div className="flex h-full items-center justify-center gap-2">
           <IconFilePlus className="text-muted-foreground h-5 w-5" />

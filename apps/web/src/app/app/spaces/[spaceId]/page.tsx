@@ -19,8 +19,13 @@ export default function Space({
   params: Promise<{ spaceId: string }>;
 }) {
   const { spaceId } = use(params);
-  const { data, error } = useSpace(spaceId);
-  const { data: files, error: filesError } = useFilesInSpace(spaceId);
+  const { data, error, refetch, isPending } = useSpace(spaceId);
+  const {
+    data: files,
+    error: filesError,
+    isPending: filesPending,
+    refetch: refetchFiles,
+  } = useFilesInSpace(spaceId);
   const deleteFileMutation = useDeleteFile();
 
   if (error || filesError) {
@@ -35,7 +40,11 @@ export default function Space({
     );
   }
 
-  if (data?.error || files?.error || !data?.data?.space) {
+  if (
+    data?.error ||
+    (files?.error && !filesPending) ||
+    (!data?.data?.space && !isPending)
+  ) {
     return (
       <div>
         Error: {data?.error}
@@ -49,17 +58,22 @@ export default function Space({
       <div className="flex h-full w-full flex-col gap-4 md:w-2/3 md:pt-40">
         <div className="flex items-center justify-between">
           <div className="flex gap-4 text-3xl font-medium">
-            <h1>
-              {data?.data.space.icon} {data?.data.space.name}
-            </h1>
+            {isPending ? (
+              <div className="bg-muted h-8 w-xs animate-pulse" />
+            ) : (
+              <h1>
+                {data?.data.space.icon} {data?.data.space.name}
+              </h1>
+            )}
           </div>
 
-          <SpaceActions space={data?.data?.space ?? null} />
+          <SpaceActions space={data?.data?.space ?? null} refetch={refetch} />
         </div>
         <div className="flex max-h-full min-h-0 flex-1 flex-col gap-6">
           <UploadFile
             spaceId={spaceId}
             areFilesInSpace={(files?.data && files.data.length > 0) ?? false}
+            refetch={refetchFiles}
           />
           <ScrollArea className="flex h-full max-h-full w-full flex-1 flex-col">
             {files?.data.map((fileItem) => (
