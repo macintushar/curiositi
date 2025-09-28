@@ -16,7 +16,12 @@ export default async function Header() {
         </Link>
         <nav className="hidden gap-8 md:flex">
           {navLinks.map((link, idx) => (
-            <NavLink key={idx} href={link.href} label={link.label} />
+            <NavLink
+              key={idx}
+              href={link.href}
+              label={link.label}
+              isExternal={link.isExternal}
+            />
           ))}
         </nav>
         <div className="flex items-center gap-4">
