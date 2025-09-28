@@ -1,5 +1,5 @@
 import { FIRECRAWL_API_KEY } from "@/constants";
-import { Firecrawl } from "firecrawl";
+import Firecrawl from "@mendable/firecrawl-js";
 
 // Initialize Firecrawl client only if API key is available
 const firecrawl = FIRECRAWL_API_KEY
@@ -28,21 +28,47 @@ export const webSearchTool = {
         },
       });
 
-      console.log(`[WebSearch] Results: ${JSON.stringify(results)}`);
+      console.log(`[WebSearch] Raw results: ${JSON.stringify(results)}`);
 
-      // Handle the response based on the actual API structure
-      if (!results || !Array.isArray(results)) {
-        console.log(`[WebSearch] No results found for: ${query}`);
-        return `No search results found for: ${query}`;
-      }
+      const getField = (value: unknown, field: string): unknown =>
+        typeof value === "object" && value !== null
+          ? (value as Record<string, unknown>)[field]
+          : undefined;
 
-      if (results.length === 0) {
+      const directCandidates: unknown[] = [
+        results,
+        getField(results, "data"),
+        getField(results, "web"),
+        getField(results, "items"),
+        getField(results, "results"),
+      ];
+
+      const dataField = getField(results, "data");
+      const nestedCandidates: unknown[] = [
+        getField(dataField, "web"),
+        getField(dataField, "items"),
+        getField(dataField, "results"),
+        getField(dataField, "hits"),
+      ];
+
+      const candidateArrays = [...directCandidates, ...nestedCandidates];
+
+      const hitsCandidate = candidateArrays.find(
+        (value): value is Array<Record<string, unknown>> =>
+          Array.isArray(value),
+      );
+
+      const hits = hitsCandidate ?? [];
+
+      console.log(`[WebSearch] Normalized hits count: ${hits.length}`);
+
+      if (hits.length === 0) {
         console.log(`[WebSearch] No results found for: ${query}`);
         return `No search results found for: ${query}`;
       }
 
       // Format the results for the agent
-      const formattedResults = results
+      const formattedResults = hits
         .map((result: Record<string, unknown>, index: number) => {
           const title =
             (result.title as string) || (result.name as string) || "Untitled";
@@ -62,7 +88,7 @@ Description: ${description}`;
         })
         .join("\n\n");
 
-      console.log(`[WebSearch] Found ${results.length} results for: ${query}`);
+      console.log(`[WebSearch] Found ${hits.length} results for: ${query}`);
       return `Search results for "${query}":\n\n${formattedResults}`;
     } catch (error) {
       console.error("[WebSearch] Firecrawl search error:", error);
