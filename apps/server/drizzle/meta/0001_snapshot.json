@@ -1,5 +1,5 @@
 {
-  "id": "dbf5d1e6-ce08-4d67-855e-890e6e807c52",
+  "id": "8a006429-4c77-4277-aa2c-506c85ffa58c",
   "prevId": "f41f1a65-3428-489b-8145-337caec3d9c1",
   "version": "7",
   "dialect": "postgresql",
@@ -344,52 +344,39 @@
           "primaryKey": false,
           "notNull": true
         },
-        "document_searches": {
-          "name": "document_searches",
-          "type": "text[]",
+        "tool_calls": {
+          "name": "tool_calls",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "web_searches": {
-          "name": "web_searches",
-          "type": "text[]",
+        "tool_results": {
+          "name": "tool_results",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "document_search_results": {
-          "name": "document_search_results",
-          "type": "text[]",
+        "sources": {
+          "name": "sources",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
-        },
-        "web_search_results": {
-          "name": "web_search_results",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "specific_file_content": {
-          "name": "specific_file_content",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "follow_up_suggestions": {
-          "name": "follow_up_suggestions",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "strategy": {
-          "name": "strategy",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'comprehensive'"
         },
         "reasoning": {
           "name": "reasoning",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "finish_reason": {
+          "name": "finish_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usage": {
+          "name": "usage",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         }

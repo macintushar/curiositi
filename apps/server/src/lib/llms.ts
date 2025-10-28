@@ -21,7 +21,6 @@ export const openRouter = createOpenRouter({
 
 export const openai = createOpenAI({
   apiKey: OPENAI_API_KEY,
-  compatibility: "strict",
 });
 
 export const anthropic = createAnthropic({
@@ -47,7 +46,7 @@ export function llm(model: string, provider: LLM_PROVIDERS) {
 export function llmEmbedding(provider: EMBEDDING_PROVIDERS) {
   switch (provider) {
     case EMBEDDING_PROVIDERS.OPENAI:
-      return openai.embedding(OPENAI_EMBEDDING_MODEL, { dimensions: 1024 });
+      return openai.textEmbeddingModel(OPENAI_EMBEDDING_MODEL);
 
     default:
       throw new Error(`Embedding not supported for provider: ${provider}`);

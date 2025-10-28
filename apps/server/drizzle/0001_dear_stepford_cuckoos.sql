@@ -45,14 +45,12 @@ CREATE TABLE "messages" (
 	"thread_id" uuid NOT NULL,
 	"model" text NOT NULL,
 	"provider" text NOT NULL,
-	"document_searches" text[],
-	"web_searches" text[],
-	"document_search_results" text[],
-	"web_search_results" text[],
-	"specific_file_content" text[],
-	"follow_up_suggestions" text[],
-	"strategy" text DEFAULT 'comprehensive',
-	"reasoning" text
+	"tool_calls" jsonb,
+	"tool_results" jsonb,
+	"sources" jsonb,
+	"reasoning" text,
+	"finish_reason" text,
+	"usage" jsonb
 );
 --> statement-breakpoint
 CREATE TABLE "session" (

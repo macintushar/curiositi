@@ -34,10 +34,6 @@ export async function searchHandler({
     columns: {
       role: true,
       content: true,
-      documentSearches: true,
-      webSearches: true,
-      documentSearchResults: true,
-      webSearchResults: true,
     },
   });
 
@@ -66,10 +62,10 @@ export async function searchHandler({
             .max(50)
             .describe("The title of the chat thread"),
         }),
-        system: `You are a helpful assistant that generates titles for chat threads. 
-        The title should be a single sentence that captures the main idea of the chat thread. 
-        Give only the title, no other text. The title should be no more than 30 characters. 
-        The title should be in the same language as the message. Do not include any other text in your response. 
+        system: `You are a helpful assistant that generates titles for chat threads.
+        The title should be a single sentence that captures the main idea of the chat thread.
+        Give only the title, no other text. The title should be no more than 30 characters.
+        The title should be in the same language as the message. Do not include any other text in your response.
         Do not generate a title that is too generic or vague. Do not give more than one title.`,
         prompt: `Generate a title for a chat thread based on this message: ${input}. ${formattedHistory.length > 0 ? `The previous messages are: ${formattedHistory.map((h) => h.content).join("\n")}` : ""}`,
       });

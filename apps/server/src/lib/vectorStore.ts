@@ -4,6 +4,7 @@ import { documents } from "@/db/schema";
 import { llmEmbedding } from "@/lib/llms";
 import { and, cosineDistance, eq, gt, sql } from "drizzle-orm";
 import { tryCatch } from "@/lib/try-catch";
+import { embedMany } from "ai";
 
 export async function addDocumentsToVectorStore(
   chunk: string,
@@ -52,11 +53,17 @@ export const generateEmbeddings = async (
       throw new Error("Embedding model not found");
     }
 
-    const response = await embeddingModel.doEmbed({
+    const { embeddings } = await embedMany({
+      model: embeddingModel,
       values: texts,
+      providerOptions: {
+        openai: {
+          dimensions: 1024,
+        },
+      },
     });
 
-    return response.embeddings || [];
+    return embeddings;
   };
 
   const { data, error } = await tryCatch(generateEmbeddingsPromise());

@@ -20,3 +20,9 @@ export type ServerThreadMessage = {
   strategy: "comprehensive" | "focused" | "hybrid" | "error";
   reasoning: string | null;
 };
+
+export type SearchResult = {
+  title: string;
+  content: string;
+  source: string;
+};
