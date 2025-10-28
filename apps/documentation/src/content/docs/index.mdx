@@ -1,0 +1,79 @@
+---
+title: Curiositi Documentation
+description: Build an AI-powered knowledge workspace that chats over your documents and the web.
+template: splash
+hero:
+  tagline: Get answers from your documents and the web
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Try Curiositi Cloud
+      link: https://curiositi.xyz
+      icon: external
+      variant: primary
+    - text: Self-Host Docs
+      link: /getting-started
+      icon: right-arrow
+    - text: GitHub Repo
+      link: https://github.com/macintushar/curiositi
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## Quick Start
+
+Get up and running with Curiositi:
+
+```bash
+# Clone
+git clone https://github.com/macintushar/curiositi
+cd curiositi
+
+# Install deps
+bun install
+
+# Copy env templates
+cp ./apps/server/.env.example ./apps/server/.env
+cp ./apps/web/.env.example ./apps/web/.env
+
+# Run migrations (requires Postgres + pgvector)
+bun run db:migrate
+
+# Start dev (server + web)
+bun run dev
+```
+
+## Key Features
+
+<CardGrid stagger>
+	<LinkCard title="Document Intelligence" href="/ingestion">
+		Upload PDFs, Office docs, text & more. We extract, chunk and index for semantic retrieval.
+	</LinkCard>
+	<LinkCard title="Hybrid Retrieval (RAG)" href="/architecture">
+		Combine your private corpus with fresh web results for grounded, up-to-date answers.
+	</LinkCard>
+	<LinkCard title="Secure Auth" href="/api">
+		Session + API key management powered by better-auth with scoped provider keys.
+	</LinkCard>
+	<LinkCard title="Spaces & Search" href="/search">
+		Organize files into spaces; fast vector + keyword search surfaces relevant context.
+	</LinkCard>
+	<LinkCard title="Extensible Models" href="/llm-agent">
+		Bring your own OpenAI, Anthropic, or OpenRouter keys; swap embedding / chat models.
+	</LinkCard>
+	<LinkCard title="Deployment Ready" href="/deployment">
+		Docker + compose + Bun. Run locally, self-host, or deploy to your infra in minutes.
+	</LinkCard>
+</CardGrid>
+
+## Essential Documentation
+
+<LinkCard title="Getting Started" href="/getting-started" />
+<LinkCard title="Self-Hosting" href="/self-hosting" />
+<LinkCard title="Architecture" href="/architecture" />
+<LinkCard title="API Reference" href="/api" />
+<LinkCard title="Ingestion" href="/ingestion" />
+<LinkCard title="Styling" href="/styling" />
+<LinkCard title="Troubleshooting" href="/troubleshooting" />

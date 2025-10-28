@@ -64,7 +64,7 @@ The Curiositi project is structured as a monorepo, containing several key compon
 
 - **apps/web**: This is the Next.js 15 app router UI, responsible for the frontend interface of Curiositi.
 - **apps/server**: This is the Bun + Hono API server, handling backend operations and API requests.
-- **apps/docs**: Contains the Docusaurus documentation for Curiositi, providing comprehensive guides and references.
+- **apps/documentation**: Contains the Astro Starlight documentation for Curiositi, providing comprehensive guides and references.
 - **packages/share**: Houses shared TypeScript types used across different parts of the application.
 
 ### Key Features

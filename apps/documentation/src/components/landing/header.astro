@@ -1,0 +1,75 @@
+---
+// Simple header for the documentation landing page
+---
+
+<script>
+  // Dark mode toggle functionality
+  function toggleDarkMode() {
+    const html = document.documentElement;
+    const isDark = html.classList.contains('dark');
+
+    if (isDark) {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    } else {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  }
+
+  // Initialize theme on page load
+  function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  }
+
+  // Initialize theme when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+  } else {
+    initTheme();
+  }
+</script>
+
+<header class="bg-background/80 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur-md">
+  <div class="flex h-16 items-center justify-between px-4 md:px-6">
+    <a href="/" class="flex items-center gap-2">
+      <img src="/logo.svg" alt="Curiositi" class="h-8 w-auto" />
+    </a>
+
+    <nav class="hidden gap-8 md:flex">
+      <a href="#features" class="text-sm font-medium hover:text-primary transition-colors">Features</a>
+      <a href="#how-it-works" class="text-sm font-medium hover:text-primary transition-colors">How It Works</a>
+      <a href="#use-cases" class="text-sm font-medium hover:text-primary transition-colors">Use Cases</a>
+      <a href="#pricing" class="text-sm font-medium hover:text-primary transition-colors">Pricing</a>
+      <a href="/overview" class="text-sm font-medium hover:text-primary transition-colors">Docs</a>
+    </nav>
+
+     <div class="flex items-center gap-4">
+       <button
+         onclick="toggleDarkMode()"
+         class="bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground p-2 rounded-full text-sm font-medium transition-colors"
+         aria-label="Toggle dark mode"
+       >
+         <svg class="h-4 w-4 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+         </svg>
+         <svg class="h-4 w-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+         </svg>
+       </button>
+       <a
+         href="https://github.com/macintushar/curiositi"
+         target="_blank"
+         rel="noopener noreferrer"
+         class="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-full text-sm font-medium transition-colors"
+       >
+         GitHub
+       </a>
+     </div>
+  </div>
+</header>

@@ -1,0 +1,292 @@
+---
+import Header from '../components/landing/header.astro';
+import Footer from '../components/landing/footer.astro';
+import Section from '../components/landing/section.astro';
+import FeatureCard from '../components/landing/feature-card.astro';
+import HowItWorksStep from '../components/landing/how-it-works-step.astro';
+import UseCaseCard from '../components/landing/use-case-card.astro';
+import PricingPlanCard from '../components/landing/pricing-plan-card.astro';
+
+import agentFlowImage from '../assets/agent-flow.png';
+
+import '../styles/landing.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <title>Curiositi - Get answers from your documents and the web</title>
+    <meta name="description" content="Curiositi combines your documents with live web data to deliver context-aware answers using advanced AI and Retrieval-Augmented Generation." />
+  </head>
+  <body class="min-h-screen bg-background font-sans antialiased">
+    <Header />
+
+    <main class="w-full flex-1 pt-4">
+      <!-- Hero Section -->
+      <section class="w-full py-20 md:py-32 lg:py-40">
+        <div class="px-4 md:px-6">
+          <div class="animate-fade-up mx-auto max-w-3xl space-y-8 text-center">
+            <div class="bg-secondary text-secondary-foreground mb-4 inline-flex items-center justify-center gap-2 rounded-full px-3 py-1 text-sm font-medium">
+              <span>🎉</span>
+              <span>Introducing Curiositi!</span>
+              <span>🎉</span>
+            </div>
+            <h1 class="text-brand font-serif text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-6xl">
+              <span class="text-gradient">Get answers</span> from your
+              documents and the web
+            </h1>
+            <p class="text-muted-foreground mx-auto max-w-2xl text-xl">
+              Curiositi combines your documents with live web data to deliver
+              context-aware answers using advanced AI and Retrieval-Augmented
+              Generation.
+            </p>
+            <div class="flex flex-col justify-center gap-4 sm:flex-row">
+              <a href="https://curiositi.xyz" class="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 rounded-full font-medium transition-colors">
+                Try Curiositi Free
+              </a>
+              <button class="bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground px-8 py-3 rounded-full font-medium transition-colors border border-border">
+                See Demo
+              </button>
+            </div>
+          </div>
+
+          <div class="animate-fade-up animation-delay-200 mt-16 flex justify-center md:mt-24">
+            <div class="relative w-full max-w-4xl overflow-hidden rounded-lg border shadow-xl">
+              <div class="from-primary/10 to-primary/5 absolute inset-0 rounded-lg bg-gradient-to-br"></div>
+              <div class="bg-card relative h-full rounded-lg border-0 p-6">
+                <div class="flex h-full flex-col">
+                  <div class="mb-6 flex items-center gap-2">
+                    <div class="text-muted-foreground h-5 w-5">
+                      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                      </svg>
+                    </div>
+                    <div class="bg-background flex-1 rounded-full px-4 py-2 text-sm">
+                      How does RAG improve AI responses?
+                    </div>
+                  </div>
+                  <div class="bg-background/50 mb-6 flex-1 rounded-lg p-6">
+                    <p class="text-sm leading-relaxed">
+                      Retrieval-Augmented Generation (RAG) improves AI
+                      responses by combining the power of large language
+                      models with specific information retrieval. When you ask
+                      a question, RAG first searches through your documents
+                      and the web to find relevant information, then uses this
+                      context to generate more accurate, up-to-date, and
+                      personalized answers.
+                    </p>
+                    <div class="border-border/40 mt-4 border-t pt-4">
+                      <p class="text-muted-foreground text-xs">
+                        Sources: Your Documents, Web Search (May 2025)
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex gap-2">
+                    <button class="bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1">
+                      <div class="h-4 w-4">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                      </div>
+                      Your Documents
+                    </button>
+                    <button class="bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground px-3 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-1">
+                      <div class="h-4 w-4">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+                        </svg>
+                      </div>
+                      Web Data
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <Section
+        id="features"
+        className="bg-secondary/50"
+        title="Powerful AI with context-aware intelligence"
+        subtitle="Curiositi combines the best of AI language models with your data and the latest information from the web."
+      >
+        <div slot="titlePrefix" class="bg-primary/10 text-primary mb-2 inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium">
+          Features
+        </div>
+        <div class="mx-auto grid max-w-5xl items-start gap-8 py-12 md:grid-cols-3">
+          <FeatureCard
+            title="Document Intelligence"
+            description="Upload your documents, PDFs, spreadsheets, and presentations for instant insights and answers."
+            link="/docs/ingestion"
+          >
+            <div slot="icon" class="h-6 w-6">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+          </FeatureCard>
+          <FeatureCard
+            title="Live Web Data"
+            description="Access real-time information from the web to complement your documents with the latest data."
+            link="/docs/search"
+          >
+            <div slot="icon" class="h-6 w-6">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
+              </svg>
+            </div>
+          </FeatureCard>
+          <FeatureCard
+            title="Hybrid RAG System"
+            description="Our advanced Retrieval-Augmented Generation system ensures precise, contextual answers every time."
+            link="/docs/architecture"
+          >
+            <div slot="icon" class="h-6 w-6">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+          </FeatureCard>
+        </div>
+      </Section>
+
+      <!-- How It Works Section -->
+      <Section
+        id="how-it-works"
+        title="Retrieval-Augmented Generation"
+        subtitle="See how Curiositi combines your documents with web data to deliver precise answers."
+      >
+        <div slot="titlePrefix" class="bg-primary/10 text-primary mb-2 inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium">
+          How It Works
+        </div>
+        <div class="mx-auto grid max-w-5xl items-center gap-12 py-12 lg:grid-cols-2">
+          <div class="relative overflow-hidden rounded-xl border shadow-lg">
+            <div class="from-primary/5 absolute inset-0 bg-gradient-to-br to-transparent"></div>
+            <img
+              src={agentFlowImage.src}
+              width="500"
+              height="400"
+              alt="RAG System Diagram"
+              class="h-auto w-full bg-white object-cover p-1"
+            />
+          </div>
+          <div class="space-y-8">
+            <HowItWorksStep
+              stepNumber={1}
+              title="Document Processing"
+              description="Upload your documents which are processed, indexed, and stored securely."
+            />
+            <HowItWorksStep
+              stepNumber={2}
+              title="Query Understanding"
+              description="When you ask a question, our AI understands the context and intent behind it."
+            />
+            <HowItWorksStep
+              stepNumber={3}
+              title="Retrieval"
+              description="The system retrieves relevant information from your documents and the web."
+            />
+            <HowItWorksStep
+              stepNumber={4}
+              title="Generation"
+              description="Using the retrieved context, our AI generates precise, tailored answers."
+            />
+          </div>
+        </div>
+      </Section>
+
+      <!-- Use Cases Section -->
+      <Section
+        id="use-cases"
+        className="bg-secondary/50"
+        title="How people are using Curiositi"
+        subtitle="Discover how Curiositi is transforming how people work with information."
+      >
+        <div slot="titlePrefix" class="bg-primary/10 text-primary mb-2 inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium">
+          Use Cases
+        </div>
+        <div class="mx-auto grid max-w-5xl gap-8 py-12 md:grid-cols-3">
+          <UseCaseCard
+            title="Research & Analysis"
+            description="Use Curiositi to analyze documents and find connections across multiple sources, saving hours of manual work."
+          >
+            <div slot="icon" class="h-6 w-6">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+              </svg>
+            </div>
+          </UseCaseCard>
+          <UseCaseCard
+            title="Knowledge Management"
+            description="Use Curiositi to make their internal knowledge bases accessible and actionable for all employees."
+          >
+            <div slot="icon" class="h-6 w-6">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+          </UseCaseCard>
+          <UseCaseCard
+            title="Study & Research"
+            description="Use Curiositi to research topics and generate content backed by accurate, up-to-date information based on their lectures, textbooks, and other documents."
+          >
+            <div slot="icon" class="h-6 w-6">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+          </UseCaseCard>
+        </div>
+      </Section>
+
+      <!-- Pricing Section -->
+      <Section
+        id="pricing"
+        title="Simple, transparent pricing"
+        subtitle="Choose the plan that's right for you and start getting better answers today."
+      >
+        <div slot="titlePrefix" class="bg-primary/10 text-primary mb-2 inline-flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium">
+          Pricing
+        </div>
+        <div class="mx-auto flex max-w-5xl justify-center py-12">
+          <PricingPlanCard
+            title="Free"
+            description="Use Curiositi for free by deploying your own instance"
+            price=""
+            features={[
+              "Upload unlimited documents",
+              "Unlimited queries",
+              "Unlimited web retrieval",
+              "Bring your own models",
+              "Own your data, forever",
+            ]}
+            ctaText="GitHub"
+            ctaVariant="default"
+            ctaHref="https://github.com/macintushar/curiositi"
+            ctaHrefExternal={true}
+            className="w-full md:w-1/3"
+            isPopular={true}
+          >
+            <div slot="ctaExtra" class="flex items-center justify-center rounded-full bg-white p-0.5 mr-2">
+              <svg class="text-black w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+            </div>
+          </PricingPlanCard>
+        </div>
+      </Section>
+    </main>
+
+    <Footer />
+  </body>
+</html>

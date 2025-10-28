@@ -1,0 +1,89 @@
+/* Starlight custom theme to match landing page */
+
+@import url('landing.css');
+
+/* Starlight theme overrides */
+:root {
+  --sl-color-accent: hsl(var(--color-primary));
+  --sl-color-accent-low: hsl(var(--color-primary) / 0.1);
+  --sl-color-accent-high: hsl(var(--color-primary) / 0.2);
+  --sl-color-white: hsl(var(--color-background));
+  --sl-color-gray-1: hsl(var(--color-muted));
+  --sl-color-gray-2: hsl(var(--color-muted-foreground));
+  --sl-color-gray-3: hsl(var(--color-border));
+  --sl-color-black: hsl(var(--color-foreground));
+  --sl-color-text-accent: hsl(var(--color-primary));
+  --sl-color-bg: hsl(var(--color-background));
+  --sl-color-bg-sidebar: hsl(var(--color-card));
+  --sl-color-bg-nav: hsl(var(--color-card));
+  --sl-color-text: hsl(var(--color-foreground));
+  --sl-color-text-invert: hsl(var(--color-background));
+  --sl-color-hairline: hsl(var(--color-border));
+  --sl-color-hairline-light: hsl(var(--color-border) / 0.5);
+}
+
+/* Dark mode overrides */
+.dark {
+  --sl-color-accent: hsl(var(--color-primary-dark));
+  --sl-color-accent-low: hsl(var(--color-primary-dark) / 0.1);
+  --sl-color-accent-high: hsl(var(--color-primary-dark) / 0.2);
+  --sl-color-white: hsl(var(--color-background-dark));
+  --sl-color-gray-1: hsl(var(--color-muted-dark));
+  --sl-color-gray-2: hsl(var(--color-muted-foreground-dark));
+  --sl-color-gray-3: hsl(var(--color-border-dark));
+  --sl-color-black: hsl(var(--color-foreground-dark));
+  --sl-color-text-accent: hsl(var(--color-primary-dark));
+  --sl-color-bg: hsl(var(--color-background-dark));
+  --sl-color-bg-sidebar: hsl(var(--color-card-dark));
+  --sl-color-bg-nav: hsl(var(--color-card-dark));
+  --sl-color-text: hsl(var(--color-foreground-dark));
+  --sl-color-text-invert: hsl(var(--color-background-dark));
+  --sl-color-hairline: hsl(var(--color-border-dark));
+  --sl-color-hairline-light: hsl(var(--color-border-dark) / 0.5);
+}
+
+/* Custom fonts */
+:root {
+  --sl-font: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --sl-font-mono: ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  --sl-font-heading: "Instrument Serif", ui-serif, serif;
+}
+
+/* Custom component styles */
+.sl-container {
+  font-family: var(--sl-font);
+}
+
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4,
+.sl-markdown-content h5,
+.sl-markdown-content h6 {
+  font-family: var(--sl-font-heading);
+  font-weight: 500;
+}
+
+/* Button styles */
+.sl-button {
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+/* Card styles */
+.sl-card {
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--color-border));
+  background: hsl(var(--color-card));
+}
+
+/* Code block styles */
+.sl-code {
+  background: hsl(var(--color-muted));
+  border: 1px solid hsl(var(--color-border));
+}
+
+.dark .sl-code {
+  background: hsl(var(--color-muted-dark));
+  border: 1px solid hsl(var(--color-border-dark));
+}
