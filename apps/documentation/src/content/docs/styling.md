@@ -3,8 +3,6 @@ title: Styling & Theming
 description: Formal reference for styling across Curiositi (web + docs).
 ---
 
-# Styling & Theming
-
 Formal reference for styling across Curiositi (web + docs).
 
 ## Tailwind Adoption

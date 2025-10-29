@@ -3,8 +3,6 @@ title: LLM & Agent Layer
 description: This document summarizes model/provider abstraction and agent behaviors.
 ---
 
-# LLM & Agent Layer
-
 This document summarizes model/provider abstraction and agent behaviors.
 
 ## Goals

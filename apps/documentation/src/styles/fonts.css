@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("/fonts/InstrumentSans.ttf") format("ttf-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/InstrumentSerif-Regular.ttf") format("ttf");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("/fonts/InstrumentSans-Italic.ttf") format("ttf-variations");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Instrument Serif";
+  src: url("/fonts/InstrumentSerif-Italic.ttf") format("ttf");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}

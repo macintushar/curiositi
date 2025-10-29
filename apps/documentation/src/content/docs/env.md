@@ -3,8 +3,6 @@ title: Environment Variables Reference
 description: All variables are defined per application. Required indicates local development necessity.
 ---
 
-# Environment Variables Reference
-
 All variables are defined per application. Required indicates local development necessity.
 
 ## Server (`apps/server`)

@@ -3,8 +3,6 @@ title: Frontend Architecture (Web)
 description: A formal reference for the Next.js application located at `apps/web`.
 ---
 
-# Frontend Architecture (Web)
-
 A formal reference for the Next.js application located at `apps/web`.
 
 ## Structure

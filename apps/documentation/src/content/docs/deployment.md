@@ -3,8 +3,6 @@ title: Deployment & Build
 description: Formal reference for building and deploying Curiositi components.
 ---
 
-# Deployment & Build
-
 Formal reference for building and deploying Curiositi components.
 
 ## Build Pipeline (Turbo)

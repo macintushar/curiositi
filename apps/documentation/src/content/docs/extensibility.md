@@ -3,8 +3,6 @@ title: Extensibility Recipes
 description: Formal guidance for extending Curiositi's core domains.
 ---
 
-# Extensibility Recipes
-
 Formal guidance for extending Curiositi's core domains.
 
 ## Add a New API Route

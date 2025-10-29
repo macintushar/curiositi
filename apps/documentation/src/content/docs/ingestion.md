@@ -3,8 +3,6 @@ title: Ingestion & Vector Pipeline
 description: This document describes the end-to-end ingestion process from file upload to searchable vectorized chunks.
 ---
 
-# Ingestion & Vector Pipeline
-
 This document describes the end-to-end ingestion process from file upload to searchable vectorized chunks.
 
 ## Supported File Types

@@ -3,8 +3,6 @@ title: Self-Hosting Guide
 description: This guide covers self-hosting Curiositi and its dependencies, including web search options.
 ---
 
-# Self-Hosting Guide
-
 This guide covers self-hosting Curiositi and its dependencies, including web search options.
 
 ## Overview

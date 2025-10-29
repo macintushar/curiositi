@@ -3,8 +3,6 @@ title: Curiositi Roadmap
 description: Development roadmap and planned features for Curiositi.
 ---
 
-# Curiositi Roadmap
-
 ## v0.1.0
 
 - [x] Spaces

@@ -3,8 +3,6 @@ title: Curiositi Overview
 description: Curiositi is an Elastic-licensed, developer-focused knowledge and AI interaction platform.
 ---
 
-# Curiositi Overview
-
 Curiositi is an Elastic-licensed, developer-focused knowledge and AI interaction platform. It provides ingestion of user documents, vector-based semantic search, configurable multi-provider LLM access, and a modern web UI—all in a Bun + Turbo monorepo.
 
 ## Core Capabilities

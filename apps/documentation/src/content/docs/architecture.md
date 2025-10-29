@@ -3,8 +3,6 @@ title: Architecture
 description: This document provides a formal architectural reference for Curiositi.
 ---
 
-# Architecture
-
 This document provides a formal architectural reference for Curiositi.
 
 ## Monorepo Structure

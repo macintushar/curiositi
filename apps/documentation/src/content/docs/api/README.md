@@ -3,8 +3,6 @@ title: API Reference
 description: All endpoints are rooted at `/api/v1` and require an authenticated session unless explicitly stated. Responses are JSON unless noted.
 ---
 
-# API Reference
-
 All endpoints are rooted at `/api/v1` and require an authenticated session unless explicitly stated. Responses are JSON unless noted.
 
 | Category             | Router Path | File                |

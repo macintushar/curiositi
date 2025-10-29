@@ -3,8 +3,6 @@ title: Troubleshooting & FAQ
 description: Formal reference for common issues.
 ---
 
-# Troubleshooting & FAQ
-
 Formal reference for common issues.
 
 ## Server Returns 401 For All API Routes

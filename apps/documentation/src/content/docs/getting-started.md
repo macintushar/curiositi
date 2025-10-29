@@ -3,8 +3,6 @@ title: Getting Started
 description: A formal setup guide for developers and OSS contributors.
 ---
 
-# Getting Started
-
 A formal setup guide for developers and OSS contributors.
 
 ## 1. Prerequisites
