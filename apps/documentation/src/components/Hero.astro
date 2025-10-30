@@ -1,27 +1,16 @@
 ---
-import { Image } from "astro:assets";
-import { Icon, LinkButton } from "@astrojs/starlight/components";
+import { Icon } from "@astrojs/starlight/components";
 
 const { data } = Astro.locals.starlightRoute.entry;
-const { title = data.title, tagline, image, actions = [] } = data.hero || {};
+const { tagline, image, actions = [] } = data.hero || {};
 
-const imageAttrs = {
-  loading: "eager" as const,
-  decoding: "async" as const,
-  width: 400,
-  height: 400,
-  alt: image?.alt || "",
-};
-
-let darkImage: ImageMetadata | undefined;
-let lightImage: ImageMetadata | undefined;
 let rawHtml: string | undefined;
 if (image) {
   if ("file" in image) {
-    darkImage = image.file;
+    // darkImage = image.file;
   } else if ("dark" in image) {
-    darkImage = image.dark;
-    lightImage = image.light;
+    // darkImage = image.dark;
+    // lightImage = image.light;
   } else {
     rawHtml = image.html;
   }
