@@ -24,6 +24,7 @@ export default defineConfig({
     starlight({
       title: "Curiositi",
       lastUpdated: true,
+      titleDelimiter: "|",
       expressiveCode: {
         themes: ["github-light", "github-dark"],
       },
