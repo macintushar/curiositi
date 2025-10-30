@@ -5,6 +5,8 @@ description: All variables are defined per application. Required indicates local
 
 All variables are defined per application. Required indicates local development necessity.
 
+Note: TRUSTED_ORIGINS is derived in server code from a fixed production domain and UI_HOST. Set UI_HOST appropriately; do not set TRUSTED_ORIGINS directly.
+
 ## Server (`apps/server`)
 
 | Variable                    | Required                               | Description                                                                                                           |

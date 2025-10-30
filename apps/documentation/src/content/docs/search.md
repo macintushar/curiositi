@@ -4,56 +4,100 @@ title: Search & Retrieval
 description: How Curiositi indexes content and retrieves relevant context for RAG answers.
 ---
 
-Curiositi blends **vector similarity**, lightweight metadata filtering, and optional **web search** to supply grounded context to the LLM.
+Curiositi blends vector similarity, lightweight metadata filtering, and optional web search to supply grounded context to the LLM.
 
-## Pipeline Overview
+## Endpoints overview
 
-1. **Ingestion** – Files are uploaded, text is extracted (PDF/Office/plain), chunked, and embedded.
-2. **Storage** – Chunks + embeddings persisted in Postgres using the `vector` type (pgvector extension).
-3. **Query** – A user message triggers: embedding of the query -> vector similarity search -> optional keyword / metadata refinement.
-4. **Web Augmentation (Optional)** – If enabled, Firecrawl search fetches fresh web content which is normalized and scored. See the [Self-Hosting Guide](self-hosting.md) for Firecrawl configuration options.
-5. **Context Assembly** – Top document chunks + (optional) web results are merged, deduplicated, and truncated to model token budget.
-6. **Generation** – An LLM produces the final answer citing which sources were used when possible.
+- POST /api/v1/search – synchronous, returns a JSON response and persists messages
+- POST /api/v1/search/stream – streaming, returns a plain text stream and persists history after completion
 
-## Spaces & Scoping
+Authentication: both routes require a valid session cookie.
 
-- **Spaces** group related files (projects, teams, subjects).
-- A query can be restricted to one or more space IDs (or specific file IDs) to narrow retrieval.
-- This minimizes noise and improves precision.
+## Request schema
+
+Both routes accept the same JSON body (validated by the server):
+
+{
+  "input": "Your question...",                  // required, string
+  "model": "gpt-4o-mini",                      // required, string
+  "provider": "openai",                        // required, one of: openai | anthropic | openrouter
+  "thread_id": "uuid",                         // required, string
+  "space_ids": ["space-uuid", "..."] ,        // optional, string[]
+  "file_ids": ["file-uuid", "..."]            // optional, string[] (ignored by the stream route currently)
+}
+
+Optional headers
+- X-User-Timezone: e.g., America/New_York. Used to improve prompt context.
+
+Notes
+- In the current implementation, /api/v1/search/stream does not use file_ids even if provided. Restrict by spaces to scope retrieval.
+- The streaming route returns a plain text stream (chunked text) without SSE/event envelopes.
+
+## Typical pipeline
+
+1) Ingestion – Files are uploaded, text is extracted (PDF/Office/plain), chunked, and embedded.
+2) Storage – Chunks + embeddings are stored in Postgres (pgvector).
+3) Retrieval – The query is embedded and matched via vector similarity, optionally scoped by spaces.
+4) Web augmentation (optional) – If enabled and applicable, Firecrawl search fetches fresh web content which is normalized and scored.
+5) Context assembly – Top document chunks + optional web results are merged, deduplicated, and trimmed to the model budget.
+6) Generation – The LLM produces an answer. The agent persists the user and assistant messages to the thread. Parsed tool results are saved post-stream.
+
+## Examples
+
+Synchronous
+
+curl -sS -X POST "$SERVER/api/v1/search" \
+  -H "Content-Type: application/json" \
+  -H "Cookie: better-auth.session_token=..." \
+  -H "X-User-Timezone: America/Los_Angeles" \
+  -d '{
+    "input": "Summarize the Q3 plan",
+    "model": "gpt-4o-mini",
+    "provider": "openai",
+    "thread_id": "THREAD_UUID",
+    "space_ids": ["SPACE_UUID"]
+  }'
+
+Streaming (plain text)
+
+curl -sS -N -X POST "$SERVER/api/v1/search/stream" \
+  -H "Content-Type: application/json" \
+  -H "Cookie: better-auth.session_token=..." \
+  -H "X-User-Timezone: America/New_York" \
+  -d '{
+    "input": "Explain vector search",
+    "model": "gpt-4o-mini",
+    "provider": "openai",
+    "thread_id": "THREAD_UUID",
+    "space_ids": ["SPACE_UUID"]
+  }' \
+  | sed -u -e 's/.*/[chunk] &/'
+
+Client guidance
+- Treat the streaming response as a continuous text body and append chunks as they arrive.
+- Do not assume SSE framing; no event names or JSON envelopes are guaranteed.
+
+## Spaces and scoping
+
+- Spaces group related files (projects, teams, subjects).
+- Restricting a query to one or more space IDs narrows retrieval and improves precision.
 
 ## Embeddings
 
-Default embedding model is configurable via environment (`OPENAI_EMBEDDING_MODEL`). You can switch providers (OpenAI / OpenRouter / others) without re-writing the pipeline—new embeddings are generated on subsequent ingestion.
+- Embeddings are 1024-dimensional vectors stored via pgvector.
+- The default embedding model can be overridden using OPENAI_EMBEDDING_MODEL.
 
-## Chunking Strategy
+## Chunking and ranking
 
-- Fixed-size text windows with slight overlap balance recall + cost.
-- Overlap ensures semantic continuity across paragraph boundaries.
-- Very large files are streamed during extraction to avoid memory spikes.
+- Fixed-size windows with overlap preserve coherence across boundaries.
+- After similarity scoring, near-duplicate chunks are pruned.
+- Web snippets (when used) are interleaved via simple score normalization.
 
-## Ranking & Deduplication
+## Citing sources
 
-After similarity scoring:
+Chunks retain file and space metadata, allowing the UI/agent to display Sources beneath answers. Web results are parsed and saved after the stream when available.
 
-- Near-duplicate chunks (high cosine similarity + overlapping source span) are pruned.
-- Web snippets are interleaved using a simple score normalization so that very relevant fresh data can appear among top internal chunks.
-
-## Citing Sources
-
-Chunks retain file + space metadata allowing the UI / agent to display "Sources" beneath answers (e.g. document titles + web domain list).
-
-## Configuration Reference
-
-See also:
-
-- [Ingestion](/docs/ingestion) – extraction & chunking internals
-- [LLM Agent](/docs/llm-agent) – orchestration + prompt assembly
-- [Environment](/docs/env) – provider keys & model controls
-
-## Future Improvements (Roadmap)
-
-- Hybrid BM25 + vector re-ranking
-- Cross-file semantic clustering for diversification
-- Streaming partial context reasoning traces
-
-If you have ideas, open a discussion or PR in **GitHub**.
+See also
+- Ingestion – extraction and chunking internals
+- LLM Agent – orchestration and tool behavior
+- Environment – provider keys and model controls

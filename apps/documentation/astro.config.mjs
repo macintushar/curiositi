@@ -24,7 +24,7 @@ export default defineConfig({
             dark: './public/logo-dark.svg',
           },
           description: 'Build an AI-powered knowledge workspace that chats over your documents and the web.',
-          customCss: ['./src/styles/theme.css', './src/styles/starlight.css', './src/styles/fonts.css', './src/styles/global.css'],
+          customCss: ['./src/styles/starlight.css', './src/styles/fonts.css', './src/styles/global.css'],
           social: [
               { icon: 'github', label: 'GitHub', href: 'https://github.com/macintushar/curiositi' },
           ],

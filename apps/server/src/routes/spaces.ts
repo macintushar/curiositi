@@ -12,6 +12,8 @@ import {
   updateSpaceHandler,
 } from "@/services/spaces";
 
+
+
 const spacesRouter = new Hono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;

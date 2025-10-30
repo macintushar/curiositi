@@ -1,10 +1,10 @@
-import { Hono } from "hono";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
 import apiRouter from "@/routes/api";
 
-const app = new Hono();
+const app = new OpenAPIHono();
 import { auth } from "./lib/auth";
 import { TRUSTED_ORIGINS } from "./constants";
 import { html, raw } from "hono/html";
@@ -210,5 +210,15 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 });
 
 app.route("/api/v1", apiRouter);
+
+// OpenAPI documentation
+app.doc("/doc", {
+  openapi: "3.0.0",
+  info: {
+    version: "1.0.0",
+    title: "Curiositi API",
+    description: "AI-powered knowledge workspace API for document management and search",
+  },
+});
 
 export default app;

@@ -1,9 +1,9 @@
 ---
-title: LLM & Agent Layer
-description: This document summarizes model/provider abstraction and agent behaviors.
+ title: LLM & Agent Layer
+ description: This document summarizes model/provider abstraction and agent behaviors.
 ---
 
-This document summarizes model/provider abstraction and agent behaviors.
+This document summarizes model/provider abstraction and agent behaviors. It reflects the current SearchAgent implementation and streaming behavior in the server.
 
 ## Goals
 
@@ -17,7 +17,7 @@ This document summarizes model/provider abstraction and agent behaviors.
 | --------------------------- | --------------------------------------------------- |
 | `models-list.ts`            | Declares available models and providers             |
 | `lib/llms.ts`               | Provider client wrappers / selection logic          |
-| `agents/curiositi-agent.ts` | High-level orchestration (conversation + retrieval) |
+| `agents/search-agent.ts`    | Current streaming agent with tool calling           |
 | `services/search.ts`        | Integrates retrieval + generation pipeline          |
 
 ## Provider Configuration
@@ -31,10 +31,10 @@ API request fields (`model`, `provider`) inform which underlying client executes
 ## Retrieval-Augmented Flow (High-Level)
 
 1. Receive search/chat input.
-2. Retrieve vectors (similar chunks) for context.
-3. Construct prompt (system + user + context assembly).
-4. Send to chosen provider.
-5. Return structured response with model output and references.
+2. Retrieve vectors (similar chunks) for context and optionally run web search.
+3. Construct prompt (system + user + context assembly + space metadata and X-User-Timezone).
+4. Stream generation begins immediately; tools may be called mid-stream.
+5. After the stream completes, messages and parsed sources are persisted to the thread.
 
 ## Adding a Provider
 
@@ -48,10 +48,18 @@ API request fields (`model`, `provider`) inform which underlying client executes
 - Normalize provider-specific errors into a unified shape (suggested improvement if not present).
 - Distinguish transient (retryable) vs fatal errors.
 
+## Current Streaming Behavior
+
+- The streaming route returns a plain text stream (not SSE). Clients should read it as a continuous text body.
+- The SearchAgent exposes tools named `search_documents` and `search_web`.
+- Tool output is expected to be JSON with shape: { "summary": string, "results": [{ "title": string, "content": string, "source": string, "query"?: string }] }.
+- The agent system prompt enforces inline citations like [1], [2] and a References section with full URLs.
+- The server saves the final assistant text, toolCalls, toolResults, and parsed sources to the messages table after streaming.
+
 ## Potential Enhancements
 
-- Streaming support for partial responses.
-- Tool invocation / function calling.
+- SSE or JSON-chunk streaming with events (if needed by clients).
+- More robust tool result parsing with versioned schema.
 - Caching of recent model responses.
 - Per-model token usage metrics.
 
