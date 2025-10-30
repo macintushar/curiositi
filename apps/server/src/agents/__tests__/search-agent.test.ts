@@ -51,7 +51,7 @@ describe("Search Agent", () => {
   describe("Streaming", () => {
     it("returns a stream result", async () => {
       const result = await executeSearchAgent(baseConfig);
-      
+
       expect(result).toBeDefined();
       expect(result.toTextStreamResponse).toBeDefined();
       expect(typeof result.toTextStreamResponse).toBe("function");
@@ -145,7 +145,7 @@ describe("Search Agent", () => {
           name: "",
         },
       };
-      
+
       const result = await executeSearchAgent(configWithoutUser);
       expect(result).toBeDefined();
     });

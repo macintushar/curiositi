@@ -123,7 +123,7 @@ describe("Search Stream Integration", () => {
   describe("Model Validation", () => {
     it("accepts valid OpenAI models", () => {
       const models = ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"];
-      
+
       models.forEach((model) => {
         const request = {
           input: "Test",
@@ -131,7 +131,7 @@ describe("Search Stream Integration", () => {
           provider: LLM_PROVIDERS.OPENAI,
           thread_id: "test",
         };
-        
+
         expect(request.model).toBe(model);
       });
     });
@@ -142,7 +142,7 @@ describe("Search Stream Integration", () => {
         "claude-3-opus-20240229",
         "claude-3-haiku-20240307",
       ];
-      
+
       models.forEach((model) => {
         const request = {
           input: "Test",
@@ -150,7 +150,7 @@ describe("Search Stream Integration", () => {
           provider: LLM_PROVIDERS.ANTHROPIC,
           thread_id: "test",
         };
-        
+
         expect(request.model).toBe(model);
       });
     });

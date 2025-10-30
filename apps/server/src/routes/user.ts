@@ -5,8 +5,6 @@ import { tryCatch } from "@/lib/try-catch";
 import { AddOrUpdateApiKeySchema } from "@/types/schemas";
 import { addOrUpdateApiKey, getApiKeys } from "@/services/user";
 
-
-
 const userRouter = new OpenAPIHono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;

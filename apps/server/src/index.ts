@@ -217,7 +217,8 @@ app.doc("/doc", {
   info: {
     version: "1.0.0",
     title: "Curiositi API",
-    description: "AI-powered knowledge workspace API for document management and search",
+    description:
+      "AI-powered knowledge workspace API for document management and search",
   },
 });
 

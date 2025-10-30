@@ -10,8 +10,6 @@ import db from "@/db";
 import { messages, spaces } from "@/db/schema";
 import { eq, inArray } from "drizzle-orm";
 
-
-
 const searchRouter = new Hono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;

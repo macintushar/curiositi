@@ -32,7 +32,14 @@ async function executeWebSearches(
 
   return results
     .filter((r) => r.status === "fulfilled" && r.value !== null)
-    .map((r) => (r as PromiseFulfilledResult<(SearchResult & { query?: string }) | null>).value!)
+    .map(
+      (r) =>
+        (
+          r as PromiseFulfilledResult<
+            (SearchResult & { query?: string }) | null
+          >
+        ).value!,
+    )
     .slice(0, 5);
 }
 
@@ -67,7 +74,14 @@ async function executeDocSearches(
 
   return results
     .filter((r) => r.status === "fulfilled" && r.value !== null)
-    .map((r) => (r as PromiseFulfilledResult<(SearchResult & { query?: string }) | null>).value!)
+    .map(
+      (r) =>
+        (
+          r as PromiseFulfilledResult<
+            (SearchResult & { query?: string }) | null
+          >
+        ).value!,
+    )
     .slice(0, 10);
 }
 
@@ -134,4 +148,3 @@ const tools = (
 };
 
 export default tools;
-

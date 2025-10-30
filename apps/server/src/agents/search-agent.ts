@@ -120,7 +120,6 @@ function createSearchAgent(
   });
 }
 
-
 export async function executeSearchAgent(config: SearchAgentConfig) {
   const startTime = Date.now();
   const {
@@ -199,13 +198,22 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
       console.log(`[SearchAgent] Stream finished - Reason: ${finishReason}`);
 
       // Attempt to parse toolResults into structured sources
-      const parsedSources: Array<{ title: string; content: string; source: string; query?: string }> = [];
+      const parsedSources: Array<{
+        title: string;
+        content: string;
+        source: string;
+        query?: string;
+      }> = [];
       try {
         if (Array.isArray(toolResults)) {
           for (const tr of toolResults as unknown[]) {
             // AI SDK may return tool results as strings or objects with an `output` field.
             let payload: unknown = tr as unknown;
-            if (tr && typeof tr === "object" && (tr as any).output !== undefined) {
+            if (
+              tr &&
+              typeof tr === "object" &&
+              (tr as any).output !== undefined
+            ) {
               payload = (tr as any).output;
             }
 
@@ -224,7 +232,8 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
                         title: r.title,
                         content: r.content,
                         source: r.source,
-                        query: typeof r.query === "string" ? r.query : undefined,
+                        query:
+                          typeof r.query === "string" ? r.query : undefined,
                       });
                     }
                   }
