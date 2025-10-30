@@ -1,17 +1,19 @@
-name: Server Lint (Prettier)
+name: Server CI (Lint + Test + Build)
 
 on:
   push:
     branches: ["main"]
     paths:
       - "apps/server/**"
+      - "packages/share/**"
   pull_request:
     branches: ["main"]
     paths:
       - "apps/server/**"
+      - "packages/share/**"
 
 jobs:
-  lint:
+  lint-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,12 +23,27 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest # Or specify a version
+          bun-version: latest
 
-      - name: Install dependencies
+      - name: Install workspace dependencies
         run: bun install
+
+      - name: Copy .env.example files
+        shell: bash
+        run: find . -type f -name ".env.example" -exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
+
+      - name: Run ESLint
+        run: bun run lint
         working-directory: ./apps/server
 
-      - name: Run Prettier Lint
-        run: bunx prettier --check . # Run prettier from the server directory context
+      - name: Run Prettier Check
+        run: bunx prettier --check .
+        working-directory: ./apps/server
+
+      - name: Run Tests
+        run: bun run test
+        working-directory: ./apps/server
+
+      - name: Run Type Check
+        run: bun run typecheck
         working-directory: ./apps/server

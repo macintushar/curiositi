@@ -1,16 +1,14 @@
-name: Web CI (Lint + Build)
+name: Documentation CI (Lint + Build)
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "apps/web/**"
-      - "packages/share/**"
+      - "apps/documentation/**"
   pull_request:
     branches: ["main"]
     paths:
-      - "apps/web/**"
-      - "packages/share/**"
+      - "apps/documentation/**"
 
 jobs:
   lint-and-build:
@@ -28,14 +26,10 @@ jobs:
       - name: Install workspace dependencies
         run: bun install
 
-      - name: Copy .env.example files
-        shell: bash
-        run: find . -type f -name ".env.example" -exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
-
-      - name: Run Lint Check
-        run: bun run lint
-        working-directory: ./apps/web
+      - name: Run Type Check
+        run: bun run typecheck
+        working-directory: ./apps/documentation
 
       - name: Run Build Check
         run: bun run build
-        working-directory: ./apps/web
+        working-directory: ./apps/documentation
