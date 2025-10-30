@@ -23,7 +23,6 @@
   ],
   "dependencies": {
     "@better-fetch/fetch": "^1.1.18",
-    "@langchain/community": "^0.3.56",
-    "starlight-theme-flexoki": "^0.2.1"
+    "@langchain/community": "^0.3.56"
   }
 }

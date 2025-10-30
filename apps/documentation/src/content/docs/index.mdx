@@ -1,26 +1,28 @@
 ---
-title: Curiositi Documentation
+title: Curiositi starts here, knowledge never ends
 description: Open-source AI knowledge workspace for document retrieval and web-augmented answers
 template: splash
 hero:
-  tagline: Upload documents, chat with AI agents that search your knowledge and the web
+  tagline: Curiositi combines your documents with live web data to deliver context aware answers using advanced AI and Retrieval-Augmented Generation.
   image:
     file: ../../assets/houston.webp
   actions:
     - text: Try Curiositi Cloud
       link: https://curiositi.xyz
-      icon: external
+      icon: seti:salesforce
       variant: primary
-    - text: Getting Started
+    - text: Read the Docs
       link: /getting-started
-      icon: right-arrow
+      icon: open-book
+      variant: secondary
     - text: GitHub Repo
       link: https://github.com/macintushar/curiositi
-      icon: external
+      icon: github
       variant: minimal
 ---
 
-import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Image } from "astro:assets";
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 ## Quick Start
 
@@ -61,112 +63,23 @@ Curiositi is a **self-hostable AI knowledge workspace** that combines:
 - **Secure by Design**: better-auth with per-user API keys, session management
 - **Multi-Provider**: OpenAI, Anthropic, and OpenRouter support
 
-## Core Features
-
-<CardGrid stagger>
-	<LinkCard title="Spaces" href="/overview">
-		Organize documents into isolated knowledge spaces with scoped retrieval
-	</LinkCard>
-	<LinkCard title="Smart Ingestion" href="/ingestion">
-		Automatic text extraction, chunking, and embedding for PDFs, Office docs, and text files
-	</LinkCard>
-	<LinkCard title="Search Agent" href="/search">
-		AI agent with dual search: vector similarity in your docs + Firecrawl web search
-	</LinkCard>
-	<LinkCard title="Streaming RAG" href="/llm-agent">
-		Real-time answers with reasoning, tool calls, and inline citations
-	</LinkCard>
-	<LinkCard title="Multi-Provider LLMs" href="/env">
-		Support for OpenAI (GPT-4o, o3), Anthropic (Claude 4), and OpenRouter models
-	</LinkCard>
-	<LinkCard title="Production Ready" href="/deployment">
-		Docker deployment, PostgreSQL + pgvector, optional Sentry monitoring
-	</LinkCard>
-</CardGrid>
-
 ## Architecture Overview
 
-```
-┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│  Next.js 15  │  HTTP   │   Hono API   │  SQL    │  PostgreSQL  │
-│   Web UI     │ ◄─────► │   + Bun      │ ◄─────► │  + pgvector  │
-└──────────────┘         └──────────────┘         └──────────────┘
-                                │
-                    ┌───────────┴───────────┐
-                    ▼                       ▼
-              ┌───────────┐           ┌───────────┐
-              │  OpenAI   │           │ Firecrawl │
-              │ Anthropic │           │ (Search)  │
-              │OpenRouter │           └───────────┘
-              └───────────┘
-```
+<Image
+  src="/agent-overview.svg"
+  alt="S"
+  layout="constrained"
+  width={600}
+  height={400}
+/>
 
-**Tech Stack:**
+## **Tech Stack:**
+
 - **Frontend**: Next.js 15, React 19, TanStack Query, Zustand, Tailwind v4
 - **Backend**: Hono, Bun runtime, Drizzle ORM, better-auth
 - **Database**: PostgreSQL 16+ with pgvector extension
 - **AI**: Vercel AI SDK, LangChain (document processing)
 - **Search**: Vector similarity (cosine distance), Firecrawl web search
-
-## Documentation Guide
-
-<LinkCard title="Getting Started" href="/getting-started" description="Set up local development or self-hosted deployment" />
-<LinkCard title="Architecture" href="/architecture" description="System design, data flows, and technical decisions" />
-<LinkCard title="Frontend Guide" href="/frontend" description="Next.js app structure, components, and state management" />
-<LinkCard title="LLM Agent" href="/llm-agent" description="How the search agent works: context analysis, query planning, synthesis" />
-<LinkCard title="Search System" href="/search" description="Vector search, web search, and retrieval strategies" />
-<LinkCard title="File Ingestion" href="/ingestion" description="Document processing pipeline and supported formats" />
-<LinkCard title="API Reference" href="/api" description="Complete REST API documentation with examples" />
-<LinkCard title="Environment Variables" href="/env" description="Configuration guide for all environment variables" />
-<LinkCard title="Self-Hosting" href="/self-hosting" description="Production deployment with Docker and cloud providers" />
-<LinkCard title="Styling" href="/styling" description="Theming, Tailwind configuration, and UI customization" />
-<LinkCard title="Extensibility" href="/extensibility" description="Add custom LLM providers, file types, and tools" />
-<LinkCard title="Contributing" href="/contributing" description="Development workflow, code standards, and contribution guidelines" />
-<LinkCard title="Troubleshooting" href="/troubleshooting" description="Common issues and solutions" />
-
-## Key Concepts
-
-### Spaces
-Isolated containers for organizing documents. Each space has:
-- Unique vector index for scoped retrieval
-- Independent file management
-- Optional descriptions for better context
-
-### Threads
-Conversation threads that maintain chat history:
-- Can be associated with specific spaces
-- Store complete message history with tool calls
-- Track token usage and model metadata
-
-### Search Agent
-The core AI component that:
-1. **Analyzes** your question and conversation context
-2. **Plans** optimal document and web search queries
-3. **Executes** searches in parallel across sources
-4. **Synthesizes** comprehensive answers with citations
-5. **Suggests** relevant follow-up questions
-
-### Vector Embeddings
-Documents are split into chunks and embedded using OpenAI's `text-embedding-3-small` (1024 dimensions):
-- Stored in PostgreSQL with pgvector extension
-- Searched using cosine similarity (threshold > 0.3)
-- Retrieved in parallel for multiple queries
-
-## Use Cases
-
-- **Personal Knowledge Base**: Store research papers, notes, and documents
-- **Team Documentation**: Centralized knowledge repository with semantic search
-- **Research Assistant**: Ask questions across multiple documents and web sources
-- **Customer Support**: Build internal Q&A systems over documentation
-- **Learning Tool**: Interactive exploration of educational materials
-
-## Community & Support
-
-- **GitHub**: [macintushar/curiositi](https://github.com/macintushar/curiositi)
-- **Documentation**: [docs.curiositi.xyz](https://docs.curiositi.xyz)
-- **Issues**: [Report bugs](https://github.com/macintushar/curiositi/issues)
-- **Discussions**: [Community forum](https://github.com/macintushar/curiositi/discussions)
-- **Roadmap**: [Feature plans](https://docs.curiositi.xyz/docs/roadmap)
 
 ## License
 
