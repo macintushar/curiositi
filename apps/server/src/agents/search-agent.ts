@@ -212,9 +212,9 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
             if (
               tr &&
               typeof tr === "object" &&
-              (tr as any).output !== undefined
+              (tr as unknown as { output?: unknown }).output !== undefined
             ) {
-              payload = (tr as any).output;
+              payload = (tr as unknown as { output?: unknown }).output;
             }
 
             if (typeof payload === "string") {
@@ -238,13 +238,13 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
                     }
                   }
                 }
-              } catch (_) {
+              } catch {
                 // ignore JSON parse errors; tool may not have returned JSON
               }
             }
           }
         }
-      } catch (_) {
+      } catch {
         // swallow any parsing issues
       }
 

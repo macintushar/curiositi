@@ -107,8 +107,8 @@ const tools = (
   maxDocQueries: number,
   spaceIds: string[],
   enableWebSearch: boolean = true,
-): Record<string, Tool<any, string>> => {
-  const webTool: Record<string, Tool<any, string>> = enableWebSearch
+): Record<string, Tool<unknown, string>> => {
+  const webTool: Record<string, Tool<unknown, string>> = enableWebSearch
     ? {
         search_web: tool({
           description: "Search the web for information.",
@@ -127,7 +127,7 @@ const tools = (
       }
     : {};
 
-  const docTool: Record<string, Tool<any, string>> = {
+  const docTool: Record<string, Tool<unknown, string>> = {
     search_documents: tool({
       description: "Search documents for information.",
       inputSchema: z.object({
