@@ -37,18 +37,18 @@ app.get("/", async (c) => {
         <meta name="bingbot" content="index, follow" />
         <link
           rel="icon"
-          href="${TRUSTED_ORIGINS[1]}/favicon.svg"
+          href="${TRUSTED_ORIGINS[1]}/favicon.ico"
           sizes="48x48"
           type="image/svg+xml"
         />
         <link
           id="favicon"
           rel="icon"
-          href="${TRUSTED_ORIGINS[1]}/favicon.svg"
+          href="${TRUSTED_ORIGINS[1]}/favicon.ico"
           sizes="any"
           type="image/svg+xml"
         />
-        <link rel="apple-touch-icon" href="${TRUSTED_ORIGINS[1]}/favicon.svg" />
+        <link rel="apple-touch-icon" href="${TRUSTED_ORIGINS[1]}/favicon.ico" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
