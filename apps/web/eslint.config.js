@@ -1,4 +1,4 @@
-import nextCoreWebVitals from "eslint-config-next/core-web-vitals.js";
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 
 export default [
   // Base rules and ignores
