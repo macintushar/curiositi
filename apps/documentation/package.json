@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "NODE_OPTIONS=--no-experimental-strip-types astro dev",
     "start": "NODE_OPTIONS=--no-experimental-strip-types astro dev",
-    "build": "NODE_OPTIONS=--no-experimental-strip-types astro build",
+    "build": "astro build",
     "preview": "NODE_OPTIONS=--no-experimental-strip-types astro preview",
     "astro": "astro",
     "typecheck": "astro check"
@@ -17,6 +17,7 @@
     "@astrojs/react": "^4.2.1",
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/starlight": "^0.36.1",
+    "@pagefind/default-ui": "^1.0.0",
     "astro": "^5.6.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
