@@ -167,7 +167,6 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
         toolCalls,
         finishReason,
         reasoning,
-        response: responseMetadata,
       } = await result;
 
       // Await all Promise-based return values
