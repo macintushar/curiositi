@@ -1,3 +1,5 @@
+// @ts-check
+// @ts-expect-error - eslint-config-next doesn't have type definitions
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 
 export default [

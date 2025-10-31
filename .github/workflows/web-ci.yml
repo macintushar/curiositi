@@ -39,3 +39,6 @@ jobs:
       - name: Run Build Check
         run: bun run build
         working-directory: ./apps/web
+        # Note: To enable Sentry source map uploads in CI, add SENTRY_AUTH_TOKEN to GitHub secrets
+        # env:
+        #   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

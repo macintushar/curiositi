@@ -153,21 +153,20 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
     model: llm(modelName, provider),
     system: SEARCH_AGENT_SYSTEM_PROMPT,
     messages,
-    tools: tools(maxWebQueries, maxDocQueries, spaces.map((s) => s.id), enableWebSearch),
+    tools: tools(
+      maxWebQueries,
+      maxDocQueries,
+      spaces.map((s) => s.id),
+      enableWebSearch,
+    ),
     temperature: 0.6,
   });
 
   // Process the stream asynchronously to save messages to DB
   (async () => {
     try {
-      const {
-        text,
-        usage,
-        toolResults,
-        toolCalls,
-        finishReason,
-        reasoning,
-      } = await result;
+      const { text, usage, toolResults, toolCalls, finishReason, reasoning } =
+        await result;
 
       // Await all Promise-based return values
       const [
@@ -186,7 +185,9 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
         reasoning,
       ]);
 
-      console.log(`[SearchAgent] Stream finished - Reason: ${resolvedFinishReason}`);
+      console.log(
+        `[SearchAgent] Stream finished - Reason: ${resolvedFinishReason}`,
+      );
 
       // Parse tool results into structured sources
       const parsedSources: Array<{
@@ -201,11 +202,7 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
           for (const tr of resolvedToolResults) {
             // AI SDK returns tool results with a `result` field
             let payload: unknown = tr;
-            if (
-              tr &&
-              typeof tr === "object" &&
-              "result" in tr
-            ) {
+            if (tr && typeof tr === "object" && "result" in tr) {
               payload = tr.result;
             }
 
