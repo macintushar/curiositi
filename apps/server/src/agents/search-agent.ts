@@ -1,4 +1,4 @@
-import { Experimental_Agent as Agent, stepCountIs } from "ai";
+import { streamText, CoreMessage } from "ai";
 import { llm } from "@/lib/llms";
 import {
   LLM_PROVIDERS,
@@ -103,23 +103,6 @@ ${spacesInfo}
 ${context.question}`;
 }
 
-function createSearchAgent(
-  modelName: string,
-  provider: LLM_PROVIDERS,
-  maxWebQueries: number,
-  maxDocQueries: number,
-  spaceIds: string[],
-  enableWebSearch: boolean,
-) {
-  return new Agent({
-    model: llm(modelName, provider),
-    system: SEARCH_AGENT_SYSTEM_PROMPT,
-    tools: tools(maxWebQueries, maxDocQueries, spaceIds, enableWebSearch),
-    temperature: 0.6,
-    stopWhen: stepCountIs(10),
-  });
-}
-
 export async function executeSearchAgent(config: SearchAgentConfig) {
   const startTime = Date.now();
   const {
@@ -146,15 +129,6 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
     enableWebSearch,
   });
 
-  const agent = createSearchAgent(
-    modelName,
-    provider,
-    maxWebQueries,
-    maxDocQueries,
-    spaces.map((space) => space.id),
-    enableWebSearch,
-  );
-
   const userPrompt = buildUserPrompt({
     user,
     userTime,
@@ -163,7 +137,7 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
     history,
   });
 
-  const messages = [
+  const messages: CoreMessage[] = [
     ...history.map((msg) => ({
       role: msg.role as "user" | "assistant",
       content: msg.content,
@@ -175,46 +149,65 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
     `[SearchAgent] Starting stream (time to start: ${Date.now() - startTime}ms)`,
   );
 
-  const result = agent.stream({ messages });
+  const result = streamText({
+    model: llm(modelName, provider),
+    system: SEARCH_AGENT_SYSTEM_PROMPT,
+    messages,
+    tools: tools(maxWebQueries, maxDocQueries, spaces.map((s) => s.id), enableWebSearch),
+    temperature: 0.6,
+  });
 
+  // Process the stream asynchronously to save messages to DB
   (async () => {
     try {
-      const [
+      const {
         text,
-        totalUsage,
+        usage,
         toolResults,
         toolCalls,
-        reasoningText,
         finishReason,
+        reasoning,
+        response: responseMetadata,
+      } = await result;
+
+      // Await all Promise-based return values
+      const [
+        resolvedText,
+        resolvedUsage,
+        resolvedToolResults,
+        resolvedToolCalls,
+        resolvedFinishReason,
+        resolvedReasoning,
       ] = await Promise.all([
-        result.text,
-        result.totalUsage,
-        result.toolResults,
-        result.toolCalls,
-        result.reasoningText,
-        result.finishReason,
+        text,
+        usage,
+        toolResults,
+        toolCalls,
+        finishReason,
+        reasoning,
       ]);
 
-      console.log(`[SearchAgent] Stream finished - Reason: ${finishReason}`);
+      console.log(`[SearchAgent] Stream finished - Reason: ${resolvedFinishReason}`);
 
-      // Attempt to parse toolResults into structured sources
+      // Parse tool results into structured sources
       const parsedSources: Array<{
         title: string;
         content: string;
         source: string;
         query?: string;
       }> = [];
+
       try {
-        if (Array.isArray(toolResults)) {
-          for (const tr of toolResults as unknown[]) {
-            // AI SDK may return tool results as strings or objects with an `output` field.
-            let payload: unknown = tr as unknown;
+        if (Array.isArray(resolvedToolResults)) {
+          for (const tr of resolvedToolResults) {
+            // AI SDK returns tool results with a `result` field
+            let payload: unknown = tr;
             if (
               tr &&
               typeof tr === "object" &&
-              (tr as unknown as { output?: unknown }).output !== undefined
+              "result" in tr
             ) {
-              payload = (tr as unknown as { output?: unknown }).output;
+              payload = tr.result;
             }
 
             if (typeof payload === "string") {
@@ -239,7 +232,7 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
                   }
                 }
               } catch {
-                // ignore JSON parse errors; tool may not have returned JSON
+                // ignore JSON parse errors
               }
             }
           }
@@ -258,16 +251,16 @@ export async function executeSearchAgent(config: SearchAgentConfig) {
         },
         {
           role: "assistant",
-          content: text,
+          content: resolvedText,
           provider,
           model: modelName,
           threadId: threadId,
-          usage: totalUsage,
-          reasoning: reasoningText || "",
-          toolCalls: toolCalls,
-          toolResults: toolResults,
+          usage: resolvedUsage,
+          reasoning: resolvedReasoning,
+          toolCalls: resolvedToolCalls,
+          toolResults: resolvedToolResults,
           sources: parsedSources.length > 0 ? parsedSources : undefined,
-          finishReason,
+          finishReason: resolvedFinishReason,
         },
       ]);
     } catch (error) {
