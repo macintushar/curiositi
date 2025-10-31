@@ -22,7 +22,7 @@ export default defineConfig({
   integrations: [
     react(),
     starlight({
-      title: "Curiositi",
+      title: "Curiositi Docs",
       lastUpdated: true,
       titleDelimiter: "|",
       expressiveCode: {
