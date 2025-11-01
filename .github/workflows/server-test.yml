@@ -32,8 +32,8 @@ jobs:
         shell: bash
         run: find . -type f -name ".env.example" -exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
 
-      - name: Run Tests
-        run: bun run test
+      - name: Run tests and collect coverage
+        run: bun test --coverage
         working-directory: ./apps/server
 
       - name: Upload coverage reports to Codecov
