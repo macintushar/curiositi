@@ -1,4 +1,4 @@
-name: Server CI (Lint)
+name: Server CI (Test)
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
       - "packages/share/**"
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,14 +32,11 @@ jobs:
         shell: bash
         run: find . -type f -name ".env.example" -exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
 
-      - name: Run ESLint
-        run: bun run lint
+      - name: Run Tests
+        run: bun run test
         working-directory: ./apps/server
 
-      - name: Run Prettier Check
-        run: bunx prettier --check .
-        working-directory: ./apps/server
-
-      - name: Run Type Check
-        run: bun run typecheck
-        working-directory: ./apps/server
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
