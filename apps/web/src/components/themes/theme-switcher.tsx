@@ -23,6 +23,11 @@ function ThemedIcon({ theme }: { theme: Theme }) {
   }
 }
 
+function ThemeIcon({ theme }: { theme: Theme }) {
+  const Icon = ThemedIcon({ theme });
+  return <Icon className="size-4" />;
+}
+
 export default function ThemeSwitcher({
   className,
   variant = "outline",
@@ -31,11 +36,6 @@ export default function ThemeSwitcher({
   variant?: "outline" | "ghost";
 }) {
   const { theme, setTheme } = useTheme();
-
-  const ThemeIcon = ({ theme }: { theme: Theme }) => {
-    const Icon = ThemedIcon({ theme: theme });
-    return <Icon className="size-4" />;
-  };
 
   return (
     <DropdownMenu>

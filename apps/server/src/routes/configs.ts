@@ -1,16 +1,45 @@
-import { Hono } from "hono";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { auth } from "@/lib/auth";
 import { tryCatch } from "@/lib/try-catch";
 import { getConfigs } from "@/services/configs";
 
-const configsRouter = new Hono<{
+const configsRouter = new OpenAPIHono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;
     session: typeof auth.$Infer.Session.session | null;
   };
 }>();
 
-configsRouter.post("/", async (c) => {
+const getConfigsRoute = createRoute({
+  method: "post",
+  path: "/",
+  summary: "Get application configs",
+  description: "Retrieve application configuration settings",
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: {
+            data: {},
+          },
+        },
+      },
+      description: "Configs retrieved successfully",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: {
+            error: { type: "string" },
+          },
+        },
+      },
+      description: "Internal server error",
+    },
+  },
+});
+
+configsRouter.openapi(getConfigsRoute, async (c) => {
   const { data, error } = await tryCatch(getConfigs());
   if (error) {
     console.error(error);

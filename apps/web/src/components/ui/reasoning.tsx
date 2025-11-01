@@ -125,6 +125,8 @@ function ReasoningContent({
 
     if (isOpen) {
       contentRef.current.style.maxHeight = `${innerRef.current.scrollHeight}px`;
+    } else {
+      contentRef.current.style.maxHeight = "0px";
     }
 
     return () => observer.disconnect();
@@ -137,9 +139,6 @@ function ReasoningContent({
         "overflow-hidden transition-[max-height] duration-300 ease-out",
         className,
       )}
-      style={{
-        maxHeight: isOpen ? contentRef.current?.scrollHeight : "0px",
-      }}
       {...props}
     >
       <div ref={innerRef}>{children}</div>

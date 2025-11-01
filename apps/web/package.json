@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "check": "next lint && tsc --noEmit",
+    "check": "eslint . && tsc --noEmit",
     "dev": "next dev --turbo --port 3040",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "preview": "next build && next start",
     "start": "next start --port 3040",
     "typecheck": "tsc --noEmit"
@@ -58,13 +58,13 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^20.19.13",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
-    "eslint": "^9.35.0",
-    "eslint-config-next": "^15.5.3",
+    "eslint": "^9.38.0",
+    "eslint-config-next": "^16.0.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.6.14",

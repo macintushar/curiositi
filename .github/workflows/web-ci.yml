@@ -5,13 +5,15 @@ on:
     branches: ["main"]
     paths:
       - "apps/web/**"
+      - "packages/share/**"
   pull_request:
     branches: ["main"]
     paths:
       - "apps/web/**"
+      - "packages/share/**"
 
 jobs:
-  lint:
+  lint-and-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +25,8 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install dependencies
+      - name: Install workspace dependencies
         run: bun install
-        working-directory: ./apps/web
 
       - name: Copy .env.example files
         shell: bash
@@ -38,3 +39,6 @@ jobs:
       - name: Run Build Check
         run: bun run build
         working-directory: ./apps/web
+        # Note: To enable Sentry source map uploads in CI, add SENTRY_AUTH_TOKEN to GitHub secrets
+        # env:
+        #   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

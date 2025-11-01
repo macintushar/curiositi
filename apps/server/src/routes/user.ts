@@ -1,18 +1,57 @@
-import { Hono } from "hono";
+import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { zValidator } from "@hono/zod-validator";
 import { auth } from "@/lib/auth";
 import { tryCatch } from "@/lib/try-catch";
 import { AddOrUpdateApiKeySchema } from "@/types/schemas";
 import { addOrUpdateApiKey, getApiKeys } from "@/services/user";
 
-const userRouter = new Hono<{
+const userRouter = new OpenAPIHono<{
   Variables: {
     user: typeof auth.$Infer.Session.user | null;
     session: typeof auth.$Infer.Session.session | null;
   };
 }>();
 
-userRouter.get("/settings", async (c) => {
+const getSettingsRoute = createRoute({
+  method: "get",
+  path: "/settings",
+  summary: "Get user settings",
+  description: "Retrieve the current user's API key settings",
+  responses: {
+    200: {
+      content: {
+        "application/json": {
+          schema: {
+            data: {},
+          },
+        },
+      },
+      description: "User settings retrieved successfully",
+    },
+    401: {
+      content: {
+        "application/json": {
+          schema: {
+            error: { type: "string" },
+          },
+        },
+      },
+      description: "Unauthorized",
+    },
+    500: {
+      content: {
+        "application/json": {
+          schema: {
+            error: { type: "string" },
+          },
+        },
+      },
+      description: "Internal server error",
+    },
+  },
+});
+
+userRouter.openapi(getSettingsRoute, async (c) => {
   const user = c.get("user");
 
   if (!user) {

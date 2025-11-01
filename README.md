@@ -8,10 +8,22 @@
   Upload documents, organize them into spaces, and chat with an agent that answers using your knowledge and the web.
 </p>
 
-<p align="center">
+<p align="center" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
   <a href="https://github.com/macintushar/curiositi/stargazers"><img src="https://img.shields.io/github/stars/macintushar/curiositi?style=for-the-badge" alt="GitHub stars"></a>
   <a href="https://github.com/macintushar/curiositi/graphs/commit-activity"><img src="https://img.shields.io/github/commit-activity/m/macintushar/curiositi?style=for-the-badge" alt="Commit activity"></a>
   <a href="./LICENSE.md"><img src="https://img.shields.io/badge/licence-Elastic_V2-blue?style=for-the-badge" alt="License"></a>
+</p>
+
+<p align="center">
+    <a href="https://codecov.io/github/macintushar/curiositi">
+        <img src="https://codecov.io/github/macintushar/curiositi/graph/badge.svg?token=35SYPDCQFH" alt="codecov">
+    </a>
+    <a href="https://github.com/macintushar/curiositi/actions/workflows/web-ci.yml">
+        <img src="https://img.shields.io/github/actions/workflow/status/macintushar/curiositi/web-ci.yml?branch=main&label=Web%20CI&style=for-the-badge" alt="Web CI">
+    </a>
+    <a href="https://github.com/macintushar/curiositi/actions/workflows/documentation-ci.yml">
+      <img src="https://img.shields.io/github/actions/workflow/status/macintushar/curiositi/documentation-ci.yml?branch=main&label=Docs%20CI&style=for-the-badge" alt="Docs CI">
+    </a>
 </p>
 
 <p align="center">
@@ -64,7 +76,7 @@ The Curiositi project is structured as a monorepo, containing several key compon
 
 - **apps/web**: This is the Next.js 15 app router UI, responsible for the frontend interface of Curiositi.
 - **apps/server**: This is the Bun + Hono API server, handling backend operations and API requests.
-- **apps/docs**: Contains the Docusaurus documentation for Curiositi, providing comprehensive guides and references.
+- **apps/documentation**: Contains the Astro Starlight documentation for Curiositi, providing comprehensive guides and references.
 - **packages/share**: Houses shared TypeScript types used across different parts of the application.
 
 ### Key Features
@@ -177,7 +189,6 @@ The server runs `bun run db:migrate` on start and mounts hot‑reload volumes fo
 All routes require auth cookies issued by better‑auth (`/api/auth/*` handled by server). Common 401 on missing session.
 
 - `POST /search`
-
   - body: `{ input, model, provider, thread_id, space_ids?, file_ids? }`
   - returns: assistant `ThreadMessage`; creates title if needed and stores messages
 

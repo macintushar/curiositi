@@ -12,7 +12,7 @@ export const mcpURL = "https://modelcontextprotocol.io/introduction";
 export const docsURL =
   env.NEXT_PUBLIC_BASE_URL !== "http://localhost:3040"
     ? "https://docs.curiositi.xyz"
-    : "http://localhost:3035";
+    : "http://localhost:4321";
 
 import CuriositiIcon from "@/assets/icon.svg";
 import { env } from "@/env";

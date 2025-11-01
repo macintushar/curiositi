@@ -1,0 +1,37 @@
+{
+  "name": "@curiositi/documentation",
+  "description": "Documentation for Curiositi",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_OPTIONS=--no-experimental-strip-types astro dev",
+    "start": "NODE_OPTIONS=--no-experimental-strip-types astro dev",
+    "build": "astro build",
+    "preview": "NODE_OPTIONS=--no-experimental-strip-types astro preview",
+    "astro": "astro",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^6.3.1",
+    "@astrojs/react": "^4.2.1",
+    "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/starlight": "^0.36.1",
+    "@pagefind/default-ui": "^1.0.0",
+    "astro": "^5.6.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "sharp": "^0.34.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.3",
+    "esbuild": "^0.21.5"
+  },
+  "engines": {
+    "node": ">=20.0"
+  }
+}

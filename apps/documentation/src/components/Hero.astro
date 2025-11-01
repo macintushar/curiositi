@@ -1,0 +1,170 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+
+const { data } = Astro.locals.starlightRoute.entry;
+const { tagline, image, actions = [] } = data.hero || {};
+
+let rawHtml: string | undefined;
+if (image) {
+  if ("file" in image) {
+    // darkImage = image.file;
+  } else if ("dark" in image) {
+    // darkImage = image.dark;
+    // lightImage = image.light;
+  } else {
+    rawHtml = image.html;
+  }
+}
+---
+
+<div class="hero">
+  {rawHtml && <div class="hero-html sl-flex" set:html={rawHtml} />}
+  <div class="sl-flex stack" style="border-bottom: 1px solid white;">
+    <div class="sl-flex copy">
+      <div>
+        <h1 class="title">Curiositi starts here,</h1>
+        <h1 class="title" style="font-style: italic !important;">
+          knowledge never ends
+        </h1>
+      </div>
+    </div>
+  </div>
+  <div class="sl-flex stack sidecar">
+    {tagline && <div class="tagline" set:html={tagline} />}
+    {
+      actions.length > 0 && (
+        <div class="sl-flex actions">
+          {actions.map((action) => (
+            <a href={action.link}>
+              <button class="hero-button">
+                {action.text}
+                <Icon name={action.icon?.name || "document"} size="18px" />
+              </button>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  @layer starlight.core {
+    .hero {
+      display: flex;
+      flex-direction: column;
+      padding-left: 100px;
+      padding-right: 100px;
+      padding-bottom: 1rem;
+      background-image: url("../assets/hero.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100%;
+      aspect-ratio: 16/9;
+      border-radius: 16px;
+    }
+
+    .hero > img,
+    .hero > .hero-html {
+      object-fit: contain;
+      width: min(70%, 20rem);
+      height: auto;
+      margin-inline: auto;
+    }
+
+    .hero-button {
+      background-color: white;
+      color: black;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border-color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      height: 40px;
+      text-decoration: none;
+    }
+
+    .stack {
+      flex-direction: column;
+      gap: clamp(1.5rem, calc(1.5rem + 1vw), 2rem);
+      text-align: center;
+    }
+
+    .copy {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .title {
+      color: white !important;
+      font-size: 48px !important;
+    }
+
+    .copy > * {
+      max-width: 50ch;
+    }
+
+    h1 {
+      font-size: clamp(
+        var(--sl-text-3xl),
+        calc(0.25rem + 5vw),
+        var(--sl-text-6xl)
+      );
+      line-height: var(--sl-line-height-headings);
+      font-weight: 600;
+      color: var(--sl-color-white);
+    }
+
+    .tagline {
+      font-size: clamp(
+        var(--sl-text-base),
+        calc(0.0625rem + 2vw),
+        var(--sl-text-xl)
+      );
+      color: whitesmoke;
+    }
+
+    .sidecar {
+      width: 50%;
+      align-items: end;
+      align-self: flex-end;
+    }
+
+    .actions {
+      gap: 1rem 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    @media (min-width: 50rem) {
+      .hero {
+        grid-template-columns: 7fr 4fr;
+        gap: 3%;
+        padding-block: clamp(2.5rem, calc(1rem + 10vmin), 10rem);
+      }
+
+      .hero > img,
+      .hero > .hero-html {
+        order: 2;
+        width: min(100%, 25rem);
+      }
+
+      .stack {
+        text-align: start;
+        padding-bottom: 32px;
+      }
+
+      .copy {
+        align-items: flex-start;
+      }
+
+      .actions {
+        justify-content: flex-start;
+      }
+    }
+  }
+</style>

@@ -10,7 +10,7 @@ const firecrawl = FIRECRAWL_API_KEY
 
 // Create a web search tool using Firecrawl
 export const webSearchTool = {
-  async invoke(query: string): Promise<string> {
+  async invoke(query: string, maxQueries: number): Promise<string> {
     // Check if Firecrawl is configured
     if (!firecrawl || !FIRECRAWL_API_KEY) {
       console.warn("Firecrawl API key not configured. Web search disabled.");
@@ -22,7 +22,7 @@ export const webSearchTool = {
 
       // Use the correct Firecrawl search API
       const results = await firecrawl.search(query, {
-        limit: 5,
+        limit: maxQueries,
         scrapeOptions: {
           formats: ["markdown"],
         },

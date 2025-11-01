@@ -1,22 +1,37 @@
-import { FlatCompat } from "@eslint/eslintrc";
-import tseslint from "typescript-eslint";
+// @ts-check
+// @ts-expect-error - eslint-config-next doesn't have type definitions
+import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-});
-
-export default tseslint.config(
+export default [
+  // Base rules and ignores
   {
+    rules: {
+      semi: "error",
+      "prefer-const": "error",
+    },
     ignores: [".next"],
   },
-  ...compat.extends("next/core-web-vitals"),
+
+  // Next.js core web vitals (flat config exports an array and already sets up TypeScript ESLint)
+  ...nextCoreWebVitals,
+
+  // Allow anonymous default exports in config files
+  {
+    files: ["*.config.js", "*.config.ts"],
+    rules: {
+      "import/no-anonymous-default-export": "off",
+    },
+  },
+
+  // Project-specific TS settings and rules
   {
     files: ["**/*.ts", "**/*.tsx"],
-    extends: [
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
-    ],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       "@typescript-eslint/array-type": "off",
       "@typescript-eslint/consistent-type-definitions": "off",
@@ -35,15 +50,11 @@ export default tseslint.config(
       ],
     },
   },
+
+  // Linter options
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,
     },
-    languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
   },
-);
+];

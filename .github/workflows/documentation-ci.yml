@@ -1,0 +1,35 @@
+name: Documentation CI (Lint + Build)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "apps/documentation/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "apps/documentation/**"
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install workspace dependencies
+        run: bun install
+
+      - name: Run Type Check
+        run: bun run typecheck
+        working-directory: ./apps/documentation
+
+      - name: Run Build Check
+        run: bun run build
+        working-directory: ./apps/documentation
