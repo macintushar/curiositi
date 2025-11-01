@@ -5,6 +5,7 @@ import {
   uuid,
   boolean,
   vector,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { customType } from "drizzle-orm/pg-core";
@@ -149,16 +150,12 @@ export const messages = pgTable("messages", {
     .references(() => threads.id, { onDelete: "cascade" }),
   model: text("model").notNull(),
   provider: text("provider").notNull(),
-  documentSearches: text("document_searches").array(),
-  webSearches: text("web_searches").array(),
-  documentSearchResults: text("document_search_results").array(),
-  webSearchResults: text("web_search_results").array(),
-  specificFileContent: text("specific_file_content").array(),
-  followUpSuggestions: text("follow_up_suggestions").array(),
-  strategy: text("strategy", {
-    enum: ["comprehensive", "focused", "hybrid", "error"],
-  }).default("comprehensive"),
+  toolCalls: jsonb("tool_calls"),
+  toolResults: jsonb("tool_results"),
+  sources: jsonb("sources"),
   reasoning: text("reasoning"),
+  finishReason: text("finish_reason"),
+  usage: jsonb("usage"),
 });
 
 export const settings = pgTable("settings", {

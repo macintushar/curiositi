@@ -1,0 +1,42 @@
+name: Server CI (Test)
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "apps/server/**"
+      - "packages/share/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "apps/server/**"
+      - "packages/share/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install workspace dependencies
+        run: bun install
+
+      - name: Copy .env.example files
+        shell: bash
+        run: find . -type f -name ".env.example" -exec sh -c 'cp "$1" "${1%.*}"' _ {} \;
+
+      - name: Run Tests
+        run: bun run test
+        working-directory: ./apps/server
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

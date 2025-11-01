@@ -17,6 +17,7 @@ try {
   Bun.serve({
     port: PORT,
     fetch: app.fetch,
+    idleTimeout: 255,
   });
   console.log("Server is running on port", PORT);
   console.log(

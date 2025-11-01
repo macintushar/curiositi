@@ -1,10 +1,10 @@
-import { Hono } from "hono";
+import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 
 import apiRouter from "@/routes/api";
 
-const app = new Hono();
+const app = new OpenAPIHono();
 import { auth } from "./lib/auth";
 import { TRUSTED_ORIGINS } from "./constants";
 import { html, raw } from "hono/html";
@@ -37,18 +37,18 @@ app.get("/", async (c) => {
         <meta name="bingbot" content="index, follow" />
         <link
           rel="icon"
-          href="${TRUSTED_ORIGINS[1]}/favicon.svg"
+          href="${TRUSTED_ORIGINS[1]}/favicon.ico"
           sizes="48x48"
           type="image/svg+xml"
         />
         <link
           id="favicon"
           rel="icon"
-          href="${TRUSTED_ORIGINS[1]}/favicon.svg"
+          href="${TRUSTED_ORIGINS[1]}/favicon.ico"
           sizes="any"
           type="image/svg+xml"
         />
-        <link rel="apple-touch-icon" href="${TRUSTED_ORIGINS[1]}/favicon.svg" />
+        <link rel="apple-touch-icon" href="${TRUSTED_ORIGINS[1]}/favicon.ico" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -210,5 +210,16 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => {
 });
 
 app.route("/api/v1", apiRouter);
+
+// OpenAPI documentation
+app.doc("/doc", {
+  openapi: "3.0.0",
+  info: {
+    version: "1.0.0",
+    title: "Curiositi API",
+    description:
+      "AI-powered knowledge workspace API for document management and search",
+  },
+});
 
 export default app;

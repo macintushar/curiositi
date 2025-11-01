@@ -1,4 +1,4 @@
-import { generateObject, type Message as AIMessage } from "ai";
+import { generateObject } from "ai";
 import { llm } from "@/lib/llms";
 import {
   LLM_PROVIDERS,
@@ -129,7 +129,7 @@ Provide your analysis focusing on information strategy and source prioritization
             "You are an expert at analyzing information needs and planning comprehensive research strategies. Focus on understanding what sources and approaches will best answer the user's question.",
         },
         { role: "user", content: contextAnalysisPrompt },
-      ] as Omit<AIMessage, "id">[],
+      ],
       temperature: 0.3,
     });
 
@@ -179,7 +179,7 @@ Generate queries that will give the most complete answer to the user's question.
             "You are a search query optimization specialist. Create precise, effective queries that will find the most relevant information for comprehensive answers.",
         },
         { role: "user", content: queryGenerationPrompt },
-      ] as Omit<AIMessage, "id">[],
+      ],
       temperature: 0.4,
     });
 
@@ -434,7 +434,7 @@ Focus on providing accurate, well-reasoned answers based on the available inform
             "You are an expert AI assistant specializing in comprehensive information synthesis and generation. You excel at combining multiple sources to create accurate, well-reasoned responses.",
         },
         { role: "user", content: generationPrompt },
-      ] as Omit<AIMessage, "id">[],
+      ],
       temperature: 0.6,
     });
 
