@@ -1,92 +1,64 @@
-"use client";
+"use client"
 
-import { cn } from "@/lib/utils";
-import React, { useEffect, useState } from "react";
-import { codeToHtml } from "shiki";
-import CopyButton from "../app/copy-button";
-import CodeLanguageIcon from "./code-language-icon";
+import { cn } from "@/lib/utils"
+import React, { useEffect, useState } from "react"
+import { codeToHtml } from "shiki"
 
 export type CodeBlockProps = {
-  children?: React.ReactNode;
-  className?: string;
-  language?: string;
-  text?: string;
-} & React.HTMLProps<HTMLDivElement>;
+  children?: React.ReactNode
+  className?: string
+} & React.HTMLProps<HTMLDivElement>
 
-function CodeBlock({
-  children,
-  className,
-  language,
-  text,
-  ...props
-}: CodeBlockProps) {
+function CodeBlock({ children, className, ...props }: CodeBlockProps) {
   return (
     <div
       className={cn(
-        "not-prose my-2 flex w-full flex-col overflow-clip border",
-        "border-border text-card-foreground rounded-xl",
-        className,
+        "not-prose flex w-full flex-col overflow-clip border",
+        "border-border bg-card text-card-foreground rounded-xl",
+        className
       )}
       {...props}
     >
-      <div className="flex items-center justify-between px-2 py-1 text-xs">
-        <div className="flex items-center gap-1">
-          <CodeLanguageIcon language={language ?? "code"} />
-          <p className="text-muted-foreground font-mono">
-            {language ?? "Code"}
-          </p>
-        </div>
-        <CopyButton
-          className="size-5 rounded-sm p-1"
-          iconSize="size-3"
-          variant="outline"
-          text={text?.trim() ?? "No code provided to copy"}
-        />
-      </div>
       {children}
     </div>
-  );
+  )
 }
 
 export type CodeBlockCodeProps = {
-  code: string;
-  language?: string;
-  theme?: string;
-  className?: string;
-} & React.HTMLProps<HTMLDivElement>;
+  code: string
+  language?: string
+  theme?: string
+  className?: string
+} & React.HTMLProps<HTMLDivElement>
 
 function CodeBlockCode({
   code,
   language = "tsx",
-  theme = "light-plus",
+  theme = "github-light",
   className,
   ...props
 }: CodeBlockCodeProps) {
-  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
+  const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null)
 
   useEffect(() => {
     async function highlight() {
       if (!code) {
-        setHighlightedHtml("<pre><code></code></pre>");
-        return;
+        setHighlightedHtml("<pre><code></code></pre>")
+        return
       }
 
-      const html = await codeToHtml(code, {
-        lang: language,
-        theme,
-      });
-      setHighlightedHtml(html);
+      const html = await codeToHtml(code, { lang: language, theme })
+      setHighlightedHtml(html)
     }
-    void highlight();
-  }, [code, language, theme]);
+    highlight()
+  }, [code, language, theme])
 
   const classNames = cn(
-    "w-full overflow-x-auto text-xs [&>pre]:px-4 [&>pre]:py-4",
-    className,
-  );
+    "w-full overflow-x-auto text-[13px] [&>pre]:px-4 [&>pre]:py-4",
+    className
+  )
 
   // SSR fallback: render plain code if not hydrated yet
-
   return highlightedHtml ? (
     <div
       className={classNames}
@@ -99,10 +71,10 @@ function CodeBlockCode({
         <code>{code}</code>
       </pre>
     </div>
-  );
+  )
 }
 
-export type CodeBlockGroupProps = React.HTMLAttributes<HTMLDivElement>;
+export type CodeBlockGroupProps = React.HTMLAttributes<HTMLDivElement>
 
 function CodeBlockGroup({
   children,
@@ -116,7 +88,7 @@ function CodeBlockGroup({
     >
       {children}
     </div>
-  );
+  )
 }
 
-export { CodeBlockGroup, CodeBlockCode, CodeBlock };
+export { CodeBlockGroup, CodeBlockCode, CodeBlock }

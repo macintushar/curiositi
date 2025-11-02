@@ -13,6 +13,7 @@ type ChatStore = {
   prompt: string;
   context: Context[];
   isLoading: boolean;
+  isStreaming: boolean;
   search: string;
   tab: SearchTab;
   files: AllFiles[];
@@ -22,6 +23,7 @@ type ChatStore = {
   setPrompt: (prompt: string) => void;
   setContext: (context: Context[]) => void;
   setIsLoading: (isLoading: boolean) => void;
+  setIsStreaming: (isStreaming: boolean) => void;
   setSearch: (search: string) => void;
   setTab: (tab: SearchTab) => void;
   setFiles: (files: AllFiles[]) => void;
@@ -36,6 +38,7 @@ const useChatStore = create(
       prompt: "",
       context: [],
       isLoading: false,
+      isStreaming: false,
       search: "",
       tab: "all",
       files: [],
@@ -45,6 +48,7 @@ const useChatStore = create(
       setPrompt: (prompt) => set({ prompt }),
       setContext: (context) => set({ context }),
       setIsLoading: (isLoading) => set({ isLoading }),
+      setIsStreaming: (isStreaming) => set({ isStreaming }),
       setSearch: (search) => set({ search }),
       setTab: (tab) => set({ tab }),
       setFiles: (files) => set({ files }),

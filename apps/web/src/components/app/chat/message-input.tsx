@@ -23,11 +23,13 @@ import useChatStore from "@/stores/useChatStore";
 type MessageInputProps = {
   onSubmit?: () => void;
   isLoading?: boolean;
+  onStop?: () => void;
 };
 
 export default function MessageInput({
   onSubmit,
   isLoading: externalLoading,
+  onStop,
 }: MessageInputProps) {
   const {
     prompt,
@@ -64,7 +66,7 @@ export default function MessageInput({
           ))}
       </div>
       <PromptInput
-        isLoading={false}
+        isLoading={isLoading}
         value={prompt}
         onValueChange={setPrompt}
         onSubmit={onSubmit}
@@ -80,18 +82,28 @@ export default function MessageInput({
           <PromptInputActions className="mt-5 flex w-full items-center justify-between gap-2 px-3 pb-3">
             <div className="flex w-full items-center justify-between gap-2">
               <ModelSelector />
-              <Button
-                size="icon"
-                className="bg-brand"
-                disabled={!prompt.trim() || isLoading}
-                onClick={onSubmit}
-              >
-                {!isLoading ? (
+               {!isLoading ? (
+                <Button
+                  size="icon"
+                  className="bg-brand"
+                  disabled={!prompt.trim()}
+                  onClick={onSubmit}
+                >
                   <IconArrowUp />
-                ) : (
-                  <span className="size-3 rounded-xs bg-white" />
-                )}
-              </Button>
+                </Button>
+               ) : onStop ? (
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  className="bg-destructive"
+                  onClick={onStop}
+                >
+                  <IconX />
+                </Button>
+               ) : (
+                <span className="size-3 rounded-xs bg-white" />
+               )}
+
             </div>
           </PromptInputActions>
         </div>

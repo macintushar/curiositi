@@ -5,6 +5,7 @@ import remarkBreaks from "remark-breaks";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import remarkGfm from "remark-gfm";
+import rehypeExternalLinks from "rehype-external-links";
 
 import { IconDownload } from "@tabler/icons-react";
 import { useTheme } from "next-themes";
@@ -116,7 +117,11 @@ const INITIAL_COMPONENTS: Partial<Components> = {
   },
   a: function AComponent({ children, href, className }) {
     return (
-      <Link href={href ?? ""} className={cn("text-blue-500", className)}>
+      <Link
+        href={href ?? ""}
+        className={cn("text-blue-500", className)}
+        target={href?.startsWith("http") ? "_blank" : undefined}
+      >
         {children}
       </Link>
     );
@@ -146,7 +151,8 @@ const MemoizedMarkdownBlock = memo(
   }) {
     return (
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath, rehypeKatex]}
+        remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+        rehypePlugins={[[rehypeExternalLinks, { target: "_blank", rel: ["noopener", "noreferrer"] }], rehypeKatex]}
         components={components}
       >
         {content}
