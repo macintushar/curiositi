@@ -197,6 +197,7 @@ app.use(
       "Access-Control-Allow-Origin",
       "Access-Control-Allow-Credentials",
       "Cookie",
+      "X-User-Timezone",
     ],
     allowMethods: ["POST", "GET", "OPTIONS", "PATCH", "DELETE", "PUT"],
     exposeHeaders: ["Content-Length", "Set-Cookie"],

@@ -23,6 +23,8 @@ type PromptInputContextType = {
   maxHeight: number | string;
   onSubmit?: () => void;
   disabled?: boolean;
+  // when true, actions and textarea are disabled
+  // derived from isLoading unless explicitly provided
 };
 
 const PromptInputContext = createContext<PromptInputContextType>({
@@ -73,13 +75,14 @@ function PromptInput({
   return (
     <TooltipProvider>
       <PromptInputContext.Provider
-        value={{
-          isLoading,
-          value: value ?? internalValue,
-          setValue: onValueChange ?? handleChange,
-          maxHeight,
-          onSubmit,
-        }}
+         value={{
+           isLoading,
+           value: value ?? internalValue,
+           setValue: onValueChange ?? handleChange,
+           maxHeight,
+           onSubmit,
+           disabled: isLoading,
+         }}
       >
         <div
           className={cn(

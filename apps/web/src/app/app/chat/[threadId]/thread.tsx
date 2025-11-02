@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   ChatContainerRoot,
   ChatContainerContent,
+  ChatContainerScrollAnchor,
 } from "@/components/ui/chat-container";
 import MessageInput from "@/components/app/chat/message-input";
 import MessageContainer from "@/components/app/chat/message-container";
@@ -12,11 +13,13 @@ import MessageContainer from "@/components/app/chat/message-container";
 import useChatStore from "@/stores/useChatStore";
 
 import type { AllFiles, Configs, Space, ThreadMessage } from "@/types";
-import { search } from "@/actions/search";
 import useThreadStore from "@/stores/useThreadStore";
 import { toast } from "sonner";
 import { Loader } from "@/components/ui/loader";
 import { ScrollButton } from "@/components/ui/scroll-button";
+import { sendMessageStream } from "@/services/chats";
+import { clientApiFetch } from "@/services/client-fetch";
+import type { ApiResponse } from "@/types";
 
 export default function Thread({
   files,
@@ -41,10 +44,14 @@ export default function Thread({
     prompt,
     activeModel,
     context,
+    isStreaming,
+    setIsStreaming,
   } = useChatStore();
 
   const { messages: messagesState, setMessages: setMessagesState } =
     useThreadStore();
+
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (files) {
@@ -65,6 +72,12 @@ export default function Thread({
       setMessagesState([]);
     }
   }, [threadId, messages, setMessagesState]);
+
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   return (
     <div className="flex h-full flex-col items-center justify-between gap-2 px-2 py-2">
@@ -88,12 +101,19 @@ export default function Thread({
             </div>
           )}
         </ChatContainerContent>
+        <ChatContainerScrollAnchor />
         <div className="absolute right-12 bottom-50">
           <ScrollButton />
         </div>
       </ChatContainerRoot>
       <MessageInput
+        isLoading={isStreaming}
+        onStop={() => abortControllerRef.current?.abort()}
         onSubmit={async () => {
+          if (isStreaming) {
+            return;
+          }
+
           if (!activeModel || !prompt.trim() || !threadId) {
             console.error("Missing required fields:", {
               activeModel,
@@ -103,62 +123,120 @@ export default function Thread({
             return;
           }
 
+          const question = prompt.trim();
           setPrompt("");
+
+          // Append user message optimistically
+          const userMessage: ThreadMessage = {
+            role: "user",
+            content: question,
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            threadId,
+            documentSearches: [],
+            webSearches: [],
+            documentSearchResults: [],
+            webSearchResults: [],
+            confidence: 0,
+            followUpSuggestions: [],
+            strategy: "comprehensive",
+            specificFileContent: [],
+            model: activeModel.model.model,
+            provider: activeModel.provider_name,
+            reasoning: null,
+          };
+
+          const assistantId = crypto.randomUUID();
+          const assistantSkeleton: ThreadMessage = {
+            role: "assistant",
+            content: "",
+            id: assistantId,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            threadId,
+            documentSearches: [],
+            webSearches: [],
+            documentSearchResults: [],
+            webSearchResults: [],
+            confidence: 0,
+            followUpSuggestions: [],
+            strategy: "comprehensive",
+            specificFileContent: [],
+            model: activeModel.model.model,
+            provider: activeModel.provider_name,
+            reasoning: null,
+          };
 
           setMessagesState([
             ...useThreadStore.getState().messages,
-            {
-              role: "user",
-              content: prompt.trim(),
-              id: crypto.randomUUID(),
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              threadId,
-              documentSearches: [],
-              webSearches: [],
-              documentSearchResults: [],
-              webSearchResults: [],
-              confidence: 0,
-              followUpSuggestions: [],
-              strategy: "comprehensive",
-              specificFileContent: [],
-              model: activeModel.model.model,
-              provider: activeModel.provider_name,
-              reasoning: null,
-            },
+            userMessage,
+            assistantSkeleton,
           ]);
 
           setIsLoading(true);
-          const data = await search({
-            input: prompt.trim(),
-            model: activeModel.model.model,
-            provider: activeModel.provider_name,
-            thread_id: threadId,
-            space_ids: context
-              .filter((item) => item.type === "space")
-              .map((item) => item.id),
-            file_ids: context
-              .filter((item) => item.type === "file")
-              .map((item) => item.id),
-          });
+          setIsStreaming(true);
 
-          if (data.error) {
-            toast.error(data.error);
-            setPrompt(prompt.trim());
-          }
+          const abortController = new AbortController();
+          abortControllerRef.current = abortController;
 
-          if (data.data?.error) {
-            toast.error(data.data.error);
-            setPrompt(prompt.trim());
-          }
+          try {
+            const stream = await sendMessageStream(
+              question,
+              activeModel.model.model,
+              activeModel.provider_name,
+              threadId,
+              context
+                .filter((item) => item.type === "space")
+                .map((item) => item.id),
+              context
+                .filter((item) => item.type === "file")
+                .map((item) => item.id),
+              abortController.signal,
+            );
 
-          if (data?.data?.data) {
-            setMessagesState([
-              ...useThreadStore.getState().messages,
-              data.data.data,
-            ]);
+            let accumulated = "";
+            for await (const chunk of stream) {
+              accumulated += chunk;
+              const current = useThreadStore.getState().messages;
+              const updated = current.map((m) =>
+                m.id === assistantId ? { ...m, content: accumulated } : m,
+              );
+              setMessagesState(updated);
+            }
+
+            // After completion, try to refresh to get metadata saved by server
+            try {
+              const refreshed = await clientApiFetch<ApiResponse<ThreadMessage[]>>(
+                `/api/v1/threads/${threadId}/messages`,
+                { method: "GET" },
+              );
+              if (refreshed?.data) {
+                setMessagesState(refreshed.data);
+              }
+            } catch {
+              // ignore refresh errors, we already showed streamed content
+            }
+          } catch (err: unknown) {
+            // Ignore user-initiated aborts
+            if (
+              err &&
+              typeof err === "object" &&
+              "name" in err &&
+              (err as any).name === "AbortError"
+            ) {
+              return;
+            }
+
+            console.error("Streaming error:", err);
+            toast.error(
+              err instanceof Error ? err.message : "Failed to stream response",
+            );
+          } finally {
+            setIsLoading(false);
+            setIsStreaming(false);
+            abortControllerRef.current = null;
           }
-          setIsLoading(false);
         }}
       />
     </div>
