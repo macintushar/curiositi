@@ -1,5 +1,5 @@
 {
-	"name": "server",
+	"name": "@curiositi/worker",
 	"scripts": {
 		"dev": "bun run --hot --watch src/index.ts",
 		"lint": "biome check .",
