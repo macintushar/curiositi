@@ -1,0 +1,36 @@
+{
+	"name": "@curiositi/db",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./src/index.ts"
+		},
+		"./client": {
+			"types": "./dist/client.d.ts",
+			"default": "./src/client.ts"
+		},
+		"./schema": {
+			"types": "./dist/schema.d.ts",
+			"default": "./src/schema.ts"
+		}
+	},
+	"license": "MIT",
+	"scripts": {
+		"push": "with-env drizzle-kit push",
+		"generate": "with-env drizzle-kit generate",
+		"migrate": "with-env drizzle-kit migrate",
+		"studio": "with-env drizzle-kit studio",
+		"with-env": "dotenv -e ../../.env --"
+	},
+	"dependencies": {
+		"drizzle-orm": "^0.44.7",
+		"drizzle-zod": "^0.8.3",
+		"postgres": "^3.4.7"
+	},
+	"devDependencies": {
+		"@curiositi/tsconfig": "workspace:*",
+		"drizzle-kit": "^0.31.5"
+	}
+}

@@ -1,0 +1,19 @@
+{
+	"name": "@curiositi/queue",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": "./index.ts"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@curiositi/tsconfig": "workspace:*",
+		"@curiositi/share": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@upstash/qstash": "^2.8.4"
+	}
+}
