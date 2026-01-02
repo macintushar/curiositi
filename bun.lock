@@ -13,20 +13,8 @@
         "typescript": "5.9.2",
       },
     },
-    "apps/server": {
-      "name": "server",
-      "dependencies": {
-        "@curiositi/share": "workspace:*",
-        "hono": "^4.11.3",
-      },
-      "devDependencies": {
-        "@curiositi/tsconfig": "workspace:*",
-        "@types/bun": "latest",
-        "typescript": "5.9.2",
-      },
-    },
-    "apps/web": {
-      "name": "web",
+    "apps/platform": {
+      "name": "@curiositi/platform",
       "version": "0.1.0",
       "dependencies": {
         "@repo/ui": "*",
@@ -39,6 +27,18 @@
         "@types/node": "^22.15.3",
         "@types/react": "19.2.2",
         "@types/react-dom": "19.2.2",
+        "typescript": "5.9.2",
+      },
+    },
+    "apps/server": {
+      "name": "server",
+      "dependencies": {
+        "@curiositi/share": "workspace:*",
+        "hono": "^4.11.3",
+      },
+      "devDependencies": {
+        "@curiositi/tsconfig": "workspace:*",
+        "@types/bun": "latest",
         "typescript": "5.9.2",
       },
     },
@@ -91,6 +91,8 @@
     "@biomejs/cli-win32-arm64": ["@biomejs/cli-win32-arm64@2.3.10", "", { "os": "win32", "cpu": "arm64" }, "sha512-o7lYc9n+CfRbHvkjPhm8s9FgbKdYZu5HCcGVMItLjz93EhgJ8AM44W+QckDqLA9MKDNFrR8nPbO4b73VC5kGGQ=="],
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.3.10", "", { "os": "win32", "cpu": "x64" }, "sha512-pHEFgq7dUEsKnqG9mx9bXihxGI49X+ar+UBrEIj3Wqj3UCZp1rNgV+OoyjFgcXsjCWpuEAF4VJdkZr3TrWdCbQ=="],
+
+    "@curiositi/platform": ["@curiositi/platform@workspace:apps/platform"],
 
     "@curiositi/share": ["@curiositi/share@workspace:packages/share"],
 
@@ -447,8 +449,6 @@
     "uuid": ["uuid@3.4.0", "", { "bin": { "uuid": "./bin/uuid" } }, "sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A=="],
 
     "verror": ["verror@1.10.0", "", { "dependencies": { "assert-plus": "^1.0.0", "core-util-is": "1.0.2", "extsprintf": "^1.2.0" } }, "sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw=="],
-
-    "web": ["web@workspace:apps/web"],
 
     "wrappy": ["wrappy@1.0.2", "", {}, "sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ=="],
 
