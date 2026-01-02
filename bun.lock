@@ -53,7 +53,7 @@
         "typescript": "^5",
       },
     },
-    "packages/typescript-config": {
+    "packages/tsconfig": {
       "name": "@curiositi/tsconfig",
       "version": "0.0.0",
     },
@@ -94,7 +94,7 @@
 
     "@curiositi/share": ["@curiositi/share@workspace:packages/share"],
 
-    "@curiositi/tsconfig": ["@curiositi/tsconfig@workspace:packages/typescript-config"],
+    "@curiositi/tsconfig": ["@curiositi/tsconfig@workspace:packages/tsconfig"],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.7.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-PVtJr5CmLwYAU9PZDMITZoR5iAOShYREoR45EyyLrbntV50mdePTgUn4AmOw90Ifcj+x2kRjdzr1HP3RrNiHGA=="],
 
