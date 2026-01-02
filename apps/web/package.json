@@ -18,7 +18,7 @@
 		"react-dom": "^19.2.0"
 	},
 	"devDependencies": {
-		"@repo/typescript-config": "*",
+		"@curiositi/tsconfig": "workspace:*",
 		"@types/node": "^22.15.3",
 		"@types/react": "19.2.2",
 		"@types/react-dom": "19.2.2",
