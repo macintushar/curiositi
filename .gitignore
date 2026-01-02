@@ -36,5 +36,9 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
 # Biome cache
 .biome/
+
+# File Storage
+storage

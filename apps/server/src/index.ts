@@ -1,9 +1,18 @@
 import { Hono } from "hono";
+import { logger } from "hono/logger";
+import uploadRouter from "./routers/upload";
 
-const app = new Hono();
+const api = new Hono();
 
-app.get("/", (c) => {
+api.use(logger());
+
+api.get("/", (c) => {
 	return c.text("Hello Hono!");
 });
 
-export default app;
+api.route("/api/v1/upload", uploadRouter);
+
+export default {
+	port: 3030,
+	...api,
+};

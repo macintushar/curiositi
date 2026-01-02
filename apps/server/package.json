@@ -1,11 +1,12 @@
 {
 	"name": "server",
 	"scripts": {
-		"dev": "bun run --hot src/index.ts",
+		"dev": "bun run --hot --watch src/index.ts",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write ."
 	},
 	"dependencies": {
+		"@curiositi/share": "workspace:*",
 		"hono": "^4.11.3"
 	},
 	"devDependencies": {
