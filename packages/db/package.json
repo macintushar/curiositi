@@ -18,11 +18,11 @@
 	},
 	"license": "MIT",
 	"scripts": {
-		"push": "with-env drizzle-kit push",
-		"generate": "with-env drizzle-kit generate",
-		"migrate": "with-env drizzle-kit migrate",
-		"studio": "with-env drizzle-kit studio",
-		"with-env": "dotenv -e ../../.env --"
+		"with-env": "dotenv -e ../../.env --",
+		"push": "bun run with-env -- drizzle-kit push",
+		"generate": "bun run with-env -- drizzle-kit generate",
+		"migrate": "bun run with-env -- drizzle-kit migrate",
+		"studio": "bun run with-env -- drizzle-kit studio"
 	},
 	"dependencies": {
 		"drizzle-orm": "^0.44.7",
