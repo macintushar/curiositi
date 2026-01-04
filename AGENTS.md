@@ -26,14 +26,14 @@ This is a pure TypeScript project. We use Bun for running the code.
 Run commands in specific packages:
 - `bun --filter <package-name> <command>` (e.g., `bun --filter web dev`)
 - `bun --filter server dev` - Run server dev mode only
-- `bun --filter @repo/ui check-types` - Type check UI package
+- `bun --filter @curiositi/ui check-types` - Type check UI package
 
 ## Code Style Guidelines
 
 ### Import Style
 - Use ES6 imports: `import { X } from "module"`
 - Use `import type { X }` for type-only imports
-- Package imports: Use workspace protocol (`@repo/ui`, `@curiositi/share`)
+- Package imports: Use workspace protocol (`@curiositi/ui`, `@curiositi/share`)
 - Relative imports: Use `./` and `../` for local files
 - Export default for main exports, named exports for utilities
 
@@ -92,7 +92,7 @@ Run commands in specific packages:
 - Type definitions: inline or in `types/` directories
 
 ### Workspace References
-- `@repo/ui` - Shared React components
+- `@curiositi/ui` - Shared React components
 - `@curiositi/share` - Shared utilities (logger, fs, schemas, constants)
 - `@curiositi/tsconfig` - Shared TypeScript configurations
 

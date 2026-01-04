@@ -1,11 +1,13 @@
 {
 	"name": "@curiositi/worker",
 	"scripts": {
-		"dev": "bun run --hot --watch src/index.ts",
+		"dev": "bun run with-env -- bun run --hot --watch src/index.ts",
 		"lint": "biome check .",
-		"lint:fix": "biome check --write ."
+		"lint:fix": "biome check --write .",
+		"with-env": "dotenv -e ../../.env --"
 	},
 	"dependencies": {
+		"@curiositi/db": "workspace:*",
 		"@curiositi/share": "workspace:*",
 		"hono": "^4.11.3"
 	},
