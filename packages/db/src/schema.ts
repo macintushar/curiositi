@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
 	boolean,
 	index,
+	pgEnum,
 	pgTable,
 	pgTableCreator,
 	text,
@@ -234,15 +235,28 @@ export const organizationRolesRelations = relations(
 //                                                         //
 /////////////////////////////////////////////////////////////
 
-export const posts = createTable(
-	"post",
+export const fileStatusEnum = pgEnum("file_status", [
+	"pending",
+	"processing",
+	"completed",
+	"failed",
+]);
+
+export const files = createTable(
+	"files",
 	(d) => ({
-		id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-		name: d.varchar({ length: 256 }),
-		createdById: d
-			.varchar({ length: 255 })
+		id: d.uuid().primaryKey().defaultRandom(),
+		name: d.text().notNull(),
+		path: d.text().notNull(),
+		organizationId: d
+			.text()
+			.notNull()
+			.references(() => organization.id),
+		uploadedById: d
+			.text()
 			.notNull()
 			.references(() => user.id),
+		status: fileStatusEnum().notNull().default("pending"),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -250,7 +264,27 @@ export const posts = createTable(
 		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 	}),
 	(t) => [
-		index("created_by_idx").on(t.createdById),
+		index("uploaded_by_idx").on(t.uploadedById),
+		index("organization_idx").on(t.organizationId),
 		index("name_idx").on(t.name),
 	]
+);
+
+export const fileContents = createTable(
+	"file_contents",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		fileId: d
+			.uuid()
+			.notNull()
+			.references(() => files.id),
+		content: d.text().notNull(),
+		embeddedContent: d.vector({ dimensions: 1536 }).notNull(),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [index("file_idx").on(t.fileId), index("content_idx").on(t.content)]
 );
