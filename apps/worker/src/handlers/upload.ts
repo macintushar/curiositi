@@ -24,8 +24,6 @@ export default async function uploadHandler(file: File) {
 				createdById: "",
 			})
 			.returning();
-		
-		
 
 		return { message: "File uploaded successfully" };
 	} catch (error) {
