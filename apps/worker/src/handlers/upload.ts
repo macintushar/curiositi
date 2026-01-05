@@ -1,7 +1,7 @@
 import write from "@curiositi/share/fs/write";
 import logger from "@curiositi/share/logger";
 import db from "@curiositi/db/client";
-import { posts } from "@curiositi/db/schema";
+import { files } from "@curiositi/db/schema";
 
 export default async function uploadHandler(file: File) {
 	try {
@@ -16,14 +16,6 @@ export default async function uploadHandler(file: File) {
 		});
 
 		logger.info(`File Ingested: ${file.name}`);
-
-		const res = await db
-			.insert(posts)
-			.values({
-				name: file.name,
-				createdById: "",
-			})
-			.returning();
 
 		return { message: "File uploaded successfully" };
 	} catch (error) {

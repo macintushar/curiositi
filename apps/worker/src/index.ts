@@ -13,6 +13,6 @@ api.get("/", (c) => {
 api.route("/api/v1/upload", uploadRouter);
 
 export default {
-	port: 3030,
+	port: 3040,
 	...api,
 };

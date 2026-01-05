@@ -1,7 +1,12 @@
 {
 	"extends": "@curiositi/tsconfig/react-library.json",
 	"compilerOptions": {
-		"outDir": "dist"
+		"outDir": "dist",
+		"rootDir": "src",
+		"baseUrl": ".",
+		"paths": {
+			"@curiositi/ui": ["./src/index.ts"]
+		}
 	},
 	"include": ["src"],
 	"exclude": ["node_modules", "dist"]
