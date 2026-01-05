@@ -12,7 +12,7 @@ export const createTable = pgTableCreator((name) => `curiositi_${name}`);
 
 /////////////////////////////////////////////////////////////
 //                                                         //
-//				Drizzle Schemas - Auto Generated           // 
+//				Drizzle Schemas - Auto Generated           //
 //                                                         //
 /////////////////////////////////////////////////////////////
 
@@ -228,11 +228,9 @@ export const organizationRolesRelations = relations(
 	})
 );
 
-
-
 /////////////////////////////////////////////////////////////
 //                                                         //
-//					Curiositi Schemas           		   // 
+//					Curiositi Schemas           		   //
 //                                                         //
 /////////////////////////////////////////////////////////////
 
@@ -256,4 +254,3 @@ export const posts = createTable(
 		index("name_idx").on(t.name),
 	]
 );
-
