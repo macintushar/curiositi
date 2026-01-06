@@ -3,6 +3,7 @@ import write from "@curiositi/share/fs/write";
 import logger from "@curiositi/share/logger";
 
 import { files } from "@curiositi/db/schema";
+import { env } from "@/env";
 type UploadHandlerProps = {
 	file: File;
 	orgId: string;
@@ -19,12 +20,10 @@ export default async function uploadHandler({
 
 	try {
 		await write(file.name, file, {
-			accessKeyId: "60e7a70b61e0953f7eb634262f0ecc66",
-			secretAccessKey:
-				"5d8c0d035a495d60e7ecee8ca6f9896c50fce6fd0cf080399fec23ea09630ca3",
-			bucket: "curiositi-dev",
-			endpoint:
-				"https://bde4bc52844d339889cafefcf436aced.r2.cloudflarestorage.com",
+			accessKeyId: env.S3_ACCESS_KEY_ID,
+			secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+			bucket: env.S3_BUCKET,
+			endpoint: env.S3_ENDPOINT,
 		});
 		logger.info(`File Uploaded: ${file.name}`, {
 			file: file.name,
@@ -32,7 +31,7 @@ export default async function uploadHandler({
 			size: file.size,
 		});
 	} catch (error) {
-		logger.error(`File Upload Failed: ${file.name}`, error);
+		logger.error(`File Upload to S3 Failed: ${file.name}`, error);
 	}
 
 	try {
@@ -47,8 +46,8 @@ export default async function uploadHandler({
 			})
 			.returning();
 
-		return fileData;
+		return fileData[0];
 	} catch (error) {
-		logger.error(`File Upload Failed: ${file.name}`, error);
+		logger.error(`File Upload to DB Failed: ${file.name}`, error);
 	}
 }

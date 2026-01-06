@@ -1,27 +1,34 @@
 import { Hono } from "hono";
 import uploadHandler from "../handlers/upload";
+import { zValidator } from "@hono/zod-validator";
+import z from "zod";
 
 const uploadRouter = new Hono();
 
-uploadRouter.get("/", (c) => {
-	return c.text("Hello Bono!");
-});
+uploadRouter.post(
+	"/",
+	zValidator(
+		"form",
+		z.object({
+			file: z.instanceof(File),
+			userId: z.string(),
+			orgId: z.string(),
+		})
+	),
+	async (c) => {
+		const { file, userId, orgId } = await c.req.valid("form");
 
-uploadRouter.get("/gg", (c) => {
-	console.log("Hello!");
-	return c.text("Hello Jono!");
-});
+		if (!file) {
+			return c.json({ error: "No file uploaded" }, 400);
+		}
 
-uploadRouter.post("/", async (c) => {
-	const formData = await c.req.formData();
-	const file = formData.get("file") as File;
-
-	if (!file) {
-		return c.json({ error: "No file uploaded" }, 400);
+		const res = uploadHandler({
+			file,
+			orgId,
+			userId,
+		});
+		return c.json(res);
 	}
-
-	const res = uploadHandler(file);
-	return c.json(res);
-});
+);
 
 export default uploadRouter;

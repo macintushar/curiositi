@@ -15,6 +15,13 @@
 			"when": 1767548486442,
 			"tag": "0001_auth-schemas",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1767643994153,
+			"tag": "0002_files",
+			"breakpoints": true
 		}
 	]
 }
