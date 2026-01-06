@@ -3,8 +3,8 @@ import { z } from "zod";
 import { protectedProcedure } from "../init";
 
 import type { TRPCRouterRecord } from "@trpc/server";
-import uploadHandler from "../handlers/upload";
-import { createResponse } from "@/lib/utils";
+import { uploadHandler } from "@curiositi/api-handlers";
+import { env } from "@platform/env";
 
 const uploadRouter = {
 	upload: protectedProcedure
@@ -14,8 +14,14 @@ const uploadRouter = {
 				file: input.file,
 				orgId: ctx.session.user.id,
 				userId: ctx.session.user.id,
+				s3: {
+					bucket: env.S3_BUCKET,
+					accessKeyId: env.S3_ACCESS_KEY_ID,
+					secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+					endpoint: env.S3_ENDPOINT,
+				},
 			});
-			return createResponse(res, null);
+			return res;
 		}),
 } satisfies TRPCRouterRecord;
 

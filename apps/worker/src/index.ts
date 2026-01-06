@@ -1,16 +1,20 @@
+import { createResponse } from "@curiositi/api-handlers";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
-import uploadRouter from "./routers/upload";
 
 const api = new Hono();
 
 api.use(logger());
 
 api.get("/", (c) => {
-	return c.text("Hello Hono!");
+	return c.text("Hello from Curiositi Worker!");
 });
 
-api.route("/api/v1/upload", uploadRouter);
+api.post("/api/v1/process-file", (c) => {
+	return c.json(
+		createResponse({ message: "File processed successfully!" }, null)
+	);
+});
 
 export default {
 	port: 3040,
