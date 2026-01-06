@@ -9,6 +9,7 @@
 	"dependencies": {
 		"@curiositi/db": "workspace:*",
 		"@curiositi/share": "workspace:*",
+		"@curiositi/api-handlers": "workspace:*",
 		"@hono/zod-validator": "^0.7.6",
 		"@t3-oss/env-core": "^0.13.10",
 		"hono": "^4.11.3",

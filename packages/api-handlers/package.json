@@ -1,0 +1,22 @@
+{
+	"name": "@curiositi/api-handlers",
+	"type": "module",
+	"private": true,
+	"exports": {
+		"./upload": "./src/upload.ts",
+		"./response": "./src/response.ts",
+		".": "./src/index.ts"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"dependencies": {
+		"@curiositi/share": "workspace:*",
+		"@curiositi/db": "workspace:*",
+		"@types/bun": "latest"
+	},
+	"devDependencies": {
+		"@curiositi/tsconfig": "workspace:*",
+		"@types/bun": "latest"
+	}
+}

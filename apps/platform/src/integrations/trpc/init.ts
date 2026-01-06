@@ -1,6 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { auth } from "@/lib/auth";
+import { auth } from "@platform/lib/auth";
 import db from "@curiositi/db/client";
 import z, { ZodError } from "zod";
 

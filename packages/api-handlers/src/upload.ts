@@ -1,29 +1,35 @@
 import client from "@curiositi/db/client";
+import { files } from "@curiositi/db/schema";
 import write from "@curiositi/share/fs/write";
 import logger from "@curiositi/share/logger";
 
-import { files } from "@curiositi/db/schema";
-import { env } from "@/env";
-type UploadHandlerProps = {
+export interface UploadHandlerInput {
 	file: File;
 	orgId: string;
 	userId: string;
-};
+	s3: {
+		accessKeyId: string;
+		secretAccessKey: string;
+		bucket: string;
+		endpoint: string;
+	};
+}
 
 export default async function uploadHandler({
 	file,
 	orgId,
 	userId,
-}: UploadHandlerProps) {
+	s3,
+}: UploadHandlerInput) {
 	logger.info(`Attempting to Uploading File: ${file.name}`);
 	const path = `${orgId}/${file.name}`;
 
 	try {
 		await write(file.name, file, {
-			accessKeyId: env.S3_ACCESS_KEY_ID,
-			secretAccessKey: env.S3_SECRET_ACCESS_KEY,
-			bucket: env.S3_BUCKET,
-			endpoint: env.S3_ENDPOINT,
+			accessKeyId: s3.accessKeyId,
+			secretAccessKey: s3.secretAccessKey,
+			bucket: s3.bucket,
+			endpoint: s3.endpoint,
 		});
 		logger.info(`File Uploaded: ${file.name}`, {
 			file: file.name,
@@ -46,8 +52,9 @@ export default async function uploadHandler({
 			})
 			.returning();
 
-		return fileData[0];
+		return fileData[0] ?? null;
 	} catch (error) {
 		logger.error(`File Upload to DB Failed: ${file.name}`, error);
+		return null;
 	}
 }
