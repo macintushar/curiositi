@@ -2,7 +2,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { auth } from "@/lib/auth";
 import db from "@curiositi/db/client";
-import { ZodError } from "zod";
+import z, { ZodError } from "zod";
 
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
@@ -51,7 +51,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 			data: {
 				...shape.data,
 				zodError:
-					error.cause instanceof ZodError ? error.cause.flatten() : null,
+					error.cause instanceof ZodError ? z.treeifyError(error.cause) : null,
 			},
 		};
 	},
