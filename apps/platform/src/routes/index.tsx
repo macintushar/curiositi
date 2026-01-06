@@ -1,4 +1,4 @@
-import { Button } from "@curiositi/ui/button";
+import { Button } from "@platform/components/ui/button";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({ component: App });

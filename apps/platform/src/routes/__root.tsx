@@ -35,12 +35,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				title: "TanStack Start Starter",
 			},
 		],
-		links: [
-			{
-				rel: "stylesheet",
-				href: appCss,
-			},
-		],
+		links: [{ rel: "stylesheet", href: appCss }],
 	}),
 
 	shellComponent: RootDocument,
@@ -53,7 +48,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 			</head>
-			<body>
+			<body className="bg-red-900">
 				{children}
 				<TanStackDevtools
 					config={{
