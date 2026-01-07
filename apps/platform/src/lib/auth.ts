@@ -6,9 +6,6 @@ import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { env } from "@platform/env";
 import client from "@curiositi/db/client";
 import * as schema from "@curiositi/db/schema";
-import db from "@curiositi/db/client";
-import * as drizzle from "@curiositi/db";
-import { Scaling } from "lucide-react";
 
 export const auth = betterAuth({
 	plugins: [organization(), tanstackStartCookies()],

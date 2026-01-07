@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/upload/")({
 	server: {
 		middleware: [authMiddleware],
 		handlers: {
-			GET: async ({ request }) => {
+			GET: async () => {
 				return new Response("Hello World!");
 			},
 			POST: async ({ request }) => {
