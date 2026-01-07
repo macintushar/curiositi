@@ -235,6 +235,29 @@ export const organizationRolesRelations = relations(
 //                                                         //
 /////////////////////////////////////////////////////////////
 
+export const spaces = createTable(
+	"spaces",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		name: d.text().notNull(),
+		description: d.text(),
+		icon: d.text(),
+		organizationId: d
+			.text()
+			.notNull()
+			.references(() => organization.id),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [
+		index("space_id_idx").on(t.id),
+		index("space_organization_id_idx").on(t.organizationId),
+	]
+);
+
 export const fileStatusEnum = pgEnum("file_status", [
 	"pending",
 	"processing",
@@ -252,6 +275,7 @@ export const files = createTable(
 			.text()
 			.notNull()
 			.references(() => organization.id),
+		spaceId: d.uuid().references(() => spaces.id),
 		uploadedById: d
 			.text()
 			.notNull()
