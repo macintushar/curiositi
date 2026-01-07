@@ -21,6 +21,7 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 	SidebarRail,
+	useSidebar,
 } from "@platform/components/ui/sidebar";
 
 // This is sample data.
@@ -132,9 +133,13 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const { open } = useSidebar();
 	return (
 		<Sidebar collapsible="icon" {...props}>
-			<SidebarHeader>
+			<div className="border-b border-b-sidebar-border py-2 flex items-center justify-center w-full">
+				{open ? "Curiositi" : "C"}
+			</div>
+			<SidebarHeader className="border-b border-b-sidebar-border py-2 flex flex-col items-center justify-center">
 				<OrgSwitcher />
 			</SidebarHeader>
 			<SidebarContent>
