@@ -9,7 +9,7 @@ import {
 import { Input } from "@platform/components/ui/input";
 import { Button } from "@platform/components/ui/button";
 
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import AuthLayout from "@platform/layouts/auth-layout";
 import { useForm } from "@tanstack/react-form";
 import { signUpSchema } from "@curiositi/share/schemas";
@@ -17,8 +17,10 @@ import { signUpSchema } from "@curiositi/share/schemas";
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
 import HiddenInput from "@platform/components/ui/hidden-input";
+import GoogleAuth from "@platform/components/google-auth";
 
 export default function SignUp() {
+	const navigate = useNavigate();
 	const form = useForm({
 		defaultValues: {
 			name: "",
@@ -44,6 +46,7 @@ export default function SignUp() {
 			}
 			if (res.data) {
 				toast.success("Signed up successfully");
+				navigate({ to: "/onboarding" });
 			}
 		},
 	});
@@ -62,7 +65,7 @@ export default function SignUp() {
 					<div className="flex flex-col items-center gap-1 text-center">
 						<h1 className="text-2xl font-bold">Sign up for Curiositi</h1>
 						<p className="text-muted-foreground text-sm text-balance">
-							Enter your email below to sign up to your account
+							Create your account to access curiositi
 						</p>
 					</div>
 					<form.Field
@@ -161,9 +164,7 @@ export default function SignUp() {
 					</Field>
 					<FieldSeparator>or</FieldSeparator>
 					<Field>
-						<Button variant="outline" type="button">
-							Continue with Google
-						</Button>
+						<GoogleAuth />
 						<FieldDescription className="text-center">
 							Already have an account?{" "}
 							<Link to="/sign-in" className="underline underline-offset-4">

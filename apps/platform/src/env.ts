@@ -3,9 +3,9 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
-		SERVER_URL: z.url().optional(),
-		BETTER_AUTH_GITHUB_CLIENT_ID: z.string(),
-		BETTER_AUTH_GITHUB_CLIENT_SECRET: z.string(),
+		SERVER_URL: z.url(),
+		BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
+		BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
 		BETTER_AUTH_SECRET: z.string(),
 		S3_ACCESS_KEY_ID: z.string(),
 		S3_SECRET_ACCESS_KEY: z.string(),
@@ -36,9 +36,9 @@ export const env = createEnv({
 		VITE_SENTRY_ORG: import.meta.env.VITE_SENTRY_ORG,
 		VITE_SENTRY_PROJECT: import.meta.env.VITE_SENTRY_PROJECT,
 		SERVER_URL: process.env.SERVER_URL,
-		BETTER_AUTH_GITHUB_CLIENT_ID: process.env.BETTER_AUTH_GITHUB_CLIENT_ID,
-		BETTER_AUTH_GITHUB_CLIENT_SECRET:
-			process.env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
+		BETTER_AUTH_GOOGLE_CLIENT_ID: process.env.BETTER_AUTH_GOOGLE_CLIENT_ID,
+		BETTER_AUTH_GOOGLE_CLIENT_SECRET:
+			process.env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
 		BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
 		S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
 		S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
