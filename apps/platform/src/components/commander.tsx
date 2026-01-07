@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Calculator, Folder, Home, Link2, Settings, Smile } from "lucide-react";
+import { Folder, Home, Link2, Settings } from "lucide-react";
 
 import {
 	CommandDialog,

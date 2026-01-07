@@ -34,6 +34,7 @@ function getCookie(name: string): string | undefined {
 
 function setCookie(name: string, value: string): void {
 	if (typeof document === "undefined") return;
+	// biome-ignore lint/suspicious/noDocumentCookie: <This is fine for themes for now>
 	document.cookie = `${name}=${value}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
 }
 
@@ -102,7 +103,7 @@ export const useTheme = () => {
  */
 export function getThemeFromCookies(
 	cookieHeader: string | null,
-	cookieName = "theme",
+	cookieName = "theme"
 ): Theme | null {
 	if (!cookieHeader) return null;
 	const cookies = cookieHeader.split(";").reduce(
@@ -113,7 +114,7 @@ export function getThemeFromCookies(
 			}
 			return acc;
 		},
-		{} as Record<string, string>,
+		{} as Record<string, string>
 	);
 	const theme = cookies[cookieName] as Theme | undefined;
 	if (theme && ["dark", "light", "system"].includes(theme)) {

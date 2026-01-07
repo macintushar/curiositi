@@ -6,7 +6,7 @@ import {
 	ChevronsUpDown,
 	CreditCard,
 	LogOut,
-	LucideIcon,
+	type LucideIcon,
 	MonitorSmartphone,
 	Moon,
 	Sun,
