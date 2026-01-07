@@ -17,12 +17,6 @@ const config = defineConfig({
 	},
 	plugins: [
 		devtools(),
-		nitro({
-			prerender: {
-				failOnError: false,
-				routes: [],
-			},
-		}),
 		// this is the plugin that enables path aliases
 		viteTsConfigPaths({
 			projects: ["./tsconfig.json"],
@@ -31,9 +25,17 @@ const config = defineConfig({
 		tanstackStart({
 			spa: {
 				enabled: true,
+				prerender: {
+					enabled: false,
+				},
 			},
 			prerender: {
 				enabled: false,
+			},
+		}),
+		nitro({
+			prerender: {
+				failOnError: false,
 			},
 		}),
 		viteReact({
