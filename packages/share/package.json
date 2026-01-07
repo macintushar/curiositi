@@ -16,11 +16,14 @@
 		"format:fix": "biome format --write ."
 	},
 	"devDependencies": {
-		"@types/bun": "latest",
+		"@types/bun": "^1.3.5",
 		"biome": "latest",
 		"@curiositi/tsconfig": "workspace:*"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
+	},
+	"dependencies": {
+		"bun": "^1.3.5"
 	}
 }
