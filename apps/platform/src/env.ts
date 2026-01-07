@@ -59,5 +59,7 @@ export const env = createEnv({
 	 * In order to solve these issues, we recommend that all new projects
 	 * explicitly specify this option as true.
 	 */
+	skipValidation:
+		!!process.env.CI || process.env.npm_lifecycle_event === "lint",
 	emptyStringAsUndefined: true,
 });
