@@ -16,6 +16,7 @@ import { signInSchema } from "@curiositi/share/schemas";
 
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
+import GoogleAuth from "@platform/components/google-auth";
 
 export default function SignIn() {
 	const navigate = useNavigate();
@@ -59,9 +60,9 @@ export default function SignIn() {
 			>
 				<FieldGroup>
 					<div className="flex flex-col items-center gap-1 text-center">
-						<h1 className="text-2xl font-bold">Login to your account</h1>
+						<h1 className="text-2xl font-bold">Sign in to Curiositi</h1>
 						<p className="text-muted-foreground text-sm text-balance">
-							Enter your email below to login to your account
+							Sign in to access curiositi
 						</p>
 					</div>
 					<form.Field
@@ -124,9 +125,7 @@ export default function SignIn() {
 					</Field>
 					<FieldSeparator>or</FieldSeparator>
 					<Field>
-						<Button variant="outline" type="button">
-							Login with Google
-						</Button>
+						<GoogleAuth />
 						<FieldDescription className="text-center">
 							Don&apos;t have an account?{" "}
 							<Link to="/sign-up" className="underline underline-offset-4">

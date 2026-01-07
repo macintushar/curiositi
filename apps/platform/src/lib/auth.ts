@@ -8,6 +8,7 @@ import client from "@curiositi/db/client";
 import * as schema from "@curiositi/db/schema";
 
 export const auth = betterAuth({
+	baseURL: env.SERVER_URL,
 	plugins: [organization(), tanstackStartCookies()],
 	database: drizzleAdapter(client, {
 		provider: "pg",
@@ -16,15 +17,22 @@ export const auth = betterAuth({
 			user: schema.user,
 		},
 	}),
-	trustedOrigins: ["*"],
+	trustedOrigins: [env.SERVER_URL],
 	emailAndPassword: {
 		enabled: true,
 	},
 	socialProviders: {
-		github: {
-			clientId: env.BETTER_AUTH_GITHUB_CLIENT_ID,
-			clientSecret: env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
-			redirectURI: `${env.SERVER_URL}/api/auth/callback/github`,
+		google: {
+			clientId: env.BETTER_AUTH_GOOGLE_CLIENT_ID,
+			clientSecret: env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
+			redirectURI: `${env.SERVER_URL}/api/auth/callback/google`,
+			mapProfileToUser(profile) {
+				return {
+					name: profile.name,
+					email: profile.email,
+					image: profile.picture,
+				};
+			},
 		},
 	},
 });
