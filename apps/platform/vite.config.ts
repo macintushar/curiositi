@@ -7,6 +7,14 @@ import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
 
 const config = defineConfig({
+	ssr: {
+		external: ["bun"],
+	},
+	build: {
+		rollupOptions: {
+			external: ["bun"],
+		},
+	},
 	plugins: [
 		devtools(),
 		nitro(),
@@ -18,6 +26,9 @@ const config = defineConfig({
 		tanstackStart({
 			spa: {
 				enabled: true,
+			},
+			prerender: {
+				enabled: false,
 			},
 		}),
 		viteReact({
