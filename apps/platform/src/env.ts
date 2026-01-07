@@ -21,6 +21,9 @@ export const env = createEnv({
 
 	client: {
 		VITE_APP_TITLE: z.string().min(1).optional(),
+		VITE_SENTRY_DSN: z.string().optional(),
+		VITE_SENTRY_ORG: z.string().optional(),
+		VITE_SENTRY_PROJECT: z.string().optional(),
 	},
 
 	/**
@@ -29,6 +32,9 @@ export const env = createEnv({
 	 */
 	runtimeEnvStrict: {
 		VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
+		VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
+		VITE_SENTRY_ORG: import.meta.env.VITE_SENTRY_ORG,
+		VITE_SENTRY_PROJECT: import.meta.env.VITE_SENTRY_PROJECT,
 		SERVER_URL: process.env.SERVER_URL,
 		BETTER_AUTH_GITHUB_CLIENT_ID: process.env.BETTER_AUTH_GITHUB_CLIENT_ID,
 		BETTER_AUTH_GITHUB_CLIENT_SECRET:

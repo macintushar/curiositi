@@ -1,16 +1,9 @@
-import { Button } from "@platform/components/ui/button";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({ component: App });
-
-function App() {
-	return (
-		<Button
-			onClick={() => {
-				throw new Error("Sentry Test Error");
-			}}
-		>
-			Break Everything
-		</Button>
-	);
-}
+export const Route = createFileRoute("/")({
+	server: {
+		handlers: {
+			GET: () => redirect({ to: "/sign-in" }),
+		},
+	},
+});

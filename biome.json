@@ -14,13 +14,22 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"style": {
+				"noHeadElement": "off"
+			},
+			"correctness": {
+				"noChildrenProp": "off"
+			},
+			"suspicious": {
+				"noUnknownAtRules": "off",
+				"noArrayIndexKey": "off"
+			}
 		},
 		"domains": {
 			"react": "recommended",
-			"next": "recommended",
-			"turborepo": "recommended",
-			"project": "recommended"
+			"project": "recommended",
+			"tailwind": "recommended"
 		}
 	},
 	"javascript": {
@@ -32,10 +41,5 @@
 			"arrowParentheses": "always"
 		},
 		"globals": []
-	},
-	"css": {
-		"parser": {
-			"tailwindDirectives": true
-		}
 	}
 }

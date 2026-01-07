@@ -15,6 +15,9 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { TRPCRouter } from "@platform/integrations/trpc/router";
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
+import { Toaster } from "@platform/components/ui/sonner";
+import { ThemeProvider } from "@platform/components/theme-provider";
+
 interface MyRouterContext {
 	queryClient: QueryClient;
 
@@ -39,7 +42,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	}),
 
 	shellComponent: RootDocument,
-	notFoundComponent: () => <div>Not Found</div>,
+	notFoundComponent(props) {
+		return <div>Not Found: {props.routeId}</div>;
+	},
+	errorComponent(props) {
+		return <div>Error: {props.error.message}</div>;
+	},
+	ssr: false,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -48,21 +57,24 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 			</head>
-			<body className="bg-red-900">
-				{children}
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
-				<Scripts />
+			<body>
+				<ThemeProvider defaultTheme="system" cookieName="curiositi-theme">
+					{children}
+					<Toaster />
+					<TanStackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+							TanStackQueryDevtools,
+						]}
+					/>
+					<Scripts />
+				</ThemeProvider>
 			</body>
 		</html>
 	);
