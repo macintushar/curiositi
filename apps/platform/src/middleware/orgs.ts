@@ -17,5 +17,14 @@ export const orgsMiddleware = createMiddleware().server(async ({ next }) => {
 		throw redirect({ to: "/onboarding" });
 	}
 
+	if (!session.session.activeOrganizationId) {
+		await auth.api.setActiveOrganization({
+			headers,
+			body: {
+				organizationId: userOrgs[0].id,
+			},
+		});
+	}
+
 	return await next();
 });
