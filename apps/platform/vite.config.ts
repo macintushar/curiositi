@@ -25,6 +25,7 @@ const config = defineConfig({
 		tanstackStart({
 			spa: {
 				enabled: true,
+				maskPath: "/app",
 				prerender: {
 					enabled: false,
 				},
@@ -44,6 +45,11 @@ const config = defineConfig({
 			},
 		}),
 	],
+	nitro: {
+		prerender: {
+			failOnError: false,
+		},
+	},
 });
 
 export default config;
