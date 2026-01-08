@@ -61,18 +61,8 @@ export default function OrganizationForm({
 					toast.error(error.message);
 				}
 				if (data?.id) {
-					const { data: setActiveData, error: setActiveError } =
-						await authClient.organization.setActive({
-							organizationId: data.id,
-							organizationSlug: value.slug,
-						});
-					if (setActiveError) {
-						toast.error(setActiveError.message);
-					}
-					if (setActiveData?.id) {
-						toast.success("Workspace created successfully");
-						nextStep?.();
-					}
+					toast.success("Workspace created successfully");
+					nextStep?.();
 				}
 			}
 			if (mode === "edit" && defaultValues) {
