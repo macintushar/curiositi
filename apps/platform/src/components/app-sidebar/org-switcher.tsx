@@ -2,11 +2,11 @@ import { Briefcase, ChevronsUpDown, Plus } from "lucide-react";
 
 import {
 	DropdownMenu,
+	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
-	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@platform/components/ui/dropdown-menu";
 import {
@@ -52,10 +52,10 @@ export function OrgSwitcher() {
 						sideOffset={4}
 					>
 						<DropdownMenuLabel className="text-muted-foreground text-xs">
-							Orgs
+							Your Workspaces
 						</DropdownMenuLabel>
-						{orgs.map((org, index) => (
-							<DropdownMenuItem
+						{orgs.map((org) => (
+							<DropdownMenuCheckboxItem
 								key={org.name}
 								onClick={async () => {
 									const res = await authClient.organization.setActive({
@@ -66,17 +66,17 @@ export function OrgSwitcher() {
 										toast.error(res.error.message);
 									}
 									if (res.data?.id) {
-										toast.success("Workspace created successfully");
+										toast.success(`Workspace changed to: ${org.name}`);
 									}
 								}}
-								className="gap-2 p-2"
+								checked={org.id === activeOrg.id}
+								checkboxSide="right"
 							>
 								<div className="flex size-6 items-center justify-center rounded-md border">
 									<Briefcase className="size-3.5 shrink-0" />
 								</div>
 								{org.name}
-								<DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-							</DropdownMenuItem>
+							</DropdownMenuCheckboxItem>
 						))}
 						<DropdownMenuSeparator />
 						<DropdownMenuItem className="gap-2 p-2">
