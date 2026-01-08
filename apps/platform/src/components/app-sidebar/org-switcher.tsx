@@ -17,11 +17,15 @@ import {
 } from "@platform/components/ui/sidebar";
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
+import { useState } from "react";
+import OrgDialog from "../org-dialog";
 
 export function OrgSwitcher() {
 	const { isMobile } = useSidebar();
 	const { data: activeOrg } = authClient.useActiveOrganization();
 	const { data: orgs } = authClient.useListOrganizations();
+
+	const [open, setOpen] = useState(false);
 
 	if (!activeOrg || !orgs) {
 		return null;
@@ -79,7 +83,10 @@ export function OrgSwitcher() {
 							</DropdownMenuCheckboxItem>
 						))}
 						<DropdownMenuSeparator />
-						<DropdownMenuItem className="gap-2 p-2">
+						<DropdownMenuItem
+							onClick={() => setOpen(true)}
+							className="gap-2 p-2"
+						>
 							<div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
 								<Plus className="size-4" />
 							</div>
@@ -89,6 +96,7 @@ export function OrgSwitcher() {
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
+				<OrgDialog mode="create" open={open} onOpenChange={setOpen} />
 			</SidebarMenuItem>
 		</SidebarMenu>
 	);
