@@ -17,6 +17,7 @@ import { signInSchema } from "@curiositi/share/schemas";
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
 import GoogleAuth from "@platform/components/google-auth";
+import LastUsedBadge from "@platform/components/last-used-badge";
 
 export default function SignIn() {
 	const navigate = useNavigate();
@@ -47,6 +48,8 @@ export default function SignIn() {
 			}
 		},
 	});
+
+	const lastUsed = authClient.getLastUsedLoginMethod();
 
 	return (
 		<AuthLayout>
@@ -121,11 +124,14 @@ export default function SignIn() {
 						}}
 					/>
 					<Field>
-						<Button type="submit">Login</Button>
+						<Button type="submit" className="relative">
+							Login
+							{lastUsed === "email" && <LastUsedBadge />}
+						</Button>
 					</Field>
 					<FieldSeparator>or</FieldSeparator>
 					<Field>
-						<GoogleAuth />
+						<GoogleAuth isLastUsed={lastUsed === "google"} />
 						<FieldDescription className="text-center">
 							Don&apos;t have an account?{" "}
 							<Link to="/sign-up" className="underline underline-offset-4">
