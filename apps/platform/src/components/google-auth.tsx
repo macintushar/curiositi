@@ -11,6 +11,8 @@ export default function GoogleAuth() {
 			onClick={async () => {
 				const res = await authClient.signIn.social({
 					provider: "google",
+					callbackURL: "/app",
+					newUserCallbackURL: "/onboarding",
 				});
 
 				if (res.error) {
