@@ -16,7 +16,8 @@ export const auth = betterAuth({
 			updateUserInfoOnLink: true,
 		},
 	},
-	baseURL: env.SERVER_URL,
+	baseURL: env.PLATFORM_URL,
+	trustedOrigins: [env.PLATFORM_URL],
 	emailAndPassword: {
 		enabled: true,
 	},
@@ -27,10 +28,6 @@ export const auth = betterAuth({
 			user: schema.user,
 		},
 	}),
-	trustedOrigins: [env.PLATFORM_URL],
-	emailAndPassword: {
-		enabled: true,
-	},
 	plugins: [
 		organization(),
 		tanstackStartCookies(),
@@ -57,7 +54,6 @@ export const auth = betterAuth({
 			},
 		},
 	},
-	trustedOrigins: [env.SERVER_URL],
 });
 
 export type Session = typeof auth.$Infer.Session;

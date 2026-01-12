@@ -1,4 +1,4 @@
-import { Client } from "@upstash/qstash";
+// import { Client } from "@upstash/qstash";
 
 type Payload = {
 	workerUrl: string;
