@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+	type AnyPgColumn,
 	boolean,
 	index,
 	pgEnum,
@@ -8,6 +9,7 @@ import {
 	text,
 	timestamp,
 } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const createTable = pgTableCreator((name) => `curiositi_${name}`);
 
@@ -27,6 +29,7 @@ export const user = pgTable(
 			.$defaultFn(() => false)
 			.notNull(),
 		image: text("image"),
+		lastLoginMethod: text("last_login_method"),
 		createdAt: timestamp("created_at")
 			.$defaultFn(() => new Date())
 			.notNull(),
@@ -246,6 +249,7 @@ export const spaces = createTable(
 			.text()
 			.notNull()
 			.references(() => organization.id),
+		parentSpaceId: d.uuid().references((): AnyPgColumn => spaces.id),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -257,6 +261,9 @@ export const spaces = createTable(
 		index("space_organization_id_idx").on(t.organizationId),
 	]
 );
+
+export const selectSpaceSchema = createSelectSchema(spaces);
+export const createSpaceSchema = createInsertSchema(spaces);
 
 export const fileStatusEnum = pgEnum("file_status", [
 	"pending",
@@ -271,16 +278,19 @@ export const files = createTable(
 		id: d.uuid().primaryKey().defaultRandom(),
 		name: d.text().notNull(),
 		path: d.text().notNull(),
+		size: d.integer().notNull(),
+		type: d.text().notNull(),
 		organizationId: d
 			.text()
 			.notNull()
 			.references(() => organization.id),
-		spaceId: d.uuid().references(() => spaces.id),
 		uploadedById: d
 			.text()
 			.notNull()
 			.references(() => user.id),
-		status: fileStatusEnum().notNull().default("pending"),
+		status: fileStatusEnum().default("pending").notNull(),
+		tags: d.jsonb().default({ tags: [] }),
+		processedAt: d.timestamp({ withTimezone: true }),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -294,6 +304,9 @@ export const files = createTable(
 	]
 );
 
+export const selectFileSchema = createSelectSchema(files);
+export const createFileSchema = createInsertSchema(files);
+
 export const fileContents = createTable(
 	"file_contents",
 	(d) => ({
@@ -304,6 +317,7 @@ export const fileContents = createTable(
 			.references(() => files.id),
 		content: d.text().notNull(),
 		embeddedContent: d.vector({ dimensions: 1536 }).notNull(),
+		metadata: d.json(),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -311,4 +325,25 @@ export const fileContents = createTable(
 		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 	}),
 	(t) => [index("file_idx").on(t.fileId), index("content_idx").on(t.content)]
+);
+
+export const filesInSpace = createTable(
+	"files_in_space",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		fileId: d
+			.uuid()
+			.notNull()
+			.references(() => files.id),
+		spaceId: d
+			.uuid()
+			.notNull()
+			.references(() => spaces.id),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [index("space_idx").on(t.spaceId)]
 );

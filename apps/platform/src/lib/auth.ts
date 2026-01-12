@@ -8,7 +8,7 @@ import client from "@curiositi/db/client";
 import * as schema from "@curiositi/db/schema";
 
 export const auth = betterAuth({
-	baseURL: env.SERVER_URL,
+	baseURL: env.PLATFORM_URL,
 	plugins: [organization(), tanstackStartCookies()],
 	database: drizzleAdapter(client, {
 		provider: "pg",
@@ -17,7 +17,7 @@ export const auth = betterAuth({
 			user: schema.user,
 		},
 	}),
-	trustedOrigins: [env.SERVER_URL],
+	trustedOrigins: [env.PLATFORM_URL],
 	emailAndPassword: {
 		enabled: true,
 	},
@@ -25,7 +25,7 @@ export const auth = betterAuth({
 		google: {
 			clientId: env.BETTER_AUTH_GOOGLE_CLIENT_ID,
 			clientSecret: env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
-			redirectURI: `${env.SERVER_URL}/api/auth/callback/google`,
+			redirectURI: `${env.PLATFORM_URL}/api/auth/callback/google`,
 			mapProfileToUser(profile) {
 				return {
 					name: profile.name,

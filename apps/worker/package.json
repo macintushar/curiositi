@@ -7,11 +7,16 @@
 		"with-env": "dotenv -e ../../.env --"
 	},
 	"dependencies": {
+		"@ai-sdk/google": "^3.0.6",
+		"@ai-sdk/openai": "^3.0.7",
+		"@curiositi/api-handlers": "workspace:*",
 		"@curiositi/db": "workspace:*",
 		"@curiositi/share": "workspace:*",
-		"@curiositi/api-handlers": "workspace:*",
 		"@hono/zod-validator": "^0.7.6",
+		"@opendocsg/pdf2md": "^0.2.2",
 		"@t3-oss/env-core": "^0.13.10",
+		"ai": "^6.0.27",
+		"ai-sdk-ollama": "^3.1.0",
 		"hono": "^4.11.3",
 		"zod": "^4.3.5"
 	},

@@ -3,19 +3,23 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
-		SERVER_URL: z.url().optional(),
+		PLATFORM_URL: z.url(),
+		WORKER_URL: z.string(),
 		S3_ACCESS_KEY_ID: z.string(),
 		S3_SECRET_ACCESS_KEY: z.string(),
 		S3_BUCKET: z.string(),
 		S3_ENDPOINT: z.string(),
+		OLLAMA_URL: z.string().optional(),
 	},
 
 	runtimeEnvStrict: {
-		SERVER_URL: process.env.SERVER_URL,
+		PLATFORM_URL: process.env.PLATFORM_URL,
+		WORKER_URL: process.env.WORKER_URL,
 		S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
 		S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
 		S3_BUCKET: process.env.S3_BUCKET,
 		S3_ENDPOINT: process.env.S3_ENDPOINT,
+		OLLAMA_URL: process.env.OLLAMA_URL,
 	},
 
 	/**

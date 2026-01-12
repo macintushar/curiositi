@@ -1,20 +1,54 @@
 import { createResponse } from "@curiositi/api-handlers";
+
+import z from "zod";
+
 import { Hono } from "hono";
 import { logger } from "hono/logger";
+import { requestId, type RequestIdVariables } from "hono/request-id";
+import { zValidator } from "@hono/zod-validator";
+import processFile from "./process-file";
+import { createLogger } from "./create-logger";
 
-const api = new Hono();
+const api = new Hono<{
+	Variables: RequestIdVariables;
+}>();
 
 api.use(logger());
+api.use(requestId());
 
 api.get("/", (c) => {
 	return c.text("Hello from Curiositi Worker!");
 });
 
-api.post("/api/v1/process-file", (c) => {
-	return c.json(
-		createResponse({ message: "File processed successfully!" }, null)
-	);
+api.get("/health", (c) => {
+	return c.json({ status: "ok" });
 });
+
+api.post(
+	"/process-file",
+	zValidator(
+		"json",
+		z.object({ fileId: z.string(), orgId: z.string() }),
+		async (result, c) => {
+			const reqLogger = createLogger(c.var.requestId);
+			reqLogger.info("[Process File] API Validation Result", {
+				...result,
+				body: await c.req.json(),
+				error: result.target,
+			});
+		}
+	),
+	async (c) => {
+		try {
+			const { fileId, orgId } = c.req.valid("json");
+			const reqLogger = createLogger(c.var.requestId);
+			const res = await processFile({ fileId, orgId, logger: reqLogger });
+			return c.json(createResponse(res.data, res.error));
+		} catch (error) {
+			return c.json(createResponse(null, error), 500);
+		}
+	}
+);
 
 export default {
 	port: 3040,

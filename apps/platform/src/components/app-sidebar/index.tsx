@@ -1,139 +1,32 @@
 "use client";
 
 import type * as React from "react";
-import {
-	BookOpen,
-	Bot,
-	Frame,
-	MapIcon,
-	PieChart,
-	Settings2,
-	SquareTerminal,
-} from "lucide-react";
+import { Folder, Home } from "lucide-react";
 
-import { NavMain } from "./nav-main";
-import { NavProjects } from "./nav-projects";
 import { NavUser } from "./nav-user";
 import { OrgSwitcher } from "./org-switcher";
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
+	SidebarGroup,
 	SidebarHeader,
-	SidebarRail,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
 	useSidebar,
 } from "@platform/components/ui/sidebar";
+import { Link, useRouterState } from "@tanstack/react-router";
 
-// This is sample data.
-const data = {
-	navMain: [
-		{
-			title: "Playground",
-			url: "#",
-			icon: SquareTerminal,
-			isActive: true,
-			items: [
-				{
-					title: "History",
-					url: "#",
-				},
-				{
-					title: "Starred",
-					url: "#",
-				},
-				{
-					title: "Settings",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Models",
-			url: "#",
-			icon: Bot,
-			items: [
-				{
-					title: "Genesis",
-					url: "#",
-				},
-				{
-					title: "Explorer",
-					url: "#",
-				},
-				{
-					title: "Quantum",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Documentation",
-			url: "#",
-			icon: BookOpen,
-			items: [
-				{
-					title: "Introduction",
-					url: "#",
-				},
-				{
-					title: "Get Started",
-					url: "#",
-				},
-				{
-					title: "Tutorials",
-					url: "#",
-				},
-				{
-					title: "Changelog",
-					url: "#",
-				},
-			],
-		},
-		{
-			title: "Settings",
-			url: "#",
-			icon: Settings2,
-			items: [
-				{
-					title: "General",
-					url: "#",
-				},
-				{
-					title: "Team",
-					url: "#",
-				},
-				{
-					title: "Billing",
-					url: "#",
-				},
-				{
-					title: "Limits",
-					url: "#",
-				},
-			],
-		},
-	],
-	projects: [
-		{
-			name: "Design Engineering",
-			url: "#",
-			icon: Frame,
-		},
-		{
-			name: "Sales & Marketing",
-			url: "#",
-			icon: PieChart,
-		},
-		{
-			name: "Travel",
-			url: "#",
-			icon: MapIcon,
-		},
-	],
-};
+const routes = [
+	{ path: "/app", label: "Home", icon: Home },
+	{ path: "/app/spaces", label: "Spaces", icon: Folder },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { open } = useSidebar();
+	const router = useRouterState();
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<div className="border-b border-b-sidebar-border py-2 flex items-center justify-center w-full">
@@ -143,13 +36,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<OrgSwitcher />
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain items={data.navMain} />
-				<NavProjects projects={data.projects} />
+				<SidebarGroup>
+					<SidebarMenu>
+						{routes.map((route) => (
+							<SidebarMenuItem key={route.path}>
+								<SidebarMenuButton
+									tooltip={route.label}
+									isActive={router.location.pathname === route.path}
+									asChild
+								>
+									<Link to={route.path}>
+										<route.icon />
+										<span>{route.label}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						))}
+					</SidebarMenu>
+				</SidebarGroup>
 			</SidebarContent>
-			<SidebarFooter>
+			<SidebarFooter className="border-t border-t-sidebar-border py-2 flex flex-col items-center justify-center">
 				<NavUser />
 			</SidebarFooter>
-			<SidebarRail />
 		</Sidebar>
 	);
 }
