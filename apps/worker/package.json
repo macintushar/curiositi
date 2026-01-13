@@ -4,7 +4,8 @@
 		"dev": "bun run with-env -- bun run --hot --watch src/index.ts",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
-		"with-env": "dotenv -e ../../.env --"
+		"with-env": "dotenv -e ../../.env --",
+		"start": "bun run src/index.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/google": "^3.0.6",
