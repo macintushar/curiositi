@@ -51,7 +51,7 @@ api.post(
 	}
 );
 
-api.get("*", serveStatic({root: "./public"}))
+api.get("*", serveStatic({ root: "./public" }));
 
 export default {
 	port: 3040,
