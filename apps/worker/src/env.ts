@@ -2,6 +2,7 @@ import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
 export const env = createEnv({
+	clientPrefix: undefined,
 	server: {
 		PLATFORM_URL: z.url(),
 		WORKER_URL: z.string(),
