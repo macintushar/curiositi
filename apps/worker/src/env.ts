@@ -14,7 +14,17 @@ export const env = createEnv({
 		QSTASH_URL: z.string().optional(),
 	},
 
-	runtimeEnv: process.env,
+	runtimeEnvStrict: {
+		PLATFORM_URL: process.env.PLATFORM_URL,
+		WORKER_URL: process.env.WORKER_URL,
+		S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
+		S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
+		S3_BUCKET: process.env.S3_BUCKET,
+		S3_ENDPOINT: process.env.S3_ENDPOINT,
+		OLLAMA_URL: process.env.OLLAMA_URL,
+		QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+		QSTASH_URL: process.env.QSTASH_URL,
+	},
 
 	/**
 	 * By default, this library will feed the environment variables directly to
