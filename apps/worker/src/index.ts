@@ -8,6 +8,7 @@ import { requestId, type RequestIdVariables } from "hono/request-id";
 import { zValidator } from "@hono/zod-validator";
 import processFile from "./process-file";
 import { createLogger } from "./create-logger";
+import { serveStatic } from "hono/bun";
 
 const api = new Hono<{
 	Variables: RequestIdVariables;
@@ -49,6 +50,8 @@ api.post(
 		}
 	}
 );
+
+api.get("*", serveStatic({root: "./public"}))
 
 export default {
 	port: 3040,

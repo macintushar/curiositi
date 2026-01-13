@@ -148,7 +148,7 @@ export default async function processFile({
 		});
 		let chunks: Awaited<ReturnType<typeof chunkPages>>;
 		try {
-			chunks = await chunkPages(md.pages);
+			chunks = chunkPages(md.pages);
 			logger.info("Pages chunked successfully", {
 				fileId,
 				chunkCount: chunks.length,

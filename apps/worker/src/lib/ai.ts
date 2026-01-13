@@ -1,10 +1,8 @@
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
-import { env } from "@worker/env";
 import { embedMany } from "ai";
-import { createOllama } from "ai-sdk-ollama";
 
-type AIProvider = "openai" | "google" | "ollama";
+type AIProvider = "openai" | "google";
 
 export function model(name: AIProvider) {
 	switch (name) {
@@ -13,9 +11,6 @@ export function model(name: AIProvider) {
 		}
 		case "google": {
 			return google.embedding("gemini-embedding-001");
-		}
-		case "ollama": {
-			return createOllama({ baseURL: env.OLLAMA_URL }).embedding("");
 		}
 	}
 }

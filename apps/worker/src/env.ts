@@ -4,27 +4,19 @@ import { z } from "zod";
 export const env = createEnv({
 	clientPrefix: undefined,
 	server: {
-		PLATFORM_URL: z.url(),
-		WORKER_URL: z.string(),
 		S3_ACCESS_KEY_ID: z.string(),
 		S3_SECRET_ACCESS_KEY: z.string(),
 		S3_BUCKET: z.string(),
-		S3_ENDPOINT: z.string(),
-		OLLAMA_URL: z.string().optional(),
-		QSTASH_TOKEN: z.string(),
-		QSTASH_URL: z.string().optional(),
+    S3_ENDPOINT: z.string(),
+		POSTGRES_URL: z.url()
 	},
 
 	runtimeEnvStrict: {
-		PLATFORM_URL: process.env.PLATFORM_URL,
-		WORKER_URL: process.env.WORKER_URL,
 		S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
 		S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
 		S3_BUCKET: process.env.S3_BUCKET,
-		S3_ENDPOINT: process.env.S3_ENDPOINT,
-		OLLAMA_URL: process.env.OLLAMA_URL,
-		QSTASH_TOKEN: process.env.QSTASH_TOKEN,
-		QSTASH_URL: process.env.QSTASH_URL,
+    S3_ENDPOINT: process.env.S3_ENDPOINT,
+    POSTGRES_URL: process.env.POSTGRES_URL,
 	},
 
 	/**
