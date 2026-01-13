@@ -59,6 +59,7 @@ export default async function handleUpload({
 	} catch (error) {
 		logger.error(`File Upload to S3 Failed: ${file.name}`, error);
 		uploadError.s3.error = error;
+		return createResponse(null, uploadError);
 	}
 
 	try {
