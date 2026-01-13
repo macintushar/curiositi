@@ -20,14 +20,18 @@ import { toast } from "sonner";
 import { useState } from "react";
 import OrgDialog from "../org-dialog";
 import { Badge } from "../ui/badge";
+import { Skeleton } from "../ui/skeleton";
 
 export function OrgSwitcher() {
 	const { isMobile } = useSidebar();
-	const { data: activeOrg } = authClient.useActiveOrganization();
-	const { data: orgs } = authClient.useListOrganizations();
+	const { data: activeOrg, isPending: isActiveOrgLoading} = authClient.useActiveOrganization();
+	const { data: orgs, isPending: isOrgsLoading } = authClient.useListOrganizations();
 
 	const [open, setOpen] = useState(false);
 
+  if (isActiveOrgLoading || isOrgsLoading) {
+    return <Skeleton className="h-12" />
+	}
 	if (!activeOrg || !orgs) {
 		return null;
 	}
