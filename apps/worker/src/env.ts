@@ -2,7 +2,6 @@ import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
 export const env = createEnv({
-	clientPrefix: undefined,
 	server: {
 		S3_ACCESS_KEY_ID: z.string(),
 		S3_SECRET_ACCESS_KEY: z.string(),
