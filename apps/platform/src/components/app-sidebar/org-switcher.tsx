@@ -19,6 +19,7 @@ import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
 import OrgDialog from "../org-dialog";
+import { Badge } from "../ui/badge";
 
 export function OrgSwitcher() {
 	const { isMobile } = useSidebar();
@@ -43,11 +44,13 @@ export function OrgSwitcher() {
 							<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
 								<Briefcase className="size-4" />
 							</div>
-							<div className="grid flex-1 text-left text-sm leading-tight">
-								<span className="truncate font-medium">{activeOrg.name}</span>
-								<span className="truncate text-xs leading-none tracking-wider text-muted-foreground">
+							<div className="grid flex-1 text-left text-sm leading-tight gap-1">
+                <span className="truncate font-medium">{activeOrg.name}</span>
+								<Badge variant="secondary" className="rounded-none w-fit p-0.5">
+								<code className="truncate text-xs leading-none tracking-wider text-muted-foreground font-semibold">
 									{activeOrg.slug}
-								</span>
+                  </code>
+								</Badge>
 							</div>
 							<ChevronsUpDown className="ml-auto" />
 						</SidebarMenuButton>
