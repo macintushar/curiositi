@@ -24,13 +24,15 @@ import { Skeleton } from "../ui/skeleton";
 
 export function OrgSwitcher() {
 	const { isMobile } = useSidebar();
-	const { data: activeOrg, isPending: isActiveOrgLoading} = authClient.useActiveOrganization();
-	const { data: orgs, isPending: isOrgsLoading } = authClient.useListOrganizations();
+	const { data: activeOrg, isPending: isActiveOrgLoading } =
+		authClient.useActiveOrganization();
+	const { data: orgs, isPending: isOrgsLoading } =
+		authClient.useListOrganizations();
 
 	const [open, setOpen] = useState(false);
 
-  if (isActiveOrgLoading || isOrgsLoading) {
-    return <Skeleton className="h-12" />
+	if (isActiveOrgLoading || isOrgsLoading) {
+		return <Skeleton className="h-12" />;
 	}
 	if (!activeOrg || !orgs) {
 		return null;
@@ -49,11 +51,11 @@ export function OrgSwitcher() {
 								<Briefcase className="size-4" />
 							</div>
 							<div className="grid flex-1 text-left text-sm leading-tight gap-1">
-                <span className="truncate font-medium">{activeOrg.name}</span>
+								<span className="truncate font-medium">{activeOrg.name}</span>
 								<Badge variant="secondary" className="rounded-none w-fit p-0.5">
-								<code className="truncate text-xs leading-none tracking-wider text-muted-foreground font-semibold">
-									{activeOrg.slug}
-                  </code>
+									<code className="truncate text-xs leading-none tracking-wider text-muted-foreground font-semibold">
+										{activeOrg.slug}
+									</code>
 								</Badge>
 							</div>
 							<ChevronsUpDown className="ml-auto" />

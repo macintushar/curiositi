@@ -75,11 +75,12 @@ export function NavUser() {
 	const navigate = useNavigate();
 	const { theme, setTheme } = useTheme();
 
-  const { data: session, isPending: isSessionLoading } = authClient.useSession();
+	const { data: session, isPending: isSessionLoading } =
+		authClient.useSession();
 
-  if (isSessionLoading) {
-    return <Skeleton className="h-12" />
-  }
+	if (isSessionLoading) {
+		return <Skeleton className="h-12" />;
+	}
 
 	if (!session?.session || !session?.user) {
 		return null;
