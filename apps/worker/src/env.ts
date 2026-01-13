@@ -9,8 +9,8 @@ export const env = createEnv({
 		S3_SECRET_ACCESS_KEY: z.string(),
 		S3_BUCKET: z.string(),
 		S3_ENDPOINT: z.string(),
-    OLLAMA_URL: z.string().optional(),
-    QSTASH_TOKEN: z.string(),
+		OLLAMA_URL: z.string().optional(),
+		QSTASH_TOKEN: z.string(),
 		QSTASH_URL: z.string().optional(),
 	},
 

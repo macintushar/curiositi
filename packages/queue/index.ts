@@ -7,24 +7,29 @@ type Payload = {
 };
 
 type PushToQueueProps = {
-  qstashToken: string;
+	qstashToken: string;
 	qstashUrl?: string;
 	payload: Payload;
 };
 
-export async function pushToQueue({ qstashToken, qstashUrl, payload }: PushToQueueProps) {
+export async function pushToQueue({
+	qstashToken,
+	qstashUrl,
+	payload,
+}: PushToQueueProps) {
 	const client = new Client({
 		token: qstashToken,
+		baseUrl: qstashUrl,
 	});
 
-  const res = await client.publishJSON({
+	const res = await client.publishJSON({
 		url: `${payload.workerUrl}/process-file`,
 		body: {
-      fileId: payload.fileId,
+			fileId: payload.fileId,
 			orgId: payload.orgId,
 		},
 		method: "POST",
-  });
+	});
 
 	return res;
 }

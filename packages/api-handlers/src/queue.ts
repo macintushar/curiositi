@@ -14,10 +14,12 @@ export async function enqueueFileForProcessing({
 	workerUrl,
 }: EnqueueFileForProcessingParams) {
 	try {
-		console.log(process.env.QSTASH_URL, qstashToken);
 		const res = await pushToQueue({
-      qstashToken,
-      qstashUrl: process.env.NODE_ENV === "development" ? process.env.QSTASH_URL : undefined,
+			qstashToken,
+			qstashUrl:
+				process.env.NODE_ENV === "development"
+					? process.env.QSTASH_URL
+					: undefined,
 			payload: {
 				workerUrl,
 				fileId,
