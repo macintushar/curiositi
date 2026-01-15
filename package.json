@@ -9,7 +9,8 @@
 		"format": "biome format --write .",
 		"format:check": "biome format .",
 		"check-types": "turbo run check-types",
-		"check": "biome check . && turbo run check-types"
+		"check": "biome check . && turbo run check-types",
+		"start": "turbo run start"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.11",

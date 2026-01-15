@@ -11,7 +11,7 @@
 		"format": "biome format",
 		"lint": "biome lint",
 		"check": "biome check",
-		"start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs"
+		"start": "PORT=3030 bun run --import ./.output/server/instrument.server.mjs .output/server/index.mjs"
 	},
 	"dependencies": {
 		"@curiositi/api-handlers": "workspace:*",
