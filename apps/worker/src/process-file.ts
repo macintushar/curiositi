@@ -8,6 +8,7 @@ import type { Logger } from "./create-logger";
 import { chunkPages } from "./lib/chunk";
 import { embedChunks } from "./lib/ai";
 import { env } from "./env";
+import { TEXT_FILE_TYPES } from "@curiositi/share/constants";
 
 type ProcessFileProps = {
 	fileId: string;
@@ -15,22 +16,8 @@ type ProcessFileProps = {
 	logger: Logger;
 };
 
-/** Text-based MIME types that should be processed as single-page documents */
-const TEXT_MIME_TYPES = new Set([
-	"text/plain",
-	"text/markdown",
-	"text/csv",
-	"text/html",
-	"text/xml",
-	"application/json",
-	"application/xml",
-]);
-
-/**
- * Checks if a MIME type is text-based
- */
 function isTextMimeType(mimeType: string): boolean {
-	return TEXT_MIME_TYPES.has(mimeType) || mimeType.startsWith("text/");
+	return TEXT_FILE_TYPES.includes(mimeType) || mimeType.startsWith("text/");
 }
 
 export default async function processFile({
