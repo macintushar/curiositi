@@ -68,7 +68,7 @@ export default function Commander() {
 						</CommandItem>
 						<CommandItem
 							onSelect={() => {
-								navigate({ to: "/app/settings" });
+								navigate({ to: "/app" });
 								setOpen(false);
 							}}
 						>
