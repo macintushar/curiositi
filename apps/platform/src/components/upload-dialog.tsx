@@ -25,19 +25,19 @@ import { toast } from "sonner";
 
 type FileEntryStatus = "pending" | "uploading" | "success" | "error";
 
-interface FileEntry {
+type FileEntry = {
 	id: string;
 	file: File;
 	tags: string[];
 	status: FileEntryStatus;
 	error?: string;
-}
+};
 
-interface UploadDialogProps {
+type UploadDialogProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	spaceId?: string | null;
-}
+};
 
 function formatFileSize(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
@@ -127,9 +127,19 @@ export default function UploadDialog({
 			}
 		}
 
-		queryClient.invalidateQueries({
-			queryKey: ["files", "orphan", sessionData?.session.activeOrganizationId],
-		});
+		if (spaceId) {
+			queryClient.invalidateQueries({
+				queryKey: ["files", "inSpace", spaceId],
+			});
+		} else {
+			queryClient.invalidateQueries({
+				queryKey: [
+					"files",
+					"orphan",
+					sessionData?.session.activeOrganizationId,
+				],
+			});
+		}
 
 		if (successCount === totalCount) {
 			toast.success(
