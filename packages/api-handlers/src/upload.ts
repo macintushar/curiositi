@@ -11,6 +11,7 @@ export interface UploadHandlerInput {
 	orgId: string;
 	userId: string;
 	spaceId?: string;
+	tags?: string[];
 	s3: S3Config;
 }
 
@@ -28,6 +29,7 @@ export default async function handleUpload({
 	orgId,
 	userId,
 	spaceId,
+	tags,
 	s3,
 }: UploadHandlerInput) {
 	logger.info(`Attempting to Uploading File: ${file.name}`);
@@ -73,6 +75,7 @@ export default async function handleUpload({
 				organizationId: orgId,
 				uploadedById: userId,
 				status: "pending",
+				tags: { tags: tags ?? [] },
 			})
 			.returning();
 

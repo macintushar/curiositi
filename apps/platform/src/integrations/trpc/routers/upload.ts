@@ -14,7 +14,11 @@ import logger from "@curiositi/share/logger";
 const uploadRouter = {
 	upload: protectedProcedure
 		.input(
-			z.object({ file: z.instanceof(File), spaceId: z.string().optional() })
+			z.object({
+				file: z.instanceof(File),
+				spaceId: z.string().optional(),
+				tags: z.array(z.string()).optional(),
+			})
 		)
 		.mutation(async ({ ctx, input }) => {
 			const { data: uploadData, error: uploadError } = await uploadHandler({
@@ -22,6 +26,7 @@ const uploadRouter = {
 				orgId: ctx.session.session.activeOrganizationId,
 				userId: ctx.session.user.id,
 				spaceId: input.spaceId,
+				tags: input.tags,
 				s3: {
 					bucket: env.S3_BUCKET,
 					accessKeyId: env.S3_ACCESS_KEY_ID,
