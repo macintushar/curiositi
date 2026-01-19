@@ -17,6 +17,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppSpacesIndexRouteImport } from './routes/app/spaces/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
+import { Route as AppSpaceSpaceIdRouteImport } from './routes/app/space/$spaceId'
+import { Route as AppItemFileIdRouteImport } from './routes/app/item/$fileId'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -60,6 +62,16 @@ const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
   path: '/api/upload/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSpaceSpaceIdRoute = AppSpaceSpaceIdRouteImport.update({
+  id: '/space/$spaceId',
+  path: '/space/$spaceId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppItemFileIdRoute = AppItemFileIdRouteImport.update({
+  id: '/item/$fileId',
+  path: '/item/$fileId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
@@ -80,6 +92,8 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/item/$fileId': typeof AppItemFileIdRoute
+  '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload': typeof ApiUploadIndexRoute
   '/app/spaces': typeof AppSpacesIndexRoute
 }
@@ -91,6 +105,8 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/item/$fileId': typeof AppItemFileIdRoute
+  '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload': typeof ApiUploadIndexRoute
   '/app/spaces': typeof AppSpacesIndexRoute
 }
@@ -104,6 +120,8 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/item/$fileId': typeof AppItemFileIdRoute
+  '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload/': typeof ApiUploadIndexRoute
   '/app/spaces/': typeof AppSpacesIndexRoute
 }
@@ -118,6 +136,8 @@ export interface FileRouteTypes {
     | '/app/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/app/item/$fileId'
+    | '/app/space/$spaceId'
     | '/api/upload'
     | '/app/spaces'
   fileRoutesByTo: FileRoutesByTo
@@ -129,6 +149,8 @@ export interface FileRouteTypes {
     | '/app'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/app/item/$fileId'
+    | '/app/space/$spaceId'
     | '/api/upload'
     | '/app/spaces'
   id:
@@ -141,6 +163,8 @@ export interface FileRouteTypes {
     | '/app/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/app/item/$fileId'
+    | '/app/space/$spaceId'
     | '/api/upload/'
     | '/app/spaces/'
   fileRoutesById: FileRoutesById
@@ -214,6 +238,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUploadIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/space/$spaceId': {
+      id: '/app/space/$spaceId'
+      path: '/space/$spaceId'
+      fullPath: '/app/space/$spaceId'
+      preLoaderRoute: typeof AppSpaceSpaceIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/item/$fileId': {
+      id: '/app/item/$fileId'
+      path: '/item/$fileId'
+      fullPath: '/app/item/$fileId'
+      preLoaderRoute: typeof AppItemFileIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/api/trpc/$': {
       id: '/api/trpc/$'
       path: '/api/trpc/$'
@@ -233,11 +271,15 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppItemFileIdRoute: typeof AppItemFileIdRoute
+  AppSpaceSpaceIdRoute: typeof AppSpaceSpaceIdRoute
   AppSpacesIndexRoute: typeof AppSpacesIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppItemFileIdRoute: AppItemFileIdRoute,
+  AppSpaceSpaceIdRoute: AppSpaceSpaceIdRoute,
   AppSpacesIndexRoute: AppSpacesIndexRoute,
 }
 
