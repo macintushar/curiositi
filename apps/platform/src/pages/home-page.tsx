@@ -1,4 +1,4 @@
-import SpaceExplorerLayout from "@platform/components/space-explorer-layout";
+import SpaceExplorerLayout from "@platform/layouts/space-explorer-layout";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 import { authClient } from "@platform/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
