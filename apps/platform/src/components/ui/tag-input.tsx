@@ -4,13 +4,13 @@ import { Badge } from "@platform/components/ui/badge";
 import { cn } from "@platform/lib/utils";
 import { IconX } from "@tabler/icons-react";
 
-interface TagInputProps {
+type TagInputProps = {
 	value: string[];
 	onChange: (tags: string[]) => void;
 	placeholder?: string;
 	disabled?: boolean;
 	className?: string;
-}
+};
 
 export function TagInput({
 	value,

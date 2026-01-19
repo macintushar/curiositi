@@ -6,14 +6,14 @@ import type { S3Config } from "@curiositi/share/types";
 import { createResponse } from "./response";
 import { hash } from "bun";
 
-export interface UploadHandlerInput {
+export type UploadHandlerInput = {
 	file: File;
 	orgId: string;
 	userId: string;
 	spaceId?: string;
 	tags?: string[];
 	s3: S3Config;
-}
+};
 
 type UploadError = {
 	s3: {

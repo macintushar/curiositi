@@ -190,11 +190,11 @@ export default function SpaceDialog({
 					}}
 				>
 					<FieldGroup className="py-4">
-						<div className="flex gap-3 items-start">
+						<div className="flex gap-3 items-end">
 							<form.Field
 								name="icon"
 								children={(field) => (
-									<Field className="w-auto">
+									<Field className="size-9">
 										<FieldLabel className="sr-only">Icon</FieldLabel>
 										<DropdownMenu
 											open={emojiPickerOpen}

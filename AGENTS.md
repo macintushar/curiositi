@@ -52,20 +52,21 @@ Run commands in specific packages:
 - Module: NodeNext (base) / ESNext (packages with bundler)
 - JSX: react-jsx (React), preserve (Next.js), hono/jsx (Hono)
 - Declaration maps enabled
-- Use `interface` for object shapes, `type` for unions/primitives
+- Use `type` for all type definitions (object shapes, unions, primitives)
+- Do not use `interface` - prefer `type` for consistency
 
 ### Naming Conventions
 - Components: PascalCase (Button, Card, ThemeImage)
 - Functions/Methods: camelCase (uploadHandler, handleUpload)
 - Variables: camelCase
 - Constants: camelCase (logger) or UPPER_CASE for globals
-- Interfaces/Types: PascalCase with descriptive names (ButtonProps, ThemeImageProps)
+- Types: PascalCase with descriptive names (ButtonProps, ThemeImageProps)
 - Files: camelCase (page.tsx, upload.tsx, button.tsx)
 - Directories: lowercase (src, handlers, routers)
 
 ### React/Next.js Patterns
 - Use `"use client"` directive for client components
-- Define props interfaces above components
+- Define props types above components
 - Use `ReactNode` for children prop type
 - Type props destructuring: `({ prop1, prop2 }: Props) => {}`
 - Use JSX.Element return type for components (optional but consistent)
