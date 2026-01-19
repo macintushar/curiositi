@@ -43,3 +43,6 @@ yarn-error.log*
 # File Storage
 storage
 .env*.local
+
+# Cache
+**/.cache/**
