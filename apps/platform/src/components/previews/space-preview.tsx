@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import type { selectSpaceSchema } from "@curiositi/db/schema";
-import SpaceDialog from "@platform/components/space-dialog";
-import ConfirmDialog from "@platform/components/confirm-dialog";
+import SpaceDialog from "@platform/components/dialogs/space-dialog";
+import ConfirmDialog from "@platform/components/dialogs/confirm-dialog";
 import {
 	ContextMenu,
 	ContextMenuContent,

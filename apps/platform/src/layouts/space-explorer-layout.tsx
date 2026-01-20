@@ -5,8 +5,8 @@ import type { ReactNode } from "react";
 import type { selectSpaceSchema } from "@curiositi/db/schema";
 import type z from "zod";
 import { Button } from "@platform/components/ui/button";
-import SpaceDialog from "@platform/components/space-dialog";
-import UploadDialog from "@platform/components/upload-dialog";
+import SpaceDialog from "@platform/components/dialogs/space-dialog";
+import UploadDialog from "@platform/components/dialogs/upload-dialog";
 import ExplorerView from "@platform/components/explorer-view";
 import {
 	ContextMenu,

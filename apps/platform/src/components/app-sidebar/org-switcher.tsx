@@ -18,7 +18,7 @@ import {
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
-import OrgDialog from "../org-dialog";
+import OrgDialog from "../dialogs/org-dialog";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 

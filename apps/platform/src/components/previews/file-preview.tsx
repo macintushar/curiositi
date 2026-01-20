@@ -11,7 +11,7 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "../ui/context-menu";
-import ConfirmDialog from "../confirm-dialog";
+import ConfirmDialog from "../dialogs/confirm-dialog";
 import FileIcon from "../file-icon";
 import { Skeleton } from "../ui/skeleton";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
