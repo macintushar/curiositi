@@ -90,21 +90,25 @@ const fileRouter = {
 				});
 			}
 
-			const s3Client = new S3Client({
-				accessKeyId: env.S3_ACCESS_KEY_ID,
-				secretAccessKey: env.S3_SECRET_ACCESS_KEY,
-				bucket: env.S3_BUCKET,
-				endpoint: env.S3_ENDPOINT,
-			});
-
-			await s3Client.delete(file.path);
-
 			const { error: deleteError } = await deleteFile(input.fileId);
 			if (deleteError) {
 				throw new TRPCError({
 					code: "INTERNAL_SERVER_ERROR",
-					message: "Failed to delete file",
+					message: "Failed to delete file from database",
 				});
+			}
+
+			try {
+				const s3Client = new S3Client({
+					accessKeyId: env.S3_ACCESS_KEY_ID,
+					secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+					bucket: env.S3_BUCKET,
+					endpoint: env.S3_ENDPOINT,
+				});
+
+				await s3Client.delete(file.path);
+			} catch (s3Error) {
+				console.error(`Failed to delete file from S3: ${file.path}`, s3Error);
 			}
 
 			return { success: true };

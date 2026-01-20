@@ -51,12 +51,19 @@ export async function getFilesNotInSpace(orgId: string) {
 
 export async function deleteFile(fileId: string) {
 	try {
-		await db.delete(filesInSpace).where(eq(filesInSpace.fileId, fileId));
-		const data = await db.delete(files).where(eq(files.id, fileId)).returning();
-		if (data.length === 0) {
-			return createResponse(null, new Error("File not found"));
-		}
-		return createResponse(data[0], null);
+		const result = await db.transaction(async (tx) => {
+			await tx.delete(filesInSpace).where(eq(filesInSpace.fileId, fileId));
+			const data = await tx
+				.delete(files)
+				.where(eq(files.id, fileId))
+				.returning();
+			if (data.length === 0) {
+				throw new Error("File not found");
+			}
+			return data[0];
+		});
+
+		return createResponse(result, null);
 	} catch (error) {
 		return createResponse(null, error);
 	}
