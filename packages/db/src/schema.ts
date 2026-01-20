@@ -9,7 +9,7 @@ import {
 	text,
 	timestamp,
 } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
 
 export const createTable = pgTableCreator((name) => `curiositi_${name}`);
 
@@ -262,8 +262,27 @@ export const spaces = createTable(
 	]
 );
 
-export const selectSpaceSchema = createSelectSchema(spaces);
-export const createSpaceSchema = createInsertSchema(spaces);
+export const selectSpaceSchema = z.object({
+	id: z.string().uuid(),
+	name: z.string(),
+	description: z.string().nullable(),
+	icon: z.string().nullable(),
+	organizationId: z.string(),
+	parentSpaceId: z.string().uuid().nullable(),
+	createdAt: z.date(),
+	updatedAt: z.date().nullable(),
+});
+
+export const createSpaceSchema = z.object({
+	id: z.string().uuid().optional(),
+	name: z.string(),
+	description: z.string().nullable().optional(),
+	icon: z.string().nullable().optional(),
+	organizationId: z.string(),
+	parentSpaceId: z.string().uuid().nullable().optional(),
+	createdAt: z.date().optional(),
+	updatedAt: z.date().nullable().optional(),
+});
 
 export const fileStatusEnum = pgEnum("file_status", [
 	"pending",
@@ -304,8 +323,35 @@ export const files = createTable(
 	]
 );
 
-export const selectFileSchema = createSelectSchema(files);
-export const createFileSchema = createInsertSchema(files);
+export const selectFileSchema = z.object({
+	id: z.string().uuid(),
+	name: z.string(),
+	path: z.string(),
+	size: z.number().int(),
+	type: z.string(),
+	organizationId: z.string(),
+	uploadedById: z.string(),
+	status: z.enum(["pending", "processing", "completed", "failed"]),
+	tags: z.unknown().nullable(),
+	processedAt: z.date().nullable(),
+	createdAt: z.date(),
+	updatedAt: z.date().nullable(),
+});
+
+export const createFileSchema = z.object({
+	id: z.string().uuid().optional(),
+	name: z.string(),
+	path: z.string(),
+	size: z.number().int(),
+	type: z.string(),
+	organizationId: z.string(),
+	uploadedById: z.string(),
+	status: z.enum(["pending", "processing", "completed", "failed"]).optional(),
+	tags: z.unknown().nullable().optional(),
+	processedAt: z.date().nullable().optional(),
+	createdAt: z.date().optional(),
+	updatedAt: z.date().nullable().optional(),
+});
 
 export const fileContents = createTable(
 	"file_contents",
