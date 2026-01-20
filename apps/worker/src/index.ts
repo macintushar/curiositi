@@ -1,4 +1,4 @@
-import { createResponse } from "@curiositi/api-handlers";
+import { createResponse } from "./utils";
 
 import z from "zod";
 

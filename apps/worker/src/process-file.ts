@@ -1,4 +1,4 @@
-import { createResponse } from "@curiositi/api-handlers";
+import { createResponse } from "./utils";
 import { and, eq } from "@curiositi/db";
 import db from "@curiositi/db/client";
 import { fileContents, files } from "@curiositi/db/schema";
