@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { cn } from "@platform/lib/utils";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
@@ -10,10 +10,10 @@ import {
 	ContextMenuContent,
 	ContextMenuItem,
 	ContextMenuTrigger,
-} from "./ui/context-menu";
-import ConfirmDialog from "./confirm-dialog";
-import FileIcon from "./file-icon";
-import { Skeleton } from "./ui/skeleton";
+} from "../ui/context-menu";
+import ConfirmDialog from "../confirm-dialog";
+import FileIcon from "../file-icon";
+import { Skeleton } from "../ui/skeleton";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { toast } from "sonner";
 

@@ -1,7 +1,7 @@
 import type { selectSpaceSchema } from "@curiositi/db/schema";
 import type z from "zod";
-import FilePreview from "./file-preview";
-import SpacePreview from "./space-preview";
+import FilePreview from "./previews/file-preview";
+import SpacePreview from "./previews/space-preview";
 
 type FileType = {
 	id: string;
