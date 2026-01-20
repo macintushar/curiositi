@@ -42,7 +42,7 @@ function SpacePageComponent() {
 		spaceQuery.isLoading || childSpaces.isLoading || filesInSpace.isLoading;
 
 	const headerContent = (
-		<div className="flex flex-col gap-2 items-center">
+		<div className="flex flex-col gap-2">
 			<Breadcrumb>
 				<BreadcrumbList>
 					<BreadcrumbItem>
