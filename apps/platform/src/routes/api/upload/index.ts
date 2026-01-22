@@ -21,7 +21,15 @@ export const Route = createFileRoute("/api/upload/")({
 				const file = data.get("file") as File | null;
 				const spaceId = data.get("spaceId") as string | null;
 				const tagsString = data.get("tags") as string | null;
-				const tags = tagsString ? JSON.parse(tagsString) : undefined;
+				
+				let tags: string[] | undefined;
+				if (tagsString) {
+					try {
+						tags = JSON.parse(tagsString);
+					} catch (error) {
+						return new Response("Invalid tags format", { status: 400 });
+					}
+				}
 
 				if (!file) {
 					return new Response("Bad Request", { status: 400 });
