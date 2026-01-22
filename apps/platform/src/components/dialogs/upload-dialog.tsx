@@ -11,7 +11,6 @@ import {
 	DialogTitle,
 } from "@platform/components/ui/dialog";
 import { TagInput } from "@platform/components/ui/tag-input";
-import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 import { authClient } from "@platform/lib/auth-client";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -113,11 +112,24 @@ export default function UploadDialog({
 				updateEntryStatus(entry.id, "uploading");
 
 				try {
-					await trpcClient.upload.upload.mutate({
-						file: entry.file,
-						tags: entry.tags.length > 0 ? entry.tags : undefined,
-						spaceId: spaceId ?? undefined,
+					const formData = new FormData();
+					formData.append("file", entry.file);
+					if (spaceId) {
+						formData.append("spaceId", spaceId);
+					}
+					if (entry.tags.length > 0) {
+						formData.append("tags", JSON.stringify(entry.tags));
+					}
+
+					const response = await fetch("/api/upload", {
+						method: "POST",
+						body: formData,
 					});
+
+					if (!response.ok) {
+						throw new Error(`Upload failed: ${response.statusText}`);
+					}
+
 					updateEntryStatus(entry.id, "success");
 					successCount++;
 				} catch (error) {

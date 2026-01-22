@@ -20,6 +20,8 @@ export const Route = createFileRoute("/api/upload/")({
 				const data = await request.formData();
 				const file = data.get("file") as File | null;
 				const spaceId = data.get("spaceId") as string | null;
+				const tagsString = data.get("tags") as string | null;
+				const tags = tagsString ? JSON.parse(tagsString) : undefined;
 
 				if (!file) {
 					return new Response("Bad Request", { status: 400 });
@@ -41,6 +43,7 @@ export const Route = createFileRoute("/api/upload/")({
 					userId: session.user.id,
 					orgId: session.session.activeOrganizationId,
 					spaceId: spaceId ?? undefined,
+					tags,
 					s3: {
 						accessKeyId: env.S3_ACCESS_KEY_ID,
 						bucket: env.S3_BUCKET,
