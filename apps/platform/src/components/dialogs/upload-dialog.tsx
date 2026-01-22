@@ -128,7 +128,9 @@ export default function UploadDialog({
 
 					if (!response.ok) {
 						const errorText = await response.text();
-						throw new Error(errorText || `Upload failed: ${response.statusText}`);
+						throw new Error(
+							errorText || `Upload failed: ${response.statusText}`
+						);
 					}
 
 					updateEntryStatus(entry.id, "success");

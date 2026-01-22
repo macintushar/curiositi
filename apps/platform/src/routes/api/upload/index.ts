@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/upload/")({
 				const file = data.get("file") as File | null;
 				const spaceId = data.get("spaceId") as string | null;
 				const tagsString = data.get("tags") as string | null;
-				
+
 				let tags: string[] | undefined;
 				if (tagsString) {
 					try {
