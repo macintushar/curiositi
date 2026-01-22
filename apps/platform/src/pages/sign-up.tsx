@@ -80,6 +80,7 @@ export default function SignUp() {
 										id={field.name}
 										name={field.name}
 										type="name"
+										placeholder="Mac"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={(e) => field.handleChange(e.target.value)}

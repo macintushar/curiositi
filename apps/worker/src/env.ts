@@ -3,19 +3,23 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
-		SERVER_URL: z.url().optional(),
 		S3_ACCESS_KEY_ID: z.string(),
 		S3_SECRET_ACCESS_KEY: z.string(),
 		S3_BUCKET: z.string(),
 		S3_ENDPOINT: z.string(),
+		POSTGRES_URL: z.url(),
 	},
 
+	clientPrefix: "PUBLIC_",
+
+	client: {},
+
 	runtimeEnvStrict: {
-		SERVER_URL: process.env.SERVER_URL,
 		S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
 		S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
 		S3_BUCKET: process.env.S3_BUCKET,
 		S3_ENDPOINT: process.env.S3_ENDPOINT,
+		POSTGRES_URL: process.env.POSTGRES_URL,
 	},
 
 	/**
@@ -33,5 +37,5 @@ export const env = createEnv({
 	 */
 	skipValidation:
 		!!process.env.CI || process.env.npm_lifecycle_event === "lint",
-	emptyStringAsUndefined: true,
+	emptyStringAsUndefined: false,
 });

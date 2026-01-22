@@ -1,15 +1,6 @@
-import AppLayout from "@platform/layouts/app-layout";
-import { authMiddleware } from "@platform/middleware/auth";
-import { orgsMiddleware } from "@platform/middleware/orgs";
 import { createFileRoute } from "@tanstack/react-router";
+import HomePage from "@platform/pages/home-page";
 
 export const Route = createFileRoute("/app/")({
-	server: {
-		middleware: [authMiddleware, orgsMiddleware],
-	},
-	component: RouteComponent,
+	component: HomePage,
 });
-
-async function RouteComponent() {
-	return <AppLayout>Main App Page!</AppLayout>;
-}

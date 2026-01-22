@@ -13,6 +13,7 @@
 	"dependencies": {
 		"@curiositi/share": "workspace:*",
 		"@curiositi/db": "workspace:*",
+		"@curiositi/queue": "workspace:*",
 		"@types/bun": "latest"
 	},
 	"devDependencies": {

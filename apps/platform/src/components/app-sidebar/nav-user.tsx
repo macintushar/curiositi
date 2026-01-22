@@ -42,6 +42,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import logger from "@curiositi/share/logger";
 import { type Theme, useTheme } from "../theme-provider";
+import { Skeleton } from "../ui/skeleton";
 
 function SidebarAvatar({
 	name,
@@ -74,7 +75,12 @@ export function NavUser() {
 	const navigate = useNavigate();
 	const { theme, setTheme } = useTheme();
 
-	const { data: session } = authClient.useSession();
+	const { data: session, isPending: isSessionLoading } =
+		authClient.useSession();
+
+	if (isSessionLoading) {
+		return <Skeleton className="h-12" />;
+	}
 
 	if (!session?.session || !session?.user) {
 		return null;

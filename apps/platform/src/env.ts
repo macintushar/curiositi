@@ -3,7 +3,9 @@ import { z } from "zod";
 
 export const env = createEnv({
 	server: {
-		SERVER_URL: z.url(),
+		PLATFORM_URL: z.url(),
+		QSTASH_TOKEN: z.string(),
+		WORKER_URL: z.string(),
 		BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
 		BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
 		BETTER_AUTH_SECRET: z.string(),
@@ -35,7 +37,7 @@ export const env = createEnv({
 		VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
 		VITE_SENTRY_ORG: import.meta.env.VITE_SENTRY_ORG,
 		VITE_SENTRY_PROJECT: import.meta.env.VITE_SENTRY_PROJECT,
-		SERVER_URL: process.env.SERVER_URL,
+		PLATFORM_URL: process.env.PLATFORM_URL,
 		BETTER_AUTH_GOOGLE_CLIENT_ID: process.env.BETTER_AUTH_GOOGLE_CLIENT_ID,
 		BETTER_AUTH_GOOGLE_CLIENT_SECRET:
 			process.env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
@@ -44,6 +46,8 @@ export const env = createEnv({
 		S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
 		S3_BUCKET: process.env.S3_BUCKET,
 		S3_ENDPOINT: process.env.S3_ENDPOINT,
+		QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+		WORKER_URL: process.env.WORKER_URL,
 	},
 
 	/**
