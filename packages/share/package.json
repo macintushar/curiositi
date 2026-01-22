@@ -7,7 +7,8 @@
 		"./logger": "./src/logger/index.ts",
 		"./fs/*": "./src/fs/src/*.ts",
 		"./schemas": "./src/schemas/index.ts",
-		"./constants": "./src/constants/index.ts"
+		"./constants": "./src/constants/index.ts",
+		"./types": "./src/types/index.ts"
 	},
 	"scripts": {
 		"lint": "biome check .",

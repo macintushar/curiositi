@@ -18,11 +18,11 @@ import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { Toaster } from "@platform/components/ui/sonner";
 import { ThemeProvider } from "@platform/components/theme-provider";
 
-interface MyRouterContext {
+type MyRouterContext = {
 	queryClient: QueryClient;
 
 	trpc: TRPCOptionsProxy<TRPCRouter>;
-}
+};
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	head: () => ({

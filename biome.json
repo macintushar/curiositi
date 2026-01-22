@@ -10,7 +10,8 @@
 		"includes": [
 			"**",
 			"!apps/platform/src/routeTree.gen.ts",
-			"!apps/platform/src/components/ui/*"
+			"!apps/platform/src/components/ui/*",
+			"!apps/worker/.cache"
 		]
 	},
 	"formatter": {

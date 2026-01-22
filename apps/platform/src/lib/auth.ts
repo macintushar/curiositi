@@ -16,7 +16,8 @@ export const auth = betterAuth({
 			updateUserInfoOnLink: true,
 		},
 	},
-	baseURL: env.SERVER_URL,
+	baseURL: env.PLATFORM_URL,
+	trustedOrigins: [env.PLATFORM_URL],
 	emailAndPassword: {
 		enabled: true,
 	},
@@ -43,7 +44,7 @@ export const auth = betterAuth({
 		google: {
 			clientId: env.BETTER_AUTH_GOOGLE_CLIENT_ID,
 			clientSecret: env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
-			redirectURI: `${env.SERVER_URL}/api/auth/callback/google`,
+			redirectURI: `${env.PLATFORM_URL}/api/auth/callback/google`,
 			mapProfileToUser(profile) {
 				return {
 					name: profile.name,
@@ -53,7 +54,6 @@ export const auth = betterAuth({
 			},
 		},
 	},
-	trustedOrigins: [env.SERVER_URL],
 });
 
 export type Session = typeof auth.$Infer.Session;

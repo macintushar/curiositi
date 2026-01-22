@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+	type AnyPgColumn,
 	boolean,
 	index,
 	pgEnum,
@@ -8,6 +9,7 @@ import {
 	text,
 	timestamp,
 } from "drizzle-orm/pg-core";
+import { z } from "zod";
 
 export const createTable = pgTableCreator((name) => `curiositi_${name}`);
 
@@ -27,6 +29,7 @@ export const user = pgTable(
 			.$defaultFn(() => false)
 			.notNull(),
 		image: text("image"),
+		lastLoginMethod: text("last_login_method"),
 		createdAt: timestamp("created_at")
 			.$defaultFn(() => new Date())
 			.notNull(),
@@ -246,6 +249,9 @@ export const spaces = createTable(
 			.text()
 			.notNull()
 			.references(() => organization.id),
+		parentSpaceId: d
+			.uuid()
+			.references((): AnyPgColumn => spaces.id, { onDelete: "cascade" }),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -257,6 +263,28 @@ export const spaces = createTable(
 		index("space_organization_id_idx").on(t.organizationId),
 	]
 );
+
+export const selectSpaceSchema = z.object({
+	id: z.string().uuid(),
+	name: z.string(),
+	description: z.string().nullable(),
+	icon: z.string().nullable(),
+	organizationId: z.string(),
+	parentSpaceId: z.string().uuid().nullable(),
+	createdAt: z.date(),
+	updatedAt: z.date().nullable(),
+});
+
+export const createSpaceSchema = z.object({
+	id: z.string().uuid().optional(),
+	name: z.string(),
+	description: z.string().nullable().optional(),
+	icon: z.string().nullable().optional(),
+	organizationId: z.string(),
+	parentSpaceId: z.string().uuid().nullable().optional(),
+	createdAt: z.date().optional(),
+	updatedAt: z.date().nullable().optional(),
+});
 
 export const fileStatusEnum = pgEnum("file_status", [
 	"pending",
@@ -271,16 +299,19 @@ export const files = createTable(
 		id: d.uuid().primaryKey().defaultRandom(),
 		name: d.text().notNull(),
 		path: d.text().notNull(),
+		size: d.integer().notNull(),
+		type: d.text().notNull(),
 		organizationId: d
 			.text()
 			.notNull()
 			.references(() => organization.id),
-		spaceId: d.uuid().references(() => spaces.id),
 		uploadedById: d
 			.text()
 			.notNull()
 			.references(() => user.id),
-		status: fileStatusEnum().notNull().default("pending"),
+		status: fileStatusEnum().default("pending").notNull(),
+		tags: d.jsonb().default({ tags: [] }),
+		processedAt: d.timestamp({ withTimezone: true }),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -294,6 +325,36 @@ export const files = createTable(
 	]
 );
 
+export const selectFileSchema = z.object({
+	id: z.string().uuid(),
+	name: z.string(),
+	path: z.string(),
+	size: z.number().int(),
+	type: z.string(),
+	organizationId: z.string(),
+	uploadedById: z.string(),
+	status: z.enum(["pending", "processing", "completed", "failed"]),
+	tags: z.unknown().nullable(),
+	processedAt: z.date().nullable(),
+	createdAt: z.date(),
+	updatedAt: z.date().nullable(),
+});
+
+export const createFileSchema = z.object({
+	id: z.string().uuid().optional(),
+	name: z.string(),
+	path: z.string(),
+	size: z.number().int(),
+	type: z.string(),
+	organizationId: z.string(),
+	uploadedById: z.string(),
+	status: z.enum(["pending", "processing", "completed", "failed"]).optional(),
+	tags: z.unknown().nullable().optional(),
+	processedAt: z.date().nullable().optional(),
+	createdAt: z.date().optional(),
+	updatedAt: z.date().nullable().optional(),
+});
+
 export const fileContents = createTable(
 	"file_contents",
 	(d) => ({
@@ -301,9 +362,10 @@ export const fileContents = createTable(
 		fileId: d
 			.uuid()
 			.notNull()
-			.references(() => files.id),
+			.references(() => files.id, { onDelete: "cascade" }),
 		content: d.text().notNull(),
 		embeddedContent: d.vector({ dimensions: 1536 }).notNull(),
+		metadata: d.json(),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -311,4 +373,25 @@ export const fileContents = createTable(
 		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 	}),
 	(t) => [index("file_idx").on(t.fileId), index("content_idx").on(t.content)]
+);
+
+export const filesInSpace = createTable(
+	"files_in_space",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		fileId: d
+			.uuid()
+			.notNull()
+			.references(() => files.id, { onDelete: "cascade" }),
+		spaceId: d
+			.uuid()
+			.notNull()
+			.references(() => spaces.id, { onDelete: "cascade" }),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [index("space_idx").on(t.spaceId)]
 );

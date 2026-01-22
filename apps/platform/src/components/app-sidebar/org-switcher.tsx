@@ -18,15 +18,22 @@ import {
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
 import { useState } from "react";
-import OrgDialog from "../org-dialog";
+import OrgDialog from "../dialogs/org-dialog";
+import { Badge } from "../ui/badge";
+import { Skeleton } from "../ui/skeleton";
 
 export function OrgSwitcher() {
 	const { isMobile } = useSidebar();
-	const { data: activeOrg } = authClient.useActiveOrganization();
-	const { data: orgs } = authClient.useListOrganizations();
+	const { data: activeOrg, isPending: isActiveOrgLoading } =
+		authClient.useActiveOrganization();
+	const { data: orgs, isPending: isOrgsLoading } =
+		authClient.useListOrganizations();
 
 	const [open, setOpen] = useState(false);
 
+	if (isActiveOrgLoading || isOrgsLoading) {
+		return <Skeleton className="h-12" />;
+	}
 	if (!activeOrg || !orgs) {
 		return null;
 	}
@@ -43,8 +50,13 @@ export function OrgSwitcher() {
 							<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
 								<Briefcase className="size-4" />
 							</div>
-							<div className="grid flex-1 text-left text-sm leading-tight">
+							<div className="grid flex-1 text-left text-sm leading-tight gap-1">
 								<span className="truncate font-medium">{activeOrg.name}</span>
+								<Badge variant="secondary" className="rounded-none w-fit p-0.5">
+									<code className="truncate text-xs leading-none tracking-wider text-muted-foreground font-semibold">
+										{activeOrg.slug}
+									</code>
+								</Badge>
 							</div>
 							<ChevronsUpDown className="ml-auto" />
 						</SidebarMenuButton>

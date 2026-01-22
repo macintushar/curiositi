@@ -12,9 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppSpacesIndexRouteImport } from './routes/app/spaces/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
+import { Route as AppSpaceSpaceIdRouteImport } from './routes/app/space/$spaceId'
+import { Route as AppItemFileIdRouteImport } from './routes/app/item/$fileId'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -33,20 +37,40 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/app/',
-  path: '/app/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSpacesIndexRoute = AppSpacesIndexRouteImport.update({
+  id: '/spaces/',
+  path: '/spaces/',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
   id: '/api/upload/',
   path: '/api/upload/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppSpaceSpaceIdRoute = AppSpaceSpaceIdRouteImport.update({
+  id: '/space/$spaceId',
+  path: '/space/$spaceId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppItemFileIdRoute = AppItemFileIdRouteImport.update({
+  id: '/item/$fileId',
+  path: '/item/$fileId',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
@@ -61,13 +85,17 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
-  '/app': typeof AppIndexRoute
+  '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/item/$fileId': typeof AppItemFileIdRoute
+  '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload': typeof ApiUploadIndexRoute
+  '/app/spaces': typeof AppSpacesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,30 +105,41 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/item/$fileId': typeof AppItemFileIdRoute
+  '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload': typeof ApiUploadIndexRoute
+  '/app/spaces': typeof AppSpacesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/item/$fileId': typeof AppItemFileIdRoute
+  '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload/': typeof ApiUploadIndexRoute
+  '/app/spaces/': typeof AppSpacesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/onboarding'
     | '/sign-in'
     | '/sign-up'
-    | '/app'
+    | '/app/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/app/item/$fileId'
+    | '/app/space/$spaceId'
     | '/api/upload'
+    | '/app/spaces'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -110,25 +149,32 @@ export interface FileRouteTypes {
     | '/app'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/app/item/$fileId'
+    | '/app/space/$spaceId'
     | '/api/upload'
+    | '/app/spaces'
   id:
     | '__root__'
     | '/'
+    | '/app'
     | '/onboarding'
     | '/sign-in'
     | '/sign-up'
     | '/app/'
     | '/api/auth/$'
     | '/api/trpc/$'
+    | '/app/item/$fileId'
+    | '/app/space/$spaceId'
     | '/api/upload/'
+    | '/app/spaces/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
-  AppIndexRoute: typeof AppIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
   ApiUploadIndexRoute: typeof ApiUploadIndexRoute
@@ -157,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -166,10 +219,17 @@ declare module '@tanstack/react-router' {
     }
     '/app/': {
       id: '/app/'
-      path: '/app'
-      fullPath: '/app'
+      path: '/'
+      fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/spaces/': {
+      id: '/app/spaces/'
+      path: '/spaces'
+      fullPath: '/app/spaces'
+      preLoaderRoute: typeof AppSpacesIndexRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/api/upload/': {
       id: '/api/upload/'
@@ -177,6 +237,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/upload'
       preLoaderRoute: typeof ApiUploadIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/space/$spaceId': {
+      id: '/app/space/$spaceId'
+      path: '/space/$spaceId'
+      fullPath: '/app/space/$spaceId'
+      preLoaderRoute: typeof AppSpaceSpaceIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/item/$fileId': {
+      id: '/app/item/$fileId'
+      path: '/item/$fileId'
+      fullPath: '/app/item/$fileId'
+      preLoaderRoute: typeof AppItemFileIdRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/api/trpc/$': {
       id: '/api/trpc/$'
@@ -195,12 +269,30 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRouteRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppItemFileIdRoute: typeof AppItemFileIdRoute
+  AppSpaceSpaceIdRoute: typeof AppSpaceSpaceIdRoute
+  AppSpacesIndexRoute: typeof AppSpacesIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppItemFileIdRoute: AppItemFileIdRoute,
+  AppSpaceSpaceIdRoute: AppSpaceSpaceIdRoute,
+  AppSpacesIndexRoute: AppSpacesIndexRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
-  AppIndexRoute: AppIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
   ApiUploadIndexRoute: ApiUploadIndexRoute,

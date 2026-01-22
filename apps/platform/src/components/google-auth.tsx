@@ -11,8 +11,8 @@ export default function GoogleAuth({ isLastUsed }: { isLastUsed?: boolean }) {
 			onClick={async () => {
 				const res = await authClient.signIn.social({
 					provider: "google",
-					newUserCallbackURL: "/onboarding",
 					callbackURL: "/app",
+					newUserCallbackURL: "/onboarding",
 				});
 
 				if (res.error) {

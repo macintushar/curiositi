@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Called by "git commit" with the name of the file that contains
+# the commit log message. The hook should exit with non-zero status
+# after issuing an appropriate message if it wants to stop the commit.
+
+# Get the commit message file passed to the hook
+COMMIT_MSG_FILE=$1
+
+# Read the commit message
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Regular expression for the commit message format
+# Format: type(scope): message
+# Types: feat, fix, refactor, chore, lint, style, test
+# Scopes: db, queue, platform, worker, etc. (any lowercase alphanumeric with - or _)
+commit_regex="^(feat|fix|refactor|chore|lint|style|test)\([a-zA-Z0-9_-]+\): .+"
+
+# Check if the commit message is a merge commit
+if echo "$COMMIT_MSG" | grep -q "^Merge "; then
+  echo "Merge commit detected. Skipping commit message validation."
+  exit 0
+fi
+
+# Validate the commit message
+if ! echo "$COMMIT_MSG" | grep -Eq "$commit_regex"; then
+  echo "Error: Invalid commit message format."
+  echo
+  echo "Format: <type>(<scope>): <message>"
+  echo
+  echo "Type must be one of: feat, fix, refactor, chore, lint, style, test"
+  echo "Scope examples: db, queue, platform, worker, web, server, ui, share"
+  echo
+  echo "Examples:"
+  echo "  feat(db): add user authentication table"
+  echo "  fix(worker): resolve memory leak in queue processor"
+  echo "  chore(platform): update dependencies"
+  exit 1
+fi
+
+exit 0

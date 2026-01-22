@@ -1,36 +1,80 @@
 import client from "@curiositi/db/client";
-import { files } from "@curiositi/db/schema";
+import { files, filesInSpace } from "@curiositi/db/schema";
+import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@curiositi/share/constants";
 import write from "@curiositi/share/fs/write";
 import logger from "@curiositi/share/logger";
+import type { S3Config } from "@curiositi/share/types";
+import { hash } from "bun";
+import { createResponse } from "./response";
 
-export interface UploadHandlerInput {
+export type UploadHandlerInput = {
 	file: File;
 	orgId: string;
 	userId: string;
-	s3: {
-		accessKeyId: string;
-		secretAccessKey: string;
-		bucket: string;
-		endpoint: string;
-	};
-}
+	spaceId?: string;
+	tags?: string[];
+	s3: S3Config;
+};
 
-export default async function uploadHandler({
+type UploadError = {
+	validation: {
+		error: string | null;
+	};
+	s3: {
+		error: unknown | null;
+	};
+	db: {
+		error: unknown | null;
+	};
+};
+
+export default async function handleUpload({
 	file,
 	orgId,
 	userId,
+	spaceId,
+	tags,
 	s3,
 }: UploadHandlerInput) {
 	logger.info(`Attempting to Uploading File: ${file.name}`);
-	const path = `${orgId}/${file.name}`;
+
+	const uploadError: UploadError = {
+		validation: {
+			error: null,
+		},
+		s3: {
+			error: null,
+		},
+		db: {
+			error: null,
+		},
+	};
+
+	if (file.size > MAX_FILE_SIZE) {
+		uploadError.validation.error = `File size exceeds the limit of ${
+			MAX_FILE_SIZE / 1024 / 1024
+		}MB`;
+		return createResponse(null, uploadError);
+	}
+
+	if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+		uploadError.validation.error = `File type ${file.type} is not allowed`;
+		return createResponse(null, uploadError);
+	}
+
+	// Sanitize filename to prevent path traversal
+	const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+	const fileHash = hash(await file.arrayBuffer());
+	const path = `/curiositi/storage/${orgId}/${fileHash}-${sanitizedFileName}`;
 
 	try {
-		await write(file.name, file, {
+		await write(path, file, {
 			accessKeyId: s3.accessKeyId,
 			secretAccessKey: s3.secretAccessKey,
 			bucket: s3.bucket,
 			endpoint: s3.endpoint,
 		});
+
 		logger.info(`File Uploaded: ${file.name}`, {
 			file: file.name,
 			path: path,
@@ -38,6 +82,8 @@ export default async function uploadHandler({
 		});
 	} catch (error) {
 		logger.error(`File Upload to S3 Failed: ${file.name}`, error);
+		uploadError.s3.error = error;
+		return createResponse(null, uploadError);
 	}
 
 	try {
@@ -46,15 +92,43 @@ export default async function uploadHandler({
 			.values({
 				name: file.name,
 				path: path,
+				type: file.type,
+				size: file.size,
 				organizationId: orgId,
 				uploadedById: userId,
 				status: "pending",
+				tags: { tags: tags ?? [] },
 			})
 			.returning();
 
-		return fileData[0] ?? null;
+		logger.info(`[FILES] File Added to DB: ${file.name}`, {
+			file: file.name,
+			path: path,
+			size: file.size,
+		});
+
+		if (!fileData[0]) {
+			return createResponse(null, uploadError);
+		}
+
+		if (spaceId) {
+			await client.insert(filesInSpace).values({
+				fileId: fileData[0].id,
+				spaceId: spaceId,
+			});
+
+			logger.info(`[FILES <=> SPACES] File Added to Space: ${file.name}`, {
+				file: file.name,
+				path: path,
+				size: file.size,
+			});
+		}
+
+		return createResponse(fileData[0] ?? null, null);
 	} catch (error) {
 		logger.error(`File Upload to DB Failed: ${file.name}`, error);
-		return null;
+		uploadError.db.error = error;
 	}
+
+	return createResponse(null, uploadError);
 }
