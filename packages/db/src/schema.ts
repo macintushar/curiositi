@@ -249,7 +249,9 @@ export const spaces = createTable(
 			.text()
 			.notNull()
 			.references(() => organization.id),
-		parentSpaceId: d.uuid().references((): AnyPgColumn => spaces.id),
+		parentSpaceId: d
+			.uuid()
+			.references((): AnyPgColumn => spaces.id, { onDelete: "cascade" }),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())
@@ -360,7 +362,7 @@ export const fileContents = createTable(
 		fileId: d
 			.uuid()
 			.notNull()
-			.references(() => files.id),
+			.references(() => files.id, { onDelete: "cascade" }),
 		content: d.text().notNull(),
 		embeddedContent: d.vector({ dimensions: 1536 }).notNull(),
 		metadata: d.json(),
@@ -380,11 +382,11 @@ export const filesInSpace = createTable(
 		fileId: d
 			.uuid()
 			.notNull()
-			.references(() => files.id),
+			.references(() => files.id, { onDelete: "cascade" }),
 		spaceId: d
 			.uuid()
 			.notNull()
-			.references(() => spaces.id),
+			.references(() => spaces.id, { onDelete: "cascade" }),
 		createdAt: d
 			.timestamp({ withTimezone: true })
 			.$defaultFn(() => new Date())

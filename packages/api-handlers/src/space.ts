@@ -6,7 +6,7 @@ import {
 } from "@curiositi/db/schema";
 import type { z } from "zod";
 import db from "@curiositi/db/client";
-import { and, eq, isNull, sql } from "@curiositi/db";
+import { and, eq, inArray, isNull, sql } from "@curiositi/db";
 import { createResponse } from "./response";
 
 export async function createSpace(input: z.infer<typeof createSpaceSchema>) {
@@ -167,8 +167,55 @@ export async function updateSpace(
 
 export async function deleteSpace(id: string) {
 	try {
-		const space = await db.delete(spaces).where(eq(spaces.id, id)).returning();
-		return createResponse(space, null);
+		// Use a transaction to ensure all related deletions happen together
+		const result = await db.transaction(async (tx) => {
+			// 1. Get all child space IDs recursively
+			// We need a CTE or recursive logic. Since Drizzle's CTE support might be specific,
+			// we'll fetch all spaces for this org (not ideal for huge orgs but safe) or
+			// use a recursive function. Given typical space counts, a recursive fetch is acceptable.
+
+			// Helper to get all descendant IDs including the root
+			async function getAllDescendantIds(rootId: string): Promise<string[]> {
+				const children = await tx
+					.select({ id: spaces.id })
+					.from(spaces)
+					.where(eq(spaces.parentSpaceId, rootId));
+
+				let ids = [rootId];
+				for (const child of children) {
+					const childDescendants = await getAllDescendantIds(child.id);
+					ids = [...ids, ...childDescendants];
+				}
+				return ids;
+			}
+
+			const allSpaceIds = await getAllDescendantIds(id);
+
+			// 2. Find all files in these spaces
+			const filesToDelete = await tx
+				.select({ id: filesInSpace.fileId })
+				.from(filesInSpace)
+				.where(inArray(filesInSpace.spaceId, allSpaceIds));
+
+			const fileIdsToDelete = filesToDelete.map((f) => f.id);
+
+			// 3. Delete the files (this will cascade to file_contents and files_in_space)
+			// Note: This implements the "hard delete" logic requested (delete all files in the space)
+			// If a file is shared with a space outside this tree, it will still be deleted.
+			if (fileIdsToDelete.length > 0) {
+				await tx.delete(files).where(inArray(files.id, fileIdsToDelete));
+			}
+
+			// 4. Delete the root space (this will cascade to child spaces because of the schema update)
+			const deletedSpace = await tx
+				.delete(spaces)
+				.where(eq(spaces.id, id))
+				.returning();
+
+			return deletedSpace;
+		});
+
+		return createResponse(result, null);
 	} catch (error) {
 		return createResponse(null, error);
 	}
