@@ -1,10 +1,11 @@
 import client from "@curiositi/db/client";
 import { files, filesInSpace } from "@curiositi/db/schema";
+import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@curiositi/share/constants";
 import write from "@curiositi/share/fs/write";
 import logger from "@curiositi/share/logger";
 import type { S3Config } from "@curiositi/share/types";
-import { createResponse } from "./response";
 import { hash } from "bun";
+import { createResponse } from "./response";
 
 export type UploadHandlerInput = {
 	file: File;
@@ -16,6 +17,9 @@ export type UploadHandlerInput = {
 };
 
 type UploadError = {
+	validation: {
+		error: string | null;
+	};
 	s3: {
 		error: unknown | null;
 	};
@@ -33,10 +37,11 @@ export default async function handleUpload({
 	s3,
 }: UploadHandlerInput) {
 	logger.info(`Attempting to Uploading File: ${file.name}`);
-	const fileHash = hash(await file.arrayBuffer());
-	const path = `/curiositi/storage/${orgId}/${fileHash}-${file.name}`;
 
 	const uploadError: UploadError = {
+		validation: {
+			error: null,
+		},
 		s3: {
 			error: null,
 		},
@@ -44,6 +49,23 @@ export default async function handleUpload({
 			error: null,
 		},
 	};
+
+	if (file.size > MAX_FILE_SIZE) {
+		uploadError.validation.error = `File size exceeds the limit of ${
+			MAX_FILE_SIZE / 1024 / 1024
+		}MB`;
+		return createResponse(null, uploadError);
+	}
+
+	if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+		uploadError.validation.error = `File type ${file.type} is not allowed`;
+		return createResponse(null, uploadError);
+	}
+
+	// Sanitize filename to prevent path traversal
+	const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+	const fileHash = hash(await file.arrayBuffer());
+	const path = `/curiositi/storage/${orgId}/${fileHash}-${sanitizedFileName}`;
 
 	try {
 		await write(path, file, {
