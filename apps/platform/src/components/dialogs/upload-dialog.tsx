@@ -107,25 +107,27 @@ export default function UploadDialog({
 		let successCount = 0;
 		const totalCount = fileEntries.length;
 
-		for (const entry of fileEntries) {
-			if (entry.status !== "pending") continue;
+		const uploadPromises = fileEntries
+			.filter((entry) => entry.status === "pending")
+			.map(async (entry) => {
+				updateEntryStatus(entry.id, "uploading");
 
-			updateEntryStatus(entry.id, "uploading");
+				try {
+					await trpcClient.upload.upload.mutate({
+						file: entry.file,
+						tags: entry.tags.length > 0 ? entry.tags : undefined,
+						spaceId: spaceId ?? undefined,
+					});
+					updateEntryStatus(entry.id, "success");
+					successCount++;
+				} catch (error) {
+					const errorMessage =
+						error instanceof Error ? error.message : "Upload failed";
+					updateEntryStatus(entry.id, "error", errorMessage);
+				}
+			});
 
-			try {
-				await trpcClient.upload.upload.mutate({
-					file: entry.file,
-					tags: entry.tags.length > 0 ? entry.tags : undefined,
-					spaceId: spaceId ?? undefined,
-				});
-				updateEntryStatus(entry.id, "success");
-				successCount++;
-			} catch (error) {
-				const errorMessage =
-					error instanceof Error ? error.message : "Upload failed";
-				updateEntryStatus(entry.id, "error", errorMessage);
-			}
-		}
+		await Promise.allSettled(uploadPromises);
 
 		if (spaceId) {
 			queryClient.invalidateQueries({
