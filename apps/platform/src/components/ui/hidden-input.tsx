@@ -17,6 +17,7 @@ export default function HiddenInput({
 			<Input
 				type={isVisible ? "text" : "password"}
 				className="pr-9"
+				placeholder="********"
 				{...props}
 			/>
 			<Button

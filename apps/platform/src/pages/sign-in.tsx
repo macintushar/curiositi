@@ -18,6 +18,7 @@ import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
 import GoogleAuth from "@platform/components/google-auth";
 import LastUsedBadge from "@platform/components/last-used-badge";
+import HiddenInput from "@platform/components/ui/hidden-input";
 
 export default function SignIn() {
 	const navigate = useNavigate();
@@ -108,10 +109,9 @@ export default function SignIn() {
 											Forgot your password?
 										</Link>
 									</div>
-									<Input
+									<HiddenInput
 										id={field.name}
 										name={field.name}
-										type="password"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={(e) => field.handleChange(e.target.value)}
