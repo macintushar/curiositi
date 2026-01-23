@@ -27,6 +27,7 @@ export const Route = createFileRoute("/api/upload/")({
 					try {
 						tags = JSON.parse(tagsString);
 					} catch (error) {
+						logger.error("Error parsing tags", error);
 						return new Response("Invalid tags format", { status: 400 });
 					}
 				}
