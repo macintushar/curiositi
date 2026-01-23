@@ -42,7 +42,7 @@ export async function embedChunks({ chunks, provider }: EmbedChunksProps) {
 export function textModel(name: AIProvider) {
 	switch (name) {
 		case "openai": {
-			return openai("gpt-5.2");
+			return openai("gpt-5-mini-2025-08-07");
 		}
 		case "google": {
 			return google("gemini-3-flash-preview");
@@ -54,14 +54,14 @@ export async function describeImage({
 	image,
 	provider,
 }: {
-	image: string;
+	image: string | Uint8Array | Buffer | ArrayBuffer | URL;
 	provider: AIProvider;
 }) {
 	return await generateText({
 		model: textModel(provider),
-		prompt: [
+		messages: [
 			{ role: "system", content: IMAGE_DESCRIPTION_PROMPT },
-			{ role: "user", content: image },
+			{ role: "user", content: [{ type: "image", image }] },
 		],
 	});
 }
