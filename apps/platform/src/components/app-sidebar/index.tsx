@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { Folder, Home } from "lucide-react";
+import { Home } from "lucide-react";
 
 import { NavUser } from "./nav-user";
 import { OrgSwitcher } from "./org-switcher";
@@ -18,10 +18,7 @@ import {
 } from "@platform/components/ui/sidebar";
 import { Link, useRouterState } from "@tanstack/react-router";
 
-const routes = [
-	{ path: "/app", label: "Home", icon: Home },
-	{ path: "/app/spaces", label: "Spaces", icon: Folder },
-];
+const routes = [{ path: "/app", label: "Home", icon: Home }];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { open } = useSidebar();
