@@ -3,22 +3,17 @@ import { and, eq } from "@curiositi/db";
 import db from "@curiositi/db/client";
 import { fileContents, files } from "@curiositi/db/schema";
 import read from "@curiositi/share/fs/read";
-import parsePdf, { type PdfParseResult } from "./lib/md";
 import type { Logger } from "./create-logger";
 import { chunkPages } from "./lib/chunk";
 import { embedChunks } from "./lib/ai";
 import { env } from "./env";
-import { TEXT_FILE_TYPES } from "@curiositi/share/constants";
+import { getProcessor } from "./processors";
 
 type ProcessFileProps = {
 	fileId: string;
 	orgId: string;
 	logger: Logger;
 };
-
-function isTextMimeType(mimeType: string): boolean {
-	return TEXT_FILE_TYPES.includes(mimeType) || mimeType.startsWith("text/");
-}
 
 export default async function processFile({
 	fileId,
@@ -86,56 +81,33 @@ export default async function processFile({
 			throw readError;
 		}
 
-		// Parse file to pages based on file type
 		const filetype = fileData[0].type;
-		let md: PdfParseResult;
+		const processor = getProcessor(filetype);
 
-		if (isTextMimeType(filetype)) {
-			// Text-based files: read content directly as a single page
-			logger.debug("Processing text-based file", { fileId, filetype });
-			try {
-				const textContent = await file.text();
-				md = {
-					metadata: {},
-					pages: [{ pageNumber: 1, content: textContent }],
-				};
-				logger.info("Text file processed successfully", {
-					fileId,
-					contentLength: textContent.length,
-				});
-			} catch (textError) {
-				logger.error("Failed to read text file", {
-					fileId,
-					error: textError,
-				});
-				throw textError;
-			}
-		} else {
-			// PDF files: use the PDF parser
-			logger.debug("Parsing PDF to markdown", { fileId });
-			try {
-				md = await parsePdf(file);
-				logger.info("PDF parsed successfully", {
-					fileId,
-					pageCount: md.pages?.length,
-				});
-			} catch (parseError) {
-				logger.error("Failed to parse PDF", {
-					fileId,
-					error: parseError,
-				});
-				throw parseError;
-			}
+		if (!processor) {
+			logger.error("Unsupported file type", { fileId, filetype });
+			throw new Error(`Unsupported file type: ${filetype}`);
 		}
 
-		// Chunk pages
+		logger.debug("Processing file content", { fileId, filetype });
+		const pages = await processor({
+			file,
+			fileData: fileData[0],
+			fileId,
+			logger,
+		});
+		logger.info("File content processed successfully", {
+			fileId,
+			pageCount: pages.length,
+		});
+
 		logger.debug("Chunking pages", {
 			fileId,
-			pageCount: md.pages?.length,
+			pageCount: pages.length,
 		});
 		let chunks: Awaited<ReturnType<typeof chunkPages>>;
 		try {
-			chunks = chunkPages(md.pages);
+			chunks = chunkPages(pages);
 			logger.info("Pages chunked successfully", {
 				fileId,
 				chunkCount: chunks.length,
