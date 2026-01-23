@@ -1,0 +1,70 @@
+name: Weekly Release
+
+on:
+  schedule:
+    # Runs at 00:00 UTC every Friday
+    - cron: '0 0 * * 5'
+  workflow_dispatch:
+    inputs:
+      force_release:
+        description: 'Force release regardless of schedule'
+        required: false
+        type: boolean
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Weekly Mega Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Create Changesets from Commits
+        # This script simulates "bun changeset" by reading commits.
+        # It's a placeholder logic: in a real automated setup, we'd use a tool like 
+        # 'conventional-changelog-changesets' or a custom script here.
+        # For now, we assume the user might manually run 'bun changeset' OR 
+        # we rely on 'changesets/action' which often wants pre-existing changeset files.
+        # However, to meet the "No Manual Work" requirement, we need to generate them.
+        run: |
+          echo "Generating changesets from commits..."
+          # Note: This is a complex logic to implement in bash perfectly.
+          # For a "Commit-to-Release" flow without manual changesets, 
+          # we often use 'semantic-release' concepts. 
+          # But since we committed to Changesets:
+          # We will use a community script or 'changeset-version' logic if available.
+          # For this initial setup, we will rely on the standard Changesets Action
+          # which expects *some* input. 
+          # If the goal is 100% automation from commits, we need a separate step here.
+          
+          # Since you asked to "Just look at the commits and do it", 
+          # we will use 'git-log' to find new 'feat:' and 'fix:' commits 
+          # and write .changeset/unique-id.md files for them.
+          
+          bun .github/scripts/generate-changesets.ts
+
+      - name: Version & Release
+        uses: changesets/action@v1
+        with:
+          # This runs 'bun version-packages' internally to bump versions
+          version: bun version-packages
+          # This prevents the action from publishing to npm (we just want tags/releases)
+          publish: bun run release:gh
+          commit: 'chore: weekly release [skip ci]'
+          title: 'Weekly Release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
