@@ -104,7 +104,7 @@ export default function SignIn() {
 										<FieldLabel htmlFor={field.name}>Password</FieldLabel>
 										<Link
 											to="/"
-											className="ml-auto text-sm underline-offset-4 hover:underline text-black"
+											className="ml-auto text-sm underline-offset-4 hover:underline text-muted-foreground"
 										>
 											Forgot your password?
 										</Link>
