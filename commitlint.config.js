@@ -20,7 +20,7 @@ export default {
 		"scope-enum": [
 			2,
 			"always",
-			["platform", "worker", "db", "share", "queue", "api"],
+			["platform", "worker", "db", "share", "queue", "api", "repo"],
 		],
 	},
 };
