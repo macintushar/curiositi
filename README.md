@@ -2,6 +2,8 @@
 
 _Curiositi is your Digital Brain. Store anything you want, access it anytime, anywhere._
 
+[![codecov](https://codecov.io/gh/macintushar/curiositi/graph/badge.svg?token=35SYPDCQFH)](https://codecov.io/gh/macintushar/curiositi)
+
 Currently, we support the following types of data:
 - Text
     - PDF
