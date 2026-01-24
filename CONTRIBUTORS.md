@@ -89,7 +89,7 @@ To trigger a **Major** release, add `!` after the type/scope or include `BREAKIN
 - `fix!: changed api response format`
 
 ### 🚫 No Manual Changesets Required
-You do **not** need to run `bun changeset` manually. Our CI/CD pipeline automatically analyzes your commit messages on Friday nights to generate the necessary changesets and releases. Just commit properly, and the rest is magic! ✨
+You do **not** need to run `bun changeset` manually. Our CI/CD pipeline automatically analyzes your commit messages every Friday at 00:00 UTC to generate the necessary changesets and releases. Just commit properly, and the rest is magic! ✨
 
 ## 🤝 Pull Request Process
 
