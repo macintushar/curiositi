@@ -55,7 +55,7 @@ export default function SpaceExplorerLayout({
 		<>
 			<ContextMenu>
 				<ContextMenuTrigger asChild>
-					<div className="p-4 min-h-full">
+					<div className="min-h-full">
 						<div className="flex items-center justify-between mb-4">
 							{header ?? <div />}
 
