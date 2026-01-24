@@ -1,6 +1,7 @@
 {
 	"version": "0.0.1",
 	"name": "curiositi",
+	"type": "module",
 	"private": true,
 	"scripts": {
 		"build": "turbo run build",
