@@ -12,9 +12,9 @@ COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 
 # Regular expression for the commit message format
 # Format: type(scope): message
-# Types: feat, fix, refactor, chore, lint, style, test
-# Scopes: db, queue, platform, worker, etc. (any lowercase alphanumeric with - or _)
-commit_regex="^(feat|fix|refactor|chore|lint|style|test)\([a-zA-Z0-9_-]+\): .+"
+# Types: feat, fix, refactor, chore, lint, style, test, perf, docs, ci, revert
+# Scopes: platform, worker, db, share, queue, api, repo
+commit_regex="^(feat|fix|refactor|chore|lint|style|test|perf|docs|ci|revert)(\((platform|worker|db|share|queue|api|repo)\))?: .+"
 
 # Check if the commit message is a merge commit
 if echo "$COMMIT_MSG" | grep -q "^Merge "; then
@@ -26,15 +26,15 @@ fi
 if ! echo "$COMMIT_MSG" | grep -Eq "$commit_regex"; then
   echo "Error: Invalid commit message format."
   echo
-  echo "Format: <type>(<scope>): <message>"
+  echo "Format: <type>(<scope>): <message> or <type>: <message>"
   echo
-  echo "Type must be one of: feat, fix, refactor, chore, lint, style, test"
-  echo "Scope examples: db, queue, platform, worker, web, server, ui, share"
+  echo "Type must be one of: feat, fix, refactor, chore, lint, style, test, perf, docs, ci, revert, repo"
+  echo "Scope (optional) must be one of: platform, worker, db, share, queue, api"
   echo
   echo "Examples:"
   echo "  feat(db): add user authentication table"
   echo "  fix(worker): resolve memory leak in queue processor"
-  echo "  chore(platform): update dependencies"
+  echo "  chore: update dependencies"
   exit 1
 fi
 

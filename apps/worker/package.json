@@ -1,5 +1,7 @@
 {
+	"version": "0.0.1",
 	"name": "@curiositi/worker",
+	"type": "module",
 	"scripts": {
 		"dev": "bun run with-env -- bun run --hot --watch src/index.ts",
 		"lint": "biome check .",
