@@ -68,12 +68,16 @@ for (const line of commits) {
 		if (scope && SCOPE_MAP[scope]) {
 			packages.push(SCOPE_MAP[scope]);
 		} else {
-			// If no scope or unknown scope, we generally don't want to release random things.
-			// However, to be safe, we can log a warning.
+			// If no scope is provided (global change), we bump all packages
+			// If unknown scope is provided, we warn but still bump everything to be safe
+			// Or we could choose to ignore unknown scopes.
+			// Based on feedback "Allow commits without scopes to trigger a patch bump for all packages"
 			console.warn(
-				`[WARN] Commit ${hash.substring(0, 7)} has unknown or missing scope: "${scope || "none"}". Skipped.`
+				`[WARN] Commit ${hash.substring(0, 7)} has unknown/missing scope: "${scope || "none"}". Bumping ALL packages.`
 			);
-			continue;
+			Object.values(SCOPE_MAP).forEach((p) => {
+				packages.push(p);
+			});
 		}
 
 		if (packages.length > 0) {
