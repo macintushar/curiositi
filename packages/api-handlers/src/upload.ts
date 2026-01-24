@@ -66,8 +66,20 @@ export default async function handleUpload({
 
 	// Sanitize filename to prevent path traversal
 	const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-	const fileHash = hash(await file.arrayBuffer());
-	const path = `/curiositi/storage/${orgId}/${fileHash}-${sanitizedFileName}`;
+
+	let fileHash: string;
+	let path: string;
+	try {
+		fileHash = hash(await file.arrayBuffer()).toString();
+		path = `/curiositi/storage/${orgId}/${fileHash}-${sanitizedFileName}`;
+	} catch (error) {
+		logger.error(
+			`Failed to hash file: ${file.name} (sanitized: ${sanitizedFileName})`,
+			error
+		);
+		uploadError.validation.error = `Failed to read file: ${file.name}`;
+		return createResponse(null, uploadError);
+	}
 
 	try {
 		await write(path, file, {
