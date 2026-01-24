@@ -57,7 +57,6 @@ export default async function handleUpload({
 		return createResponse(null, uploadError);
 	}
 
-	// Remove parameters (like charset) from mime type for validation
 	const mimeType = file.type.split(";")[0] ?? "";
 	if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
 		uploadError.validation.error = `File type ${file.type} is not allowed`;

@@ -19,7 +19,6 @@ describe("Space Handler", () => {
 	});
 
 	test("createSpace should insert and return space", async () => {
-		// Drizzle's returning() returns an array
 		mockDb.returning.mockReturnValue([mockSpace]);
 
 		const result = await createSpace({
