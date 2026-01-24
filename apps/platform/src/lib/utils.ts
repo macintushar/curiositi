@@ -11,3 +11,13 @@ export function createResponse<T, E>(data: T | null, error: E | null) {
 		error,
 	};
 }
+
+export function getTime(time: number) {
+	return new Date(time)
+		.toLocaleTimeString("en-US", {
+			hour: "numeric",
+			minute: "2-digit",
+			hour12: true,
+		})
+		.split(/\s+/);
+}
