@@ -12,7 +12,7 @@ import { createResponse } from "./response";
 export async function createSpace(input: z.infer<typeof createSpaceSchema>) {
 	try {
 		const space = await db.insert(spaces).values(input).returning();
-		return createResponse(space, null);
+		return createResponse(space[0], null);
 	} catch (error) {
 		return createResponse(null, error);
 	}
