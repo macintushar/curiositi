@@ -3,13 +3,13 @@
 	"changelog": [
 		"@changesets/changelog-github",
 		{
-			"repo": "tushar/curiositi"
+			"repo": "macintushar/curiositi"
 		}
 	],
 	"commit": false,
 	"fixed": [],
 	"linked": [],
-	"access": "private",
+	"access": "public",
 	"baseBranch": "main",
 	"updateInternalDependencies": "patch",
 	"ignore": []
