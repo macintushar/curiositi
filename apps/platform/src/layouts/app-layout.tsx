@@ -1,8 +1,8 @@
 import { AppSidebar } from "@platform/components/app-sidebar";
+import MobileNav from "@platform/components/mobile-nav";
 import {
 	SidebarInset,
 	SidebarProvider,
-	SidebarTrigger,
 	useSidebar,
 } from "@platform/components/ui/sidebar";
 import { useIsMobile } from "@platform/hooks/use-mobile";
@@ -38,13 +38,16 @@ export default function AppLayout({ children }: React.PropsWithChildren) {
 					isMobile ? "pl-1.5" : ""
 				)}
 			>
-				<SidebarInset className="h-full bg-accent">{children}</SidebarInset>
+				<SidebarInset
+					className={cn(
+						"h-full max-h-full overflow-scroll bg-accent",
+						isMobile ? "mb-14" : ""
+					)}
+				>
+					{children}
+				</SidebarInset>
 			</div>
-			{isMobile && (
-				<div className="w-full h-16 bg-background rounded-tl-xl rounded-tr-2xl p-2 fixed bottom-0 flex items-center border-t border-sidebar-ring border-l border-r">
-					<SidebarTrigger className="size-10" />
-				</div>
-			)}
+			{isMobile && <MobileNav />}
 		</SidebarProvider>
 	);
 }

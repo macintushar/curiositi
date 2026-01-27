@@ -1,9 +1,9 @@
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
-import { embedMany, generateText } from "ai";
+import { embed, embedMany, generateText } from "ai";
 import { IMAGE_DESCRIPTION_PROMPT } from "./prompts";
 
-type AIProvider = "openai" | "google";
+export type AIProvider = "openai" | "google";
 
 export function embeddingModel(name: AIProvider) {
 	switch (name) {
@@ -20,11 +20,35 @@ type EmbedChunksProps = {
 	chunks: string[];
 	provider: AIProvider;
 };
+
 export async function embedChunks({ chunks, provider }: EmbedChunksProps) {
 	return await embedMany({
 		model: embeddingModel(provider),
 		maxParallelCalls: 3,
 		values: chunks,
+		providerOptions: {
+			openai: {
+				dimensions: 1536,
+			},
+			google: {
+				dimensions: 1536,
+			},
+			ollama: {
+				dimensions: 1536,
+			},
+		},
+	});
+}
+
+type EmbedTextProps = {
+	text: string;
+	provider: AIProvider;
+};
+
+export async function embedText({ text, provider }: EmbedTextProps) {
+	return await embed({
+		model: embeddingModel(provider),
+		value: text,
 		providerOptions: {
 			openai: {
 				dimensions: 1536,

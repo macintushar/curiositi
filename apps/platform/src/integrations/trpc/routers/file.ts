@@ -11,12 +11,25 @@ import {
 	getFileById,
 	getFilesNotInSpace,
 	deleteFile,
+	searchFilesByName,
+	searchFilesWithAI,
 } from "@curiositi/api-handlers";
 
 const fileRouter = {
-	getAllInOrg: protectedProcedure.query(async ({ ctx }) => {
-		return await getAllFiles(ctx.session.session.activeOrganizationId);
-	}),
+	getAllInOrg: protectedProcedure
+		.input(
+			z.object({
+				limit: z.number().min(1).max(100).default(50),
+				offset: z.number().min(0).default(0),
+			})
+		)
+		.query(async ({ input, ctx }) => {
+			return await getAllFiles(
+				ctx.session.session.activeOrganizationId,
+				input.limit,
+				input.offset
+			);
+		}),
 	getOrphanFiles: protectedProcedure.query(async ({ ctx }) => {
 		return await getFilesNotInSpace(ctx.session.session.activeOrganizationId);
 	}),
@@ -112,6 +125,22 @@ const fileRouter = {
 			}
 
 			return { success: true };
+		}),
+	search: protectedProcedure
+		.input(z.object({ query: z.string().min(1) }))
+		.query(async ({ input, ctx }) => {
+			return await searchFilesByName(
+				input.query,
+				ctx.session.session.activeOrganizationId
+			);
+		}),
+	searchWithAI: protectedProcedure
+		.input(z.object({ query: z.string().min(1) }))
+		.query(async ({ input, ctx }) => {
+			return await searchFilesWithAI(
+				input.query,
+				ctx.session.session.activeOrganizationId
+			);
 		}),
 } satisfies TRPCRouterRecord;
 
