@@ -1,5 +1,5 @@
 import type { Processor } from "./types";
-import { describeImage } from "../lib/ai";
+import { describeImage } from "@curiositi/share/ai";
 import { LARGE_IMAGE_THRESHOLD } from "@curiositi/share/constants";
 
 const imageProcessor: Processor = async ({ file, fileData, logger }) => {

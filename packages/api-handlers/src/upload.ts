@@ -100,42 +100,46 @@ export default async function handleUpload({
 	}
 
 	try {
-		const fileData = await client
-			.insert(files)
-			.values({
-				name: file.name,
-				path: path,
-				type: file.type,
-				size: file.size,
-				organizationId: orgId,
-				uploadedById: userId,
-				status: "pending",
-				tags: { tags: tags ?? [] },
-			})
-			.returning();
+		const fileData = await client.transaction(async (tx) => {
+			const insertedFile = await tx
+				.insert(files)
+				.values({
+					name: file.name,
+					path: path,
+					type: file.type,
+					size: file.size,
+					organizationId: orgId,
+					uploadedById: userId,
+					status: "pending",
+					tags: { tags: tags ?? [] },
+				})
+				.returning();
+
+			if (!insertedFile[0]) {
+				throw new Error("Failed to insert file record");
+			}
+
+			if (spaceId) {
+				await tx.insert(filesInSpace).values({
+					fileId: insertedFile[0].id,
+					spaceId: spaceId,
+				});
+
+				logger.info(`[FILES <=> SPACES] File Added to Space: ${file.name}`, {
+					file: file.name,
+					path: path,
+					size: file.size,
+				});
+			}
+
+			return insertedFile;
+		});
 
 		logger.info(`[FILES] File Added to DB: ${file.name}`, {
 			file: file.name,
 			path: path,
 			size: file.size,
 		});
-
-		if (!fileData[0]) {
-			return createResponse(null, uploadError);
-		}
-
-		if (spaceId) {
-			await client.insert(filesInSpace).values({
-				fileId: fileData[0].id,
-				spaceId: spaceId,
-			});
-
-			logger.info(`[FILES <=> SPACES] File Added to Space: ${file.name}`, {
-				file: file.name,
-				path: path,
-				size: file.size,
-			});
-		}
 
 		return createResponse(fileData[0] ?? null, null);
 	} catch (error) {

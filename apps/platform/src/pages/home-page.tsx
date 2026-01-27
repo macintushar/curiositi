@@ -20,7 +20,7 @@ export default function HomePage() {
 	const isLoading = rootSpaces.isLoading || orphanFiles.isLoading;
 
 	return (
-		<>
+		<div className="flex flex-col h-screen overflow-scroll">
 			<TimeMessage userName={sessionData?.user.name} />
 			<SpaceExplorerLayout
 				spaces={rootSpaces.data?.data}
@@ -28,6 +28,6 @@ export default function HomePage() {
 				isLoading={isLoading}
 				spaceId={null}
 			/>
-		</>
+		</div>
 	);
 }

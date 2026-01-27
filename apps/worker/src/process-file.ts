@@ -5,7 +5,7 @@ import { fileContents, files } from "@curiositi/db/schema";
 import read from "@curiositi/share/fs/read";
 import type { Logger } from "./create-logger";
 import { chunkPages } from "./lib/chunk";
-import { embedChunks } from "./lib/ai";
+import { embedChunks } from "@curiositi/share/ai";
 import { env } from "./env";
 import { getProcessor } from "./processors";
 

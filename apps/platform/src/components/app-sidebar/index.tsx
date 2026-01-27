@@ -17,11 +17,14 @@ import {
 	useSidebar,
 } from "@platform/components/ui/sidebar";
 import { Link, useRouterState } from "@tanstack/react-router";
+import Commander from "../commander";
+import { useIsMobile } from "@platform/hooks/use-mobile";
 
 const routes = [{ path: "/app", label: "Home", icon: Home }];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { open } = useSidebar();
+	const isMobile = useIsMobile();
 	const router = useRouterState();
 
 	return (
@@ -33,6 +36,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<OrgSwitcher />
 			</SidebarHeader>
 			<SidebarContent>
+				{!isMobile && (
+					<SidebarGroup>
+						<Commander />
+					</SidebarGroup>
+				)}
 				<SidebarGroup>
 					<SidebarMenu>
 						{routes.map((route) => (
