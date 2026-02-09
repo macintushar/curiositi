@@ -1,9 +1,19 @@
+import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 import { useQuery } from "@tanstack/react-query";
-import { IconArrowLeft, IconHome } from "@tabler/icons-react";
+import { IconHome } from "@tabler/icons-react";
 import FileIcon from "@platform/components/file-icon";
+import FileContentPreview from "@platform/components/previews/file-content-preview";
 import { Skeleton } from "@platform/components/ui/skeleton";
+import NavigationButtons from "@platform/components/navigation-buttons";
+import { useNavigationHistory } from "@platform/contexts/navigation-history-context";
+import {
+	IMAGE_TYPES,
+	PDF_TYPE,
+	TEXT_FILE_TYPES,
+} from "@curiositi/share/constants";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/item/$fileId")({
 	component: ItemPageComponent,
@@ -12,23 +22,58 @@ export const Route = createFileRoute("/app/item/$fileId")({
 function ItemPageComponent() {
 	const { fileId } = Route.useParams();
 
-	const fileQuery = useQuery({
+	const {
+		data: fileData,
+		error: fileQueryError,
+		isLoading: isFileQueryLoading,
+	} = useQuery({
 		queryKey: ["file", fileId],
 		queryFn: () => trpcClient.file.getById.query({ fileId }),
 	});
 
-	const file = fileQuery.data?.data;
+	const { canGoBack, canGoForward, goBack, goForward, pushEntry } =
+		useNavigationHistory();
 
-	const isImage = file?.type.startsWith("image/") ?? false;
+	const file = fileData?.data;
+
+	useEffect(() => {
+		if (!fileId) {
+			return;
+		}
+
+		pushEntry({
+			path: `/app/item/${fileId}`,
+			spaceId: null,
+		});
+	}, [fileId, pushEntry]);
 
 	const presignedUrlQuery = useQuery({
 		queryKey: ["file", "presignedUrl", fileId],
 		queryFn: () => trpcClient.file.getPresignedUrl.query({ fileId }),
-		enabled: isImage && !!file,
+		enabled: !!file,
 		staleTime: 1000 * 60 * 50,
 	});
 
-	if (fileQuery.isLoading) {
+	if (!file) {
+		return <>File Not Found</>;
+	}
+
+	if (fileQueryError || fileData.error) {
+		toast.error("Error", {
+			description: fileQueryError?.message || fileData.error,
+		});
+		return <>An unknown error occured</>;
+	}
+
+	const fileType: "image" | "pdf" | "text" = IMAGE_TYPES.includes(file.type)
+		? "image"
+		: PDF_TYPE === file.type
+			? "pdf"
+			: TEXT_FILE_TYPES.includes(file.type)
+				? "text"
+				: "text";
+
+	if (isFileQueryLoading) {
 		return (
 			<div className="p-4">
 				<Skeleton className="h-8 w-64 mb-4" />
@@ -54,9 +99,15 @@ function ItemPageComponent() {
 	}
 
 	return (
-		<div className="p-4">
+		<div>
 			<div className="flex items-center justify-between mb-4">
 				<div className="flex items-center gap-2">
+					<NavigationButtons
+						canGoBack={canGoBack}
+						canGoForward={canGoForward}
+						goBack={goBack}
+						goForward={goForward}
+					/>
 					<nav className="flex items-center gap-1 text-sm">
 						<Link
 							to="/app"
@@ -73,31 +124,22 @@ function ItemPageComponent() {
 					</nav>
 				</div>
 			</div>
-
-			<div className="mb-4">
-				<Link
-					to="/app"
-					className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-				>
-					<IconArrowLeft className="w-4 h-4" />
-					Back
-				</Link>
-			</div>
-
 			<div className="bg-card rounded-xl p-6 border">
 				<div className="flex items-center gap-4 mb-6">
 					<div className="size-16 bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-						{isImage && presignedUrlQuery.isLoading && (
+						{fileType === "image" && presignedUrlQuery.isLoading && (
 							<Skeleton className="size-full" />
 						)}
-						{isImage && presignedUrlQuery.data?.url && (
+						{fileType === "image" && presignedUrlQuery.data?.url && (
 							<img
 								src={presignedUrlQuery.data.url}
 								alt={file.name}
 								className="size-full object-cover"
 							/>
 						)}
-						{!isImage && <FileIcon className="size-8" type={file.type} />}
+						{fileType !== "image" && (
+							<FileIcon className="size-8" type={file.type} />
+						)}
 					</div>
 					<div>
 						<h1 className="text-xl font-semibold">{file.name}</h1>
@@ -106,16 +148,11 @@ function ItemPageComponent() {
 						</p>
 					</div>
 				</div>
-
-				{isImage && presignedUrlQuery.data?.url && (
-					<div className="mb-6">
-						<img
-							src={presignedUrlQuery.data.url}
-							alt={file.name}
-							className="max-w-full max-h-96 rounded-lg object-contain mx-auto"
-						/>
-					</div>
-				)}
+				<FileContentPreview
+					file={file}
+					fileType={fileType}
+					presignedUrl={presignedUrlQuery.data?.url}
+				/>
 
 				<div className="grid grid-cols-2 gap-4 text-sm">
 					<div>

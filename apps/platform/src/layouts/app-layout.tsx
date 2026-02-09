@@ -5,6 +5,7 @@ import {
 	SidebarProvider,
 	useSidebar,
 } from "@platform/components/ui/sidebar";
+import { NavigationHistoryProvider } from "@platform/contexts/navigation-history-context";
 import { useIsMobile } from "@platform/hooks/use-mobile";
 import { cn } from "@platform/lib/utils";
 
@@ -22,32 +23,34 @@ function DesktopSidebarTrigger() {
 export default function AppLayout({ children }: React.PropsWithChildren) {
 	const isMobile = useIsMobile();
 	return (
-		<SidebarProvider>
-			<AppSidebar />
-			<div className="flex min-h-svh max-h-svh w-fit h-svh flex-col bg-accent px-1.5">
-				{!isMobile && (
-					<div className="flex h-full items-center">
-						<DesktopSidebarTrigger />
-					</div>
-				)}
-			</div>
+		<NavigationHistoryProvider>
+			<SidebarProvider>
+				<AppSidebar />
+				<div className="flex min-h-svh max-h-svh w-fit h-svh flex-col bg-accent px-1.5">
+					{!isMobile && (
+						<div className="flex h-full items-center">
+							<DesktopSidebarTrigger />
+						</div>
+					)}
+				</div>
 
-			<div
-				className={cn(
-					"flex min-h-svh max-h-svh w-full h-svh flex-col p-4 pl-0 bg-accent",
-					isMobile ? "pl-1.5" : ""
-				)}
-			>
-				<SidebarInset
+				<div
 					className={cn(
-						"h-full max-h-full overflow-scroll bg-accent",
-						isMobile ? "mb-14" : ""
+						"flex min-h-svh max-h-svh w-full h-svh flex-col p-4 pl-0 bg-accent",
+						isMobile ? "pl-1.5" : ""
 					)}
 				>
-					{children}
-				</SidebarInset>
-			</div>
-			{isMobile && <MobileNav />}
-		</SidebarProvider>
+					<SidebarInset
+						className={cn(
+							"h-full max-h-full overflow-scroll bg-accent",
+							isMobile ? "mb-14" : ""
+						)}
+					>
+						{children}
+					</SidebarInset>
+				</div>
+				{isMobile && <MobileNav />}
+			</SidebarProvider>
+		</NavigationHistoryProvider>
 	);
 }

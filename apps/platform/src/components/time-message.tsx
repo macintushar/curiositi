@@ -10,30 +10,37 @@ const messages = {
 function getTimeMessage(time: string[]) {
 	const [hm, ampm] = time;
 	const hour = Number(hm.split(":")[0]);
-	if (hour < 7 && ampm === "AM") return messages.lateNight;
-	if (hour < 12 && ampm === "AM") return messages.morning;
-	if (hour < 12 && ampm === "PM") return messages.afternoon;
-	if (hour < 12 && ampm === "PM") return messages.evening;
-	return `${hm} ${ampm}`;
+	const hour24 =
+		ampm === "AM"
+			? hour === 12
+				? 0
+				: hour
+			: hour === 12
+				? 12
+				: hour + 12;
+
+	if (hour24 >= 20 || hour24 < 7) return messages.lateNight;
+	if (hour24 >= 7 && hour24 < 12) return messages.morning;
+	if (hour24 >= 12 && hour24 < 16) return messages.afternoon;
+	if (hour24 >= 16 && hour24 < 20) return messages.evening;
+	return `Hey`;
 }
 
 type TimeMessageProps = {
 	userName?: string;
-	messageClassName?: string;
-	userNameClassName?: string;
+	className?: string;
 };
 
 export default function TimeMessage({
 	userName,
-	messageClassName,
-	userNameClassName,
+	className,
 }: TimeMessageProps) {
 	const time = getTime(Date.now());
 	const message = getTimeMessage(time);
 	return (
-		<h1 className={cn("text-2xl font-bold", messageClassName)}>
+		<h1 className={cn("text-2xl font-bold", className)}>
 			{message}
-			<span className={cn("font-serif", userNameClassName)}>
+			<span>
 				{userName && `, ${userName}`}
 			</span>
 		</h1>

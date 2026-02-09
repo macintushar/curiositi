@@ -35,7 +35,8 @@
 				"noHeadElement": "off"
 			},
 			"correctness": {
-				"noChildrenProp": "off"
+				"noChildrenProp": "off",
+				"noUnusedImports": "error"
 			},
 			"suspicious": {
 				"noUnknownAtRules": "off",
