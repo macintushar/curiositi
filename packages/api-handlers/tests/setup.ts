@@ -72,6 +72,8 @@ mock.module("@curiositi/share/logger", () => ({
 
 mock.module("@curiositi/share/fs/write", () => ({
 	default: mockWrite,
+	isS3UploadError: (error: unknown) =>
+		error instanceof Error && (error as any).type === "S3UploadError",
 }));
 
 mock.module("@curiositi/queue", () => ({
