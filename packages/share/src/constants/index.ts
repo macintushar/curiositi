@@ -2,6 +2,7 @@ export const STORAGE_PATH_PREFIX = "../../storage/";
 
 export const TEXT_FILE_TYPES = [
 	"text/plain",
+	"plaintext",
 	"text/markdown",
 	"text/csv",
 	"text/html",
