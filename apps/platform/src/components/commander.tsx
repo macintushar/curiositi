@@ -1,7 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Folder, Home, Link2, Settings, File, Sparkles } from "lucide-react";
+import {
+	Folder,
+	Home,
+	Link2,
+	Settings,
+	File,
+	Sparkles,
+	Image,
+	FileText,
+} from "lucide-react";
 import { useCommandState } from "cmdk";
 
 import {
@@ -22,57 +31,123 @@ import { useQuery } from "@tanstack/react-query";
 import { useIsMobile } from "@platform/hooks/use-mobile";
 import { IconSearch } from "@tabler/icons-react";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import {
+	formatFileSize,
+	formatDate,
+	getFileTypeColor,
+	getFileTypeLabel,
+} from "@platform/lib/search-utils";
+import type { SearchResult } from "@curiositi/api-handlers";
+import FileViewerDialog from "./dialogs/file-viewer-dialog";
 
-// Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
 	const [debouncedValue, setDebouncedValue] = React.useState(value);
-
 	React.useEffect(() => {
-		const handler = setTimeout(() => {
-			setDebouncedValue(value);
-		}, delay);
-
-		return () => {
-			clearTimeout(handler);
-		};
+		const handler = setTimeout(() => setDebouncedValue(value), delay);
+		return () => clearTimeout(handler);
 	}, [value, delay]);
-
 	return debouncedValue;
 }
 
-// Component that uses cmdk's internal state for search
+function FileTypeIcon({
+	type,
+	className,
+}: {
+	type: string;
+	className?: string;
+}) {
+	if (type.startsWith("image/")) return <Image className={className} />;
+	if (type === "application/pdf") return <FileText className={className} />;
+	return <File className={className} />;
+}
+
+function FileTags({ tags }: { tags: unknown }) {
+	const tagArray = (tags as { tags?: string[] })?.tags;
+	if (!Array.isArray(tagArray) || tagArray.length === 0) return null;
+	return (
+		<div className="flex items-center gap-1 mt-1">
+			{tagArray.map((tag) => (
+				<Badge key={tag} variant="secondary" className="text-[10px] px-1 py-0">
+					{tag}
+				</Badge>
+			))}
+		</div>
+	);
+}
+
+function RecentFiles({ onOpenFile }: { onOpenFile: (fileId: string) => void }) {
+	const { data, isLoading } = useQuery({
+		queryKey: ["commander", "recent"],
+		queryFn: () => trpcClient.file.getRecent.query({ limit: 5 }),
+	});
+
+	if (isLoading || !data?.data || data.data.length === 0) return null;
+
+	return (
+		<CommandGroup heading="RECENT FILES">
+			{data.data.map((result: SearchResult) => (
+				<CommandItem
+					key={result.file.id}
+					value={`recent-${result.file.id}-${result.file.name}`}
+					onSelect={() => onOpenFile(result.file.id)}
+				>
+					<FileTypeIcon
+						type={result.file.type}
+						className={`w-4 h-4 ${getFileTypeColor(result.file.type)}`}
+					/>
+					<div className="flex-1 min-w-0">
+						<span className="truncate block">{result.file.name}</span>
+						<div className="flex items-center gap-2 text-xs text-muted-foreground">
+							<span>{formatFileSize(result.file.size)}</span>
+							<span>{formatDate(result.file.createdAt)}</span>
+							{result.spaceName && (
+								<span className="flex items-center gap-1">
+									<Folder className="w-3 h-3" />
+									{result.spaceName}
+								</span>
+							)}
+						</div>
+						<FileTags tags={result.file.tags} />
+					</div>
+				</CommandItem>
+			))}
+		</CommandGroup>
+	);
+}
+
 function SearchResults({
 	onNavigate,
+	onOpenFile,
 }: {
 	onNavigate: (path: string, params?: Record<string, string>) => void;
+	onOpenFile: (fileId: string) => void;
 }) {
 	const search = useCommandState((state) => state.search);
 	const debouncedQuery = useDebounce(search, 300);
 	const [useAISearch, setUseAISearch] = React.useState(false);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: intentionally reset when query changes
+	// biome-ignore lint/correctness/useExhaustiveDependencies: reset AI search state when query changes
 	React.useEffect(() => {
 		setUseAISearch(false);
 	}, [debouncedQuery]);
 
-	// Name-only search (fast)
 	const fileSearch = useQuery({
-		queryKey: ["commander", "files", "name", debouncedQuery],
-		queryFn: () => trpcClient.file.search.query({ query: debouncedQuery }),
+		queryKey: ["commander", "files", "search", debouncedQuery],
+		queryFn: () =>
+			trpcClient.file.search.query({ query: debouncedQuery, limit: 10 }),
 		enabled: debouncedQuery.length > 1 && !useAISearch,
 	});
 
-	// AI search (semantic)
 	const aiSearch = useQuery({
 		queryKey: ["commander", "files", "ai", debouncedQuery],
 		queryFn: () =>
-			trpcClient.file.searchWithAI.query({ query: debouncedQuery }),
+			trpcClient.file.searchWithAI.query({ query: debouncedQuery, limit: 10 }),
 		enabled: debouncedQuery.length > 1 && useAISearch,
 	});
 
-	// Space search
-	const spaceSearch = useQuery({
-		queryKey: ["commander", "spaces", debouncedQuery],
+	const { data: spacesData } = useQuery({
+		queryKey: ["commander", "spaces"],
 		queryFn: () => trpcClient.space.getRoot.query(),
 		enabled: debouncedQuery.length > 1,
 	});
@@ -81,80 +156,90 @@ function SearchResults({
 		? aiSearch.data?.data
 		: fileSearch.data?.data;
 
-	// Filter spaces by name
-	const filteredSpaces = React.useMemo(() => {
-		if (!debouncedQuery || !spaceSearch.data?.data) return [];
-		return spaceSearch.data.data.filter((space) =>
-			space.name.toLowerCase().includes(debouncedQuery.toLowerCase())
-		);
-	}, [spaceSearch.data?.data, debouncedQuery]);
-
-	const handleAISearch = () => {
-		if (debouncedQuery.length > 0) {
-			setUseAISearch(true);
-		}
-	};
-
-	if (debouncedQuery.length <= 1) {
-		return null;
-	}
+	if (debouncedQuery.length <= 1)
+		return <RecentFiles onOpenFile={onOpenFile} />;
 
 	return (
 		<>
-			{/* Search Results - Files */}
 			{searchResults && searchResults.length > 0 && (
 				<CommandGroup heading={useAISearch ? "FILES (AI SEARCH)" : "FILES"}>
-					{searchResults.slice(0, 5).map((result) => (
+					{searchResults.slice(0, 8).map((result: SearchResult) => (
 						<CommandItem
 							key={result.file.id}
 							value={`file-${result.file.id}-${result.file.name}`}
-							onSelect={() => {
-								onNavigate("/app/item/$fileId", { fileId: result.file.id });
-							}}
+							onSelect={() => onOpenFile(result.file.id)}
 						>
-							<File className="w-4 h-4" />
-							<span>{result.file.name}</span>
-							{result.matchType === "content" && (
-								<span className="text-muted-foreground text-xs ml-auto">
-									content match
-								</span>
-							)}
+							<FileTypeIcon
+								type={result.file.type}
+								className={`w-4 h-4 ${getFileTypeColor(result.file.type)}`}
+							/>
+							<div className="flex-1 min-w-0">
+								<div className="flex items-center gap-2">
+									<span className="truncate">{result.file.name}</span>
+									{result.matchType === "content" && (
+										<Badge variant="secondary" className="text-xs">
+											AI match
+										</Badge>
+									)}
+									{result.matchType === "space" && (
+										<Badge variant="outline" className="text-xs">
+											space match
+										</Badge>
+									)}
+								</div>
+								<div className="flex items-center gap-2 text-xs text-muted-foreground">
+									<span>{getFileTypeLabel(result.file.type)}</span>
+									<span>{formatFileSize(result.file.size)}</span>
+									<span>{formatDate(result.file.createdAt)}</span>
+									{result.spaceName && (
+										<span className="flex items-center gap-1">
+											<Folder className="w-3 h-3" />
+											{result.spaceName}
+										</span>
+									)}
+								</div>
+								<FileTags tags={result.file.tags} />
+							</div>
 						</CommandItem>
 					))}
 				</CommandGroup>
 			)}
 
-			<CommandSeparator />
-
-			{/* Search Results - Spaces */}
-			{filteredSpaces.length > 0 && (
-				<CommandGroup heading="SPACES">
-					{filteredSpaces.slice(0, 3).map((space) => (
-						<CommandItem
-							key={space.id}
-							value={`space-${space.id}-${space.name}`}
-							onSelect={() => {
-								onNavigate("/app/space/$spaceId", { spaceId: space.id });
-							}}
-						>
-							<Folder className="w-4 h-4" />
-							<span>{space.name}</span>
-						</CommandItem>
-					))}
-				</CommandGroup>
+			{spacesData?.data && spacesData.data.length > 0 && (
+				<>
+					<CommandSeparator />
+					<CommandGroup heading="SPACES">
+						{spacesData.data
+							.filter((space: { name: string }) =>
+								space.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+							)
+							.slice(0, 5)
+							.map((space: { id: string; name: string }) => (
+								<CommandItem
+									key={space.id}
+									value={`space-${space.id}-${space.name}`}
+									onSelect={() =>
+										onNavigate("/app/space/$spaceId", { spaceId: space.id })
+									}
+								>
+									<Folder className="w-4 h-4 text-blue-500" />
+									<span>{space.name}</span>
+								</CommandItem>
+							))}
+					</CommandGroup>
+				</>
 			)}
 
-			{/* AI Search Option - always visible during search */}
-			{!useAISearch && (
+			{!useAISearch && debouncedQuery.length > 1 && (
 				<>
 					<CommandSeparator />
 					<CommandGroup forceMount>
 						<CommandItem
 							value="search-with-ai"
-							onSelect={handleAISearch}
+							onSelect={() => setUseAISearch(true)}
 							forceMount
 						>
-							<Sparkles className="w-4 h-4" />
+							<Sparkles className="w-4 h-4 text-yellow-500" />
 							<span>Search with AI</span>
 							<span className="text-muted-foreground text-xs ml-auto">
 								{aiSearch.isFetching ? "Searching..." : "semantic search"}
@@ -163,14 +248,13 @@ function SearchResults({
 					</CommandGroup>
 				</>
 			)}
-
-			<CommandSeparator />
 		</>
 	);
 }
 
 export default function Commander() {
 	const [open, setOpen] = React.useState(false);
+	const [viewerFileId, setViewerFileId] = React.useState<string | null>(null);
 	const navigate = useNavigate();
 	const isMobile = useIsMobile();
 	const { setTheme } = useTheme();
@@ -182,13 +266,17 @@ export default function Commander() {
 				setOpen((open) => !open);
 			}
 		};
-
 		document.addEventListener("keydown", down);
 		return () => document.removeEventListener("keydown", down);
 	}, []);
 
 	const handleNavigate = (path: string, params?: Record<string, string>) => {
 		navigate({ to: path as string, params: params as Record<string, string> });
+		setOpen(false);
+	};
+
+	const handleOpenFile = (fileId: string) => {
+		setViewerFileId(fileId);
 		setOpen(false);
 	};
 
@@ -213,11 +301,11 @@ export default function Commander() {
 				<CommandInput placeholder="Search files, spaces, or type a command..." />
 				<CommandList>
 					<CommandEmpty>No results found.</CommandEmpty>
-
-					{/* Dynamic Search Results */}
-					<SearchResults onNavigate={handleNavigate} />
-
-					{/* Quick Actions */}
+					<SearchResults
+						onNavigate={handleNavigate}
+						onOpenFile={handleOpenFile}
+					/>
+					<CommandSeparator />
 					<CommandGroup heading="QUICK ACTIONS">
 						<CommandItem>
 							<Link2 />
@@ -228,10 +316,7 @@ export default function Commander() {
 							<span>Create a Space</span>
 						</CommandItem>
 					</CommandGroup>
-
 					<CommandSeparator />
-
-					{/* Navigation */}
 					<CommandGroup heading="NAVIGATION">
 						<CommandItem
 							onSelect={() => {
@@ -254,8 +339,6 @@ export default function Commander() {
 							<CommandShortcut>⌘S</CommandShortcut>
 						</CommandItem>
 					</CommandGroup>
-
-					{/* Theme Selection */}
 					<CommandSubItem
 						onSelect={() => {
 							setTheme("system");
@@ -282,6 +365,13 @@ export default function Commander() {
 					</CommandSubItem>
 				</CommandList>
 			</CommandDialog>
+			<FileViewerDialog
+				open={!!viewerFileId}
+				onOpenChange={(isOpen) => {
+					if (!isOpen) setViewerFileId(null);
+				}}
+				fileId={viewerFileId}
+			/>
 		</>
 	);
 }
