@@ -174,7 +174,7 @@ export default function OrganizationForm({
 				/>
 				<Field>
 					<Button disabled={!isSlugAvailable} type="submit">
-						Create Workspace
+						{mode === "create" ? "Create Workspace" : "Update Workspace"}
 					</Button>
 				</Field>
 			</FieldGroup>
