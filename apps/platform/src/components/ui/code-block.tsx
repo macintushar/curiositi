@@ -3,6 +3,8 @@
 import { cn } from "@platform/lib/utils"
 import React, { useEffect, useState } from "react"
 import { codeToHtml } from "shiki"
+import { Card } from "./card"
+import FileIcon from "../file-icon"
 
 export type CodeBlockProps = {
   children?: React.ReactNode
@@ -24,6 +26,18 @@ function CodeBlock({ children, className, ...props }: CodeBlockProps) {
   )
 }
 
+function CodeBlockCard({ language, children }: { language: string; children: React.ReactNode }) {
+  return (
+    <Card className="p-0 m-0 gap-0">
+      <div className="flex flex-row px-2 py-1 items-center gap-1">
+        <FileIcon type={language} className="size-5" />
+        {language}
+      </div>
+        {children}
+    </Card>
+  )
+}
+
 export type CodeBlockCodeProps = {
   code: string
   language?: string
@@ -34,7 +48,7 @@ export type CodeBlockCodeProps = {
 function CodeBlockCode({
   code,
   language = "tsx",
-  theme = "github-light",
+  theme = "github-dark",
   className,
   ...props
 }: CodeBlockCodeProps) {
@@ -60,20 +74,21 @@ function CodeBlockCode({
 
   // SSR fallback: render plain code if not hydrated yet
   return highlightedHtml ? (
-    <div>
-      {language}
-    <div
-      className={classNames}
-      dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-      {...props}
-    />
-    </div>
+    <CodeBlockCard language={language}>
+      <div
+        className={classNames}
+        dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+        {...props}
+      />
+    </CodeBlockCard>
   ) : (
+  <CodeBlockCard language={language}>
     <div className={classNames} {...props}>
       <pre>
         <code>{code}</code>
       </pre>
-    </div>
+        </div>
+  </CodeBlockCard>
   )
 }
 
