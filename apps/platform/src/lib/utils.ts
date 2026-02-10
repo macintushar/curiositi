@@ -21,3 +21,19 @@ export function getTime(time: number) {
 		})
 		.split(/\s+/);
 }
+
+export function handleFormSubmit(formHandleSubmit: () => void) {
+	return (e: React.FormEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		formHandleSubmit();
+	};
+}
+
+export function stopPropagation(fn: () => void) {
+	return (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		fn();
+	};
+}
