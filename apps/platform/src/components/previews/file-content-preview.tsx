@@ -38,35 +38,23 @@ export default function FileContentPreview({
 	fileType,
 	presignedUrl,
 }: FileContentPreviewProps) {
+	if (!presignedUrl) {
+		return (
+			<div className="text-sm text-muted-foreground">Loading preview...</div>
+		);
+	}
+
 	if (fileType === "image") {
 		return (
-			<div className="h-full min-h-0">
-				{!presignedUrl ? (
-					<div className="max-w-full rounded-lg overflow-hidden">
-						<Skeleton className="h-64 w-full" />
-					</div>
-				) : (
-					<FilePreviewCard className="object-fill flex items-center justify-center">
-						<img
-							src={presignedUrl}
-							alt={file.name}
-							className="max-w-full rounded-lg object-contain mx-auto"
-						/>
-					</FilePreviewCard>
-				)}
-			</div>
+			<FilePreviewCard className="object-contain border flex items-center justify-center">
+				<img src={presignedUrl} alt={file.name} />
+			</FilePreviewCard>
 		);
 	}
 
 	if (fileType === "pdf") {
-		if (!presignedUrl) {
-			return (
-				<div className="text-sm text-muted-foreground">Loading preview...</div>
-			);
-		}
-
 		return (
-			<FilePreviewCard>
+			<FilePreviewCard className="h-full">
 				<iframe
 					src={presignedUrl}
 					title={file.name}
@@ -136,12 +124,6 @@ function TextFilePreview({ file, presignedUrl }: TextFilePreviewProps) {
 		enabled: hasMounted && !!presignedUrl,
 	});
 
-	if (!presignedUrl) {
-		return (
-			<div className="text-sm text-muted-foreground">Loading preview...</div>
-		);
-	}
-
 	if (isLoading) {
 		return (
 			<div className="space-y-2">
@@ -170,9 +152,9 @@ function TextFilePreview({ file, presignedUrl }: TextFilePreviewProps) {
 	const isMarkdown = file.type.includes("markdown");
 
 	return (
-		<FilePreviewCard>
+		<FilePreviewCard className="sm:items-center border">
 			{isMarkdown ? (
-				<Markdown className="min-w-full px-2 prose prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-h5:text-sm prose-h6:text-xs dark:prose-invert">
+				<Markdown className=" px-2 prose prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-h5:text-sm prose-h6:text-xs dark:prose-invert">
 					{content}
 				</Markdown>
 			) : (

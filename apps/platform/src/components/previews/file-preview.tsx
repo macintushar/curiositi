@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Badge } from "../ui/badge";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
-import { authClient } from "@platform/lib/auth-client";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -10,12 +9,14 @@ import {
 	ContextMenuTrigger,
 } from "../ui/context-menu";
 import ConfirmDialog from "../dialogs/confirm-dialog";
+import FileViewerDialog from "../dialogs/file-viewer-dialog";
 import FileIcon from "../file-icon";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Link } from "@tanstack/react-router";
+import { useDeleteMutation } from "@platform/hooks/use-delete-mutation";
+import { stopPropagation } from "@platform/lib/utils";
 
 type FilePreviewProps = {
 	file: {
@@ -27,8 +28,7 @@ type FilePreviewProps = {
 
 export default function FilePreview({ file }: FilePreviewProps) {
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-	const queryClient = useQueryClient();
-	const { data: sessionData } = authClient.useSession();
+	const [isViewerOpen, setIsViewerOpen] = useState(false);
 
 	const downloadUrlQuery = useQuery({
 		queryKey: ["file", "downloadUrl", file.id],
@@ -36,25 +36,11 @@ export default function FilePreview({ file }: FilePreviewProps) {
 		enabled: false,
 	});
 
-	const deleteMutation = useMutation({
+	const deleteMutation = useDeleteMutation({
 		mutationFn: () => trpcClient.file.delete.mutate({ fileId: file.id }),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: [
-					"files",
-					"orphan",
-					sessionData?.session.activeOrganizationId,
-				],
-			});
-			queryClient.invalidateQueries({
-				queryKey: ["files"],
-			});
-			setIsDeleteDialogOpen(false);
-			toast.success("File deleted successfully");
-		},
-		onError: () => {
-			toast.error("Failed to delete file");
-		},
+		resourceType: "file",
+		resourceName: "File",
+		onSuccess: () => setIsDeleteDialogOpen(false),
 	});
 
 	const handleDownload = async (e: React.MouseEvent) => {
@@ -76,21 +62,19 @@ export default function FilePreview({ file }: FilePreviewProps) {
 		}
 	};
 
-	const handleDeleteClick = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDeleteDialogOpen(true);
-	};
-
 	return (
 		<>
 			<ContextMenu>
 				<ContextMenuTrigger asChild>
-					<Link to="/app/item/$fileId" params={{ fileId: file.id }}>
+					<button
+						type="button"
+						className="text-left cursor-pointer"
+						onClick={() => setIsViewerOpen(true)}
+					>
 						<Card className="max-w-sm">
 							<CardContent className="flex items-center justify-center">
 								<FileIcon
-									className="size-16 text-primary-foreground opacity-65"
+									className="size-16 text-primary stroke-[1.5] opacity-65"
 									type={file.type}
 								/>
 							</CardContent>
@@ -111,19 +95,28 @@ export default function FilePreview({ file }: FilePreviewProps) {
 								</Tooltip>
 							</CardFooter>
 						</Card>
-					</Link>
+					</button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
 					<ContextMenuItem onClick={handleDownload}>
 						<IconDownload className="w-4 h-4" />
 						Download
 					</ContextMenuItem>
-					<ContextMenuItem variant="destructive" onClick={handleDeleteClick}>
+					<ContextMenuItem
+						variant="destructive"
+						onClick={stopPropagation(() => setIsDeleteDialogOpen(true))}
+					>
 						<IconTrash className="w-4 h-4" />
 						Delete
 					</ContextMenuItem>
 				</ContextMenuContent>
 			</ContextMenu>
+
+			<FileViewerDialog
+				open={isViewerOpen}
+				onOpenChange={setIsViewerOpen}
+				fileId={file.id}
+			/>
 
 			<ConfirmDialog
 				open={isDeleteDialogOpen}

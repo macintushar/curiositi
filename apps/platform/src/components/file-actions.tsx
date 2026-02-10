@@ -15,19 +15,35 @@ import {
 	IconDownload,
 	IconExternalLink,
 	IconRotateClockwise,
+	IconTrash,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import type z from "zod";
+import ConfirmDialog from "./dialogs/confirm-dialog";
+import { useState } from "react";
+import { useDeleteMutation } from "@platform/hooks/use-delete-mutation";
+import { stopPropagation } from "@platform/lib/utils";
 
 export default function FileActions({
 	presignedUrl,
 	fileStatus,
 	fileId,
+	fileName,
 }: {
 	presignedUrl?: string;
 	fileStatus: z.infer<typeof selectFileSchema.shape.status>;
 	fileId: string;
+	fileName: string;
 }) {
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+	const deleteMutation = useDeleteMutation({
+		mutationFn: () => trpcClient.file.delete.mutate({ fileId }),
+		resourceType: "file",
+		resourceName: "File",
+		onSuccess: () => setIsDeleteDialogOpen(false),
+	});
+
 	const handleDownload = async () => {
 		if (!presignedUrl) return;
 		try {
@@ -65,31 +81,50 @@ export default function FileActions({
 	};
 
 	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button variant="outline" size="icon-sm">
-					<IconDotsVertical />
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent side="bottom" align="end">
-				<DropdownMenuGroup>
-					{fileStatus === "pending" || fileStatus === "failed" ? (
-						<>
-							<DropdownMenuItem onClick={() => handleReProcessFile()}>
-								<IconRotateClockwise />
-								Re-Process File
-							</DropdownMenuItem>
-							<DropdownMenuSeparator />
-						</>
-					) : null}
-					<DropdownMenuItem onClick={() => handleDownload()}>
-						<IconDownload /> Download
-					</DropdownMenuItem>
-					<DropdownMenuItem onClick={() => handleOpenInNewTab()}>
-						<IconExternalLink /> Open in new tab
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-			</DropdownMenuContent>
-		</DropdownMenu>
+		<>
+			<DropdownMenu>
+				<DropdownMenuTrigger asChild>
+					<Button variant="outline" size="icon-sm">
+						<IconDotsVertical />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent side="bottom" align="end">
+					<DropdownMenuGroup>
+						{fileStatus === "pending" || fileStatus === "failed" ? (
+							<>
+								<DropdownMenuItem onClick={() => handleReProcessFile()}>
+									<IconRotateClockwise />
+									Re-Process File
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+							</>
+						) : null}
+						<DropdownMenuItem onClick={() => handleDownload()}>
+							<IconDownload /> Download
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => handleOpenInNewTab()}>
+							<IconExternalLink /> Open in new tab
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							onClick={stopPropagation(() => setIsDeleteDialogOpen(true))}
+							variant="destructive"
+						>
+							<IconTrash /> Delete File
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				</DropdownMenuContent>
+			</DropdownMenu>
+			<ConfirmDialog
+				open={isDeleteDialogOpen}
+				onOpenChange={setIsDeleteDialogOpen}
+				title="Delete File"
+				description={`Are you sure you want to delete ${fileName}? This action cannot be undone.`}
+				confirmLabel="Delete"
+				onConfirm={() => deleteMutation.mutate()}
+				isLoading={deleteMutation.isPending}
+				variant="destructive"
+			/>
+		</>
 	);
 }
