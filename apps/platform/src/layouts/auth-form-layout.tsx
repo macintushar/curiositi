@@ -13,7 +13,7 @@ import { handleFormSubmit } from "@platform/lib/utils";
 type AuthFormLayoutProps = {
 	title: string;
 	subtitle: string;
-	onSubmit: () => void;
+	onSubmit: () => Promise<void>;
 	submitButton: React.ReactNode;
 	linkText: string;
 	linkLabel: string;
