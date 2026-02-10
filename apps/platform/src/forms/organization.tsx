@@ -1,6 +1,7 @@
 import { createOrgSchema } from "@curiositi/share/schemas";
 import { Button } from "@platform/components/ui/button";
 import { authClient } from "@platform/lib/auth-client";
+import { handleFormSubmit } from "@platform/lib/utils";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from "@platform/components/ui/field";
+import FormField, { getFieldInvalid } from "@platform/components/ui/form-field";
 import { Input } from "@platform/components/ui/input";
 import { Check, X } from "lucide-react";
 
@@ -87,41 +89,23 @@ export default function OrganizationForm({
 	return (
 		<form
 			className="flex flex-col gap-6 w-full"
-			onSubmit={(e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				form.handleSubmit();
-			}}
+			onSubmit={handleFormSubmit(() => form.handleSubmit())}
 		>
 			<FieldGroup>
 				<form.Field
 					name="name"
-					children={(field) => {
-						const isInvalid =
-							field.state.meta.isTouched && !field.state.meta.isValid;
-						return (
-							<Field data-invalid={isInvalid}>
-								<FieldLabel htmlFor={field.name}>Workspace Name</FieldLabel>
-								<Input
-									id={field.name}
-									name={field.name}
-									type="text"
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(e) => field.handleChange(e.target.value)}
-									aria-invalid={isInvalid}
-									autoComplete="organization"
-								/>
-								{isInvalid && <FieldError errors={field.state.meta.errors} />}
-							</Field>
-						);
-					}}
+					children={(field) => (
+						<FormField
+							field={field}
+							label="Workspace Name"
+							autoComplete="organization"
+						/>
+					)}
 				/>
 				<form.Field
 					name="slug"
 					children={(field) => {
-						const isInvalid =
-							field.state.meta.isTouched && !field.state.meta.isValid;
+						const isInvalid = getFieldInvalid(field);
 						return (
 							<Field data-invalid={isInvalid}>
 								<FieldLabel htmlFor={field.name}>Workspace Slug</FieldLabel>
