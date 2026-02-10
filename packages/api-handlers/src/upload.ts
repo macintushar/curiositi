@@ -1,10 +1,10 @@
 import client from "@curiositi/db/client";
+import { eq } from "@curiositi/db";
 import { files, filesInSpace } from "@curiositi/db/schema";
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@curiositi/share/constants";
 import write from "@curiositi/share/fs/write";
 import logger from "@curiositi/share/logger";
 import type { S3Config } from "@curiositi/share/types";
-import { hash } from "bun";
 import { createResponse } from "./response";
 
 export type UploadHandlerInput = {
@@ -63,41 +63,7 @@ export default async function handleUpload({
 		return createResponse(null, uploadError);
 	}
 
-	// Sanitize filename to prevent path traversal
 	const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-
-	let fileHash: string;
-	let path: string;
-	try {
-		fileHash = hash(await file.arrayBuffer()).toString();
-		path = `/curiositi/storage/${orgId}/${fileHash}-${sanitizedFileName}`;
-	} catch (error) {
-		logger.error(
-			`Failed to hash file: ${file.name} (sanitized: ${sanitizedFileName})`,
-			error
-		);
-		uploadError.validation.error = `Failed to read file: ${file.name}`;
-		return createResponse(null, uploadError);
-	}
-
-	try {
-		await write(path, file, {
-			accessKeyId: s3.accessKeyId,
-			secretAccessKey: s3.secretAccessKey,
-			bucket: s3.bucket,
-			endpoint: s3.endpoint,
-		});
-
-		logger.info(`File Uploaded: ${file.name}`, {
-			file: file.name,
-			path: path,
-			size: file.size,
-		});
-	} catch (error) {
-		logger.error(`File Upload to S3 Failed: ${file.name}`, error);
-		uploadError.s3.error = error;
-		return createResponse(null, uploadError);
-	}
 
 	try {
 		const fileData = await client.transaction(async (tx) => {
@@ -105,7 +71,7 @@ export default async function handleUpload({
 				.insert(files)
 				.values({
 					name: file.name,
-					path: path,
+					path: "",
 					type: file.type,
 					size: file.size,
 					organizationId: orgId,
@@ -119,9 +85,40 @@ export default async function handleUpload({
 				throw new Error("Failed to insert file record");
 			}
 
+			const fileId = insertedFile[0].id;
+			const path = `/curiositi/storage/${orgId}/${fileId}-${sanitizedFileName}`;
+
+			const updatedFile = await tx
+				.update(files)
+				.set({ path })
+				.where(eq(files.id, fileId))
+				.returning();
+
+			if (!updatedFile[0]) {
+				throw new Error("Failed to update file path");
+			}
+
+			try {
+				await write(path, file, {
+					accessKeyId: s3.accessKeyId,
+					secretAccessKey: s3.secretAccessKey,
+					bucket: s3.bucket,
+					endpoint: s3.endpoint,
+				});
+			} catch (error) {
+				logger.error(`File Upload to S3 Failed: ${file.name}`, error);
+				throw error;
+			}
+
+			logger.info(`File Uploaded: ${file.name}`, {
+				file: file.name,
+				path: path,
+				size: file.size,
+			});
+
 			if (spaceId) {
 				await tx.insert(filesInSpace).values({
-					fileId: insertedFile[0].id,
+					fileId: fileId,
 					spaceId: spaceId,
 				});
 
@@ -132,18 +129,17 @@ export default async function handleUpload({
 				});
 			}
 
-			return insertedFile;
+			return updatedFile;
 		});
 
 		logger.info(`[FILES] File Added to DB: ${file.name}`, {
 			file: file.name,
-			path: path,
 			size: file.size,
 		});
 
 		return createResponse(fileData[0] ?? null, null);
 	} catch (error) {
-		logger.error(`File Upload to DB Failed: ${file.name}`, error);
+		logger.error(`File Upload Failed: ${file.name}`, error);
 		uploadError.db.error = error;
 	}
 

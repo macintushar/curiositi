@@ -11,9 +11,13 @@ import {
 	getFileById,
 	getFilesNotInSpace,
 	deleteFile,
-	searchFilesByName,
+	searchFilesEnhanced,
 	searchFilesWithAI,
+	getRecentFiles,
+	enqueueFileForProcessing,
+	createResponse,
 } from "@curiositi/api-handlers";
+import logger from "@curiositi/share/logger";
 
 const fileRouter = {
 	getAllInOrg: protectedProcedure
@@ -127,19 +131,57 @@ const fileRouter = {
 			return { success: true };
 		}),
 	search: protectedProcedure
-		.input(z.object({ query: z.string().min(1) }))
+		.input(
+			z.object({
+				query: z.string().min(1),
+				filters: z
+					.object({
+						fileType: z.string().optional(),
+						spaceId: z.string().optional(),
+						dateFrom: z.date().optional(),
+						dateTo: z.date().optional(),
+					})
+					.optional(),
+				sortBy: z.enum(["relevance", "date", "name", "size"]).optional(),
+				limit: z.number().min(1).max(100).optional(),
+				offset: z.number().min(0).optional(),
+			})
+		)
 		.query(async ({ input, ctx }) => {
-			return await searchFilesByName(
+			return await searchFilesEnhanced(
 				input.query,
-				ctx.session.session.activeOrganizationId
+				ctx.session.session.activeOrganizationId,
+				{
+					filters: input.filters,
+					sortBy: input.sortBy,
+					limit: input.limit,
+					offset: input.offset,
+				}
 			);
 		}),
 	searchWithAI: protectedProcedure
-		.input(z.object({ query: z.string().min(1) }))
+		.input(
+			z.object({
+				query: z.string().min(1),
+				filters: z
+					.object({
+						fileType: z.string().optional(),
+						spaceId: z.string().optional(),
+						dateFrom: z.date().optional(),
+						dateTo: z.date().optional(),
+					})
+					.optional(),
+				limit: z.number().min(1).max(100).optional(),
+			})
+		)
 		.query(async ({ input, ctx }) => {
 			return await searchFilesWithAI(
 				input.query,
-				ctx.session.session.activeOrganizationId
+				ctx.session.session.activeOrganizationId,
+				{
+					filters: input.filters,
+					limit: input.limit,
+				}
 			);
 		}),
 	getRecent: protectedProcedure
