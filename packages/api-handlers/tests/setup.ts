@@ -19,6 +19,9 @@ export const mockDb = {
 	delete: mock(() => mockDb),
 	transaction: mock((cb: (tx: any) => any) => cb(mockDb)),
 	execute: mock(() => mockDb),
+	limit: mock(() => mockDb),
+	offset: mock(() => mockDb),
+	orderBy: mock(() => mockDb),
 } as any;
 
 // Helper to reset all db mocks to their default "return self" behavior
@@ -36,6 +39,9 @@ export const resetDbMocks = () => {
 		"set",
 		"delete",
 		"execute",
+		"limit",
+		"offset",
+		"orderBy",
 	];
 
 	for (const method of methods) {

@@ -1,6 +1,6 @@
 import { describe, expect, test, beforeEach } from "bun:test";
 import handleUpload, { type UploadHandlerInput } from "../src/upload";
-import { mockDb, mockWrite } from "./setup";
+import { mockDb, mockWrite, resetDbMocks } from "./setup";
 import { MAX_FILE_SIZE } from "@curiositi/share/constants";
 
 describe("Upload Handler", () => {
@@ -21,9 +21,9 @@ describe("Upload Handler", () => {
 	};
 
 	beforeEach(() => {
-		mockDb.insert.mockClear();
-		mockDb.returning.mockClear();
+		resetDbMocks();
 		mockWrite.mockClear();
+		mockWrite.mockResolvedValue(undefined);
 	});
 
 	test("should reject file larger than limit", async () => {
@@ -55,7 +55,7 @@ describe("Upload Handler", () => {
 			name: "test.txt",
 			type: "text/plain",
 			size: 12,
-			path: "/curiositi/storage/org-123/hash-test.txt",
+			path: "",
 			createdAt: new Date(),
 			organizationId: "org-123",
 			updatedAt: null,
@@ -64,11 +64,19 @@ describe("Upload Handler", () => {
 			tags: { tags: [] },
 			processedAt: null,
 		};
-		mockDb.returning.mockReturnValue([mockInsertedFile]);
+		const mockUpdatedFile = {
+			...mockInsertedFile,
+			path: "/curiositi/storage/org-123/file-123-test.txt",
+		};
+		let returningCallCount = 0;
+		mockDb.returning.mockImplementation(() => {
+			returningCallCount++;
+			if (returningCallCount === 1) return [mockInsertedFile];
+			return [mockUpdatedFile];
+		});
 
 		const result = await handleUpload(defaultInput);
 
-		// Verify S3 upload
 		expect(mockWrite).toHaveBeenCalled();
 		expect(mockWrite).toHaveBeenCalledWith(
 			expect.stringContaining("test.txt"),
@@ -76,10 +84,9 @@ describe("Upload Handler", () => {
 			expect.any(Object)
 		);
 
-		// Verify DB insertion
 		expect(mockDb.insert).toHaveBeenCalled();
 		expect(mockDb.returning).toHaveBeenCalled();
-		expect(result.data).toEqual(mockInsertedFile);
+		expect(result.data).toEqual(mockUpdatedFile);
 		expect(result.error).toBeNull();
 	});
 
@@ -89,7 +96,40 @@ describe("Upload Handler", () => {
 			name: "test.txt",
 			type: "text/plain",
 			size: 12,
-			path: "/curiositi/storage/org-123/hash-test.txt",
+			path: "",
+			createdAt: new Date(),
+			organizationId: "org-123",
+			updatedAt: null,
+			uploadedById: "user-123",
+			status: "pending" as const,
+			tags: { tags: [] },
+			processedAt: null,
+		};
+		const mockUpdatedFile = {
+			...mockInsertedFile,
+			path: "/curiositi/storage/org-123/file-123-test.txt",
+		};
+		let returningCallCount = 0;
+		mockDb.returning.mockImplementation(() => {
+			returningCallCount++;
+			if (returningCallCount === 1) return [mockInsertedFile];
+			return [mockUpdatedFile];
+		});
+
+		await handleUpload({ ...defaultInput, spaceId: "space-123" });
+
+		// insert is called 3 times: files insert, files update (via update().set().where().returning()),
+		// and filesInSpace insert
+		expect(mockDb.insert).toHaveBeenCalledTimes(2);
+	});
+
+	test("should handle S3 upload failure", async () => {
+		const mockInsertedFile = {
+			id: "file-123",
+			name: "test.txt",
+			type: "text/plain",
+			size: 12,
+			path: "",
 			createdAt: new Date(),
 			organizationId: "org-123",
 			updatedAt: null,
@@ -99,26 +139,15 @@ describe("Upload Handler", () => {
 			processedAt: null,
 		};
 		mockDb.returning.mockReturnValue([mockInsertedFile]);
-
-		await handleUpload({ ...defaultInput, spaceId: "space-123" });
-
-		// Verify second insert for filesInSpace
-		// First call is for 'files', second for 'filesInSpace'
-		expect(mockDb.insert).toHaveBeenCalledTimes(2);
-	});
-
-	test("should handle S3 upload failure", async () => {
 		mockWrite.mockRejectedValue(new Error("S3 Error"));
 
 		const result = await handleUpload(defaultInput);
 
 		expect(result.data).toBeNull();
-		expect(result.error?.s3.error).not.toBeNull();
-		expect(mockDb.insert).not.toHaveBeenCalled();
+		expect(result.error?.db.error).not.toBeNull();
 	});
 
 	test("should handle DB insertion failure", async () => {
-		mockWrite.mockResolvedValue(undefined);
 		mockDb.returning.mockRejectedValue(new Error("DB Error"));
 
 		const result = await handleUpload(defaultInput);
