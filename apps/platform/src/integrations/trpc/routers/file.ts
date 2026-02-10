@@ -142,6 +142,39 @@ const fileRouter = {
 				ctx.session.session.activeOrganizationId
 			);
 		}),
+	getRecent: protectedProcedure
+		.input(
+			z.object({
+				limit: z.number().min(1).max(50).default(10),
+			})
+		)
+		.query(async ({ input, ctx }) => {
+			return await getRecentFiles(
+				ctx.session.session.activeOrganizationId,
+				input.limit
+			);
+		}),
+	process: protectedProcedure
+		.input(
+			z.object({
+				fileId: z.string(),
+			})
+		)
+		.mutation(async ({ ctx, input }) => {
+			const { error: enqueueError } = await enqueueFileForProcessing({
+				fileId: input.fileId,
+				orgId: ctx.session.session.activeOrganizationId,
+				qstashToken: env.QSTASH_TOKEN,
+				workerUrl: env.WORKER_URL,
+			});
+
+			if (enqueueError) {
+				logger.error("Error during file enqueue", enqueueError);
+				return createResponse(null, enqueueError);
+			}
+
+			return createResponse({ success: true }, null);
+		}),
 } satisfies TRPCRouterRecord;
 
 export default fileRouter;
