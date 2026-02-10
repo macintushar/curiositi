@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@platform/lib/utils"
 import { marked } from "marked"
 import { memo, useId, useMemo } from "react"

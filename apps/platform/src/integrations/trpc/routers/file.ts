@@ -15,7 +15,6 @@ import {
 	searchFilesWithAI,
 	getRecentFiles,
 	enqueueFileForProcessing,
-	createResponse,
 } from "@curiositi/api-handlers";
 import logger from "@curiositi/share/logger";
 
@@ -212,10 +211,13 @@ const fileRouter = {
 
 			if (enqueueError) {
 				logger.error("Error during file enqueue", enqueueError);
-				return createResponse(null, enqueueError);
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to enqueue file for processing",
+				});
 			}
 
-			return createResponse({ success: true }, null);
+			return { success: true };
 		}),
 } satisfies TRPCRouterRecord;
 

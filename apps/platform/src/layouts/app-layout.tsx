@@ -1,3 +1,5 @@
+"use client";
+
 import { AppSidebar } from "@platform/components/app-sidebar";
 import MobileNav from "@platform/components/mobile-nav";
 import {

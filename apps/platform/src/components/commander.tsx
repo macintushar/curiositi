@@ -283,7 +283,7 @@ export default function Commander() {
 	return (
 		<>
 			{isMobile ? (
-				<Button onClick={() => setOpen(true)}>
+				<Button onClick={() => setOpen(true)} aria-label="Open search">
 					<IconSearch className="size-5" />
 				</Button>
 			) : (

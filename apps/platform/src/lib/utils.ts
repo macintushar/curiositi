@@ -22,11 +22,11 @@ export function getTime(time: number) {
 		.split(/\s+/);
 }
 
-export function handleFormSubmit(formHandleSubmit: () => void) {
-	return (e: React.FormEvent) => {
+export function handleFormSubmit(formHandleSubmit: () => void | Promise<void>) {
+	return async (e: React.FormEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-		formHandleSubmit();
+		await formHandleSubmit();
 	};
 }
 

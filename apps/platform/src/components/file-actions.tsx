@@ -23,6 +23,7 @@ import ConfirmDialog from "./dialogs/confirm-dialog";
 import { useState } from "react";
 import { useDeleteMutation } from "@platform/hooks/use-delete-mutation";
 import { stopPropagation } from "@platform/lib/utils";
+import logger from "@curiositi/share/logger";
 
 export default function FileActions({
 	presignedUrl,
@@ -70,12 +71,17 @@ export default function FileActions({
 	};
 
 	const handleReProcessFile = async () => {
-		const data = await trpcClient.file.process.mutate({ fileId });
-		if (data.data?.success) {
-			toast.success("File has been enqueued for re-processing");
-		}
+		try {
+			const data = await trpcClient.file.process.mutate({ fileId });
+			if (data.data?.success) {
+				toast.success("File has been enqueued for re-processing");
+			}
 
-		if (data.error) {
+			if (data.error) {
+				toast.error("Failed to enqueue file for re-processing");
+			}
+		} catch (error) {
+			logger.error("Failed to re-process file", error);
 			toast.error("Failed to enqueue file for re-processing");
 		}
 	};

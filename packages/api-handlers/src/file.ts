@@ -196,9 +196,9 @@ export async function searchFilesEnhanced(
 
 		const whereClause = buildSearchWhereClause(query, orgId, options?.filters);
 
-		// Get files with their spaces
+		// Get files with their spaces (DISTINCT ON to avoid duplicates when file is in multiple spaces)
 		const matches = await db
-			.select({
+			.selectDistinctOn([files.id], {
 				file: files,
 				spaceId: spaces.id,
 				spaceName: spaces.name,
@@ -207,21 +207,35 @@ export async function searchFilesEnhanced(
 			.leftJoin(filesInSpace, eq(filesInSpace.fileId, files.id))
 			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
 			.where(whereClause)
-			.orderBy(getSortOrder(sortBy))
+			.orderBy(files.id, getSortOrder(sortBy))
 			.limit(limit)
 			.offset(offset);
 
 		const results: SearchResult[] = matches.map((match) => {
 			let matchType: SearchResult["matchType"] = "name";
+			let score = 0.5;
 
-			// Determine match type
-			if (match.spaceName?.toLowerCase().includes(query.toLowerCase())) {
+			// Determine match type and calculate relevance score
+			const queryLower = query.toLowerCase();
+			const fileNameLower = match.file.name.toLowerCase();
+
+			if (match.spaceName?.toLowerCase().includes(queryLower)) {
 				matchType = "space";
+				score = 0.7;
+			}
+
+			// Higher score for exact name matches
+			if (fileNameLower === queryLower) {
+				score = 0.95;
+			} else if (fileNameLower.startsWith(queryLower)) {
+				score = 0.85;
+			} else if (fileNameLower.includes(queryLower)) {
+				score = 0.75;
 			}
 
 			return {
 				file: match.file,
-				score: 1.0,
+				score,
 				matchType,
 				spaceName: match.spaceName,
 				spaceId: match.spaceId,
@@ -240,7 +254,7 @@ export async function searchFilesEnhanced(
 export async function getRecentFiles(orgId: string, limit = 10) {
 	try {
 		const recentFiles = await db
-			.select({
+			.selectDistinctOn([files.id], {
 				file: files,
 				spaceId: spaces.id,
 				spaceName: spaces.name,
@@ -249,7 +263,7 @@ export async function getRecentFiles(orgId: string, limit = 10) {
 			.leftJoin(filesInSpace, eq(filesInSpace.fileId, files.id))
 			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
 			.where(eq(files.organizationId, orgId))
-			.orderBy(desc(files.createdAt))
+			.orderBy(files.id, desc(files.createdAt))
 			.limit(limit);
 
 		const results: SearchResult[] = recentFiles.map((match) => ({
@@ -319,26 +333,43 @@ export async function searchFilesWithAI(
 			)
 			.limit(limit);
 
-		// Get spaces for semantic matches
-		for (const match of semanticMatches) {
-			if (!results.some((r) => r.file.id === match.file.id)) {
-				// Get space info for this file
-				const spaceInfo = await db
-					.select({
-						spaceId: spaces.id,
-						spaceName: spaces.name,
-					})
-					.from(filesInSpace)
-					.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
-					.where(eq(filesInSpace.fileId, match.file.id))
-					.limit(1);
+		// Get spaces for semantic matches (batched query to avoid N+1)
+		const newMatches = semanticMatches.filter(
+			(m) => !results.some((r) => r.file.id === m.file.id)
+		);
 
+		if (newMatches.length > 0) {
+			const fileIds = newMatches.map((m) => m.file.id);
+			const spaceInfos = await db
+				.select({
+					fileId: filesInSpace.fileId,
+					spaceId: spaces.id,
+					spaceName: spaces.name,
+				})
+				.from(filesInSpace)
+				.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
+				.where(
+					sql`${filesInSpace.fileId} IN (${sql.join(
+						fileIds.map((id) => sql`${id}`),
+						sql`, `
+					)})`
+				);
+
+			const spaceMap = new Map(
+				spaceInfos.map((s) => [
+					s.fileId,
+					{ spaceId: s.spaceId, spaceName: s.spaceName },
+				])
+			);
+
+			for (const match of newMatches) {
+				const space = spaceMap.get(match.file.id);
 				results.push({
 					file: match.file,
 					score: match.similarity,
 					matchType: "content",
-					spaceName: spaceInfo[0]?.spaceName,
-					spaceId: spaceInfo[0]?.spaceId,
+					spaceName: space?.spaceName ?? null,
+					spaceId: space?.spaceId ?? null,
 				});
 			}
 		}

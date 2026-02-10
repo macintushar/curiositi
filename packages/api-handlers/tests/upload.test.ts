@@ -118,8 +118,7 @@ describe("Upload Handler", () => {
 
 		await handleUpload({ ...defaultInput, spaceId: "space-123" });
 
-		// insert is called 3 times: files insert, files update (via update().set().where().returning()),
-		// and filesInSpace insert
+		// insert is called 2 times: files insert and filesInSpace insert
 		expect(mockDb.insert).toHaveBeenCalledTimes(2);
 	});
 

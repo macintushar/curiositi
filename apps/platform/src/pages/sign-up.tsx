@@ -74,7 +74,13 @@ export default function SignUp() {
 			/>
 			<form.Field
 				name="password"
-				children={(field) => <PasswordField field={field} label="Password" />}
+				children={(field) => (
+					<PasswordField
+						field={field}
+						label="Password"
+						autoComplete="new-password"
+					/>
+				)}
 			/>
 			<form.Field
 				name="confirmPassword"
