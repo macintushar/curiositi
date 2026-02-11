@@ -114,6 +114,10 @@ export type SearchFilters = {
 
 export type SearchSortBy = "relevance" | "date" | "name" | "size";
 
+function escapeIlike(value: string): string {
+	return value.replace(/[%_\\]/g, "\\$&");
+}
+
 function buildSearchWhereClause(
 	query: string,
 	orgId: string,
@@ -128,17 +132,19 @@ function buildSearchWhereClause(
 		| ReturnType<typeof lte>
 	)[] = [eq(files.organizationId, orgId)];
 
+	const escapedQuery = escapeIlike(query);
+
 	// Name match
-	const nameMatch = ilike(files.name, `%${query}%`);
+	const nameMatch = ilike(files.name, `%${escapedQuery}%`);
 
 	// Tag match (JSONB array search)
 	const tagMatch = sql<boolean>`EXISTS (
 		SELECT 1 FROM jsonb_array_elements_text(${files.tags}->'tags') AS tag
-		WHERE tag ILIKE ${`%${query}%`}
+		WHERE tag ILIKE ${`%${escapedQuery}%`}
 	)`;
 
 	// Space name match (via join)
-	const spaceMatch = ilike(spaces.name, `%${query}%`);
+	const spaceMatch = ilike(spaces.name, `%${escapedQuery}%`);
 
 	// Combine search conditions
 	const searchCondition = or(nameMatch, tagMatch, spaceMatch);
@@ -148,7 +154,7 @@ function buildSearchWhereClause(
 
 	// Apply filters
 	if (filters?.fileType) {
-		conditions.push(ilike(files.type, `%${filters.fileType}%`));
+		conditions.push(ilike(files.type, `%${escapeIlike(filters.fileType)}%`));
 	}
 	if (filters?.spaceId) {
 		conditions.push(eq(filesInSpace.spaceId, filters.spaceId));
