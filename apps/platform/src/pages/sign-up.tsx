@@ -54,7 +54,7 @@ export default function SignUp() {
 					<FormField
 						field={field}
 						label="Name"
-						inputType="name"
+						inputType="text"
 						placeholder="Mac"
 						autoComplete="name"
 					/>
