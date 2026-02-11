@@ -72,14 +72,8 @@ export default function FileActions({
 
 	const handleReProcessFile = async () => {
 		try {
-			const data = await trpcClient.file.process.mutate({ fileId });
-			if (data.data?.success) {
-				toast.success("File has been enqueued for re-processing");
-			}
-
-			if (data.error) {
-				toast.error("Failed to enqueue file for re-processing");
-			}
+			await trpcClient.file.process.mutate({ fileId });
+			toast.success("File has been enqueued for re-processing");
 		} catch (error) {
 			logger.error("Failed to re-process file", error);
 			toast.error("Failed to enqueue file for re-processing");
