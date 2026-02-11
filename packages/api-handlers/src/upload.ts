@@ -2,7 +2,10 @@ import client from "@curiositi/db/client";
 import { eq } from "@curiositi/db";
 import { files, filesInSpace } from "@curiositi/db/schema";
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@curiositi/share/constants";
-import write, { isS3UploadError } from "@curiositi/share/fs/write";
+import write, {
+	isS3UploadError,
+	deleteS3Object,
+} from "@curiositi/share/fs/write";
 import logger from "@curiositi/share/logger";
 import type { S3Config } from "@curiositi/share/types";
 import { createResponse } from "./response";
@@ -166,6 +169,21 @@ export default async function handleUpload({
 			}
 		} else {
 			uploadError.db.error = error;
+
+			const s3Path = insertedFileId
+				? `/curiositi/storage/${orgId}/${insertedFileId}-${sanitizedFileName}`
+				: null;
+			if (s3Path) {
+				await deleteS3Object(s3Path, {
+					accessKeyId: s3.accessKeyId,
+					secretAccessKey: s3.secretAccessKey,
+					bucket: s3.bucket,
+					endpoint: s3.endpoint,
+				});
+				logger.info(
+					`[FILES] Cleaned up orphaned S3 object after DB failure: ${file.name}`
+				);
+			}
 		}
 	}
 

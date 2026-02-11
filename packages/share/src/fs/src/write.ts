@@ -36,6 +36,7 @@ export default async function write(
 	try {
 		await s3Client.write(path, data);
 	} catch (error) {
+		logger.error(`Failed to write file to S3: ${path}`, error);
 		const s3Error = Object.assign(
 			new Error(`Failed to write file to S3: ${path}`),
 			{
@@ -49,4 +50,22 @@ export default async function write(
 	logger.info(`File Written to S3 Client:`, {
 		path,
 	});
+}
+
+export async function deleteS3Object(
+	path: string,
+	config: S3Config
+): Promise<void> {
+	const s3Client = new S3Client({
+		accessKeyId: config.accessKeyId,
+		secretAccessKey: config.secretAccessKey,
+		bucket: config.bucket,
+		endpoint: config.endpoint,
+	});
+	try {
+		await s3Client.delete(path);
+		logger.info(`Deleted S3 object: ${path}`);
+	} catch (error) {
+		logger.error(`Failed to delete S3 object: ${path}`, error);
+	}
 }
