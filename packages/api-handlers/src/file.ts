@@ -163,19 +163,6 @@ function buildSearchWhereClause(
 	return and(...conditions);
 }
 
-function getSortOrder(sortBy: SearchSortBy) {
-	switch (sortBy) {
-		case "date":
-			return desc(files.createdAt);
-		case "name":
-			return asc(files.name);
-		case "size":
-			return desc(files.size);
-		default:
-			return desc(files.createdAt);
-	}
-}
-
 /**
  * Enhanced search across files, tags, and spaces
  */
@@ -196,8 +183,8 @@ export async function searchFilesEnhanced(
 
 		const whereClause = buildSearchWhereClause(query, orgId, options?.filters);
 
-		// Get files with their spaces (DISTINCT ON to avoid duplicates when file is in multiple spaces)
-		const matches = await db
+		// Use a subquery to deduplicate files first, then apply user's sort order
+		const deduped = db
 			.selectDistinctOn([files.id], {
 				file: files,
 				spaceId: spaces.id,
@@ -207,7 +194,19 @@ export async function searchFilesEnhanced(
 			.leftJoin(filesInSpace, eq(filesInSpace.fileId, files.id))
 			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
 			.where(whereClause)
-			.orderBy(files.id, getSortOrder(sortBy))
+			.orderBy(files.id)
+			.as("deduped");
+
+		const matches = await db
+			.select()
+			.from(deduped)
+			.orderBy(
+				sortBy === "name"
+					? asc(deduped.file.name)
+					: sortBy === "size"
+						? desc(deduped.file.size)
+						: desc(deduped.file.createdAt)
+			)
 			.limit(limit)
 			.offset(offset);
 
@@ -253,7 +252,8 @@ export async function searchFilesEnhanced(
  */
 export async function getRecentFiles(orgId: string, limit = 10) {
 	try {
-		const recentFiles = await db
+		// Use a subquery to deduplicate files first, then sort by recency
+		const deduped = db
 			.selectDistinctOn([files.id], {
 				file: files,
 				spaceId: spaces.id,
@@ -263,7 +263,13 @@ export async function getRecentFiles(orgId: string, limit = 10) {
 			.leftJoin(filesInSpace, eq(filesInSpace.fileId, files.id))
 			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
 			.where(eq(files.organizationId, orgId))
-			.orderBy(files.id, desc(files.createdAt))
+			.orderBy(files.id)
+			.as("deduped");
+
+		const recentFiles = await db
+			.select()
+			.from(deduped)
+			.orderBy(desc(deduped.file.createdAt))
 			.limit(limit);
 
 		const results: SearchResult[] = recentFiles.map((match) => ({
