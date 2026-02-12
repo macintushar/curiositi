@@ -162,15 +162,8 @@ const fileRouter = {
 		.input(
 			z.object({
 				query: z.string().min(1),
-				filters: z
-					.object({
-						fileType: z.string().optional(),
-						spaceId: z.string().optional(),
-						dateFrom: z.date().optional(),
-						dateTo: z.date().optional(),
-					})
-					.optional(),
 				limit: z.number().min(1).max(100).optional(),
+				minSimilarity: z.number().min(0).max(1).optional(),
 			})
 		)
 		.query(async ({ input, ctx }) => {
@@ -178,7 +171,6 @@ const fileRouter = {
 				input.query,
 				ctx.session.session.activeOrganizationId,
 				{
-					filters: input.filters,
 					limit: input.limit,
 				}
 			);

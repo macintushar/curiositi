@@ -105,154 +105,11 @@ export type SearchResult = {
 	spaceId?: string | null;
 };
 
-export type SearchFilters = {
-	fileType?: string;
-	spaceId?: string;
-	dateFrom?: Date;
-	dateTo?: Date;
-};
-
 export type SearchSortBy = "relevance" | "date" | "name" | "size";
-
-function escapeIlike(value: string): string {
-	return value.replace(/[%_\\]/g, "\\$&");
-}
-
-function buildSearchWhereClause(
-	query: string,
-	orgId: string,
-	filters?: SearchFilters
-) {
-	const conditions: (
-		| ReturnType<typeof eq>
-		| ReturnType<typeof ilike>
-		| ReturnType<typeof sql>
-		| ReturnType<typeof or>
-		| ReturnType<typeof gte>
-		| ReturnType<typeof lte>
-	)[] = [eq(files.organizationId, orgId)];
-
-	const escapedQuery = escapeIlike(query);
-
-	// Name match
-	const nameMatch = ilike(files.name, `%${escapedQuery}%`);
-
-	// Tag match (JSONB array search)
-	const tagMatch = sql<boolean>`EXISTS (
-		SELECT 1 FROM jsonb_array_elements_text(${files.tags}->'tags') AS tag
-		WHERE tag ILIKE ${`%${escapedQuery}%`}
-	)`;
-
-	// Space name match (via join)
-	const spaceMatch = ilike(spaces.name, `%${escapedQuery}%`);
-
-	// Combine search conditions
-	const searchCondition = or(nameMatch, tagMatch, spaceMatch);
-	if (searchCondition) {
-		conditions.push(searchCondition);
-	}
-
-	// Apply filters
-	if (filters?.fileType) {
-		conditions.push(ilike(files.type, `%${escapeIlike(filters.fileType)}%`));
-	}
-	if (filters?.spaceId) {
-		conditions.push(eq(filesInSpace.spaceId, filters.spaceId));
-	}
-	if (filters?.dateFrom) {
-		conditions.push(gte(files.createdAt, filters.dateFrom));
-	}
-	if (filters?.dateTo) {
-		conditions.push(lte(files.createdAt, filters.dateTo));
-	}
-
-	return and(...conditions);
-}
 
 /**
  * Enhanced search across files, tags, and spaces
  */
-export async function searchFilesEnhanced(
-	query: string,
-	orgId: string,
-	options?: {
-		filters?: SearchFilters;
-		sortBy?: SearchSortBy;
-		limit?: number;
-		offset?: number;
-	}
-) {
-	try {
-		const limit = options?.limit ?? 50;
-		const offset = options?.offset ?? 0;
-		const sortBy = options?.sortBy ?? "relevance";
-
-		const whereClause = buildSearchWhereClause(query, orgId, options?.filters);
-
-		// Use a subquery to deduplicate files first, then apply user's sort order
-		const deduped = db
-			.selectDistinctOn([files.id], {
-				file: files,
-				spaceId: spaces.id,
-				spaceName: spaces.name,
-			})
-			.from(files)
-			.leftJoin(filesInSpace, eq(filesInSpace.fileId, files.id))
-			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
-			.where(whereClause)
-			.orderBy(files.id)
-			.as("deduped");
-
-		const matches = await db
-			.select()
-			.from(deduped)
-			.orderBy(
-				sortBy === "name"
-					? asc(deduped.file.name)
-					: sortBy === "size"
-						? desc(deduped.file.size)
-						: desc(deduped.file.createdAt)
-			)
-			.limit(limit)
-			.offset(offset);
-
-		const results: SearchResult[] = matches.map((match) => {
-			let matchType: SearchResult["matchType"] = "name";
-			let score = 0.5;
-
-			// Determine match type and calculate relevance score
-			const queryLower = query.toLowerCase();
-			const fileNameLower = match.file.name.toLowerCase();
-
-			if (match.spaceName?.toLowerCase().includes(queryLower)) {
-				matchType = "space";
-				score = 0.7;
-			}
-
-			// Higher score for exact name matches
-			if (fileNameLower === queryLower) {
-				score = 0.95;
-			} else if (fileNameLower.startsWith(queryLower)) {
-				score = 0.85;
-			} else if (fileNameLower.includes(queryLower)) {
-				score = 0.75;
-			}
-
-			return {
-				file: match.file,
-				score,
-				matchType,
-				spaceName: match.spaceName,
-				spaceId: match.spaceId,
-			};
-		});
-
-		return createResponse(results, null);
-	} catch (error) {
-		return createResponse(null, error);
-	}
-}
-
 /**
  * Get recent files for a user/organization
  */
@@ -293,36 +150,18 @@ export async function getRecentFiles(orgId: string, limit = 10) {
 }
 
 /**
- * Fast name-only search (no AI, no cost) - DEPRECATED: Use searchFilesEnhanced
- */
-export async function searchFilesByName(query: string, orgId: string) {
-	return searchFilesEnhanced(query, orgId);
-}
-
-/**
  * Semantic search using AI embeddings with enhanced metadata
  */
 export async function searchFilesWithAI(
 	query: string,
 	orgId: string,
 	options?: {
-		filters?: SearchFilters;
 		limit?: number;
 	}
 ) {
 	try {
 		const results: SearchResult[] = [];
 		const limit = options?.limit ?? 20;
-
-		// 1. Include enhanced name/tag/space matches
-		const enhancedMatches = await searchFilesEnhanced(query, orgId, {
-			...options,
-			limit: 10,
-		});
-
-		if (enhancedMatches.data) {
-			results.push(...enhancedMatches.data);
-		}
 
 		// 2. Semantic search via embeddings
 		const { embedding } = await embedText({ text: query, provider: "openai" });
