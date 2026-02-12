@@ -5,7 +5,7 @@ import {
 	getFileById,
 	getFilesNotInSpace,
 } from "../src/file";
-import { mockDb } from "./setup";
+import { mockDb, resetDbMocks } from "./setup";
 
 describe("File Handler", () => {
 	const mockFileData = {
@@ -24,21 +24,17 @@ describe("File Handler", () => {
 	};
 
 	beforeEach(() => {
-		mockDb.select.mockClear();
-		mockDb.from.mockClear();
-		mockDb.where.mockClear();
-		mockDb.delete.mockClear();
-		mockDb.returning.mockClear();
+		resetDbMocks();
 	});
 
 	test("getAllFiles should return files for org", async () => {
-		mockDb.where.mockReturnValue([mockFileData]);
+		mockDb.orderBy.mockReturnValue([mockFileData]);
 
 		const result = await getAllFiles("org-123");
 
 		expect(mockDb.select).toHaveBeenCalled();
 		expect(mockDb.from).toHaveBeenCalled();
-		expect(result.data).toEqual([mockFileData]);
+		expect(result.data?.data).toEqual([mockFileData]);
 		expect(result.error).toBeNull();
 	});
 

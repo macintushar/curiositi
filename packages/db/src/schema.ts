@@ -326,7 +326,7 @@ export const files = createTable(
 );
 
 export const selectFileSchema = z.object({
-	id: z.string().uuid(),
+	id: z.uuid(),
 	name: z.string(),
 	path: z.string(),
 	size: z.number().int(),
@@ -341,7 +341,7 @@ export const selectFileSchema = z.object({
 });
 
 export const createFileSchema = z.object({
-	id: z.string().uuid().optional(),
+	id: z.uuid().optional(),
 	name: z.string(),
 	path: z.string(),
 	size: z.number().int(),

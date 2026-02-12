@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { cn } from "@platform/lib/utils";
 import { Badge } from "../ui/badge";
-import { Link } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
-import { authClient } from "@platform/lib/auth-client";
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -12,10 +9,14 @@ import {
 	ContextMenuTrigger,
 } from "../ui/context-menu";
 import ConfirmDialog from "../dialogs/confirm-dialog";
+import FileViewerDialog from "../dialogs/file-viewer-dialog";
 import FileIcon from "../file-icon";
-import { Skeleton } from "../ui/skeleton";
 import { IconDownload, IconTrash } from "@tabler/icons-react";
 import { toast } from "sonner";
+import { Card, CardContent, CardFooter } from "../ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { useDeleteMutation } from "@platform/hooks/use-delete-mutation";
+import { stopPropagation } from "@platform/lib/utils";
 
 type FilePreviewProps = {
 	file: {
@@ -25,22 +26,9 @@ type FilePreviewProps = {
 	};
 };
 
-const fileTypeClasses = {
-	file: "rounded-xl bg-card p-2 w-40 h-48",
-};
-
 export default function FilePreview({ file }: FilePreviewProps) {
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-	const queryClient = useQueryClient();
-	const { data: sessionData } = authClient.useSession();
-	const isImage = file.type.startsWith("image/");
-
-	const presignedUrlQuery = useQuery({
-		queryKey: ["file", "presignedUrl", file.id],
-		queryFn: () => trpcClient.file.getPresignedUrl.query({ fileId: file.id }),
-		enabled: isImage,
-		staleTime: 1000 * 60 * 50,
-	});
+	const [isViewerOpen, setIsViewerOpen] = useState(false);
 
 	const downloadUrlQuery = useQuery({
 		queryKey: ["file", "downloadUrl", file.id],
@@ -48,25 +36,11 @@ export default function FilePreview({ file }: FilePreviewProps) {
 		enabled: false,
 	});
 
-	const deleteMutation = useMutation({
+	const deleteMutation = useDeleteMutation({
 		mutationFn: () => trpcClient.file.delete.mutate({ fileId: file.id }),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: [
-					"files",
-					"orphan",
-					sessionData?.session.activeOrganizationId,
-				],
-			});
-			queryClient.invalidateQueries({
-				queryKey: ["files"],
-			});
-			setIsDeleteDialogOpen(false);
-			toast.success("File deleted successfully");
-		},
-		onError: () => {
-			toast.error("Failed to delete file");
-		},
+		resourceType: "file",
+		resourceName: "File",
+		onSuccess: () => setIsDeleteDialogOpen(false),
 	});
 
 	const handleDownload = async (e: React.MouseEvent) => {
@@ -88,67 +62,62 @@ export default function FilePreview({ file }: FilePreviewProps) {
 		}
 	};
 
-	const handleDeleteClick = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDeleteDialogOpen(true);
-	};
-
 	return (
 		<>
 			<ContextMenu>
 				<ContextMenuTrigger asChild>
-					<Link
-						to="/app/item/$fileId"
-						params={{ fileId: file.id }}
-						className={cn(
-							fileTypeClasses.file,
-							"relative block hover:ring-2 hover:ring-primary/20 transition-all overflow-hidden"
-						)}
+					<button
+						type="button"
+						className="text-left cursor-pointer"
+						onClick={() => setIsViewerOpen(true)}
 					>
-						{isImage && presignedUrlQuery.isLoading && (
-							<Skeleton className="absolute inset-0 rounded-xl" />
-						)}
-
-						{isImage && presignedUrlQuery.data?.url && (
-							<img
-								src={presignedUrlQuery.data.url}
-								alt={file.name}
-								className="absolute inset-0 w-full h-full object-cover rounded-xl"
-							/>
-						)}
-
-						{!isImage && (
-							<div className="absolute inset-0 flex items-center justify-center">
+						<Card className="max-w-sm shadow-none hover:border-foreground/20 transition-colors">
+							<CardContent className="flex items-center justify-center">
 								<FileIcon
-									className="size-12 text-primary opacity-65"
+									className="size-16 stroke-[1.5] transition-all"
 									type={file.type}
+									coloredIcon
 								/>
-							</div>
-						)}
-
-						<Badge
-							variant={"secondary"}
-							className="max-w-36 bg-secondary/40 flex items-center gap-1 absolute bottom-2.5 left-2"
-						>
-							<span>
-								<FileIcon className="size-4" type={file.type} />
-							</span>
-							<p className="truncate">{file.name}</p>
-						</Badge>
-					</Link>
+							</CardContent>
+							<CardFooter>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<Badge
+											variant={"secondary"}
+											className="max-w-32 bg-secondary flex items-center gap-1"
+										>
+											<span>
+												<FileIcon className="size-4" type={file.type} />
+											</span>
+											<p className="truncate">{file.name}</p>
+										</Badge>
+									</TooltipTrigger>
+									<TooltipContent>{file.name}</TooltipContent>
+								</Tooltip>
+							</CardFooter>
+						</Card>
+					</button>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
 					<ContextMenuItem onClick={handleDownload}>
 						<IconDownload className="w-4 h-4" />
 						Download
 					</ContextMenuItem>
-					<ContextMenuItem variant="destructive" onClick={handleDeleteClick}>
+					<ContextMenuItem
+						variant="destructive"
+						onClick={stopPropagation(() => setIsDeleteDialogOpen(true))}
+					>
 						<IconTrash className="w-4 h-4" />
 						Delete
 					</ContextMenuItem>
 				</ContextMenuContent>
 			</ContextMenu>
+
+			<FileViewerDialog
+				open={isViewerOpen}
+				onOpenChange={setIsViewerOpen}
+				fileId={file.id}
+			/>
 
 			<ConfirmDialog
 				open={isDeleteDialogOpen}

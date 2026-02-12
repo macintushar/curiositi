@@ -11,6 +11,7 @@ import {
 	ContextMenuTrigger,
 } from "@platform/components/ui/context-menu";
 import { cn } from "@platform/lib/utils";
+import { stopPropagation } from "@platform/lib/utils";
 import {
 	IconFolder,
 	IconFolderOpen,
@@ -18,10 +19,8 @@ import {
 	IconTrash,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
-import { authClient } from "@platform/lib/auth-client";
-import { toast } from "sonner";
+import { useDeleteMutation } from "@platform/hooks/use-delete-mutation";
 import type z from "zod";
 
 type SpacePreviewProps = {
@@ -31,37 +30,13 @@ type SpacePreviewProps = {
 export default function SpacePreview({ space }: SpacePreviewProps) {
 	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-	const queryClient = useQueryClient();
-	const { data: sessionData } = authClient.useSession();
 
-	const deleteMutation = useMutation({
+	const deleteMutation = useDeleteMutation({
 		mutationFn: () => trpcClient.space.delete.mutate({ spaceId: space.id }),
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: ["spaces", "root", sessionData?.session.activeOrganizationId],
-			});
-			queryClient.invalidateQueries({
-				queryKey: ["spaces"],
-			});
-			setIsDeleteDialogOpen(false);
-			toast.success("Space deleted successfully");
-		},
-		onError: () => {
-			toast.error("Failed to delete space");
-		},
+		resourceType: "space",
+		resourceName: "Space",
+		onSuccess: () => setIsDeleteDialogOpen(false),
 	});
-
-	const handleEditClick = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsEditDialogOpen(true);
-	};
-
-	const handleDeleteClick = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		setIsDeleteDialogOpen(true);
-	};
 
 	return (
 		<>
@@ -101,11 +76,16 @@ export default function SpacePreview({ space }: SpacePreviewProps) {
 					</Link>
 				</ContextMenuTrigger>
 				<ContextMenuContent>
-					<ContextMenuItem onClick={handleEditClick}>
+					<ContextMenuItem
+						onClick={stopPropagation(() => setIsEditDialogOpen(true))}
+					>
 						<IconPencil className="w-4 h-4" />
 						Edit
 					</ContextMenuItem>
-					<ContextMenuItem variant="destructive" onClick={handleDeleteClick}>
+					<ContextMenuItem
+						variant="destructive"
+						onClick={stopPropagation(() => setIsDeleteDialogOpen(true))}
+					>
 						<IconTrash className="w-4 h-4" />
 						Delete
 					</ContextMenuItem>

@@ -9,7 +9,8 @@
 		"./fs/*": "./src/fs/src/*.ts",
 		"./schemas": "./src/schemas/index.ts",
 		"./constants": "./src/constants/index.ts",
-		"./types": "./src/types/index.ts"
+		"./types": "./src/types/index.ts",
+		"./ai": "./src/ai/index.ts"
 	},
 	"scripts": {
 		"lint": "biome check .",
@@ -18,14 +19,17 @@
 		"format:fix": "biome format --write ."
 	},
 	"devDependencies": {
-		"@types/bun": "^1.3.5",
+		"@types/bun": "^1.3.9",
 		"biome": "latest",
 		"@curiositi/tsconfig": "workspace:*"
 	},
 	"peerDependencies": {
-		"typescript": "^5"
+		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"bun": "^1.3.5"
+		"bun": "^1.3.9",
+		"@ai-sdk/google": "^3.0.26",
+		"@ai-sdk/openai": "^3.0.27",
+		"ai": "^6.0.82"
 	}
 }

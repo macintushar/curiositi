@@ -29,9 +29,11 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from "@platform/components/ui/field";
+import { getFieldInvalid } from "@platform/components/ui/form-field";
 import { Input } from "@platform/components/ui/input";
 import { Textarea } from "@platform/components/ui/textarea";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
+import { handleFormSubmit } from "@platform/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { IconFolder, IconFolderPlus } from "@tabler/icons-react";
@@ -182,13 +184,7 @@ export default function SpaceDialog({
 					<DialogTitle>{config.title}</DialogTitle>
 					<DialogDescription>{config.description}</DialogDescription>
 				</DialogHeader>
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						e.stopPropagation();
-						form.handleSubmit();
-					}}
-				>
+				<form onSubmit={handleFormSubmit(() => form.handleSubmit())}>
 					<FieldGroup className="py-4">
 						<div className="flex gap-3 items-end">
 							<form.Field
@@ -237,8 +233,7 @@ export default function SpaceDialog({
 							<form.Field
 								name="name"
 								children={(field) => {
-									const isInvalid =
-										field.state.meta.isTouched && !field.state.meta.isValid;
+									const isInvalid = getFieldInvalid(field);
 									return (
 										<Field data-invalid={isInvalid} className="flex-1">
 											<FieldLabel htmlFor={field.name}>Name</FieldLabel>
@@ -269,8 +264,7 @@ export default function SpaceDialog({
 						<form.Field
 							name="description"
 							children={(field) => {
-								const isInvalid =
-									field.state.meta.isTouched && !field.state.meta.isValid;
+								const isInvalid = getFieldInvalid(field);
 								return (
 									<Field data-invalid={isInvalid}>
 										<FieldLabel htmlFor={field.name}>Description</FieldLabel>

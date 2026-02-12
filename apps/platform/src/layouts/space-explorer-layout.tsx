@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { selectSpaceSchema } from "@curiositi/db/schema";
 import type z from "zod";
@@ -15,6 +15,8 @@ import {
 	ContextMenuTrigger,
 } from "@platform/components/ui/context-menu";
 import { IconFolderPlus, IconUpload } from "@tabler/icons-react";
+import { useNavigationHistory } from "@platform/contexts/navigation-history-context";
+import NavigationButtons from "@platform/components/navigation-buttons";
 
 type FileType = {
 	id: string;
@@ -50,6 +52,17 @@ export default function SpaceExplorerLayout({
 }: SpaceExplorerLayoutProps) {
 	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 	const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+	const { canGoBack, canGoForward, goBack, goForward, pushEntry } =
+		useNavigationHistory();
+
+	// Track navigation when the space changes
+	useEffect(() => {
+		if (spaceId) {
+			pushEntry({ path: `/app/space/${spaceId}`, spaceId });
+		} else {
+			pushEntry({ path: "/app", spaceId: null });
+		}
+	}, [spaceId, pushEntry]);
 
 	return (
 		<>
@@ -57,7 +70,15 @@ export default function SpaceExplorerLayout({
 				<ContextMenuTrigger asChild>
 					<div className="min-h-full">
 						<div className="flex items-center justify-between mb-4">
-							{header ?? <div />}
+							<div className="flex items-center gap-2">
+								<NavigationButtons
+									canGoBack={canGoBack}
+									canGoForward={canGoForward}
+									goBack={goBack}
+									goForward={goForward}
+								/>
+								{header}
+							</div>
 
 							<div className="flex items-center gap-2">
 								<Button
