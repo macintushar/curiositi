@@ -219,6 +219,3 @@ export async function searchFilesWithAI(
 		return createResponse(null, error);
 	}
 }
-
-// Keep for backward compatibility
-export const searchFiles = searchFilesWithAI;

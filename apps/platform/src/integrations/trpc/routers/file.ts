@@ -11,7 +11,6 @@ import {
 	getFileById,
 	getFilesNotInSpace,
 	deleteFile,
-	searchFilesEnhanced,
 	searchFilesWithAI,
 	getRecentFiles,
 	enqueueFileForProcessing,
@@ -128,35 +127,6 @@ const fileRouter = {
 			}
 
 			return { success: true };
-		}),
-	search: protectedProcedure
-		.input(
-			z.object({
-				query: z.string().min(1),
-				filters: z
-					.object({
-						fileType: z.string().optional(),
-						spaceId: z.string().optional(),
-						dateFrom: z.date().optional(),
-						dateTo: z.date().optional(),
-					})
-					.optional(),
-				sortBy: z.enum(["relevance", "date", "name", "size"]).optional(),
-				limit: z.number().min(1).max(100).optional(),
-				offset: z.number().min(0).optional(),
-			})
-		)
-		.query(async ({ input, ctx }) => {
-			return await searchFilesEnhanced(
-				input.query,
-				ctx.session.session.activeOrganizationId,
-				{
-					filters: input.filters,
-					sortBy: input.sortBy,
-					limit: input.limit,
-					offset: input.offset,
-				}
-			);
 		}),
 	searchWithAI: protectedProcedure
 		.input(
