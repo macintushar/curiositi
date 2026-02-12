@@ -10,6 +10,8 @@ import {
 	IconBrandJavascript,
 } from "@tabler/icons-react";
 import { FileJson2 } from "lucide-react";
+import { cn } from "@platform/lib/utils";
+import { getFileTypeColor } from "@platform/lib/search-utils";
 
 type IconComponent = ComponentType<{ className?: string }>;
 
@@ -35,10 +37,19 @@ const FILE_ICON_RULES: FileIconRule[] = [
 type FileIconProps = {
 	type: string;
 	className?: string;
+	coloredIcon?: boolean;
 };
 
-export default function FileIcon({ type, className }: FileIconProps) {
+export default function FileIcon({
+	type,
+	className,
+	coloredIcon,
+}: FileIconProps) {
 	const rule = FILE_ICON_RULES.find((r) => type.includes(r.match));
 	const Icon = rule?.icon ?? IconFile;
-	return <Icon className={className} />;
+	return (
+		<Icon
+			className={cn(className, coloredIcon && `${getFileTypeColor(type)}`)}
+		/>
+	);
 }
