@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure } from "../init";
 import { S3Client } from "bun";
-import { env } from "../../../env";
+import { env } from "@platform/env";
 
 import type { TRPCRouterRecord } from "@trpc/server";
 
