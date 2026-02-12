@@ -118,7 +118,7 @@ export default async function handleUpload({
 		const updatedFile = await client.transaction(async (tx) => {
 			const updated = await tx
 				.update(files)
-				.set({ path, status: "completed" })
+				.set({ path })
 				.where(eq(files.id, insertedFileId as string))
 				.returning();
 
