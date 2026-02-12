@@ -18,7 +18,6 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppSpacesIndexRouteImport } from './routes/app/spaces/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
 import { Route as AppSpaceSpaceIdRouteImport } from './routes/app/space/$spaceId'
-import { Route as AppItemFileIdRouteImport } from './routes/app/item/$fileId'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -67,11 +66,6 @@ const AppSpaceSpaceIdRoute = AppSpaceSpaceIdRouteImport.update({
   path: '/space/$spaceId',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppItemFileIdRoute = AppItemFileIdRouteImport.update({
-  id: '/item/$fileId',
-  path: '/item/$fileId',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
@@ -92,7 +86,6 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
-  '/app/item/$fileId': typeof AppItemFileIdRoute
   '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload': typeof ApiUploadIndexRoute
   '/app/spaces': typeof AppSpacesIndexRoute
@@ -105,7 +98,6 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
-  '/app/item/$fileId': typeof AppItemFileIdRoute
   '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload': typeof ApiUploadIndexRoute
   '/app/spaces': typeof AppSpacesIndexRoute
@@ -120,7 +112,6 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
-  '/app/item/$fileId': typeof AppItemFileIdRoute
   '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload/': typeof ApiUploadIndexRoute
   '/app/spaces/': typeof AppSpacesIndexRoute
@@ -136,7 +127,6 @@ export interface FileRouteTypes {
     | '/app/'
     | '/api/auth/$'
     | '/api/trpc/$'
-    | '/app/item/$fileId'
     | '/app/space/$spaceId'
     | '/api/upload'
     | '/app/spaces'
@@ -149,7 +139,6 @@ export interface FileRouteTypes {
     | '/app'
     | '/api/auth/$'
     | '/api/trpc/$'
-    | '/app/item/$fileId'
     | '/app/space/$spaceId'
     | '/api/upload'
     | '/app/spaces'
@@ -163,7 +152,6 @@ export interface FileRouteTypes {
     | '/app/'
     | '/api/auth/$'
     | '/api/trpc/$'
-    | '/app/item/$fileId'
     | '/app/space/$spaceId'
     | '/api/upload/'
     | '/app/spaces/'
@@ -245,13 +233,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSpaceSpaceIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/app/item/$fileId': {
-      id: '/app/item/$fileId'
-      path: '/item/$fileId'
-      fullPath: '/app/item/$fileId'
-      preLoaderRoute: typeof AppItemFileIdRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/api/trpc/$': {
       id: '/api/trpc/$'
       path: '/api/trpc/$'
@@ -271,14 +252,12 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
-  AppItemFileIdRoute: typeof AppItemFileIdRoute
   AppSpaceSpaceIdRoute: typeof AppSpaceSpaceIdRoute
   AppSpacesIndexRoute: typeof AppSpacesIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppIndexRoute: AppIndexRoute,
-  AppItemFileIdRoute: AppItemFileIdRoute,
   AppSpaceSpaceIdRoute: AppSpaceSpaceIdRoute,
   AppSpacesIndexRoute: AppSpacesIndexRoute,
 }

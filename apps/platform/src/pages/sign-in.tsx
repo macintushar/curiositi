@@ -1,24 +1,15 @@
-import {
-	Field,
-	FieldDescription,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-	FieldSeparator,
-} from "@platform/components/ui/field";
-import { Input } from "@platform/components/ui/input";
+import FormField from "@platform/components/ui/form-field";
+import PasswordField from "@platform/components/ui/password-field";
 import { Button } from "@platform/components/ui/button";
 
 import { Link, useNavigate } from "@tanstack/react-router";
-import AuthLayout from "@platform/layouts/auth-layout";
+import AuthFormLayout from "@platform/layouts/auth-form-layout";
 import { useForm } from "@tanstack/react-form";
 import { signInSchema } from "@curiositi/share/schemas";
 
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
-import GoogleAuth from "@platform/components/google-auth";
 import LastUsedBadge from "@platform/components/last-used-badge";
-import HiddenInput from "@platform/components/ui/hidden-input";
 
 export default function SignIn() {
 	const navigate = useNavigate();
@@ -31,15 +22,11 @@ export default function SignIn() {
 			onChange: signInSchema,
 		},
 		onSubmit: async ({ value }) => {
-			// Do something with form data
 			const res = await authClient.signIn.email({
 				email: value.email,
 				password: value.password,
 				rememberMe: true,
 			});
-			console.log("here");
-
-			console.log(res);
 			if (res.error) {
 				toast.error(res.error.message);
 			}
@@ -53,94 +40,50 @@ export default function SignIn() {
 	const lastUsed = authClient.getLastUsedLoginMethod();
 
 	return (
-		<AuthLayout>
-			<form
-				className="flex flex-col gap-6"
-				onSubmit={(e) => {
-					e.preventDefault();
-					e.stopPropagation();
-					form.handleSubmit();
-				}}
-			>
-				<FieldGroup>
-					<div className="flex flex-col items-center gap-1 text-center">
-						<h1 className="text-2xl font-bold">Sign in to Curiositi</h1>
-						<p className="text-muted-foreground text-sm text-balance">
-							Sign in to access curiositi
-						</p>
-					</div>
-					<form.Field
-						name="email"
-						children={(field) => {
-							const isInvalid =
-								field.state.meta.isTouched && !field.state.meta.isValid;
-							return (
-								<Field data-invalid={isInvalid}>
-									<FieldLabel htmlFor={field.name}>Email</FieldLabel>
-									<Input
-										id={field.name}
-										name={field.name}
-										type="email"
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(e) => field.handleChange(e.target.value)}
-										aria-invalid={isInvalid}
-										placeholder="m@example.com"
-										autoComplete="email"
-									/>
-									{isInvalid && <FieldError errors={field.state.meta.errors} />}
-								</Field>
-							);
-						}}
+		<AuthFormLayout
+			title="Sign in to Curiositi"
+			subtitle="Sign in to access curiositi"
+			onSubmit={() => form.handleSubmit()}
+			submitButton={
+				<Button type="submit" className="relative">
+					Login
+					{lastUsed === "email" && <LastUsedBadge />}
+				</Button>
+			}
+			linkText="Don't have an account?"
+			linkLabel="Sign up"
+			linkTo="/sign-up"
+			googleAuthProps={{ isLastUsed: lastUsed === "google" }}
+		>
+			<form.Field
+				name="email"
+				children={(field) => (
+					<FormField
+						field={field}
+						label="Email"
+						inputType="email"
+						placeholder="m@example.com"
+						autoComplete="email"
 					/>
-					<form.Field
-						name="password"
-						children={(field) => {
-							const isInvalid =
-								field.state.meta.isTouched && !field.state.meta.isValid;
-							return (
-								<Field data-invalid={isInvalid}>
-									<div className="flex items-center">
-										<FieldLabel htmlFor={field.name}>Password</FieldLabel>
-										<Link
-											to="/"
-											className="ml-auto text-sm underline-offset-4 hover:underline text-muted-foreground"
-										>
-											Forgot your password?
-										</Link>
-									</div>
-									<HiddenInput
-										id={field.name}
-										name={field.name}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(e) => field.handleChange(e.target.value)}
-										aria-invalid={isInvalid}
-										autoComplete="current-password"
-									/>
-									{isInvalid && <FieldError errors={field.state.meta.errors} />}
-								</Field>
-							);
-						}}
-					/>
-					<Field>
-						<Button type="submit" className="relative">
-							Login
-							{lastUsed === "email" && <LastUsedBadge />}
-						</Button>
-					</Field>
-					<FieldSeparator>or</FieldSeparator>
-					<Field>
-						<GoogleAuth isLastUsed={lastUsed === "google"} />
-						<FieldDescription className="text-center">
-							Don&apos;t have an account?{" "}
-							<Link to="/sign-up" className="underline underline-offset-4">
-								Sign up
+				)}
+			/>
+			<form.Field
+				name="password"
+				children={(field) => (
+					<PasswordField
+						field={field}
+						label="Password"
+						labelExtra={
+							<Link
+								to="/"
+								className="ml-auto text-sm underline-offset-4 hover:underline text-muted-foreground"
+							>
+								Forgot your password?
 							</Link>
-						</FieldDescription>
-					</Field>
-				</FieldGroup>
-			</form>
-		</AuthLayout>
+						}
+					/>
+				)}
+			/>
+		</AuthFormLayout>
 	);
 }

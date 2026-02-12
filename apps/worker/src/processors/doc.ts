@@ -1,6 +1,7 @@
 import type { Processor } from "./types";
 import parsePdf from "../lib/md";
 import { TEXT_FILE_TYPES } from "@curiositi/share/constants";
+import { extractDocumentText } from "@curiositi/share/ai";
 
 function isTextMimeType(mimeType: string): boolean {
 	return TEXT_FILE_TYPES.includes(mimeType) || mimeType.startsWith("text/");
@@ -39,6 +40,28 @@ const docProcessor: Processor = async ({ file, fileData, logger }) => {
 
 	try {
 		const { pages } = await parsePdf(file);
+		const hasContent = pages.some((page) => page.content.trim().length > 10);
+
+		if (!hasContent) {
+			logger.info(
+				"No text found via library extraction, falling back to AI extraction",
+				{ fileId, processor: "doc" }
+			);
+
+			const fileBuffer = await file.arrayBuffer();
+			const result = await extractDocumentText({
+				file: fileBuffer,
+				provider: "openai",
+			});
+
+			logger.info("PDF extracted via AI successfully", {
+				fileId,
+				processor: "doc",
+			});
+
+			return [{ pageNumber: 1, content: result.text }];
+		}
+
 		logger.info("PDF parsed successfully", {
 			fileId,
 			pageCount: pages.length,

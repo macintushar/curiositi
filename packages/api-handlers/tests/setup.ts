@@ -19,6 +19,9 @@ export const mockDb = {
 	delete: mock(() => mockDb),
 	transaction: mock((cb: (tx: any) => any) => cb(mockDb)),
 	execute: mock(() => mockDb),
+	limit: mock(() => mockDb),
+	offset: mock(() => mockDb),
+	orderBy: mock(() => mockDb),
 } as any;
 
 // Helper to reset all db mocks to their default "return self" behavior
@@ -36,6 +39,9 @@ export const resetDbMocks = () => {
 		"set",
 		"delete",
 		"execute",
+		"limit",
+		"offset",
+		"orderBy",
 	];
 
 	for (const method of methods) {
@@ -55,6 +61,8 @@ export const mockLogger = {
 export const mockWrite = mock(() => Promise.resolve());
 export const mockPushToQueue = mock(() => Promise.resolve({ success: true }));
 
+export const mockDeleteS3Object = mock(() => Promise.resolve());
+
 // Setup global mocks
 mock.module("@curiositi/db/client", () => ({
 	default: mockDb,
@@ -66,6 +74,9 @@ mock.module("@curiositi/share/logger", () => ({
 
 mock.module("@curiositi/share/fs/write", () => ({
 	default: mockWrite,
+	isS3UploadError: (error: unknown) =>
+		error instanceof Error && (error as any).type === "S3UploadError",
+	deleteS3Object: mockDeleteS3Object,
 }));
 
 mock.module("@curiositi/queue", () => ({

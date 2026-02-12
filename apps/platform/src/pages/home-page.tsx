@@ -1,8 +1,9 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import SpaceExplorerLayout from "@platform/layouts/space-explorer-layout";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 import { authClient } from "@platform/lib/auth-client";
-import { useQuery } from "@tanstack/react-query";
-import TimeMessage from "@platform/components/time-message";
 
 export default function HomePage() {
 	const { data: sessionData } = authClient.useSession();
@@ -20,14 +21,15 @@ export default function HomePage() {
 	const isLoading = rootSpaces.isLoading || orphanFiles.isLoading;
 
 	return (
-		<>
-			<TimeMessage userName={sessionData?.user.name} />
-			<SpaceExplorerLayout
-				spaces={rootSpaces.data?.data}
-				files={orphanFiles.data?.data}
-				isLoading={isLoading}
-				spaceId={null}
-			/>
-		</>
+		<div className="flex flex-col h-screen overflow-scroll">
+			<div className="flex-1 px-6 pb-6">
+				<SpaceExplorerLayout
+					spaces={rootSpaces.data?.data}
+					files={orphanFiles.data?.data}
+					isLoading={isLoading}
+					spaceId={null}
+				/>
+			</div>
+		</div>
 	);
 }

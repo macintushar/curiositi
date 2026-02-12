@@ -169,27 +169,18 @@ export async function deleteSpace(id: string) {
 	try {
 		// Use a transaction to ensure all related deletions happen together
 		const result = await db.transaction(async (tx) => {
-			// 1. Get all child space IDs recursively
-			// We need a CTE or recursive logic. Since Drizzle's CTE support might be specific,
-			// we'll fetch all spaces for this org (not ideal for huge orgs but safe) or
-			// use a recursive function. Given typical space counts, a recursive fetch is acceptable.
+			// 1. Get all child space IDs recursively using a Recursive CTE
+			const descendantsResult = await tx.execute<{ id: string }>(sql`
+				WITH RECURSIVE descendants AS (
+					SELECT id FROM curiositi_spaces WHERE id = ${id}
+					UNION ALL
+					SELECT s.id FROM curiositi_spaces s
+					INNER JOIN descendants d ON s.parent_space_id = d.id
+				)
+				SELECT id FROM descendants
+			`);
 
-			// Helper to get all descendant IDs including the root
-			async function getAllDescendantIds(rootId: string): Promise<string[]> {
-				const children = await tx
-					.select({ id: spaces.id })
-					.from(spaces)
-					.where(eq(spaces.parentSpaceId, rootId));
-
-				let ids = [rootId];
-				for (const child of children) {
-					const childDescendants = await getAllDescendantIds(child.id);
-					ids = [...ids, ...childDescendants];
-				}
-				return ids;
-			}
-
-			const allSpaceIds = await getAllDescendantIds(id);
+			const allSpaceIds = Array.from(descendantsResult).map((row) => row.id);
 
 			// 2. Find all files in these spaces
 			const filesToDelete = await tx
@@ -200,13 +191,16 @@ export async function deleteSpace(id: string) {
 			const fileIdsToDelete = filesToDelete.map((f) => f.id);
 
 			// 3. Delete the files (this will cascade to file_contents and files_in_space)
-			// Note: This implements the "hard delete" logic requested (delete all files in the space)
-			// If a file is shared with a space outside this tree, it will still be deleted.
 			if (fileIdsToDelete.length > 0) {
 				await tx.delete(files).where(inArray(files.id, fileIdsToDelete));
 			}
 
-			// 4. Delete the root space (this will cascade to child spaces because of the schema update)
+			// 4. Delete the root space (this will cascade to child spaces because of the schema ON DELETE CASCADE)
+			// Actually, we can just delete the root space, and Postgres CASCADE will handle the children if configured.
+			// But manually deleting ensures we handle files correctly if foreign keys aren't perfect or if we have logic hooks.
+			// Current schema says: parentSpaceId references spaces.id with CASCADE.
+			// So deleting the root space *should* cascade delete all descendants.
+			// However, we explicitly fetch IDs to delete files associated with them first.
 			const deletedSpace = await tx
 				.delete(spaces)
 				.where(eq(spaces.id, id))
