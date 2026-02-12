@@ -1,7 +1,10 @@
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { embed, embedMany, generateText } from "ai";
-import { IMAGE_DESCRIPTION_PROMPT } from "./prompts";
+import {
+	DOCUMENT_EXTRACTION_PROMPT,
+	IMAGE_DESCRIPTION_PROMPT,
+} from "./prompts";
 
 export type AIProvider = "openai" | "google";
 
@@ -86,6 +89,37 @@ export async function describeImage({
 		messages: [
 			{ role: "system", content: IMAGE_DESCRIPTION_PROMPT },
 			{ role: "user", content: [{ type: "image", image }] },
+		],
+	});
+}
+
+type ExtractDocumentTextProps = {
+	file: ArrayBuffer;
+	provider: AIProvider;
+};
+
+export async function extractDocumentText({
+	file,
+	provider,
+}: ExtractDocumentTextProps) {
+	return await generateText({
+		model: textModel(provider),
+		messages: [
+			{ role: "system", content: DOCUMENT_EXTRACTION_PROMPT },
+			{
+				role: "user",
+				content: [
+					{
+						type: "text",
+						text: "Extract all text from this document:",
+					},
+					{
+						type: "file",
+						data: file,
+						mediaType: "application/pdf",
+					},
+				],
+			},
 		],
 	});
 }
