@@ -71,19 +71,20 @@ export default function FilePreview({ file }: FilePreviewProps) {
 						className="text-left cursor-pointer"
 						onClick={() => setIsViewerOpen(true)}
 					>
-						<Card className="max-w-sm">
+						<Card className="max-w-sm shadow-none hover:border-foreground/20 transition-colors">
 							<CardContent className="flex items-center justify-center">
 								<FileIcon
-									className="size-16 text-primary stroke-[1.5] opacity-65"
+									className="size-16 stroke-[1.5] transition-all"
 									type={file.type}
+									coloredIcon
 								/>
 							</CardContent>
 							<CardFooter>
 								<Tooltip>
-									<TooltipTrigger>
+									<TooltipTrigger asChild>
 										<Badge
 											variant={"secondary"}
-											className="max-w-32 bg-secondary/40 flex items-center gap-1"
+											className="max-w-32 bg-secondary flex items-center gap-1"
 										>
 											<span>
 												<FileIcon className="size-4" type={file.type} />

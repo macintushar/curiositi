@@ -6,18 +6,7 @@ import {
 } from "@curiositi/db/schema";
 import { createResponse } from "./response";
 import db from "@curiositi/db/client";
-import {
-	and,
-	eq,
-	notExists,
-	ilike,
-	sql,
-	desc,
-	asc,
-	or,
-	gte,
-	lte,
-} from "@curiositi/db";
+import { and, eq, notExists, sql, desc } from "@curiositi/db";
 import { embedText } from "@curiositi/share/ai";
 
 export async function getAllFiles(orgId: string, limit = 50, offset = 0) {
@@ -105,8 +94,6 @@ export type SearchResult = {
 	spaceId?: string | null;
 };
 
-export type SearchSortBy = "relevance" | "date" | "name" | "size";
-
 /**
  * Enhanced search across files, tags, and spaces
  */
@@ -116,7 +103,7 @@ export type SearchSortBy = "relevance" | "date" | "name" | "size";
 export async function getRecentFiles(orgId: string, limit = 10) {
 	try {
 		// Use a subquery to deduplicate files first, then sort by recency
-		const deduped = db
+		const deduped = await db
 			.selectDistinctOn([files.id], {
 				file: files,
 				spaceId: spaces.id,
@@ -127,15 +114,9 @@ export async function getRecentFiles(orgId: string, limit = 10) {
 			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
 			.where(eq(files.organizationId, orgId))
 			.orderBy(files.id)
-			.as("deduped");
-
-		const recentFiles = await db
-			.select()
-			.from(deduped)
-			.orderBy(desc(deduped.file.createdAt))
 			.limit(limit);
 
-		const results: SearchResult[] = recentFiles.map((match) => ({
+		const results: SearchResult[] = deduped.map((match) => ({
 			file: match.file,
 			score: 1.0,
 			matchType: "name" as const,
@@ -185,9 +166,15 @@ export async function searchFilesWithAI(
 			.limit(limit);
 
 		// Get spaces for semantic matches (batched query to avoid N+1)
-		const newMatches = semanticMatches.filter(
-			(m) => !results.some((r) => r.file.id === m.file.id)
-		);
+		const ids = new Set();
+		const newMatches = semanticMatches.filter((m) => {
+			if (ids.has(m.file.id)) {
+				return false;
+			} else {
+				ids.add(m.file.id);
+				return true;
+			}
+		});
 
 		if (newMatches.length > 0) {
 			const fileIds = newMatches.map((m) => m.file.id);

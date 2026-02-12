@@ -37,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				{!isMobile && (
-					<SidebarGroup>
+					<SidebarGroup className="border-b border-b-sidebar-border">
 						<Commander />
 					</SidebarGroup>
 				)}
