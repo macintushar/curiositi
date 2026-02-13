@@ -11,6 +11,7 @@ export default {
         "chore",
         "style",
         "refactor",
+        "lint",
         "ci",
         "test",
         "revert",
