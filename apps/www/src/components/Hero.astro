@@ -1,0 +1,52 @@
+---
+import { Icon } from "astro-icon/components";
+
+const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
+---
+
+<section class="relative px-6 pt-32 pb-20">
+	<div class="mx-auto max-w-4xl text-center">
+		<div
+			class="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-1.5"
+		>
+			<div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+			<span class="text-sm text-zinc-400">Now in Early Access</span>
+		</div>
+
+		<h1 class="mb-6 text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+			Your ideas, organized.
+		</h1>
+
+		<p class="mx-auto mb-10 max-w-2xl text-lg text-zinc-400 sm:text-xl">
+			One workspace for all your files, links, notes, and ideas. Let AI help you find, connect,
+			and create.
+		</p>
+
+		<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+			<a
+				href={`${platformUrl}/sign-up`}
+				class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+			>
+				Get Started Free
+				<Icon name="tabler:arrow-right" class="h-4 w-4" />
+			</a>
+			<a
+				href="#features"
+				class="inline-flex items-center gap-2 text-base text-zinc-400 transition-colors hover:text-white"
+			>
+				See How It Works
+			</a>
+		</div>
+	</div>
+
+	<div class="mx-auto mt-16 max-w-5xl">
+		<div
+			class="flex aspect-video items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50"
+		>
+			<div class="text-center">
+				<Icon name="tabler:photo" class="mx-auto mb-3 h-12 w-12 text-zinc-700" />
+				<p class="text-sm text-zinc-600">Product screenshot placeholder</p>
+			</div>
+		</div>
+	</div>
+</section>

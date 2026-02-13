@@ -1,0 +1,31 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<footer class="border-t border-zinc-800/50 px-6 py-8">
+	<div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
+		<div class="flex items-center gap-2">
+			<div class="flex h-7 w-7 items-center justify-center rounded-lg bg-white">
+				<Icon name="tabler:sparkles" class="h-3.5 w-3.5 text-zinc-900" />
+			</div>
+			<span class="text-sm font-semibold text-white">Curiositi</span>
+		</div>
+
+		<div class="flex items-center gap-6">
+		<a href="/docs" class="text-sm text-zinc-500 transition-colors hover:text-zinc-300">
+			Docs
+		</a>
+			<a href="/privacy" class="text-sm text-zinc-500 transition-colors hover:text-zinc-300">
+				Privacy
+			</a>
+			<a href="/terms" class="text-sm text-zinc-500 transition-colors hover:text-zinc-300">
+				Terms
+			</a>
+			<a href="/contact" class="text-sm text-zinc-500 transition-colors hover:text-zinc-300">
+				Contact
+			</a>
+		</div>
+
+		<p class="text-sm text-zinc-600">&copy; 2026 Curiositi. All rights reserved.</p>
+	</div>
+</footer>

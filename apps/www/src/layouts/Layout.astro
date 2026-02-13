@@ -1,0 +1,54 @@
+---
+import "../styles/global.css";
+import { SEO } from "astro-seo";
+
+type Props = {
+	title?: string;
+	description?: string;
+};
+
+const {
+	title = "Curiositi - Your ideas, organized.",
+	description = "One workspace for all your files, links, notes, and ideas. Let AI help you find, connect, and create.",
+} = Astro.props;
+
+const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
+---
+
+<!doctype html>
+<html lang="en" class="bg-zinc-950 text-zinc-100 antialiased">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<SEO
+			title={title}
+			description={description}
+			openGraph={{
+				basic: {
+					title: title,
+					type: "website",
+					image: `${Astro.site}og.png`,
+				},
+				optional: {
+					description: description,
+					siteName: "Curiositi",
+				},
+			}}
+			twitter={{
+				card: "summary_large_image",
+				title: title,
+				description: description,
+			}}
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
+	<body class="min-h-screen bg-zinc-950 font-sans">
+		<slot />
+	</body>
+</html>

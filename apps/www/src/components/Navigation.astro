@@ -1,0 +1,30 @@
+---
+import { Icon } from "astro-icon/components";
+
+const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-md">
+	<div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+		<a href="/" class="flex items-center gap-2">
+			<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
+				<Icon name="tabler:sparkles" class="h-4 w-4 text-zinc-900" />
+			</div>
+			<span class="text-lg font-semibold text-white">Curiositi</span>
+		</a>
+		<div class="flex items-center gap-4">
+			<a
+				href={`${platformUrl}/sign-in`}
+				class="text-sm text-zinc-400 transition-colors hover:text-white"
+			>
+				Sign In
+			</a>
+			<a
+				href={`${platformUrl}/sign-up`}
+				class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+			>
+				Get Started
+			</a>
+		</div>
+	</div>
+</nav>
