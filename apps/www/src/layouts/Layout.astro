@@ -1,6 +1,8 @@
 ---
 import "../styles/global.css";
 import { SEO } from "astro-seo";
+import Navigation from "../components/Navigation.astro";
+import Footer from "../components/Footer.astro";
 
 type Props = {
 	title?: string;
@@ -11,8 +13,6 @@ const {
 	title = "Curiositi - Your ideas, organized.",
 	description = "One workspace for all your files, links, notes, and ideas. Let AI help you find, connect, and create.",
 } = Astro.props;
-
-const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
 ---
 
 <!doctype html>

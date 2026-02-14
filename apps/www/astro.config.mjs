@@ -18,17 +18,13 @@ export default defineConfig({
 				{
 					icon: "github",
 					label: "GitHub",
-					href: "https://github.com/curiositi",
+					href: "https://github.com/macintushar/curiositi",
 				},
 			],
 			sidebar: [
 				{
 					label: "Welcome to Curiositi",
 					link: "/docs",
-				},
-				{
-					label: "Reference",
-					autogenerate: { directory: "docs/reference" },
 				},
 			],
 		}),

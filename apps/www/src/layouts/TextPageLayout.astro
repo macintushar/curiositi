@@ -1,0 +1,20 @@
+---
+import Navigation from "../components/Navigation.astro";
+import Footer from "../components/Footer.astro";
+
+const {
+	title = "Curiositi - Your ideas, organized.",
+	description = "One workspace for all your files, links, notes, and ideas. Let AI help you find, connect, and create.",
+} = Astro.props;
+---
+<Navigation />
+	<main class="pt-24 pb-16">
+		<div class="mx-auto max-w-3xl px-6">
+		    <h1 class="text-5xl mb-2">{title}</h1>
+			<p class="mb-8">{description}</p>
+			<article class="prose prose-invert prose-zinc max-w-none">
+			    <slot />
+			</article>
+		</div>
+	</main>
+<Footer />
