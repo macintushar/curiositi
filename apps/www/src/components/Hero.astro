@@ -1,7 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-
-const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
+import { PLATFORM_URL } from "../constants";
 ---
 
 <section class="relative px-6 pt-32 pb-20">
@@ -24,7 +23,7 @@ const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
 
 		<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 			<a
-				href={`${platformUrl}/sign-up`}
+				href={`${PLATFORM_URL}/sign-up`}
 				class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
 			>
 				Get Started Free

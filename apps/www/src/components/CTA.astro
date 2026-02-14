@@ -1,7 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-
-const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
+import { PLATFORM_URL } from "../constants";
 ---
 
 <section class="px-6 py-24">
@@ -16,7 +15,7 @@ const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
 				Join thousands of thinkers, creators, and professionals who trust Curiositi.
 			</p>
 			<a
-				href={`${platformUrl}/sign-up`}
+				href={`${PLATFORM_URL}/sign-up`}
 				class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
 			>
 				Start for Free

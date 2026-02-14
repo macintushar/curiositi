@@ -1,7 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
-
-const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
+import { PLATFORM_URL } from "../constants";
 ---
 
 <nav class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-md">
@@ -14,13 +13,13 @@ const platformUrl = import.meta.env.PLATFORM_URL || "https://app.curiositi.ai";
 		</a>
 		<div class="flex items-center gap-4">
 			<a
-				href={`${platformUrl}/sign-in`}
+				href={`${PLATFORM_URL}/sign-in`}
 				class="text-sm text-zinc-400 transition-colors hover:text-white"
 			>
 				Sign In
 			</a>
 			<a
-				href={`${platformUrl}/sign-up`}
+				href={`${PLATFORM_URL}/sign-up`}
 				class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
 			>
 				Get Started

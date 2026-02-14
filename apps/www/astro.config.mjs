@@ -4,6 +4,7 @@ import starlight from "@astrojs/starlight";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
+import { GITHUB_URL } from "./src/constants";
 
 export default defineConfig({
 	site: "https://curiositi.xyz",
@@ -18,7 +19,7 @@ export default defineConfig({
 				{
 					icon: "github",
 					label: "GitHub",
-					href: "https://github.com/macintushar/curiositi",
+					href: GITHUB_URL,
 				},
 			],
 			sidebar: [
