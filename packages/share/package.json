@@ -4,6 +4,7 @@
 	"module": "index.ts",
 	"type": "module",
 	"private": true,
+	"license": "AGPL-3.0",
 	"exports": {
 		"./logger": "./src/logger/index.ts",
 		"./fs/*": "./src/fs/src/*.ts",
