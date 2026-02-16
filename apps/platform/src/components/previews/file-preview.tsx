@@ -31,7 +31,7 @@ export default function FilePreview({ file }: FilePreviewProps) {
 	const [isViewerOpen, setIsViewerOpen] = useState(false);
 
 	const downloadUrlQuery = useQuery({
-		queryKey: ["file", "downloadUrl", file.id],
+		queryKey: ["file", "presignedUrl", file.id],
 		queryFn: () => trpcClient.file.getPresignedUrl.query({ fileId: file.id }),
 		enabled: false,
 	});
