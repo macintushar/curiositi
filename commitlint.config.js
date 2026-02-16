@@ -11,6 +11,7 @@ export default {
 				"chore",
 				"style",
 				"refactor",
+				"lint",
 				"ci",
 				"test",
 				"revert",
@@ -20,7 +21,17 @@ export default {
 		"scope-enum": [
 			2,
 			"always",
-			["platform", "worker", "db", "share", "queue", "api", "repo"],
+			[
+				"platform",
+				"worker",
+				"db",
+				"share",
+				"queue",
+				"api",
+				"repo",
+				"docs",
+				"www",
+			],
 		],
 	},
 };

@@ -87,8 +87,8 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
-  '/api/upload': typeof ApiUploadIndexRoute
-  '/app/spaces': typeof AppSpacesIndexRoute
+  '/api/upload/': typeof ApiUploadIndexRoute
+  '/app/spaces/': typeof AppSpacesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -128,8 +128,8 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/trpc/$'
     | '/app/space/$spaceId'
-    | '/api/upload'
-    | '/app/spaces'
+    | '/api/upload/'
+    | '/app/spaces/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -215,14 +215,14 @@ declare module '@tanstack/react-router' {
     '/app/spaces/': {
       id: '/app/spaces/'
       path: '/spaces'
-      fullPath: '/app/spaces'
+      fullPath: '/app/spaces/'
       preLoaderRoute: typeof AppSpacesIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/api/upload/': {
       id: '/api/upload/'
       path: '/api/upload'
-      fullPath: '/api/upload'
+      fullPath: '/api/upload/'
       preLoaderRoute: typeof ApiUploadIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

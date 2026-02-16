@@ -3,6 +3,7 @@
 	"name": "curiositi",
 	"type": "module",
 	"private": true,
+	"license": "AGPL-3.0",
 	"scripts": {
 		"build": "turbo run build",
 		"dev": "turbo run dev",

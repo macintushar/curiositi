@@ -1,0 +1,33 @@
+{
+	"name": "@curiositi/www",
+	"type": "module",
+	"version": "0.0.1",
+	"license": "AGPL-3.0",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --write",
+		"format": "biome format . --write",
+		"format:check": "biome format .",
+		"deploy": "wrangler deploy"
+	},
+	"dependencies": {
+		"@astrojs/sitemap": "^3.7.0",
+		"@astrojs/starlight": "^0.37.6",
+		"@astrojs/starlight-tailwind": "^4.0.2",
+		"@iconify-json/tabler": "^1.2.26",
+		"@tailwindcss/vite": "^4.1.18",
+		"astro": "^5.6.1",
+		"astro-icon": "^1.1.5",
+		"astro-seo": "^1.1.0",
+		"sharp": "^0.34.2",
+		"tailwindcss": "^4.1.18",
+		"zod": "3.25.76"
+	},
+	"devDependencies": {
+		"wrangler": "^4.65.0"
+	}
+}

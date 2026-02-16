@@ -9,6 +9,7 @@ import AuthLayout from "@platform/layouts/auth-layout";
 import GoogleAuth from "@platform/components/google-auth";
 import { Link } from "@tanstack/react-router";
 import { handleFormSubmit } from "@platform/lib/utils";
+import Mascot from "@platform/components/mascot";
 
 type AuthFormLayoutProps = {
 	title: string;
@@ -41,6 +42,7 @@ export default function AuthFormLayout({
 			>
 				<FieldGroup>
 					<div className="flex flex-col items-center gap-1 text-center">
+						<Mascot />
 						<h1 className="text-2xl font-bold">{title}</h1>
 						<p className="text-muted-foreground text-sm text-balance">
 							{subtitle}

@@ -14,7 +14,7 @@ COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
 # Format: type(scope): message
 # Types: feat, fix, refactor, chore, lint, style, test, perf, docs, ci, revert
 # Scopes: platform, worker, db, share, queue, api, repo
-commit_regex="^(feat|fix|refactor|chore|lint|style|test|perf|docs|ci|revert)(\((platform|worker|db|share|queue|api|repo)\))?: .+"
+commit_regex="^(feat|fix|refactor|chore|lint|style|test|perf|docs|ci|revert)(\((platform|worker|db|share|queue|api|repo|docs|www)\))?: .+"
 
 # Check if the commit message is a merge commit
 if echo "$COMMIT_MSG" | grep -q "^Merge "; then
@@ -29,7 +29,7 @@ if ! echo "$COMMIT_MSG" | grep -Eq "$commit_regex"; then
   echo "Format: <type>(<scope>): <message> or <type>: <message>"
   echo
   echo "Type must be one of: feat, fix, refactor, chore, lint, style, test, perf, docs, ci, revert, repo"
-  echo "Scope (optional) must be one of: platform, worker, db, share, queue, api"
+  echo "Scope (optional) must be one of: platform, worker, db, share, queue, api, repo, docs, www"
   echo
   echo "Examples:"
   echo "  feat(db): add user authentication table"

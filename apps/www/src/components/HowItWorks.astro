@@ -1,0 +1,53 @@
+---
+import { Icon } from "astro-icon/components";
+
+const steps = [
+	{
+		number: "01",
+		icon: "tabler:upload",
+		title: "Capture",
+		description:
+			"Upload files, paste links, or write notes. Curiositi accepts everything.",
+	},
+	{
+		number: "02",
+		icon: "tabler:stack-2",
+		title: "Organize",
+		description:
+			"Create Spaces for your projects. Group related content together naturally.",
+	},
+	{
+		number: "03",
+		icon: "tabler:bolt",
+		title: "Discover",
+		description:
+			"Find anything instantly with AI-powered search. Connect ideas effortlessly.",
+	},
+];
+---
+
+<section class="px-6 py-24">
+	<div class="mx-auto max-w-6xl">
+		<div class="mb-16 text-center">
+			<h2 class="mb-4 font-serif text-3xl font-bold text-white sm:text-4xl">How it works</h2>
+			<p class="mx-auto max-w-2xl text-lg text-zinc-400">
+				Three simple steps to transform how you work with information.
+			</p>
+		</div>
+
+		<div class="grid gap-8 sm:grid-cols-3">
+			{
+				steps.map((step) => (
+					<div class="text-center">
+						<div class="mb-4 text-sm font-medium text-zinc-600">{step.number}</div>
+						<div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800">
+							<Icon name={step.icon} class="h-6 w-6 text-zinc-300" />
+						</div>
+						<h3 class="mb-2 text-xl font-semibold text-white">{step.title}</h3>
+						<p class="text-sm leading-relaxed text-zinc-400">{step.description}</p>
+					</div>
+				))
+			}
+		</div>
+	</div>
+</section>

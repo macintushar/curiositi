@@ -17,7 +17,7 @@
 			"default": "./src/schema.ts"
 		}
 	},
-	"license": "MIT",
+	"license": "AGPL-3.0",
 	"scripts": {
 		"with-env": "dotenv -e ../../.env --",
 		"push": "bun run with-env -- drizzle-kit push",

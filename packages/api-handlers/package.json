@@ -3,6 +3,7 @@
 	"name": "@curiositi/api-handlers",
 	"type": "module",
 	"private": true,
+	"license": "AGPL-3.0",
 	"exports": {
 		"./upload": "./src/upload.ts",
 		"./response": "./src/response.ts",
