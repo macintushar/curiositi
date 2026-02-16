@@ -3,16 +3,48 @@ import { Icon } from "astro-icon/components";
 import { PLATFORM_URL } from "../constants";
 ---
 
-<section class="relative px-6 pt-32 pb-20">
+<section class="relative px-6 pt-24 pb-20 sm:pt-32">
 	<div class="mx-auto max-w-4xl text-center">
 		<div
-			class="mb-6 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-1.5"
+			class="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-1.5"
 		>
 			<div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
 			<span class="text-sm text-zinc-400">Now in Early Access</span>
 		</div>
 
-		<h1 class="mb-6 text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
+		<!-- ASCII Cat Mascot -->
+		<div class="relative mb-6 flex justify-center">
+			<!-- Magic Sparkles -->
+			<span
+				class="absolute -left-2 top-0 text-lg text-zinc-500 animate-pulse sm:text-xl"
+				style="animation-delay: 0s;">✦</span>
+			<span
+				class="absolute -right-1 top-1 text-sm text-zinc-600 animate-pulse sm:text-base"
+				style="animation-delay: 0.5s;">✧</span>
+			<span
+				class="absolute left-0 top-8 text-xs text-zinc-500 animate-pulse hidden sm:inline"
+				style="animation-delay: 1s;">⋆</span>
+			<span
+				class="absolute right-2 top-6 text-base text-zinc-400 animate-pulse sm:text-lg"
+				style="animation-delay: 1.5s;">✦</span>
+			<span
+				class="absolute -right-3 top-12 text-xs text-zinc-600 animate-pulse sm:text-sm"
+				style="animation-delay: 2s;">⋆</span>
+			<span
+				class="absolute left-4 top-10 text-sm text-zinc-500 animate-pulse hidden sm:inline"
+				style="animation-delay: 2.5s;">✧</span>
+
+			<!-- Cat with shadow -->
+			<div
+				class="font-mono text-zinc-300 text-4xl sm:text-6xl animate-float text-center leading-none drop-shadow-[0_0_15px_rgba(161,161,170,0.3)]"
+			>
+				<p class="tracking-wide ml-0.5 sm:ml-1">/\__/\</p>
+				<p class="tracking-widest">(^ . ^)</p>
+				<p class="tracking-wider">(")_(")~</p>
+			</div>
+		</div>
+
+		<h1 class="mb-6 font-serif text-5xl font-bold italic tracking-tight text-white sm:text-6xl lg:text-7xl">
 			Your ideas, organized.
 		</h1>
 

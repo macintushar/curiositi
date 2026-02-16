@@ -29,3 +29,9 @@ export const ALLOWED_MIME_TYPES = [
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export const LARGE_IMAGE_THRESHOLD = 5 * 1024 * 1024; // 5MB
+
+export const CAT_LOGO = `
+  /\\__/\\
+ (^ . ^)
+ (")_("))~
+ `;
