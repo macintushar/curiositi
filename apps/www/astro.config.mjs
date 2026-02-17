@@ -9,7 +9,7 @@ import { GITHUB_URL } from "./src/constants";
 export default defineConfig({
 	site: "https://curiositi.xyz",
 	vite: {
-		plugins: [tailwindcss()],
+		plugins: [/** @type {any} */ (tailwindcss())],
 	},
 	integrations: [
 		starlight({
@@ -63,6 +63,10 @@ export default defineConfig({
 				{
 					label: "Development",
 					autogenerate: { directory: "docs/development" },
+				},
+				{
+					label: "Community",
+					autogenerate: { directory: "docs/community" },
 				},
 				{
 					label: "References",
