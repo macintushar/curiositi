@@ -7,49 +7,76 @@ const useCases = [
 		title: "Creators",
 		description:
 			"Organize inspiration, research, and content in one place. Never lose a great idea again.",
+		color: "pink" as const,
 	},
 	{
 		icon: "tabler:book",
 		title: "Students",
 		description:
 			"Keep notes, readings, and research organized. Study smarter with AI-powered summaries.",
+		color: "accent" as const,
 	},
 	{
 		icon: "tabler:users",
 		title: "Teams",
 		description:
 			"Share spaces and collaborate. Keep everyone aligned with shared knowledge.",
+		color: "blue" as const,
 	},
 ];
+
+const colorClasses = {
+	pink: {
+		border: "border-l-playful-pink",
+		icon: "text-playful-pink",
+		bg: "bg-playful-pink/10 dark:bg-playful-pink/20",
+	},
+	accent: {
+		border: "border-l-accent-600",
+		icon: "text-accent-600 dark:text-accent-200",
+		bg: "bg-accent-600/10 dark:bg-accent-600/20",
+	},
+	blue: {
+		border: "border-l-playful-blue",
+		icon: "text-playful-blue",
+		bg: "bg-playful-blue/10 dark:bg-playful-blue/20",
+	},
+};
 ---
 
-<section class="px-6 py-24">
-	<div class="mx-auto max-w-6xl">
-		<div class="mb-16 text-center">
-			<h2 class="mb-4 font-serif text-3xl font-bold text-white sm:text-4xl">Built for how you work</h2>
-			<p class="mx-auto max-w-2xl text-lg text-zinc-400">
+<section class="relative px-6 py-16 sm:py-20 overflow-hidden">
+	<div class="absolute top-0 right-0 w-80 h-80 bg-playful-teal/5 dark:bg-playful-teal/3 rounded-full blur-3xl"></div>
+
+	<div class="relative mx-auto max-w-6xl">
+		<div class="mb-12 text-center">
+			<p class="mb-3 text-sm font-semibold uppercase tracking-widest text-accent-600 dark:text-accent-200">Use Cases</p>
+			<h2 class="mb-4 font-serif text-3xl sm:text-4xl lg:text-5xl font-bold italic text-zinc-900 dark:text-white">
+				Built for how you <span class="text-accent-600 dark:text-accent-200">work</span>
+			</h2>
+			<p class="mx-auto max-w-2xl text-base sm:text-lg text-zinc-500 dark:text-zinc-400">
 				Whether you're creating, studying, or collaborating, Curiositi adapts to your
 				workflow.
 			</p>
 		</div>
 
-		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 			{
-				useCases.map((useCase) => (
-					<div class="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 transition-colors hover:border-zinc-700">
-						<div class="mb-6 flex aspect-video items-center justify-center rounded-lg bg-zinc-800/50">
-							<Icon
-								name={useCase.icon}
-								class="h-10 w-10 text-zinc-600 transition-colors group-hover:text-zinc-400"
-							/>
+				useCases.map((useCase) => {
+					const colors = colorClasses[useCase.color];
+					return (
+						<div
+							class={`group relative rounded-xl border-2 border-zinc-200 dark:border-zinc-800 border-l-4 ${colors.border} bg-white/80 dark:bg-zinc-900/80 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50 hover:-translate-y-1`}
+						>
+							<div class="mb-4 flex items-center gap-3">
+								<div class={`flex h-12 w-12 items-center justify-center rounded-lg ${colors.bg} transition-transform group-hover:scale-110 group-hover:rotate-6`}>
+									<Icon name={useCase.icon} class={`h-6 w-6 ${colors.icon}`} />
+								</div>
+								<h3 class="text-xl font-bold text-zinc-900 dark:text-white">{useCase.title}</h3>
+							</div>
+						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{useCase.description}</p>
 						</div>
-						<div class="mb-2 flex items-center gap-2">
-							<Icon name={useCase.icon} class="h-4 w-4 text-zinc-400" />
-							<h3 class="text-base font-semibold text-white">{useCase.title}</h3>
-						</div>
-						<p class="text-sm leading-relaxed text-zinc-400">{useCase.description}</p>
-					</div>
-				))
+					);
+				})
 			}
 		</div>
 	</div>

@@ -1,0 +1,155 @@
+---
+title: 🗃️ Uploading Files
+description: How to upload and manage your files in Curiositi
+---
+
+Adding content to Curiositi is straightforward. Upload files through the web interface, and the worker processes them in the background to make them searchable.
+
+## Supported File Types
+
+### Documents
+
+| Format | MIME Type | Notes |
+|--------|-----------|-------|
+| PDF | `application/pdf` | Full text extraction |
+| Plain Text | `text/plain` | Direct content indexing |
+| Markdown | `text/markdown` | Rendered text extracted |
+| CSV | `text/csv` | Tabular data as text |
+| HTML | `text/html` | Rendered text extracted |
+| XML | `text/xml`, `application/xml` | Raw content extracted |
+| JSON | `application/json` | Raw content extracted |
+
+### Images
+
+| Format | MIME Type | Notes |
+|--------|-----------|-------|
+| JPEG | `image/jpeg` | AI-generated description via vision model |
+| PNG | `image/png` | AI-generated description via vision model |
+| WebP | `image/webp` | AI-generated description via vision model |
+| GIF | `image/gif` | AI-generated description via vision model |
+
+**Maximum file size:** 50 MB
+
+Images larger than 5 MB are considered "large" and handled accordingly during processing.
+
+## Upload Flow
+
+### Web Interface
+
+1. Navigate to a space or the main files view
+2. Use the upload interface to select files
+3. Files upload to S3 storage and metadata is saved to the database
+4. A processing job is dispatched via Upstash QStash
+
+### What Happens After Upload
+
+```
+1. Upload
+   ├─ File uploaded to S3 storage
+   ├─ File metadata saved to PostgreSQL (status: "pending")
+   └─ Processing job dispatched via QStash
+
+2. Worker Processing (POST /process-file)
+   ├─ Worker downloads file from S3
+   ├─ Content extracted based on file type:
+   │   ├─ Documents: text extraction
+   │   └─ Images: AI vision model generates description
+   ├─ Text chunked (800 tokens per chunk, 100 token overlap)
+   ├─ Vector embeddings generated (1536 dimensions)
+   ├─ Chunks + embeddings stored in fileContents table
+   └─ File status updated to "completed"
+
+3. Search Ready
+   └─ File content is now searchable via semantic search
+```
+
+### File Status
+
+Each file has a status that tracks its processing state:
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | File uploaded, waiting for worker to process |
+| `processing` | Worker is currently extracting and embedding content |
+| `completed` | Processing finished, file is searchable |
+| `failed` | Processing encountered an error |
+
+## Managing Files via tRPC
+
+All file operations use tRPC (not REST endpoints). The available procedures are:
+
+### List Files
+
+```typescript
+// Get all files in the current workspace
+const files = trpc.file.getAllInOrg.useQuery({
+  limit: 50,
+  offset: 0,
+});
+
+// Get recent files
+const recent = trpc.file.getRecent.useQuery({ limit: 10 });
+
+// Get files not assigned to any space
+const orphans = trpc.file.getOrphanFiles.useQuery();
+```
+
+### Get a File
+
+```typescript
+const file = trpc.file.getById.useQuery({ fileId: "file-uuid" });
+```
+
+### Get a Presigned URL (for downloading)
+
+```typescript
+const { url } = trpc.file.getPresignedUrl.useQuery({ fileId: "file-uuid" });
+```
+
+### Delete a File
+
+```typescript
+const deleteMutation = trpc.file.delete.useMutation();
+
+await deleteMutation.mutateAsync({ fileId: "file-uuid" });
+// Deletes from database and S3 storage
+```
+
+### Reprocess a File
+
+```typescript
+const processMutation = trpc.file.process.useMutation();
+
+await processMutation.mutateAsync({ fileId: "file-uuid" });
+// Re-enqueues the file for processing via QStash
+```
+
+## File Upload Endpoint
+
+The upload endpoint is a standard HTTP POST (not tRPC) at `/api/upload`. It handles multipart form data and stores the file in S3.
+
+## Troubleshooting
+
+### File Stuck at "Pending"
+
+1. Check the worker is running: `bun --filter @curiositi/worker dev`
+2. Verify `QSTASH_TOKEN` and `QSTASH_URL` are set correctly in `.env`
+3. Verify `WORKER_URL` points to your worker instance (default: `http://localhost:3040`)
+4. Check worker logs for errors
+
+### Processing Failed
+
+- File may be corrupted or in an unsupported format
+- Check the worker logs for specific error messages
+- Try re-processing with the `file.process` tRPC mutation
+
+### Upload Rejected
+
+- Verify the file type is in the supported MIME types list
+- Check the file is under 50 MB
+
+## Next Steps
+
+- [AI Search](/docs/features/ai-search) — Find your uploaded files
+- [Spaces](/docs/features/spaces) — Organize files into spaces
+- [Configuration](/docs/configuration) — Customize your setup

@@ -1,0 +1,129 @@
+---
+title: ✨ AI-Powered Search
+description: Find files by meaning with Curiositi's semantic search
+---
+
+Curiositi's semantic search goes beyond keyword matching. Find files by meaning, context, and intent — even when you don't remember exact filenames or terms.
+
+## What is Semantic Search?
+
+Traditional search looks for exact keyword matches:
+
+```
+Search: "quarterly report"
+Matches: Files containing the words "quarterly" AND "report"
+Misses: "Q1 financial summary", "quarter earnings review"
+```
+
+Semantic search understands meaning:
+
+```
+Search: "quarterly report"
+Matches: "Q1 financial summary", "quarter earnings review", "fiscal report Q1"
+Because: AI understands these all relate to periodic financial reports
+```
+
+## How It Works
+
+### 1. Vector Embeddings
+
+When files are processed, their content is split into chunks and each chunk is converted into a 1536-dimensional vector embedding that captures semantic meaning:
+
+```
+"quarterly sales report"  → [0.023, -0.156, 0.892, ...]
+"Q1 revenue summary"      → [0.019, -0.142, 0.887, ...]
+
+Similar meaning = Similar vectors = Close in vector space
+```
+
+### 2. Query Embedding
+
+When you search, your query text is also converted to a vector embedding using the same model.
+
+### 3. Similarity Search
+
+PostgreSQL with pgvector performs a cosine similarity search, comparing your query vector against all stored chunk vectors and returning the closest matches.
+
+### 4. Result Aggregation
+
+Matching chunks are grouped by their source file and returned with similarity scores.
+
+## Using Search
+
+### Search via tRPC
+
+Search is available through the `file.searchWithAI` tRPC procedure:
+
+```typescript
+const results = trpc.file.searchWithAI.useQuery({
+  query: "quarterly sales report",
+  limit: 10,           // optional, max 100
+  minSimilarity: 0.7,  // optional, 0.0 to 1.0
+});
+```
+
+The search is automatically scoped to the user's active workspace.
+
+### Natural Language Queries
+
+Simply describe what you're looking for:
+
+```
+"meeting notes about the product launch"
+"contract with Acme Corporation"
+"presentation about Q4 marketing strategy"
+```
+
+### Image Search
+
+Images are searchable by their AI-generated descriptions. When an image is processed, a vision model generates a text description, which is then embedded:
+
+```
+Search: "team photo from offsite"
+Finds: IMG_2847.jpg (description: "Group of employees at mountain retreat")
+
+Search: "dashboard mockup with blue theme"
+Finds: design-v2.png (description: "UI mockup showing analytics dashboard")
+```
+
+## Search Tips
+
+### Writing Good Queries
+
+1. **Be specific** — "Q1 marketing campaign budget" rather than "budget"
+2. **Use natural language** — Ask as you would a colleague
+3. **Include context** — "last month's sales data" rather than "sales"
+4. **Try variations** — If one query doesn't find what you need, rephrase it
+
+### Relevance Scoring
+
+Results include a similarity score (0.0 to 1.0):
+
+| Score | Meaning |
+|-------|---------|
+| 0.90+ | Very high relevance |
+| 0.80-0.89 | High relevance |
+| 0.70-0.79 | Good relevance |
+| 0.60-0.69 | Moderate relevance |
+| < 0.60 | Lower relevance |
+
+## Troubleshooting
+
+### No Results Found
+
+1. Check the file has completed processing (status: `completed`)
+2. Try different phrasing
+3. Lower the `minSimilarity` threshold
+4. Verify you're in the correct workspace
+
+### Irrelevant Results
+
+1. Make your query more specific
+2. Increase the `minSimilarity` threshold
+3. Check similarity scores in results to gauge relevance
+
+## Next Steps
+
+- [Spaces](/docs/features/spaces) — Organize content for better discovery
+- [Uploading Files](/docs/features/uploading-files) — Add searchable content
+- [Configuration](/docs/configuration) — Customize your setup

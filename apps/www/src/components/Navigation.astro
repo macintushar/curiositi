@@ -3,28 +3,47 @@ import { Icon } from "astro-icon/components";
 import { PLATFORM_URL } from "../constants";
 ---
 
-<nav class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-md">
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-200/50 dark:border-zinc-800/50 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xs">
 	<div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-		<a href="/" class="flex items-center gap-3 no-underline">
-			<div class="font-mono text-zinc-300 text-[10px] leading-none">
+		<a href="/" class="group flex items-center gap-3 no-underline transition-transform hover:scale-[1.02]">
+			<div class="font-mono text-zinc-600 dark:text-zinc-300 text-xs leading-none transition-transform group-hover:animate-wiggle">
 				<p class="tracking-wide ml-0.5">/\__/\</p>
 				<p class="tracking-widest">(^ . ^)</p>
 			</div>
-			<span class="text-lg font-semibold text-white">Curiositi</span>
+			<span class="text-xl font-bold text-zinc-900 dark:text-white">Curiositi</span>
 		</a>
-		<div class="flex items-center gap-4">
+		<div class="flex items-center gap-3">
 			<a
 				href={`${PLATFORM_URL}/sign-in`}
-				class="text-sm text-zinc-400 transition-colors hover:text-white"
+				class="text-sm font-medium text-zinc-600 dark:text-zinc-300 transition-colors hover:text-accent-600 dark:hover:text-accent-200"
 			>
 				Sign In
 			</a>
 			<a
 				href={`${PLATFORM_URL}/sign-up`}
-				class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+				class="rounded-xl bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-accent-600/90 active:scale-100 shadow-md shadow-accent-600/20 dark:shadow-accent-600/10"
 			>
 				Get Started
 			</a>
+			<button
+				id="theme-toggle"
+				type="button"
+				aria-label="Toggle theme"
+				class="rounded-xl p-2.5 text-zinc-600 dark:text-zinc-300 transition-all hover:bg-zinc-100 dark:bg-zinc-900 dark:hover:bg-zinc-800 hover:text-accent-600 dark:hover:text-accent-200"
+			>
+				<Icon name="tabler:sun" class="h-5 w-5 block dark:hidden" />
+				<Icon name="tabler:moon" class="h-5 w-5 hidden dark:block" />
+			</button>
 		</div>
 	</div>
 </nav>
+
+<script is:inline>
+	var toggle = document.getElementById("theme-toggle");
+	if (toggle) {
+		toggle.addEventListener("click", function () {
+			var isDark = document.documentElement.classList.toggle("dark");
+			localStorage.setItem("starlight-theme", isDark ? "dark" : "light");
+		});
+	}
+</script>

@@ -13,7 +13,32 @@ export default defineConfig({
 	},
 	integrations: [
 		starlight({
-			title: "Curiositi Docs",
+			title: "curiositi",
+			disable404Route: true,
+			head: [
+				{
+					tag: "link",
+					attrs: {
+						rel: "preconnect",
+						href: "https://fonts.googleapis.com",
+					},
+				},
+				{
+					tag: "link",
+					attrs: {
+						rel: "preconnect",
+						href: "https://fonts.gstatic.com",
+						crossorigin: true,
+					},
+				},
+				{
+					tag: "link",
+					attrs: {
+						rel: "stylesheet",
+						href: "https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap",
+					},
+				},
+			],
 			customCss: ["./src/styles/global.css"],
 			social: [
 				{
@@ -24,8 +49,24 @@ export default defineConfig({
 			],
 			sidebar: [
 				{
-					label: "Welcome to Curiositi",
-					link: "/docs",
+					label: "📖 Home",
+					slug: "docs",
+				},
+				{
+					label: "Getting Started",
+					autogenerate: { directory: "docs/getting-started" },
+				},
+				{
+					label: "Features",
+					autogenerate: { directory: "docs/features" },
+				},
+				{
+					label: "Development",
+					autogenerate: { directory: "docs/development" },
+				},
+				{
+					label: "References",
+					autogenerate: { directory: "docs/reference" },
 				},
 			],
 		}),

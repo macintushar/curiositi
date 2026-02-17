@@ -1,8 +1,6 @@
 ---
 import "../styles/global.css";
 import { SEO } from "astro-seo";
-import Navigation from "../components/Navigation.astro";
-import Footer from "../components/Footer.astro";
 
 type Props = {
 	title?: string;
@@ -16,11 +14,22 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" class="bg-zinc-950 text-zinc-100 antialiased">
+<html lang="en" class="antialiased">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<script is:inline>
+			(function () {
+				var theme = localStorage.getItem("starlight-theme");
+				var isDark =
+					theme === "dark" ||
+					(!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+				if (isDark) {
+					document.documentElement.classList.add("dark");
+				}
+			})();
+		</script>
 		<SEO
 			title={title}
 			description={description}
@@ -48,7 +57,22 @@ const {
 			rel="stylesheet"
 		/>
 	</head>
-	<body class="min-h-screen bg-zinc-950 font-sans">
+	<body class="min-h-screen bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 font-sans">
 		<slot />
+		<script is:inline>
+			(function () {
+				function applyTheme() {
+					var theme = localStorage.getItem("starlight-theme");
+					var isDark =
+						theme === "dark" ||
+						(!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+					document.documentElement.classList.toggle("dark", isDark);
+				}
+				window.addEventListener("storage", applyTheme);
+				window
+					.matchMedia("(prefers-color-scheme: dark)")
+					.addEventListener("change", applyTheme);
+			})();
+		</script>
 	</body>
 </html>

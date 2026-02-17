@@ -3,80 +3,81 @@ import { Icon } from "astro-icon/components";
 import { PLATFORM_URL } from "../constants";
 ---
 
-<section class="relative px-6 pt-24 pb-20 sm:pt-32">
-	<div class="mx-auto max-w-4xl text-center">
+<section class="relative overflow-hidden px-6 pt-24 pb-20 sm:pt-32 sm:pb-24">
+	<div class="absolute inset-0 overflow-hidden pointer-events-none">
+		<div class="absolute top-20 left-10 w-64 h-64 bg-playful-pink/10 dark:bg-playful-pink/5 rounded-full blur-3xl"></div>
+		<div class="absolute bottom-20 right-10 w-80 h-80 bg-playful-blue/10 dark:bg-playful-blue/5 rounded-full blur-3xl"></div>
+		<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-playful-purple/5 dark:bg-playful-purple/3 rounded-full blur-3xl"></div>
+	</div>
+
+	<div class="relative mx-auto max-w-5xl text-center">
 		<div
-			class="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-1.5"
+			class="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-accent-600/30 bg-accent-600/5 dark:border-accent-600/20 dark:bg-accent-600/10 px-5 py-2 animate-pop-in"
 		>
-			<div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
-			<span class="text-sm text-zinc-400">Now in Early Access</span>
+			<div class="relative">
+				<div class="h-2 w-2 rounded-full bg-accent-600"></div>
+				<div class="absolute inset-0 h-2 w-2 rounded-full bg-accent-600 animate-pulse-ring"></div>
+			</div>
+			<span class="text-sm font-medium text-accent-600 dark:text-accent-200">Now in Early Access</span>
 		</div>
 
-		<!-- ASCII Cat Mascot -->
-		<div class="relative mb-6 flex justify-center">
-			<!-- Magic Sparkles -->
-			<span
-				class="absolute -left-2 top-0 text-lg text-zinc-500 animate-pulse sm:text-xl"
-				style="animation-delay: 0s;">✦</span>
-			<span
-				class="absolute -right-1 top-1 text-sm text-zinc-600 animate-pulse sm:text-base"
-				style="animation-delay: 0.5s;">✧</span>
-			<span
-				class="absolute left-0 top-8 text-xs text-zinc-500 animate-pulse hidden sm:inline"
-				style="animation-delay: 1s;">⋆</span>
-			<span
-				class="absolute right-2 top-6 text-base text-zinc-400 animate-pulse sm:text-lg"
-				style="animation-delay: 1.5s;">✦</span>
-			<span
-				class="absolute -right-3 top-12 text-xs text-zinc-600 animate-pulse sm:text-sm"
-				style="animation-delay: 2s;">⋆</span>
-			<span
-				class="absolute left-4 top-10 text-sm text-zinc-500 animate-pulse hidden sm:inline"
-				style="animation-delay: 2.5s;">✧</span>
+		<div class="relative mb-8 flex justify-center">
+			<div class="absolute -left-8 top-2 text-3xl text-playful-pink/40 dark:text-playful-pink/30 animate-bounce-slow sm:text-4xl" aria-hidden="true">✦</div>
+			<div class="absolute -right-6 top-4 text-2xl text-playful-blue/40 dark:text-playful-blue/30 animate-bounce-slow sm:text-3xl" style="animation-delay: 0.5s;" aria-hidden="true">✧</div>
+			<div class="absolute -left-4 top-16 text-xl text-playful-teal/40 dark:text-playful-teal/30 animate-bounce-slow hidden sm:block" style="animation-delay: 1s;" aria-hidden="true">⋆</div>
+			<div class="absolute -right-10 top-14 text-2xl text-playful-orange/40 dark:text-playful-orange/30 animate-bounce-slow sm:text-3xl" style="animation-delay: 1.5s;" aria-hidden="true">✦</div>
+			<div class="absolute left-8 top-20 text-lg text-accent-600/40 dark:text-accent-200/30 animate-bounce-slow hidden sm:block" style="animation-delay: 2s;" aria-hidden="true">✧</div>
 
-			<!-- Cat with shadow -->
-			<div
-				class="font-mono text-zinc-300 text-4xl sm:text-6xl animate-float text-center leading-none drop-shadow-[0_0_15px_rgba(161,161,170,0.3)]"
-			>
-				<p class="tracking-wide ml-0.5 sm:ml-1">/\__/\</p>
-				<p class="tracking-widest">(^ . ^)</p>
-				<p class="tracking-wider">(")_(")~</p>
+		<div
+			class="relative font-mono text-zinc-700 dark:text-zinc-200 text-3xl sm:text-5xl lg:text-6xl animate-float text-center leading-none"
+			role="img"
+			aria-label="Cat mascot ASCII art"
+		>
+			<div class="absolute -inset-4 text-playful-pink/20 dark:text-playful-pink/10 blur-sm" aria-hidden="true">/\__/\<br />(^ . ^)<br />(")_(")~</div>
+				<p class="tracking-wide ml-1 sm:ml-2 relative z-10">/\__/\</p>
+				<p class="tracking-widest relative z-10">(^ . ^)</p>
+				<p class="tracking-wider relative z-10">(")_(")~</p>
 			</div>
 		</div>
 
-		<h1 class="mb-6 font-serif text-5xl font-bold italic tracking-tight text-white sm:text-6xl lg:text-7xl">
-			Your ideas, organized.
+		<h1 class="mb-6 font-serif text-3xl sm:text-4xl lg:text-5xl font-bold italic tracking-tight text-zinc-900 dark:text-white leading-[1.1]">
+			Your ideas,<br />
+			<span class="text-accent-600 dark:text-accent-200">organized.</span>
 		</h1>
 
-		<p class="mx-auto mb-10 max-w-2xl text-lg text-zinc-400 sm:text-xl">
-			One workspace for all your files, links, notes, and ideas. Let AI help you find, connect,
-			and create.
+		<p class="mx-auto mb-10 max-w-2xl text-base sm:text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed">
+			One workspace for all your files, links, notes, and ideas.<br class="hidden sm:block" />
+			Let <span class="text-accent-600 dark:text-accent-200 font-semibold">AI</span> help you find, connect, and create.
 		</p>
 
-		<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+		<div class="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
 			<a
 				href={`${PLATFORM_URL}/sign-up`}
-				class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+				class="group inline-flex items-center gap-2 rounded-xl bg-accent-600 px-6 py-3 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-accent-600/90 active:scale-100 shadow-lg shadow-accent-600/25 dark:shadow-accent-600/20"
 			>
 				Get Started Free
-				<Icon name="tabler:arrow-right" class="h-4 w-4" />
+				<Icon name="tabler:arrow-right" class="h-5 w-5 transition-transform group-hover:translate-x-1" />
 			</a>
 			<a
-				href="#features"
-				class="inline-flex items-center gap-2 text-base text-zinc-400 transition-colors hover:text-white"
+				href="/docs"
+				class="group inline-flex items-center gap-2 text-base font-medium text-zinc-600 dark:text-zinc-300 transition-colors hover:text-accent-600 dark:hover:text-accent-200"
 			>
 				See How It Works
+				<Icon name="tabler:chevron-right" class="h-5 w-5 transition-transform group-hover:translate-x-1" />
 			</a>
 		</div>
 	</div>
 
-	<div class="mx-auto mt-16 max-w-5xl">
+	<div class="relative mx-auto mt-16 max-w-5xl">
+		<div class="absolute -top-4 left-8 text-4xl text-playful-orange/20 dark:text-playful-orange/10 animate-spin-slow hidden lg:block" aria-hidden="true">✦</div>
+		<div class="absolute -bottom-4 right-12 text-3xl text-playful-teal/20 dark:text-playful-teal/10 animate-spin-slow hidden lg:block" style="animation-delay: 2s;" aria-hidden="true">✧</div>
+		
 		<div
-			class="flex aspect-video items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50"
+			class="flex aspect-video items-center justify-center rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 shadow-xl shadow-zinc-200/50 dark:shadow-zinc-900/50 transition-transform hover:scale-[1.02]"
 		>
 			<div class="text-center">
-				<Icon name="tabler:photo" class="mx-auto mb-3 h-12 w-12 text-zinc-700" />
-				<p class="text-sm text-zinc-600">Product screenshot placeholder</p>
+				<Icon name="tabler:photo" class="mx-auto mb-3 h-12 w-12 text-zinc-300 dark:text-zinc-700" />
+				<p class="text-sm text-zinc-400 dark:text-zinc-600 font-medium">Product screenshot placeholder</p>
 			</div>
 		</div>
 	</div>
