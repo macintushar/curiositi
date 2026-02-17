@@ -6,37 +6,37 @@ import { PLATFORM_URL } from "../constants";
 <section class="relative px-6 pt-24 pb-20 sm:pt-32">
 	<div class="mx-auto max-w-4xl text-center">
 		<div
-			class="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900 px-4 py-1.5"
+			class="mb-4 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900 px-4 py-1.5"
 		>
 			<div class="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
-			<span class="text-sm text-zinc-400">Now in Early Access</span>
+			<span class="text-sm text-zinc-500 dark:text-zinc-400">Now in Early Access</span>
 		</div>
 
 		<!-- ASCII Cat Mascot -->
 		<div class="relative mb-6 flex justify-center">
 			<!-- Magic Sparkles -->
 			<span
-				class="absolute -left-2 top-0 text-lg text-zinc-500 animate-pulse sm:text-xl"
+				class="absolute -left-2 top-0 text-lg text-zinc-400 dark:text-zinc-500 animate-pulse sm:text-xl"
 				style="animation-delay: 0s;">✦</span>
 			<span
-				class="absolute -right-1 top-1 text-sm text-zinc-600 animate-pulse sm:text-base"
+				class="absolute -right-1 top-1 text-sm text-zinc-300 dark:text-zinc-600 animate-pulse sm:text-base"
 				style="animation-delay: 0.5s;">✧</span>
 			<span
-				class="absolute left-0 top-8 text-xs text-zinc-500 animate-pulse hidden sm:inline"
+				class="absolute left-0 top-8 text-xs text-zinc-400 dark:text-zinc-500 animate-pulse hidden sm:inline"
 				style="animation-delay: 1s;">⋆</span>
 			<span
-				class="absolute right-2 top-6 text-base text-zinc-400 animate-pulse sm:text-lg"
+				class="absolute right-2 top-6 text-base text-zinc-500 dark:text-zinc-400 animate-pulse sm:text-lg"
 				style="animation-delay: 1.5s;">✦</span>
 			<span
-				class="absolute -right-3 top-12 text-xs text-zinc-600 animate-pulse sm:text-sm"
+				class="absolute -right-3 top-12 text-xs text-zinc-300 dark:text-zinc-600 animate-pulse sm:text-sm"
 				style="animation-delay: 2s;">⋆</span>
 			<span
-				class="absolute left-4 top-10 text-sm text-zinc-500 animate-pulse hidden sm:inline"
+				class="absolute left-4 top-10 text-sm text-zinc-400 dark:text-zinc-500 animate-pulse hidden sm:inline"
 				style="animation-delay: 2.5s;">✧</span>
 
 			<!-- Cat with shadow -->
 			<div
-				class="font-mono text-zinc-300 text-4xl sm:text-6xl animate-float text-center leading-none drop-shadow-[0_0_15px_rgba(161,161,170,0.3)]"
+				class="font-mono text-zinc-500 dark:text-zinc-300 text-4xl sm:text-6xl animate-float text-center leading-none drop-shadow-[0_0_15px_rgba(161,161,170,0.3)]"
 			>
 				<p class="tracking-wide ml-0.5 sm:ml-1">/\__/\</p>
 				<p class="tracking-widest">(^ . ^)</p>
@@ -44,11 +44,11 @@ import { PLATFORM_URL } from "../constants";
 			</div>
 		</div>
 
-		<h1 class="mb-6 font-serif text-5xl font-bold italic tracking-tight text-white sm:text-6xl lg:text-7xl">
+		<h1 class="mb-6 font-serif text-5xl font-bold italic tracking-tight text-zinc-900 dark:text-white sm:text-6xl lg:text-7xl">
 			Your ideas, organized.
 		</h1>
 
-		<p class="mx-auto mb-10 max-w-2xl text-lg text-zinc-400 sm:text-xl">
+		<p class="mx-auto mb-10 max-w-2xl text-lg text-zinc-500 dark:text-zinc-400 sm:text-xl">
 			One workspace for all your files, links, notes, and ideas. Let AI help you find, connect,
 			and create.
 		</p>
@@ -56,14 +56,14 @@ import { PLATFORM_URL } from "../constants";
 		<div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
 			<a
 				href={`${PLATFORM_URL}/sign-up`}
-				class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+				class="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
 			>
 				Get Started Free
 				<Icon name="tabler:arrow-right" class="h-4 w-4" />
 			</a>
 			<a
-				href="#features"
-				class="inline-flex items-center gap-2 text-base text-zinc-400 transition-colors hover:text-white"
+				href="/docs"
+				class="inline-flex items-center gap-2 text-base text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
 			>
 				See How It Works
 			</a>
@@ -72,11 +72,11 @@ import { PLATFORM_URL } from "../constants";
 
 	<div class="mx-auto mt-16 max-w-5xl">
 		<div
-			class="flex aspect-video items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/50"
+			class="flex aspect-video items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100/50 dark:border-zinc-800 dark:bg-zinc-900/50"
 		>
 			<div class="text-center">
-				<Icon name="tabler:photo" class="mx-auto mb-3 h-12 w-12 text-zinc-700" />
-				<p class="text-sm text-zinc-600">Product screenshot placeholder</p>
+				<Icon name="tabler:photo" class="mx-auto mb-3 h-12 w-12 text-zinc-300 dark:text-zinc-700" />
+				<p class="text-sm text-zinc-400 dark:text-zinc-600">Product screenshot placeholder</p>
 			</div>
 		</div>
 	</div>
