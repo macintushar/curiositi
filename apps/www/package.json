@@ -11,8 +11,7 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
 		"format": "biome format . --write",
-		"format:check": "biome format .",
-		"deploy": "wrangler deploy"
+		"format:check": "biome format ."
 	},
 	"dependencies": {
 		"@astrojs/sitemap": "^3.7.0",
@@ -26,8 +25,5 @@
 		"sharp": "^0.34.2",
 		"tailwindcss": "^4.1.18",
 		"zod": "3.25.76"
-	},
-	"devDependencies": {
-		"wrangler": "^4.65.0"
 	}
 }

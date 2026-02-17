@@ -1,0 +1,244 @@
+---
+title: ⚙️ Configuration
+description: Environment variables and configuration options for Curiositi
+---
+
+Curiositi is configured through environment variables. A single `.env.example` file at the repository root contains all available configuration options shared across apps.
+
+## Quick Setup
+
+Copy the example environment file from the repository root:
+
+```bash
+cp .env.example .env
+```
+
+This single `.env` file at the root is used by all apps via Turborepo.
+
+## Environment Variables
+
+The following environment variables are used by Curiositi. All variables listed below are defined in the root `.env.example` file.
+
+### Shared (Platform & Worker)
+
+These variables are required by both the platform and worker apps:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `POSTGRES_URL` | Yes | PostgreSQL connection string |
+| `S3_ENDPOINT` | Yes | S3-compatible storage endpoint URL |
+| `S3_BUCKET` | Yes | S3 bucket name |
+| `S3_ACCESS_KEY_ID` | Yes | S3 access key |
+| `S3_SECRET_ACCESS_KEY` | Yes | S3 secret key |
+
+Connection string format:
+```
+postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
+```
+
+### Platform Only
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `PLATFORM_URL` | Yes | Public URL of the platform app (default: `http://localhost:3030`) |
+| `WORKER_URL` | Yes | URL of the worker service (default: `http://localhost:3040`) |
+| `BETTER_AUTH_SECRET` | Yes | Secret key for Better Auth session signing |
+| `BETTER_AUTH_GOOGLE_CLIENT_ID` | Yes | Google OAuth client ID |
+| `BETTER_AUTH_GOOGLE_CLIENT_SECRET` | Yes | Google OAuth client secret |
+| `QSTASH_TOKEN` | Yes | Upstash QStash token for job queue |
+| `QSTASH_URL` | No | Custom QStash URL (uses default Upstash endpoint if not set) |
+
+### Client-Side (Platform)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_APP_TITLE` | No | Application title displayed in the browser |
+| `VITE_SENTRY_DSN` | No | Sentry DSN for error tracking |
+| `VITE_SENTRY_ORG` | No | Sentry organization slug |
+| `VITE_SENTRY_PROJECT` | No | Sentry project slug |
+
+### Monitoring
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SENTRY_AUTH_TOKEN` | No | Sentry auth token for source map uploads |
+
+## Full `.env.example`
+
+```bash
+# === SHARED (Platform & Worker) ===
+
+# Database - Connection string for the PostgreSQL database
+POSTGRES_URL=""
+
+# File Storage - S3 compatible storage settings for AWS, GCP, or Cloudflare R2
+S3_ENDPOINT=""
+S3_BUCKET=""
+S3_ACCESS_KEY_ID=""
+S3_SECRET_ACCESS_KEY=""
+
+# === PLATFORM ONLY ===
+
+# Server Configuration
+PLATFORM_URL="http://localhost:3030"
+WORKER_URL="http://localhost:3040"
+
+# Authentication - Better Auth configuration and Google OAuth credentials
+BETTER_AUTH_SECRET=""
+BETTER_AUTH_GOOGLE_CLIENT_ID=""
+BETTER_AUTH_GOOGLE_CLIENT_SECRET=""
+
+# Queueing (Upstash QStash)
+QSTASH_TOKEN=""
+QSTASH_URL=""
+
+# Monitoring & Error Tracking - Sentry (optional)
+VITE_SENTRY_DSN=""
+VITE_SENTRY_ORG=""
+VITE_SENTRY_PROJECT=""
+SENTRY_AUTH_TOKEN=""
+```
+
+## Configuration Validation
+
+Both the platform and worker validate environment variables at startup using `@t3-oss/env-core` with Zod schemas. Missing required variables will cause the application to fail fast with a clear error message.
+
+**Platform validation** (`apps/platform/src/env.ts`):
+
+```typescript
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
+
+export const env = createEnv({
+  server: {
+    PLATFORM_URL: z.url(),
+    QSTASH_TOKEN: z.string(),
+    WORKER_URL: z.string(),
+    BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
+    BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
+    BETTER_AUTH_SECRET: z.string(),
+    S3_ACCESS_KEY_ID: z.string(),
+    S3_SECRET_ACCESS_KEY: z.string(),
+    S3_BUCKET: z.string(),
+    S3_ENDPOINT: z.string(),
+  },
+  client: {
+    VITE_APP_TITLE: z.string().min(1).optional(),
+    VITE_SENTRY_DSN: z.string().optional(),
+    VITE_SENTRY_ORG: z.string().optional(),
+    VITE_SENTRY_PROJECT: z.string().optional(),
+  },
+  // ...
+});
+```
+
+**Worker validation** (`apps/worker/src/env.ts`):
+
+```typescript
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
+
+export const env = createEnv({
+  server: {
+    S3_ACCESS_KEY_ID: z.string(),
+    S3_SECRET_ACCESS_KEY: z.string(),
+    S3_BUCKET: z.string(),
+    S3_ENDPOINT: z.string(),
+    POSTGRES_URL: z.url(),
+  },
+  // ...
+});
+```
+
+## Hardcoded Configuration
+
+Some configuration values are set directly in code rather than through environment variables:
+
+### File Processing
+
+| Setting | Value | Location |
+|---------|-------|----------|
+| Max file size | 50MB | `packages/share/src/constants/index.ts` |
+| Large image threshold | 5MB | `packages/share/src/constants/index.ts` |
+| Chunk size | 800 tokens | `apps/worker/src/lib/chunk.ts` |
+| Chunk overlap | 100 tokens | `apps/worker/src/lib/chunk.ts` |
+| Embedding dimensions | 1536 | `packages/db/src/schema.ts` |
+
+### AI Models
+
+AI model names are hardcoded in `packages/share/src/ai/index.ts`:
+
+| Provider | Embedding Model | Text Model |
+|----------|----------------|------------|
+| OpenAI | `text-embedding-3-small` | `gpt-5-mini-2025-08-07` |
+| Google | `gemini-embedding-001` | `gemini-3-flash-preview` |
+
+### Ports
+
+| App | Port | Configuration |
+|-----|------|---------------|
+| Platform | 3030 | `apps/platform/package.json` dev script |
+| Worker | 3040 | `apps/worker/src/index.ts` |
+
+## Setting Up Services
+
+### PostgreSQL with pgvector
+
+**Docker:**
+```bash
+docker run -d \
+  --name curiositi-db \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=curiositi \
+  -p 5432:5432 \
+  pgvector/pgvector:pg16
+```
+
+**Verify pgvector:**
+```bash
+psql -h localhost -U postgres -d curiositi -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+### MinIO (S3-compatible local storage)
+
+**Docker:**
+```bash
+docker run -d \
+  --name curiositi-minio \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -e MINIO_ROOT_USER=minioadmin \
+  -e MINIO_ROOT_PASSWORD=minioadmin \
+  minio/minio server /data --console-address ":9001"
+```
+
+Create bucket:
+```bash
+mc alias set local http://localhost:9000 minioadmin minioadmin
+mc mb local/curiositi-dev
+```
+
+## Troubleshooting Configuration
+
+### Database Connection Failed
+
+```bash
+# Test connection
+psql $POSTGRES_URL -c "SELECT 1"
+
+# Check pgvector
+psql $POSTGRES_URL -c "SELECT * FROM pg_extension WHERE extname = 'vector'"
+```
+
+### S3 Connection Failed
+
+```bash
+# Test S3 access
+aws s3 ls s3://$S3_BUCKET --endpoint-url=$S3_ENDPOINT
+```
+
+## Next Steps
+
+- [Getting Started](/docs/getting-started/getting-started) — Run Curiositi with your configuration
+- [Architecture](/docs/development/architecture) — Understand the system design
+- [Roadmap](/docs/reference/roadmap) — See upcoming features

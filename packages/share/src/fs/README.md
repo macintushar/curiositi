@@ -1,15 +1,24 @@
-# fs
+# @curiositi/share/fs
 
-To install dependencies:
+S3-compatible file storage utilities using Bun's built-in `S3Client`.
 
-```bash
-bun install
+All functions accept an `S3Config` object (`accessKeyId`, `secretAccessKey`, `bucket`, `endpoint`) to allow bring-your-own storage.
+
+## Exports
+
+### `@curiositi/share/fs/read`
+
+```ts
+read(path: string, config: S3Config): Promise<S3File>
 ```
 
-To run:
+Reads a file from S3-compatible storage.
 
-```bash
-bun run index.ts
+### `@curiositi/share/fs/write`
+
+```ts
+write(path: string, data: string | File, config: S3Config): Promise<void>
+deleteS3Object(path: string, config: S3Config): Promise<void>
 ```
 
-This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Writes or deletes files in S3-compatible storage. Throws an `S3UploadError` on write failure.

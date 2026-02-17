@@ -22,3 +22,15 @@ export function MascotLogo({ className }: MascotProps) {
 		</div>
 	);
 }
+
+export function MascotNotFound({ className }: MascotProps) {
+	return (
+		<div className={cn("text-left font-mono whitespace-pre", className)}>
+			<p>{" ?       ?"}</p>
+			<p>{"  /\\__/\\"}</p>
+			<p>{" (o . o)  ?"}</p>
+			<p>{' (")_(")'}</p>
+			<p>{"     ?"}</p>
+		</div>
+	);
+}

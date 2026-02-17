@@ -4,12 +4,39 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
 	--font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
 	--font-serif: "Instrument Serif", ui-serif, Georgia, serif;
 	--animate-float: float 3s ease-in-out infinite;
 	--animate-pulse-slow: pulse 4s ease-in-out infinite;
 	--animate-pulse-slower: pulse 5s ease-in-out infinite;
+	--animate-bounce-slow: bounce 2s ease-in-out infinite;
+	--animate-wiggle: wiggle 0.5s ease-in-out;
+	--animate-pop-in: pop-in 0.4s ease-out forwards;
+	--animate-spin-slow: spin 8s linear infinite;
+	--animate-pulse-ring: pulse-ring 1.5s ease-out infinite;
+
+	--color-accent-200: #b0cbef;
+	--color-accent-600: #0e68ce;
+	--color-accent-900: #0f325e;
+	--color-accent-950: #0f2440;
+	--color-playful-pink: #f472b6;
+	--color-playful-purple: #a78bfa;
+	--color-playful-blue: #60a5fa;
+	--color-playful-teal: #2dd4bf;
+	--color-playful-orange: #fb923c;
+}
+
+.main-pane :is(h1, h2, h3, h4, h5, h6) {
+	font-family: var(--font-serif);
+	font-weight: 400;
+}
+
+.link-title {
+	font-weight: 400;
+	font-size: 18px;
 }
 
 @keyframes float {
@@ -19,5 +46,125 @@
 	}
 	50% {
 		transform: translateY(-10px);
+	}
+}
+
+@keyframes bounce {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-5px);
+	}
+}
+
+@keyframes wiggle {
+	0%,
+	100% {
+		transform: rotate(0deg);
+	}
+	25% {
+		transform: rotate(-3deg);
+	}
+	75% {
+		transform: rotate(3deg);
+	}
+}
+
+@keyframes pop-in {
+	0% {
+		opacity: 0;
+		transform: scale(0.8);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes pulse-ring {
+	0% {
+		transform: scale(1);
+		opacity: 0.5;
+	}
+	100% {
+		transform: scale(1.5);
+		opacity: 0;
+	}
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@layer utilities {
+	.text-accent-600 {
+		color: var(--color-accent-600);
+	}
+	.text-playful-pink {
+		color: var(--color-playful-pink);
+	}
+	.text-playful-purple {
+		color: var(--color-playful-purple);
+	}
+	.text-playful-blue {
+		color: var(--color-playful-blue);
+	}
+	.text-playful-teal {
+		color: var(--color-playful-teal);
+	}
+	.text-playful-orange {
+		color: var(--color-playful-orange);
+	}
+	.bg-accent-600 {
+		background-color: var(--color-accent-600);
+	}
+	.bg-playful-pink {
+		background-color: var(--color-playful-pink);
+	}
+	.bg-playful-purple {
+		background-color: var(--color-playful-purple);
+	}
+	.bg-playful-blue {
+		background-color: var(--color-playful-blue);
+	}
+	.bg-playful-teal {
+		background-color: var(--color-playful-teal);
+	}
+	.bg-playful-orange {
+		background-color: var(--color-playful-orange);
+	}
+	.border-accent-600 {
+		border-color: var(--color-accent-600);
+	}
+	.border-playful-pink {
+		border-color: var(--color-playful-pink);
+	}
+	.border-playful-purple {
+		border-color: var(--color-playful-purple);
+	}
+	.border-playful-blue {
+		border-color: var(--color-playful-blue);
+	}
+	.border-playful-teal {
+		border-color: var(--color-playful-teal);
+	}
+	.border-playful-orange {
+		border-color: var(--color-playful-orange);
+	}
+	.animate-wiggle:hover {
+		animation: wiggle 0.5s ease-in-out;
+	}
+	.hover\:rotate-2:hover {
+		transform: rotate(2deg);
+	}
+	.hover\:-rotate-2:hover {
+		transform: rotate(-2deg);
 	}
 }

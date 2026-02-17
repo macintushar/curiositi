@@ -1,0 +1,51 @@
+---
+title: 🗺️ Roadmap
+description: Upcoming features and development plans for Curiositi
+---
+
+Curiositi is actively developed. This roadmap outlines what has been built and what is planned.
+
+## Current Status
+
+Curiositi currently supports the following types of data:
+
+- Text
+  - PDF
+  - Text-based files like Markdown, HTML, etc.
+- Images
+  - JPEG, PNG, GIF, etc.
+
+## Planned
+
+### Office Docs
+
+Support for Word, Excel, and PowerPoint files.
+
+### Web Pages
+
+This requires scraping the web page, generating metadata for it, and then generating embeddings for the content and the metadata. Ideally this would use Firecrawl.
+
+### Audio
+
+This requires transcribing the audio, generating metadata for it, and then generating embeddings for the content and the metadata.
+
+### Video
+
+- **User Uploaded Videos** — Transcribe the audio, generate metadata, and generate embeddings for the content and metadata. Extract frames from the video, pass them into a Vision-capable model, and generate embeddings for them (similar to image embedding).
+- **YouTube Videos** — Download the videos, transcribe the audio, generate metadata, and generate embeddings. Extract frames and generate embeddings using a Vision-capable model.
+
+### Browser Extension
+
+This would allow users to save any text they come across on the web.
+
+### Mobile App
+
+This would function exactly the same as the web app.
+
+## Contributing
+
+Want to contribute or suggest features?
+
+- **Submit Ideas** — Open a feature request on [GitHub](https://github.com/macintushar/curiositi/issues/new)
+- **Contribute Code** — Check out the repository and submit a PR
+- **Report Bugs** — File issues on [GitHub](https://github.com/macintushar/curiositi/issues)

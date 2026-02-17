@@ -3,25 +3,44 @@ import { Icon } from "astro-icon/components";
 import { PLATFORM_URL } from "../constants";
 ---
 
-<section class="px-6 py-24">
-	<div class="mx-auto max-w-3xl text-center">
-		<div
-			class="rounded-2xl border border-zinc-800 bg-zinc-900/50 px-8 py-16"
-		>
-			<h2 class="mb-4 font-serif text-3xl font-bold text-white sm:text-4xl">
-				Ready to organize your ideas?
-			</h2>
-			<p class="mx-auto mb-8 max-w-xl text-lg text-zinc-400">
-				Join thousands of thinkers, creators, and professionals who trust Curiositi.
-			</p>
+<section class="relative px-6 py-24 sm:py-32 overflow-hidden">
+	<div class="absolute inset-0 bg-accent-600/5 dark:bg-accent-600/10"></div>
+	<div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-64 h-64 bg-playful-pink/10 dark:bg-playful-pink/5 rounded-full blur-3xl"></div>
+	<div class="absolute top-1/2 right-1/4 -translate-y-1/2 w-64 h-64 bg-playful-blue/10 dark:bg-playful-blue/5 rounded-full blur-3xl"></div>
+
+	<div class="relative mx-auto max-w-4xl text-center">
+		<div class="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-playful-orange/30 bg-playful-orange/5 dark:border-playful-orange/20 dark:bg-playful-orange/10 px-5 py-2">
+			<Icon name="tabler:sparkles" class="h-4 w-4 text-playful-orange" />
+			<span class="text-sm font-medium text-playful-orange">Free plan available</span>
+		</div>
+
+		<h2 class="mb-6 font-serif text-4xl sm:text-5xl lg:text-6xl font-bold italic text-zinc-900 dark:text-white leading-tight">
+			Ready to <span class="text-accent-600 dark:text-accent-200">organize</span><br />your ideas?
+		</h2>
+		<p class="mx-auto mb-10 max-w-xl text-lg sm:text-xl text-zinc-600 dark:text-zinc-300">
+			Join thousands of thinkers, creators, and professionals who trust Curiositi with their ideas.
+		</p>
+		
+		<div class="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
 			<a
 				href={`${PLATFORM_URL}/sign-up`}
-				class="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+				class="group inline-flex items-center gap-3 rounded-2xl bg-accent-600 px-8 py-4 text-lg font-semibold text-white transition-all hover:scale-105 hover:bg-accent-600/90 active:scale-100 shadow-lg shadow-accent-600/25 dark:shadow-accent-600/20"
 			>
 				Start for Free
-				<Icon name="tabler:arrow-right" class="h-4 w-4" />
+				<Icon name="tabler:arrow-right" class="h-5 w-5 transition-transform group-hover:translate-x-1" />
 			</a>
-			<p class="mt-4 text-sm text-zinc-600">No credit card required. Free plan available.</p>
+			<a
+				href="/docs"
+				class="inline-flex items-center gap-2 text-lg font-medium text-zinc-600 dark:text-zinc-300 transition-colors hover:text-accent-600 dark:hover:text-accent-200"
+			>
+				Learn More
+				<Icon name="tabler:chevron-right" class="h-5 w-5" />
+			</a>
 		</div>
+		
+		<p class="mt-8 text-sm text-zinc-400 dark:text-zinc-500 flex items-center justify-center gap-2">
+			<Icon name="tabler:shield-check" class="h-4 w-4 text-playful-teal" />
+			No credit card required
+		</p>
 	</div>
 </section>
