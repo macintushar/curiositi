@@ -39,8 +39,11 @@ import { PLATFORM_URL } from "../constants";
 </nav>
 
 <script is:inline>
-	document.getElementById("theme-toggle").addEventListener("click", function () {
-		var isDark = document.documentElement.classList.toggle("dark");
-		localStorage.setItem("starlight-theme", isDark ? "dark" : "light");
-	});
+	var toggle = document.getElementById("theme-toggle");
+	if (toggle) {
+		toggle.addEventListener("click", function () {
+			var isDark = document.documentElement.classList.toggle("dark");
+			localStorage.setItem("starlight-theme", isDark ? "dark" : "light");
+		});
+	}
 </script>

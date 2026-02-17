@@ -22,16 +22,18 @@ import { PLATFORM_URL } from "../constants";
 		</div>
 
 		<div class="relative mb-8 flex justify-center">
-			<div class="absolute -left-8 top-2 text-3xl text-playful-pink/40 dark:text-playful-pink/30 animate-bounce-slow sm:text-4xl">✦</div>
-			<div class="absolute -right-6 top-4 text-2xl text-playful-blue/40 dark:text-playful-blue/30 animate-bounce-slow sm:text-3xl" style="animation-delay: 0.5s;">✧</div>
-			<div class="absolute -left-4 top-16 text-xl text-playful-teal/40 dark:text-playful-teal/30 animate-bounce-slow hidden sm:block" style="animation-delay: 1s;">⋆</div>
-			<div class="absolute -right-10 top-14 text-2xl text-playful-orange/40 dark:text-playful-orange/30 animate-bounce-slow sm:text-3xl" style="animation-delay: 1.5s;">✦</div>
-			<div class="absolute left-8 top-20 text-lg text-accent-600/40 dark:text-accent-200/30 animate-bounce-slow hidden sm:block" style="animation-delay: 2s;">✧</div>
+			<div class="absolute -left-8 top-2 text-3xl text-playful-pink/40 dark:text-playful-pink/30 animate-bounce-slow sm:text-4xl" aria-hidden="true">✦</div>
+			<div class="absolute -right-6 top-4 text-2xl text-playful-blue/40 dark:text-playful-blue/30 animate-bounce-slow sm:text-3xl" style="animation-delay: 0.5s;" aria-hidden="true">✧</div>
+			<div class="absolute -left-4 top-16 text-xl text-playful-teal/40 dark:text-playful-teal/30 animate-bounce-slow hidden sm:block" style="animation-delay: 1s;" aria-hidden="true">⋆</div>
+			<div class="absolute -right-10 top-14 text-2xl text-playful-orange/40 dark:text-playful-orange/30 animate-bounce-slow sm:text-3xl" style="animation-delay: 1.5s;" aria-hidden="true">✦</div>
+			<div class="absolute left-8 top-20 text-lg text-accent-600/40 dark:text-accent-200/30 animate-bounce-slow hidden sm:block" style="animation-delay: 2s;" aria-hidden="true">✧</div>
 
-			<div
-				class="relative font-mono text-zinc-700 dark:text-zinc-200 text-3xl sm:text-5xl lg:text-6xl animate-float text-center leading-none"
-			>
-				<div class="absolute -inset-4 text-playful-pink/20 dark:text-playful-pink/10 blur-sm">/\__/\<br />(^ . ^)<br />(")_(")~</div>
+		<div
+			class="relative font-mono text-zinc-700 dark:text-zinc-200 text-3xl sm:text-5xl lg:text-6xl animate-float text-center leading-none"
+			role="img"
+			aria-label="Cat mascot ASCII art"
+		>
+			<div class="absolute -inset-4 text-playful-pink/20 dark:text-playful-pink/10 blur-sm" aria-hidden="true">/\__/\<br />(^ . ^)<br />(")_(")~</div>
 				<p class="tracking-wide ml-1 sm:ml-2 relative z-10">/\__/\</p>
 				<p class="tracking-widest relative z-10">(^ . ^)</p>
 				<p class="tracking-wider relative z-10">(")_(")~</p>
@@ -67,8 +69,8 @@ import { PLATFORM_URL } from "../constants";
 	</div>
 
 	<div class="relative mx-auto mt-16 max-w-5xl">
-		<div class="absolute -top-4 left-8 text-4xl text-playful-orange/20 dark:text-playful-orange/10 animate-spin-slow hidden lg:block">✦</div>
-		<div class="absolute -bottom-4 right-12 text-3xl text-playful-teal/20 dark:text-playful-teal/10 animate-spin-slow hidden lg:block" style="animation-delay: 2s;">✧</div>
+		<div class="absolute -top-4 left-8 text-4xl text-playful-orange/20 dark:text-playful-orange/10 animate-spin-slow hidden lg:block" aria-hidden="true">✦</div>
+		<div class="absolute -bottom-4 right-12 text-3xl text-playful-teal/20 dark:text-playful-teal/10 animate-spin-slow hidden lg:block" style="animation-delay: 2s;" aria-hidden="true">✧</div>
 		
 		<div
 			class="flex aspect-video items-center justify-center rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/80 shadow-xl shadow-zinc-200/50 dark:shadow-zinc-900/50 transition-transform hover:scale-[1.02]"

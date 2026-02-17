@@ -45,7 +45,7 @@ At minimum, you need to set:
 - `BETTER_AUTH_SECRET` — A random secret for session signing
 - `QSTASH_TOKEN`, `QSTASH_URL` — Upstash QStash credentials for the job queue
 
-See the [Configuration](/docs/configuration) guide for all available options.
+See the [Configuration](/docs/development/configuration) guide for all available options.
 
 ### 4. Set Up the Database
 
@@ -88,7 +88,7 @@ curiositi/
 │   │       ├── processors/# File type processors (doc, image)
 │   │       ├── lib/       # Chunking and markdown utilities
 │   │       └── env.ts     # Environment variable validation
-│   └── www/               # Documentation site (Starlight on Cloudflare)
+│   └── www/               # Documentation site (Starlight on Vercel)
 ├── packages/
 │   ├── db/                # Database schema and Drizzle ORM config
 │   ├── share/             # Shared utilities (logger, fs, constants, AI)
@@ -201,7 +201,7 @@ rm -rf .turbo
 
 Now that you have Curiositi running:
 
-- [Core Concepts](/docs/core-concepts) — Understand the data model
+- [Core Concepts](/docs/getting-started/core-concepts) — Understand the data model
 - [Uploading Files](/docs/features/uploading-files) — Add your content
 - [AI Search](/docs/features/ai-search) — Search with natural language
-- [Configuration](/docs/configuration) — Customize your setup
+- [Configuration](/docs/development/configuration) — Customize your setup
