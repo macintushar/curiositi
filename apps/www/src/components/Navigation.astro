@@ -3,28 +3,44 @@ import { Icon } from "astro-icon/components";
 import { PLATFORM_URL } from "../constants";
 ---
 
-<nav class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-md">
+<nav class="fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 bg-white/80 dark:border-zinc-800/50 dark:bg-zinc-950/80 backdrop-blur-md">
 	<div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
 		<a href="/" class="flex items-center gap-3 no-underline">
-			<div class="font-mono text-zinc-300 text-[10px] leading-none">
+			<div class="font-mono text-zinc-500 dark:text-zinc-300 text-[10px] leading-none">
 				<p class="tracking-wide ml-0.5">/\__/\</p>
 				<p class="tracking-widest">(^ . ^)</p>
 			</div>
-			<span class="text-lg font-semibold text-white">Curiositi</span>
+			<span class="text-lg font-semibold text-zinc-900 dark:text-white">Curiositi</span>
 		</a>
 		<div class="flex items-center gap-4">
 			<a
 				href={`${PLATFORM_URL}/sign-in`}
-				class="text-sm text-zinc-400 transition-colors hover:text-white"
+				class="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
 			>
 				Sign In
 			</a>
 			<a
 				href={`${PLATFORM_URL}/sign-up`}
-				class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200"
+				class="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
 			>
 				Get Started
 			</a>
+			<button
+				id="theme-toggle"
+				type="button"
+				aria-label="Toggle theme"
+				class="rounded-lg p-2 text-zinc-900 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-white dark:hover:text-white dark:bg-zinc-900 dark:hover:bg-zinc-800"
+			>
+				<Icon name="tabler:sun" class="h-5 w-5 block dark:hidden" />
+				<Icon name="tabler:moon" class="h-5 w-5 hidden dark:block" />
+			</button>
 		</div>
 	</div>
 </nav>
+
+<script is:inline>
+	document.getElementById("theme-toggle").addEventListener("click", function () {
+		var isDark = document.documentElement.classList.toggle("dark");
+		localStorage.setItem("starlight-theme", isDark ? "dark" : "light");
+	});
+</script>

@@ -4,12 +4,30 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
 	--font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
 	--font-serif: "Instrument Serif", ui-serif, Georgia, serif;
 	--animate-float: float 3s ease-in-out infinite;
 	--animate-pulse-slow: pulse 4s ease-in-out infinite;
 	--animate-pulse-slower: pulse 5s ease-in-out infinite;
+
+	/* Generated accent color palettes. */
+    --color-accent-200: #b0cbef;
+    --color-accent-600: #0e68ce;
+    --color-accent-900: #0f325e;
+    --color-accent-950: #0f2440;
+}
+
+.main-pane :is(h1, h2, h3, h4, h5, h6) {
+	font-family: var(--font-serif);
+	font-weight: 400;
+}
+
+.link-title {
+    font-weight: 400;
+    font-size: 18px;
 }
 
 @keyframes float {
