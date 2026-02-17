@@ -1,4 +1,98 @@
 ---
-title: Hello, World!
-description: This is a page in my Starlight-powered site
+title: Curiositi Documentation
+description: Your AI-powered digital brain for storing, organizing, and finding files
 ---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+Curiositi is your **digital brain** — an AI-powered application that helps you store, organize, and effortlessly find any file using semantic search.
+
+## What is Curiositi?
+
+Curiositi transforms how you manage digital content. Instead of remembering exact filenames or folder locations, simply describe what you're looking for in natural language. The AI understands meaning and context to surface the right files instantly.
+
+<CardGrid>
+	<Card title="Smart Storage" icon="document">
+		Upload PDFs, images, text files, and more. Files are stored in
+		S3-compatible storage and processed automatically.
+	</Card>
+	<Card title="Semantic Search" icon="magnifier">
+		Find files by meaning, not just keywords. Ask "quarterly sales report" and
+		find relevant documents even if they don't contain those exact words.
+	</Card>
+	<Card title="AI Processing" icon="setting">
+		Every file is automatically processed to extract content, chunk it, and
+		create searchable vector embeddings.
+	</Card>
+	<Card title="Fast and Scalable" icon="rocket">
+		Built on PostgreSQL with pgvector, Upstash QStash for async processing,
+		and Bun for performance.
+	</Card>
+	<Card title="Spaces" icon="seti:folder">
+		Organize files in hierarchical spaces. Create nested structures that match
+		how you think.
+	</Card>
+	<Card title="Workspaces" icon="list-format">
+		Collaborate with teams using multi-tenant workspace support. All content
+		is scoped to your workspace.
+	</Card>
+</CardGrid>
+
+## Quick Start
+
+Get up and running in minutes:
+
+```bash
+# Clone the repository
+git clone https://github.com/macintushar/curiositi.git
+cd curiositi
+
+# Install dependencies
+bun install
+
+# Set up environment variables
+cp .env.example .env
+
+# Start development servers
+bun run dev
+```
+
+Visit the [Getting Started](/docs/getting-started) guide for detailed setup instructions.
+
+## How It Works
+
+1. **Upload** — Drag and drop any supported file into Curiositi
+2. **Process** — The worker extracts content and generates embeddings in the background
+3. **Organize** — Add files to spaces, create nested hierarchies
+4. **Search** — Find anything using natural language queries
+
+## Supported File Types
+
+| Category | Formats |
+|----------|---------|
+| **Documents** | PDF |
+| **Text** | Plain text (.txt), Markdown (.md), CSV |
+| **Data** | JSON, XML |
+| **Web** | HTML |
+| **Images** | JPEG, PNG, WebP, GIF (with AI-generated descriptions) |
+
+Maximum file size: **50 MB**
+
+## Architecture Overview
+
+Curiositi is built as a monorepo with Turborepo and Bun:
+
+- **Platform** — React 19 web app with TanStack Start, tRPC v11, and Tailwind CSS v4
+- **Worker** — Hono server on Bun for AI-powered file processing
+- **Database** — PostgreSQL with Drizzle ORM and pgvector for embeddings
+- **Storage** — S3-compatible object storage for files
+- **Queue** — Upstash QStash for background job processing
+
+Learn more in the [Architecture](/docs/architecture) section.
+
+## Next Steps
+
+- [Getting Started](/docs/getting-started) — Installation and setup
+- [Core Concepts](/docs/core-concepts) — Understand spaces, files, and workspaces
+- [Uploading Files](/docs/features/uploading-files) — How to add content
+- [AI Search](/docs/features/ai-search) — Master semantic search

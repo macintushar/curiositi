@@ -1,0 +1,207 @@
+---
+title: ✅ Getting Started
+description: Install and set up Curiositi in minutes
+---
+
+Get Curiositi running locally for development. This guide covers everything you need to get started.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- **Bun** — Curiositi uses Bun as its runtime and package manager
+- **PostgreSQL** — Version 14+ with the pgvector extension enabled
+- **S3-compatible storage** — AWS S3, Cloudflare R2, or similar
+
+## Quick Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/macintushar/curiositi.git
+cd curiositi
+```
+
+### 2. Install Dependencies
+
+```bash
+bun install
+```
+
+This installs all dependencies across the monorepo using Bun workspaces.
+
+### 3. Configure Environment Variables
+
+Copy the example environment file from the repository root and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+At minimum, you need to set:
+
+- `POSTGRES_URL` — Your PostgreSQL connection string
+- `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` — S3 storage credentials
+- `BETTER_AUTH_SECRET` — A random secret for session signing
+- `QSTASH_TOKEN`, `QSTASH_URL` — Upstash QStash credentials for the job queue
+
+See the [Configuration](/docs/configuration) guide for all available options.
+
+### 4. Set Up the Database
+
+```bash
+# Push the schema to your database
+bun --filter @curiositi/db push
+
+# Or run migrations
+bun --filter @curiositi/db migrate
+```
+
+### 5. Start Development Servers
+
+```bash
+# Start all apps in development mode
+bun run dev
+```
+
+This starts:
+- **Platform** at `http://localhost:3030`
+- **Worker** at `http://localhost:3040`
+
+## Project Structure
+
+```
+curiositi/
+├── apps/
+│   ├── platform/          # Main web application (TanStack Start)
+│   │   └── src/
+│   │       ├── routes/    # TanStack Router route definitions
+│   │       ├── components/# React components
+│   │       ├── pages/     # Page views
+│   │       ├── layouts/   # Layout components
+│   │       ├── integrations/ # tRPC client and server setup
+│   │       ├── hooks/     # React hooks
+│   │       ├── lib/       # Utilities (auth, upload, etc.)
+│   │       └── env.ts     # Environment variable validation
+│   ├── worker/            # File processing worker (Hono on Bun)
+│   │   └── src/
+│   │       ├── processors/# File type processors (doc, image)
+│   │       ├── lib/       # Chunking and markdown utilities
+│   │       └── env.ts     # Environment variable validation
+│   └── www/               # Documentation site (Starlight on Cloudflare)
+├── packages/
+│   ├── db/                # Database schema and Drizzle ORM config
+│   ├── share/             # Shared utilities (logger, fs, constants, AI)
+│   ├── api-handlers/      # Shared API handler logic
+│   ├── queue/             # Job queue (Upstash QStash)
+│   └── tsconfig/          # Shared TypeScript configurations
+├── .env.example           # Environment variable template
+├── package.json
+└── turbo.json
+```
+
+## Development Commands
+
+### Running Specific Apps
+
+```bash
+# Platform only
+bun --filter @curiositi/platform dev
+
+# Worker only
+bun --filter @curiositi/worker dev
+
+# Open Drizzle Studio (database browser)
+bun --filter @curiositi/db studio
+```
+
+### Code Quality
+
+```bash
+# Lint all packages
+bun run lint
+
+# Auto-fix linting issues
+bun run lint:fix
+
+# Format code
+bun run format
+
+# Type check all packages
+bun run check-types
+
+# Full check (lint + types)
+bun run check
+```
+
+### Building for Production
+
+```bash
+# Build all apps
+bun run build
+
+# Build specific app
+bun --filter @curiositi/platform build
+```
+
+## First Steps After Setup
+
+### 1. Create an Account
+
+After starting the platform, sign up with email/password or sign in with Google.
+
+### 2. Create a Workspace
+
+Workspaces are the top-level container for all your content. Create one to get started.
+
+### 3. Create a Space
+
+Spaces help you organize files into logical groups. Create your first space.
+
+### 4. Upload a File
+
+Try uploading a PDF, text file, or image. The worker will process it in the background, extracting text, generating chunks, and creating embeddings to make it searchable.
+
+### 5. Try Semantic Search
+
+Once processing completes, try searching with natural language queries like:
+- "quarterly reports from last year"
+- "meeting notes about the product launch"
+
+## Troubleshooting
+
+### Database Connection Issues
+
+```bash
+# Verify PostgreSQL is running
+pg_isready -h localhost -p 5432
+
+# Ensure the pgvector extension is available
+psql -d your_database -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+### Worker Not Processing Files
+
+1. Check the worker is running: `bun --filter @curiositi/worker dev`
+2. Verify your `QSTASH_TOKEN` and `QSTASH_URL` are set correctly in `.env`
+3. Check worker logs for errors
+
+### Build Errors
+
+```bash
+# Clean and reinstall
+rm -rf node_modules bun.lockb
+bun install
+
+# Clear Turbo cache
+rm -rf .turbo
+```
+
+## Next Steps
+
+Now that you have Curiositi running:
+
+- [Core Concepts](/docs/core-concepts) — Understand the data model
+- [Uploading Files](/docs/features/uploading-files) — Add your content
+- [AI Search](/docs/features/ai-search) — Search with natural language
+- [Configuration](/docs/configuration) — Customize your setup

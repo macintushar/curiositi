@@ -1,0 +1,192 @@
+---
+title: 📂 Spaces
+description: Organize your files with hierarchical spaces in Curiositi
+---
+
+Spaces are Curiositi's organizational system. They work like folders, letting you group files into logical hierarchies.
+
+## What Are Spaces?
+
+Spaces provide hierarchical organization for your files:
+
+- Support unlimited nesting depth via `parentSpaceId`
+- Allow files to exist in multiple spaces (many-to-many via `filesInSpace` table)
+- Scoped to a workspace — each space belongs to one workspace
+- Work naturally with semantic search
+
+## Space Hierarchy
+
+Create nested structures to organize your content:
+
+```
+Workspace
+├── Marketing
+│   ├── Campaigns
+│   │   ├── Q1-2025
+│   │   └── Q2-2025
+│   └── Brand Assets
+├── Engineering
+│   ├── Documentation
+│   └── Architecture
+└── Finance
+    ├── Reports
+    └── Contracts
+```
+
+## Space Properties
+
+Each space has the following fields (from the database schema):
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | UUID | Unique identifier (auto-generated) |
+| `name` | text | Display name (required) |
+| `description` | text | Optional description |
+| `icon` | text | Optional icon (e.g., emoji) |
+| `organizationId` | text | Owning workspace (required) |
+| `parentSpaceId` | UUID / null | Parent space for nesting |
+| `createdAt` | timestamp | Creation time |
+| `updatedAt` | timestamp | Last update time |
+
+## Managing Spaces via tRPC
+
+All space operations use tRPC procedures. Here are the available operations:
+
+### List Spaces
+
+```typescript
+// Get all spaces in the current workspace
+const allSpaces = trpc.space.get.useQuery();
+
+// Get only root-level spaces (no parent)
+const rootSpaces = trpc.space.getRoot.useQuery();
+
+// Get child spaces of a specific space
+const children = trpc.space.getChildren.useQuery({
+  parentSpaceId: "parent-uuid",
+});
+```
+
+### Get a Space
+
+```typescript
+// Get space by ID
+const space = trpc.space.getById.useQuery({ spaceId: "space-uuid" });
+
+// Get space with its full ancestry chain (breadcrumbs)
+const spaceWithPath = trpc.space.getWithAncestry.useQuery({
+  spaceId: "space-uuid",
+});
+```
+
+### Create a Space
+
+```typescript
+const createMutation = trpc.space.create.useMutation();
+
+// Create a root-level space
+await createMutation.mutateAsync({
+  name: "Marketing",
+  description: "Marketing team files",
+  icon: "📁",
+});
+
+// Create a nested space
+await createMutation.mutateAsync({
+  name: "Campaigns",
+  parentSpaceId: "marketing-space-uuid",
+});
+```
+
+### Update a Space
+
+```typescript
+const updateMutation = trpc.space.update.useMutation();
+
+await updateMutation.mutateAsync({
+  spaceId: "space-uuid",
+  input: {
+    name: "Marketing & Sales",
+    description: "Updated description",
+    icon: "📊",
+  },
+});
+```
+
+### Delete a Space
+
+```typescript
+const deleteMutation = trpc.space.delete.useMutation();
+
+await deleteMutation.mutateAsync({ spaceId: "space-uuid" });
+// Child spaces are cascade-deleted
+```
+
+### Get Files in a Space
+
+```typescript
+// Get files linked to a space
+const files = trpc.space.getFiles.useQuery({ spaceId: "space-uuid" });
+
+// Alternative: get files via the filesInSpace junction table
+const filesInSpace = trpc.space.getFilesInSpace.useQuery({
+  spaceId: "space-uuid",
+});
+```
+
+## Files and Spaces
+
+Files are linked to spaces through the `filesInSpace` junction table. This means:
+
+- A file can exist in **multiple spaces** without duplication
+- Removing a file from a space doesn't delete the file itself
+- Deleting a space cascade-deletes the `filesInSpace` links (but not the files)
+
+## Organization Tips
+
+### Keep Depth Reasonable
+
+3-4 levels of nesting is usually sufficient. AI search reduces the need for deep folder hierarchies.
+
+### Recommended Structures
+
+**By Department:**
+```
+Workspace
+├── Marketing
+├── Engineering
+├── Sales
+└── Finance
+```
+
+**By Project:**
+```
+Workspace
+├── Active Projects
+│   ├── Project Alpha
+│   └── Project Beta
+└── Archive
+    └── 2024 Projects
+```
+
+**By Time Period:**
+```
+Workspace
+├── 2025
+│   ├── Q1
+│   └── Q2
+└── 2024
+```
+
+### Tips
+
+1. **Use consistent naming** — Pick a convention and stick to it
+2. **Don't over-organize** — Semantic search makes files findable regardless of location
+3. **Use descriptions** — Add descriptions to spaces so team members understand their purpose
+4. **Leverage nesting** — Use `parentSpaceId` for natural hierarchies
+
+## Next Steps
+
+- [Uploading Files](/docs/features/uploading-files) — Add content to your spaces
+- [AI Search](/docs/features/ai-search) — Find content across spaces
+- [Core Concepts](/docs/core-concepts) — Understand the data model
