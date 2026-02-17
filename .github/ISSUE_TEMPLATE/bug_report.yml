@@ -1,0 +1,85 @@
+name: Bug report
+description: Report something that is broken or incorrect.
+title: "Bug: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. Please include as much detail as you can.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened? What did you expect to happen?
+      placeholder: "When I ..., it ..., but I expected ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to reproduce the issue.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: "It should ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: "It actually ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / error output
+      description: Paste logs, stack traces, or screenshots (redact secrets).
+      render: shell
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Where did this happen?
+      placeholder: |
+        - App/package: (e.g. @curiositi/platform, @curiositi/worker)
+        - Branch/commit:
+        - OS:
+        - Browser (if UI):
+        - Bun version:
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Frequency
+      options:
+        - Always
+        - Often
+        - Sometimes
+        - Rarely
+        - Once
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: regression
+    attributes:
+      label: Regression check
+      options:
+        - label: This worked in a previous version/commit
+        - label: I can reproduce this on the latest main branch
