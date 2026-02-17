@@ -7,61 +7,113 @@ const features = [
 		title: "Smart Spaces",
 		description:
 			"Organize your work into Spaces. Group files, notes, and links together for each project or idea.",
+		color: "pink" as const,
 	},
 	{
 		icon: "tabler:search",
 		title: "AI-Powered Search",
 		description:
 			"Find anything instantly. Search by content, tags, or just describe what you're looking for.",
+		color: "blue" as const,
 	},
 	{
 		icon: "tabler:upload",
 		title: "Universal Upload",
 		description:
 			"Drop in any file type, paste links, or write notes. PDFs, images, videos, documents - all supported.",
+		color: "blue" as const,
 	},
 	{
 		icon: "tabler:sparkles",
 		title: "AI Assistant",
 		description:
 			"Get help summarizing documents, finding connections, and generating insights from your content.",
+		color: "teal" as const,
 	},
 	{
 		icon: "tabler:stack-2",
 		title: "Nested Organization",
 		description:
 			"Create spaces within spaces. Build the hierarchy that matches how your brain works.",
+		color: "orange" as const,
 	},
 	{
 		icon: "tabler:shield-check",
 		title: "Privacy First",
 		description:
 			"Your data is encrypted and secure. You own your content, always.",
+		color: "pink" as const,
 	},
 ];
+
+const colorClasses = {
+	pink: {
+		bg: "bg-playful-pink/10 dark:bg-playful-pink/20",
+		icon: "text-playful-pink",
+		border: "hover:border-playful-pink/50",
+	},
+	purple: {
+		bg: "bg-playful-purple/10 dark:bg-playful-purple/20",
+		icon: "text-playful-purple",
+		border: "hover:border-playful-purple/50",
+	},
+	blue: {
+		bg: "bg-playful-blue/10 dark:bg-playful-blue/20",
+		icon: "text-playful-blue",
+		border: "hover:border-playful-blue/50",
+	},
+	teal: {
+		bg: "bg-playful-teal/10 dark:bg-playful-teal/20",
+		icon: "text-playful-teal",
+		border: "hover:border-playful-teal/50",
+	},
+	orange: {
+		bg: "bg-playful-orange/10 dark:bg-playful-orange/20",
+		icon: "text-playful-orange",
+		border: "hover:border-playful-orange/50",
+	},
+};
 ---
 
-<section id="features" class="px-6 py-24">
-	<div class="mx-auto max-w-6xl">
-		<div class="mb-16 text-center">
-			<h2 class="mb-4 font-serif text-3xl font-bold text-zinc-900 dark:text-white sm:text-4xl">Everything you need</h2>
-			<p class="mx-auto max-w-2xl text-lg text-zinc-500 dark:text-zinc-400">
+<section id="features" class="relative px-6 py-16 sm:py-20 overflow-hidden">
+	<div class="absolute top-1/2 -left-32 w-64 h-64 bg-playful-pink/5 dark:bg-playful-pink/3 rounded-full blur-3xl"></div>
+	<div class="absolute top-1/4 -right-32 w-64 h-64 bg-playful-blue/5 dark:bg-playful-blue/3 rounded-full blur-3xl"></div>
+
+	<div class="relative mx-auto max-w-6xl">
+		<div class="mb-12 text-center">
+			<p class="mb-3 text-sm font-semibold uppercase tracking-widest text-accent-600 dark:text-accent-200">Features</p>
+			<h2 class="mb-4 font-serif text-3xl sm:text-4xl lg:text-5xl font-bold italic text-zinc-900 dark:text-white">
+				Everything you <span class="text-accent-600 dark:text-accent-200">need</span>
+			</h2>
+			<p class="mx-auto max-w-2xl text-base sm:text-lg text-zinc-500 dark:text-zinc-400">
 				Stop juggling multiple tools. Curiositi brings everything together in one simple
 				workspace.
 			</p>
 		</div>
 
-		<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+		<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 			{
-				features.map((feature) => (
-					<div class="rounded-xl border border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50 p-6 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700">
-						<div class="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-200 dark:bg-zinc-800">
-							<Icon name={feature.icon} class="h-5 w-5 text-zinc-600 dark:text-zinc-300" />
+				features.map((feature, index) => {
+					const colors = colorClasses[feature.color];
+					const rotations = ["hover:rotate-2", "hover:-rotate-2", "hover:rotate-1"];
+					const rotation = rotations[index % 3];
+					return (
+						<div
+							class={`group rounded-xl border-2 border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 p-5 transition-all duration-300 ${rotation} ${colors.border} hover:shadow-lg hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50 hover:scale-[1.02]`}
+						>
+							<div
+								class={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${colors.bg}`}
+							>
+								<Icon
+									name={feature.icon}
+									class={`h-6 w-6 ${colors.icon} transition-transform group-hover:scale-110`}
+								/>
+							</div>
+							<h3 class="mb-2 text-lg font-bold text-zinc-900 dark:text-white">{feature.title}</h3>
+							<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{feature.description}</p>
 						</div>
-						<h3 class="mb-2 text-lg font-semibold text-zinc-900 dark:text-white">{feature.title}</h3>
-						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{feature.description}</p>
-					</div>
-				))
+					);
+				})
 			}
 		</div>
 	</div>

@@ -8,6 +8,7 @@ const steps = [
 		title: "Capture",
 		description:
 			"Upload files, paste links, or write notes. Curiositi accepts everything.",
+		color: "pink" as const,
 	},
 	{
 		number: "02",
@@ -15,6 +16,7 @@ const steps = [
 		title: "Organize",
 		description:
 			"Create Spaces for your projects. Group related content together naturally.",
+		color: "accent" as const,
 	},
 	{
 		number: "03",
@@ -22,32 +24,78 @@ const steps = [
 		title: "Discover",
 		description:
 			"Find anything instantly with AI-powered search. Connect ideas effortlessly.",
+		color: "blue" as const,
 	},
 ];
+
+const colorClasses = {
+	pink: {
+		bg: "bg-playful-pink",
+		text: "text-playful-pink",
+		light: "bg-playful-pink/10 dark:bg-playful-pink/20",
+	},
+	accent: {
+		bg: "bg-accent-600",
+		text: "text-accent-600 dark:text-accent-200",
+		light: "bg-accent-600/10 dark:bg-accent-600/20",
+	},
+	blue: {
+		bg: "bg-playful-blue",
+		text: "text-playful-blue",
+		light: "bg-playful-blue/10 dark:bg-playful-blue/20",
+	},
+};
 ---
 
-<section class="px-6 py-24">
-	<div class="mx-auto max-w-6xl">
-		<div class="mb-16 text-center">
-			<h2 class="mb-4 font-serif text-3xl font-bold text-zinc-900 dark:text-white sm:text-4xl">How it works</h2>
-			<p class="mx-auto max-w-2xl text-lg text-zinc-500 dark:text-zinc-400">
-				Three simple steps to transform how you work with information.
+<section class="relative px-6 py-16 sm:py-20 overflow-hidden">
+	<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-accent-600/5 dark:bg-accent-600/3 rounded-full blur-3xl"></div>
+
+	<div class="relative mx-auto max-w-6xl">
+		<div class="mb-12 text-center">
+			<p class="mb-3 text-sm font-semibold uppercase tracking-widest text-accent-600 dark:text-accent-200">How It Works</p>
+			<h2 class="mb-4 font-serif text-3xl sm:text-4xl lg:text-5xl font-bold italic text-zinc-900 dark:text-white">
+				Three <span class="text-accent-600 dark:text-accent-200">simple</span> steps
+			</h2>
+			<p class="mx-auto max-w-2xl text-base sm:text-lg text-zinc-500 dark:text-zinc-400">
+				Transform how you work with information in minutes, not hours.
 			</p>
 		</div>
 
-		<div class="grid gap-8 sm:grid-cols-3">
-			{
-				steps.map((step) => (
-					<div class="text-center">
-						<div class="mb-4 text-sm font-medium text-zinc-400 dark:text-zinc-600">{step.number}</div>
-						<div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-200 dark:bg-zinc-800">
-							<Icon name={step.icon} class="h-6 w-6 text-zinc-600 dark:text-zinc-300" />
-						</div>
-						<h3 class="mb-2 text-xl font-semibold text-zinc-900 dark:text-white">{step.title}</h3>
-						<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{step.description}</p>
-					</div>
-				))
-			}
+		<div class="relative">
+			<div class="hidden sm:block absolute top-20 left-[16.67%] right-[16.67%] h-0.5 bg-zinc-200 dark:bg-zinc-800">
+				<div class="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-playful-pink"></div>
+				<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-accent-600"></div>
+				<div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-playful-blue"></div>
+			</div>
+
+			<div class="grid gap-12 sm:gap-8 sm:grid-cols-3">
+				{
+					steps.map((step, index) => {
+						const colors = colorClasses[step.color];
+						return (
+							<div class="relative text-center group">
+								<div class={`mb-4 text-5xl sm:text-6xl font-bold ${colors.text} opacity-20 dark:opacity-30`}>
+									{step.number}
+								</div>
+								<div class={`relative mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl ${colors.light} transition-transform group-hover:scale-110 group-hover:rotate-3`}>
+									<div class="absolute inset-0 rounded-xl animate-pulse-ring border-2 border-current opacity-0 group-hover:opacity-100"></div>
+									<Icon name={step.icon} class={`h-8 w-8 ${colors.text}`} />
+								</div>
+								<h3 class="mb-2 text-xl font-bold text-zinc-900 dark:text-white">{step.title}</h3>
+								<p class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 max-w-xs mx-auto">{step.description}</p>
+
+								{
+									index < steps.length - 1 && (
+										<div class="sm:hidden flex justify-center mt-8">
+											<Icon name="tabler:arrow-down" class="h-6 w-6 text-zinc-300 dark:text-zinc-700" />
+										</div>
+									)
+								}
+							</div>
+						);
+					})
+				}
+			</div>
 		</div>
 	</div>
 </section>

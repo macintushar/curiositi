@@ -47,11 +47,11 @@ export default defineConfig({
 					href: GITHUB_URL,
 				},
 			],
-      sidebar: [
-        {
-          label: "📖 Home",
-          slug: "docs",
-			},
+			sidebar: [
+				{
+					label: "📖 Home",
+					slug: "docs",
+				},
 				{
 					label: "Getting Started",
 					autogenerate: { directory: "docs/getting-started" },

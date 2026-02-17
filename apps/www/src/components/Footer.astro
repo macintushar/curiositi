@@ -2,28 +2,28 @@
 import { Icon } from "astro-icon/components";
 ---
 
-<footer class="border-t border-zinc-200/50 dark:border-zinc-800/50 px-6 py-8">
-	<div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
+<footer class="border-t-2 border-zinc-200/50 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/50 px-6 py-10">
+	<div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
 		<div class="flex items-center gap-3">
-			<div class="font-mono text-zinc-500 dark:text-zinc-300 text-[8px] leading-none">
-				<p class="tracking-wide">/\__/\</p>
+			<div class="font-mono text-zinc-500 dark:text-zinc-300 text-[10px] leading-none">
+				<p class="tracking-wide ml-0.5">/\__/\</p>
 				<p class="tracking-widest">(^ . ^)</p>
 			</div>
-			<span class="text-sm font-semibold text-zinc-900 dark:text-white">Curiositi</span>
+			<span class="text-base font-bold text-zinc-900 dark:text-white">Curiositi</span>
 		</div>
 
-		<div class="flex items-center gap-6">
-			<a href="/docs" class="text-sm text-zinc-400 dark:text-zinc-500 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300">
+		<div class="flex items-center gap-8">
+			<a href="/docs" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 transition-colors hover:text-accent-600 dark:hover:text-accent-200">
 				Docs
 			</a>
-			<a href="/legal/privacy" class="text-sm text-zinc-400 dark:text-zinc-500 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300">
+			<a href="/legal/privacy" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 transition-colors hover:text-accent-600 dark:hover:text-accent-200">
 				Privacy
 			</a>
-			<a href="/legal/terms" class="text-sm text-zinc-400 dark:text-zinc-500 transition-colors hover:text-zinc-700 dark:hover:text-zinc-300">
+			<a href="/legal/terms" class="text-sm font-medium text-zinc-500 dark:text-zinc-400 transition-colors hover:text-accent-600 dark:hover:text-accent-200">
 				Terms
 			</a>
 		</div>
 
-		<p class="text-sm text-zinc-400 dark:text-zinc-600">&copy; 2026 Curiositi. All rights reserved.</p>
+		<p class="text-sm text-zinc-400 dark:text-zinc-500">&copy; 2026 Curiositi. All rights reserved.</p>
 	</div>
 </footer>
