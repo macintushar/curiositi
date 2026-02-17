@@ -1,15 +1,19 @@
-# logger
+# @curiositi/share/logger
 
-To install dependencies:
+A simple console logger with prefixed log levels.
 
-```bash
-bun install
+## Methods
+
+- `logger.info(msg, obj?)` - logs `[INFO] msg`
+- `logger.warn(msg, obj?)` - logs `[WARN] msg`
+- `logger.error(msg, obj?)` - logs `[ERROR] msg`
+- `logger.debug(msg, obj?)` - logs `[DEBUG] msg`
+
+## Usage
+
+```ts
+import logger from "@curiositi/share/logger";
+
+logger.info("Processing file", { fileId: "abc" });
+logger.error("Upload failed", error);
 ```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
