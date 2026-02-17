@@ -1,0 +1,50 @@
+name: Feature request
+description: Suggest an improvement or new capability.
+title: "Feature: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share the problem you are trying to solve and what good looks like.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you facing? Who is affected?
+      placeholder: "As a ..., I want ..., so that ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should we build/change? Include UX/API expectations if relevant.
+      placeholder: "Add ..., update ..., expose ..., etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider?
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Bullet list of what must be true for this to be done.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope / affected areas
+      description: Which app(s)/package(s) does this touch?
+      placeholder: "@curiositi/platform, @curiositi/worker, packages/share, etc."
