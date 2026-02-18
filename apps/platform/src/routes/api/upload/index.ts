@@ -72,13 +72,27 @@ export const Route = createFileRoute("/api/upload/")({
 				}
 
 				if (uploadData) {
+					const baseParams = {
+						fileId: uploadData.id,
+						orgId: session.session.activeOrganizationId,
+					};
+
+					const enqueueParams =
+						env.QUEUE_PROVIDER === "local"
+							? {
+									...baseParams,
+									provider: "local" as const,
+									bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
+								}
+							: {
+									...baseParams,
+									provider: "qstash" as const,
+									qstashToken: env.QSTASH_TOKEN ?? "",
+									workerUrl: env.WORKER_URL ?? "",
+								};
+
 					const { data: enqueueData, error: enqueueError } =
-						await enqueueFileForProcessing({
-							fileId: uploadData.id,
-							orgId: session.session.activeOrganizationId,
-							qstashToken: env.QSTASH_TOKEN,
-							workerUrl: env.WORKER_URL,
-						});
+						await enqueueFileForProcessing(enqueueParams);
 					if (enqueueError) {
 						logger.error("Error during file enqueue", enqueueError);
 						return new Response(

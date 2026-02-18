@@ -35,3 +35,7 @@ export const CAT_LOGO = `
  (^ . ^)
  (")_("))~
  `;
+
+export enum QUEUE_NAMES {
+	INGEST = "curiositi-ingest-queue",
+}

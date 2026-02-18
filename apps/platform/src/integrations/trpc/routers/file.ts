@@ -164,12 +164,27 @@ const fileRouter = {
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { error: enqueueError } = await enqueueFileForProcessing({
+			const baseParams = {
 				fileId: input.fileId,
 				orgId: ctx.session.session.activeOrganizationId,
-				qstashToken: env.QSTASH_TOKEN,
-				workerUrl: env.WORKER_URL,
-			});
+			};
+
+			const enqueueParams =
+				env.QUEUE_PROVIDER === "local"
+					? {
+							...baseParams,
+							provider: "local" as const,
+							bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
+						}
+					: {
+							...baseParams,
+							provider: "qstash" as const,
+							qstashToken: env.QSTASH_TOKEN ?? "",
+							workerUrl: env.WORKER_URL ?? "",
+						};
+
+			const { error: enqueueError } =
+				await enqueueFileForProcessing(enqueueParams);
 
 			if (enqueueError) {
 				logger.error("Error during file enqueue", enqueueError);

@@ -4,8 +4,10 @@ import { z } from "zod";
 export const env = createEnv({
 	server: {
 		PLATFORM_URL: z.url(),
-		QSTASH_TOKEN: z.string(),
+		QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
+		QSTASH_TOKEN: z.string().optional(),
 		WORKER_URL: z.string(),
+		BUNQUEUE_URL: z.string().optional(),
 		BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
 		BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
 		BETTER_AUTH_SECRET: z.string(),
@@ -15,10 +17,6 @@ export const env = createEnv({
 		S3_ENDPOINT: z.string(),
 	},
 
-	/**
-	 * The prefix that client-side variables must have. This is enforced both at
-	 * a type-level and at runtime.
-	 */
 	clientPrefix: "VITE_",
 
 	client: {
@@ -28,10 +26,6 @@ export const env = createEnv({
 		VITE_SENTRY_PROJECT: z.string().optional(),
 	},
 
-	/**
-	 * What object holds the environment variables at runtime. This is usually
-	 * `process.env` or `import.meta.env`.
-	 */
 	runtimeEnvStrict: {
 		VITE_APP_TITLE: import.meta.env.VITE_APP_TITLE,
 		VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
@@ -46,24 +40,27 @@ export const env = createEnv({
 		S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
 		S3_BUCKET: process.env.S3_BUCKET,
 		S3_ENDPOINT: process.env.S3_ENDPOINT,
+		QUEUE_PROVIDER: process.env.QUEUE_PROVIDER,
 		QSTASH_TOKEN: process.env.QSTASH_TOKEN,
 		WORKER_URL: process.env.WORKER_URL,
+		BUNQUEUE_URL: process.env.BUNQUEUE_URL,
 	},
 
-	/**
-	 * By default, this library will feed the environment variables directly to
-	 * the Zod validator.
-	 *
-	 * This means that if you have an empty string for a value that is supposed
-	 * to be a number (e.g. `PORT=` in a ".env" file), Zod will incorrectly flag
-	 * it as a type mismatch violation. Additionally, if you have an empty string
-	 * for a value that is supposed to be a string with a default value (e.g.
-	 * `DOMAIN=` in an ".env" file), the default value will never be applied.
-	 *
-	 * In order to solve these issues, we recommend that all new projects
-	 * explicitly specify this option as true.
-	 */
 	skipValidation:
 		!!process.env.CI || process.env.npm_lifecycle_event === "lint",
 	emptyStringAsUndefined: true,
 });
+
+if (env.QUEUE_PROVIDER === "qstash") {
+	if (!env.QSTASH_TOKEN || !env.WORKER_URL) {
+		throw new Error(
+			"QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash"
+		);
+	}
+}
+
+if (env.QUEUE_PROVIDER === "local") {
+	if (!env.BUNQUEUE_URL) {
+		throw new Error("BUNQUEUE_URL is required when QUEUE_PROVIDER=local");
+	}
+}
