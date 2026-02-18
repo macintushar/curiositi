@@ -7,6 +7,14 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@platform/components/ui/dialog";
+import {
+	Drawer,
+	DrawerContent,
+	DrawerDescription,
+	DrawerHeader,
+	DrawerTitle,
+} from "@platform/components/ui/drawer";
+import { useIsMobile } from "@platform/hooks/use-mobile";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 import {
 	formatDate,
@@ -33,6 +41,139 @@ type SearchDialogProps = {
 	initialQuery?: string;
 };
 
+function SearchContent({
+	query,
+	setQuery,
+	debouncedQuery,
+	searchResults,
+	handleOpenFile,
+	onOpenChange,
+	totalResults,
+	results,
+}: {
+	query: string;
+	setQuery: (q: string) => void;
+	debouncedQuery: string;
+	searchResults: ReturnType<typeof useQuery>;
+	handleOpenFile: (fileId: string) => void;
+	onOpenChange: (open: boolean) => void;
+	totalResults: number;
+	results: SearchResult[];
+}) {
+	return (
+		<>
+			{/* Header with search input */}
+			<div className="bg-card rounded-br-xl rounded-bl-xl p-4 sm:p-6 border shrink-0">
+				<div className="flex items-center gap-4">
+					<div className="relative flex-1">
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+						<Input
+							placeholder="Search files by name, content, or concept..."
+							value={query}
+							onChange={(e) => setQuery(e.target.value)}
+							className="pl-10 h-12"
+							autoFocus
+						/>
+					</div>
+					<Button
+						variant="ghost"
+						size="icon"
+						onClick={() => onOpenChange(false)}
+					>
+						<X className="w-5 h-5" />
+					</Button>
+				</div>
+			</div>
+
+			{/* Results area */}
+			<div className="flex-1 overflow-y-auto p-4 sm:p-6">
+				{debouncedQuery.length <= 1 ? (
+					<div className="h-full flex items-center justify-center text-muted-foreground">
+						<p>Start typing to search your files</p>
+					</div>
+				) : searchResults.isLoading ? (
+					<div className="space-y-3">
+						{Array.from({ length: 5 }).map((_, i) => (
+							<Skeleton key={i} className="h-20 w-full" />
+						))}
+					</div>
+				) : totalResults === 0 ? (
+					<div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-4">
+						<Search className="w-12 h-12 opacity-50" />
+						<p className="text-lg">No files found</p>
+					</div>
+				) : (
+					<div className="space-y-6">
+						<p className="text-sm text-muted-foreground mb-4">
+							{totalResults} result{totalResults !== 1 ? "s" : ""} found
+						</p>
+
+						{/* AI Results */}
+						{totalResults > 0 && (
+							<div className="space-y-2">
+								{results.map((result: SearchResult) => (
+									<button
+										type="button"
+										key={result.file.id}
+										onClick={() => handleOpenFile(result.file.id)}
+										className="w-full text-left p-3 sm:p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
+									>
+										<div className="flex items-start gap-3 sm:gap-4">
+											<div className="shrink-0 size-10 sm:size-12 rounded-lg bg-muted flex items-center justify-center">
+												<FileIcon
+													type={result.file.type}
+													className="w-5 h-5 sm:w-6 sm:h-6"
+													coloredIcon
+												/>
+											</div>
+											<div className="flex-1 min-w-0">
+												<div className="flex items-center gap-2 flex-wrap">
+													<span className="font-medium truncate">
+														{result.file.name}
+													</span>
+													<IconSparkles2 className="h-4 w-4 sm:h-8 sm:w-8 text-yellow-300 shrink-0" />
+													<Badge variant="secondary" className="shrink-0">
+														AI match
+													</Badge>
+												</div>
+												<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-muted-foreground mt-1">
+													<span>{getFileTypeLabel(result.file.type)}</span>
+													<span>{formatFileSize(result.file.size)}</span>
+													<span className="hidden sm:inline">
+														{formatDate(result.file.createdAt)}
+													</span>
+													<span className="hidden sm:inline">
+														score: {result.score}
+													</span>
+													{result.spaceName && (
+														<span className="flex items-center gap-1">
+															<Folder className="w-3 h-3" />
+															{result.spaceName}
+														</span>
+													)}
+												</div>
+												<FileTags tags={result.file.tags} />
+											</div>
+										</div>
+									</button>
+								))}
+							</div>
+						)}
+					</div>
+				)}
+			</div>
+
+			{/* Loading indicator for AI search */}
+			{searchResults.isFetching && (
+				<div className="absolute bottom-6 right-6 flex items-center gap-2 bg-card border rounded-full px-4 py-2 shadow-lg">
+					<Loader2 className="w-4 h-4 animate-spin" />
+					<span className="text-sm">AI searching...</span>
+				</div>
+			)}
+		</>
+	);
+}
+
 export function SearchDialog({
 	open,
 	onOpenChange,
@@ -41,6 +182,7 @@ export function SearchDialog({
 }: SearchDialogProps) {
 	const [query, setQuery] = useState(initialQuery);
 	const debouncedQuery = useDebounce(query, 300);
+	const isMobile = useIsMobile();
 
 	const searchResults = useQuery({
 		queryKey: ["search-dialog", "results", debouncedQuery],
@@ -60,6 +202,31 @@ export function SearchDialog({
 	const results = searchResults.data?.data || [];
 	const totalResults = searchResults.data?.data?.length || 0;
 
+	if (isMobile) {
+		return (
+			<Drawer open={open} onOpenChange={onOpenChange}>
+				<DrawerContent className="h-[90vh] flex flex-col p-0 gap-1">
+					<DrawerHeader className="sr-only">
+						<DrawerTitle>Search Files</DrawerTitle>
+						<DrawerDescription>
+							Search across all your files with AI-powered semantic search
+						</DrawerDescription>
+					</DrawerHeader>
+					<SearchContent
+						query={query}
+						setQuery={setQuery}
+						debouncedQuery={debouncedQuery}
+						searchResults={searchResults}
+						handleOpenFile={handleOpenFile}
+						onOpenChange={onOpenChange}
+						totalResults={totalResults}
+						results={results}
+					/>
+				</DrawerContent>
+			</Drawer>
+		);
+	}
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent
@@ -72,109 +239,16 @@ export function SearchDialog({
 						Search across all your files with AI-powered semantic search
 					</DialogDescription>
 				</DialogHeader>
-
-				{/* Header with search input */}
-				<div className="bg-card rounded-br-xl rounded-bl-xl p-6 border shrink-0">
-					<div className="flex items-center gap-4">
-						<div className="relative flex-1">
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-							<Input
-								placeholder="Search files by name, content, or concept..."
-								value={query}
-								onChange={(e) => setQuery(e.target.value)}
-								className="pl-10 h-12"
-								autoFocus
-							/>
-						</div>
-						<Button
-							variant="ghost"
-							size="icon"
-							onClick={() => onOpenChange(false)}
-						>
-							<X className="w-5 h-5" />
-						</Button>
-					</div>
-				</div>
-
-				{/* Results area */}
-				<div className="flex-1 overflow-y-auto p-6">
-					{debouncedQuery.length <= 1 ? (
-						<div className="h-full flex items-center justify-center text-muted-foreground">
-							<p>Start typing to search your files</p>
-						</div>
-					) : searchResults.isLoading ? (
-						<div className="space-y-3">
-							{Array.from({ length: 5 }).map((_, i) => (
-								<Skeleton key={i} className="h-20 w-full" />
-							))}
-						</div>
-					) : totalResults === 0 ? (
-						<div className="h-full flex flex-col items-center justify-center text-muted-foreground gap-4">
-							<Search className="w-12 h-12 opacity-50" />
-							<p className="text-lg">No files found</p>
-						</div>
-					) : (
-						<div className="space-y-6">
-							<p className="text-sm text-muted-foreground mb-4">
-								{totalResults} result{totalResults !== 1 ? "s" : ""} found
-							</p>
-
-							{/* AI Results */}
-							{totalResults > 0 && (
-								<div className="space-y-2">
-									{results.map((result: SearchResult) => (
-										<button
-											type="button"
-											key={result.file.id}
-											onClick={() => handleOpenFile(result.file.id)}
-											className="w-full text-left p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors group"
-										>
-											<div className="flex items-start gap-4">
-												<div className="shrink-0 size-12 rounded-lg bg-muted flex items-center justify-center">
-													<FileIcon
-														type={result.file.type}
-														className={`w-6 h-6`}
-														coloredIcon
-													/>
-												</div>
-												<div className="flex-1 min-w-0">
-													<div className="flex items-center gap-2">
-														<span className="font-medium truncate">
-															{result.file.name}
-														</span>
-														<IconSparkles2 className="h-8 text-yellow-300" />
-														<Badge variant="secondary">AI match</Badge>
-													</div>
-													<div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-														<span>{getFileTypeLabel(result.file.type)}</span>
-														<span>{formatFileSize(result.file.size)}</span>
-														<span>{formatDate(result.file.createdAt)}</span>
-														<span>score: {result.score}</span>
-														{result.spaceName && (
-															<span className="flex items-center gap-1">
-																<Folder className="w-3 h-3" />
-																{result.spaceName}
-															</span>
-														)}
-													</div>
-													<FileTags tags={result.file.tags} />
-												</div>
-											</div>
-										</button>
-									))}
-								</div>
-							)}
-						</div>
-					)}
-				</div>
-
-				{/* Loading indicator for AI search */}
-				{searchResults.isFetching && (
-					<div className="absolute bottom-6 right-6 flex items-center gap-2 bg-card border rounded-full px-4 py-2 shadow-lg">
-						<Loader2 className="w-4 h-4 animate-spin" />
-						<span className="text-sm">AI searching...</span>
-					</div>
-				)}
+				<SearchContent
+					query={query}
+					setQuery={setQuery}
+					debouncedQuery={debouncedQuery}
+					searchResults={searchResults}
+					handleOpenFile={handleOpenFile}
+					onOpenChange={onOpenChange}
+					totalResults={totalResults}
+					results={results}
+				/>
 			</DialogContent>
 		</Dialog>
 	);
