@@ -5,10 +5,17 @@ import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
 import { requestId, type RequestIdVariables } from "hono/request-id";
 import { zValidator } from "@hono/zod-validator";
+import { Worker, type Job } from "bunqueue/client";
 
 import { createResponse } from "./utils";
 import processFile from "./process-file";
 import { createLogger } from "./create-logger";
+import { env } from "./env";
+
+type ProcessFileJobData = {
+	fileId: string;
+	orgId: string;
+};
 
 const api = new Hono<{
 	Variables: RequestIdVariables;
@@ -52,6 +59,49 @@ api.post(
 );
 
 api.get("*", serveStatic({ root: "./public" }));
+
+async function startBunqueueWorker() {
+	const bunqueueUrl = env.BUNQUEUE_URL ?? "localhost:6789";
+	const parts = bunqueueUrl.split(":");
+	const host = parts[0] ?? "localhost";
+	const port = Number.parseInt(parts[1] ?? "6789", 10);
+
+	const worker = new Worker<ProcessFileJobData>(
+		"curiositi-ingest-queue",
+		async (job: Job<ProcessFileJobData>) => {
+			if (job.name === "processFile") {
+				const { fileId, orgId } = job.data;
+				const jobLogger = createLogger(`job-${job.id}`);
+				await processFile({ fileId, orgId, logger: jobLogger });
+			}
+		},
+		{
+			connection: { host, port },
+			concurrency: 5,
+		}
+	);
+
+	worker.on("completed", (job: Job<ProcessFileJobData> | undefined) => {
+		if (job) {
+			console.log(`Job ${job.id} completed`);
+		}
+	});
+
+	worker.on(
+		"failed",
+		(job: Job<ProcessFileJobData> | undefined, error: Error) => {
+			console.error(`Job ${job?.id} failed:`, error.message);
+		}
+	);
+
+	console.log(`Bunqueue worker started (connected to ${host}:${port})`);
+}
+
+if (env.QUEUE_PROVIDER === "local") {
+	startBunqueueWorker().catch(console.error);
+} else {
+	console.log("QStash mode - HTTP server on port 3040");
+}
 
 export default {
 	port: 3040,

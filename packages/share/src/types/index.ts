@@ -4,3 +4,39 @@ export type S3Config = {
 	bucket: string;
 	endpoint: string;
 };
+
+export type JobType = "processFile";
+
+export type ProcessFilePayload = {
+	fileId: string;
+	orgId: string;
+};
+
+export type JobPayload = {
+	type: JobType;
+	data: ProcessFilePayload;
+};
+
+export enum QUEUE_PROVIDER {
+	QSTASH = "qstash",
+	LOCAL = "local",
+}
+
+export interface QueueClient {
+	enqueue(payload: JobPayload): Promise<void>;
+}
+
+export type QstashConfig = {
+	token: string;
+	url?: string;
+	workerUrl: string;
+};
+
+export type BunqueueConfig = {
+	host: string;
+	port: number;
+};
+
+export type QueueConfig =
+	| { provider: QUEUE_PROVIDER.QSTASH; qstash: QstashConfig }
+	| { provider: QUEUE_PROVIDER.LOCAL; bunqueue: BunqueueConfig };

@@ -7,6 +7,9 @@
 	"exports": {
 		".": "./index.ts"
 	},
+	"scripts": {
+		"dev": "bunx bunqueue start --port 6789 --data-path ./queue.db"
+	},
 	"devDependencies": {
 		"@types/bun": "latest",
 		"@curiositi/tsconfig": "workspace:*",
@@ -16,6 +19,7 @@
 		"typescript": "^5.9.3"
 	},
 	"dependencies": {
-		"@upstash/qstash": "^2.9.0"
+		"@upstash/qstash": "^2.9.0",
+		"bunqueue": "^2.4.6"
 	}
 }
