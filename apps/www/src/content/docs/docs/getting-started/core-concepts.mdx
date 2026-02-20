@@ -180,19 +180,19 @@ Files can exist in multiple spaces simultaneously using the `filesInSpace` junct
 erDiagram
     Files ||--o{ filesInSpace : "many-to-many"
     Spaces ||--o{ filesInSpace : "many-to-many"
-    
+
     Files {
         uuid id
         string name
         string path
     }
-    
+
     Spaces {
         uuid id
         string name
         uuid parentSpaceId
     }
-    
+
     filesInSpace {
         uuid id
         uuid fileId
@@ -276,9 +276,9 @@ How data moves through Curiositi:
 ```mermaid
 flowchart TB
     User["User<br/>(Browser)"] -->|"Upload"| Platform["Platform<br/>(TanStack Start)"]
-    Platform -->|"Enqueue job"| QStash["QStash<br/>(Queue)"]
+    Platform -->|"Enqueue job"| Queue["Queue<br/>(QStash/bunqueue)"]
     Platform -->|"Store metadata"| DB[(PostgreSQL<br/>+ pgvector)]
-    QStash -->|"Process"| Worker["Worker<br/>(Hono)"]
+    Queue -->|"Process"| Worker["Worker<br/>(Hono)"]
     Worker -->|"Download/Upload"| S3["S3 Storage"]
     Worker -->|"Store embeddings"| DB
     User -->|"Query"| Platform

@@ -9,9 +9,9 @@ The queueing system handles asynchronous file processing in Curiositi. When a us
 
 ```mermaid
 flowchart LR
-    Platform["Platform"] -->|"1. Save file<br/>to S3 storage<br/>2. Return OK"| Queue["Queue<br/>(QStash/bunqueue)"]
-    Queue -->|"2. Enqueue job"| Worker["Worker<br/>(extract + embed)"]
-    Worker -->|"3. Process file"| Complete["Process Complete"]
+    Platform["Platform"] -->|"3. Enqueue job"| Queue["Queue<br/>(QStash/bunqueue)"]
+    Queue -->|"4. Invoke worker"| Worker["Worker<br/>(extract + embed)"]
+    Worker -->|"5. Process file"| Complete["Process Complete"]
 ```
 
 **Flow:**
@@ -150,8 +150,8 @@ Restart both platform and worker after changing the provider.
 
 1. Check queue provider is running:
    ```bash
-   # For bunqueue
-   curl http://localhost:6789/health
+   # For bunqueue, use the HTTP /health endpoint which runs on a different port than TCP, which is used for enqueueing jobs
+   curl http://localhost:6790/health
    ```
 
 2. Verify environment variables are set correctly:
