@@ -1,5 +1,5 @@
 import type { BunFile, S3File } from "bun";
-import pdf from "@opendocsg/pdf2md";
+import * as pdf2md from "@opendocsg/pdf2md";
 
 export type PageContent = {
 	pageNumber: number;
@@ -31,7 +31,7 @@ export default async function parsePdf(
 	let metadata: PdfMetadata = {};
 	const pages: PageContent[] = [];
 
-	await pdf(fileBuffer, {
+	await pdf2md.default(fileBuffer, {
 		metadataParsed: (meta) => {
 			metadata = meta.info as PdfMetadata;
 		},
