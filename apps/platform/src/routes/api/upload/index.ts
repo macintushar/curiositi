@@ -78,19 +78,45 @@ export const Route = createFileRoute("/api/upload/")({
 						orgId: session.session.activeOrganizationId,
 					};
 
-					const enqueueParams =
-						env.QUEUE_PROVIDER === "local"
-							? {
-									...baseParams,
-									provider: QUEUE_PROVIDER.LOCAL as const,
-									bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
-								}
-							: {
-									...baseParams,
-									provider: QUEUE_PROVIDER.QSTASH as const,
-									qstashToken: env.QSTASH_TOKEN ?? "",
-									workerUrl: env.WORKER_URL ?? "",
-								};
+					if (env.QUEUE_PROVIDER === "local") {
+						const enqueueParams = {
+							...baseParams,
+							provider: QUEUE_PROVIDER.LOCAL as const,
+							bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
+						};
+						const { data: enqueueData, error: enqueueError } =
+							await enqueueFileForProcessing(enqueueParams);
+						if (enqueueError) {
+							logger.error("Error during file enqueue", enqueueError);
+							return new Response(
+								JSON.stringify(createResponse(null, enqueueError)),
+								{ status: 500 }
+							);
+						}
+						return new Response(
+							JSON.stringify(
+								createResponse({ file: uploadData, queue: enqueueData }, null)
+							),
+							{ status: 200 }
+						);
+					}
+
+					if (!env.QSTASH_TOKEN || !env.WORKER_URL) {
+						logger.error(
+							"QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash"
+						);
+						return new Response(
+							JSON.stringify(createResponse(null, "Queue configuration error")),
+							{ status: 500 }
+						);
+					}
+
+					const enqueueParams = {
+						...baseParams,
+						provider: QUEUE_PROVIDER.QSTASH as const,
+						qstashToken: env.QSTASH_TOKEN,
+						workerUrl: env.WORKER_URL,
+					};
 
 					const { data: enqueueData, error: enqueueError } =
 						await enqueueFileForProcessing(enqueueParams);
@@ -98,9 +124,7 @@ export const Route = createFileRoute("/api/upload/")({
 						logger.error("Error during file enqueue", enqueueError);
 						return new Response(
 							JSON.stringify(createResponse(null, enqueueError)),
-							{
-								status: 500,
-							}
+							{ status: 500 }
 						);
 					}
 					return new Response(
