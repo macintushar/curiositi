@@ -17,14 +17,9 @@ export type JobPayload = {
 	data: ProcessFilePayload;
 };
 
-export enum QUEUE_PROVIDER {
-	QSTASH = "qstash",
-	LOCAL = "local",
-}
-
-export interface QueueClient {
+export type QueueClient = {
 	enqueue(payload: JobPayload): Promise<void>;
-}
+};
 
 export type QstashConfig = {
 	token: string;
