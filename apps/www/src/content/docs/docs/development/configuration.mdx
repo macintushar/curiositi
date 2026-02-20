@@ -45,8 +45,10 @@ postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 | `BETTER_AUTH_SECRET` | Yes | Secret key for Better Auth session signing |
 | `BETTER_AUTH_GOOGLE_CLIENT_ID` | Yes | Google OAuth client ID |
 | `BETTER_AUTH_GOOGLE_CLIENT_SECRET` | Yes | Google OAuth client secret |
-| `QSTASH_TOKEN` | Yes | Upstash QStash token for job queue |
+| `QUEUE_PROVIDER` | No | Queue provider: `"qstash"` (default, cloud) or `"local"` (self-hosted bunqueue) |
+| `QSTASH_TOKEN` | Conditional | Upstash QStash token (required if `QUEUE_PROVIDER=qstash`) |
 | `QSTASH_URL` | No | Custom QStash URL (uses default Upstash endpoint if not set) |
+| `BUNQUEUE_URL` | Conditional | bunqueue server URL (required if `QUEUE_PROVIDER=local`, default: `localhost:6789`) |
 
 ### Client-Side (Platform)
 
@@ -88,9 +90,16 @@ BETTER_AUTH_SECRET=""
 BETTER_AUTH_GOOGLE_CLIENT_ID=""
 BETTER_AUTH_GOOGLE_CLIENT_SECRET=""
 
-# Queueing (Upstash QStash)
+# Queue Configuration
+# QUEUE_PROVIDER: "qstash" (default, cloud) or "local" (self-hosted bunqueue)
+QUEUE_PROVIDER="qstash"
+
+# QStash (required if QUEUE_PROVIDER=qstash)
 QSTASH_TOKEN=""
 QSTASH_URL=""
+
+# bunqueue (required if QUEUE_PROVIDER=local)
+BUNQUEUE_URL="localhost:6789"
 
 # Monitoring & Error Tracking - Sentry (optional)
 VITE_SENTRY_DSN=""
@@ -112,8 +121,10 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     PLATFORM_URL: z.url(),
-    QSTASH_TOKEN: z.string(),
+    QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
+    QSTASH_TOKEN: z.string().optional(),
     WORKER_URL: z.string(),
+    BUNQUEUE_URL: z.string().optional(),
     BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
     BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
     BETTER_AUTH_SECRET: z.string(),
@@ -128,9 +139,13 @@ export const env = createEnv({
     VITE_SENTRY_ORG: z.string().optional(),
     VITE_SENTRY_PROJECT: z.string().optional(),
   },
-  // ...
+  // Conditional validation happens at runtime after env is loaded
 });
 ```
+
+The platform performs conditional validation based on `QUEUE_PROVIDER`:
+- If `qstash`: requires `QSTASH_TOKEN` and `WORKER_URL`
+- If `local`: requires `BUNQUEUE_URL`
 
 **Worker validation** (`apps/worker/src/env.ts`):
 
@@ -145,6 +160,8 @@ export const env = createEnv({
     S3_BUCKET: z.string(),
     S3_ENDPOINT: z.string(),
     POSTGRES_URL: z.url(),
+    QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
+    BUNQUEUE_URL: z.string().optional(),
   },
   // ...
 });
@@ -216,6 +233,35 @@ Create bucket:
 ```bash
 mc alias set local http://localhost:9000 minioadmin minioadmin
 mc mb local/curiositi-dev
+```
+
+### bunqueue (Local Queue)
+
+For local development without Upstash QStash, you can use [bunqueue](https://bunqueue.vercel.app/) - a lightweight queue built on Bun.
+
+**Start the bunqueue server:**
+
+```bash
+# Using the queue package dev script
+cd packages/queue && bun run dev
+
+# Or run directly
+bunx bunqueue start --port 6789 --data-path ./queue.db
+```
+
+**Configure environment:**
+
+```bash
+QUEUE_PROVIDER=local
+BUNQUEUE_URL=localhost:6789
+```
+
+The bunqueue server stores jobs in a local SQLite database (`queue.db`). Add the following to `.gitignore`:
+
+```
+queue.db
+queue.db-shm
+queue.db-wal
 ```
 
 ## Troubleshooting Configuration

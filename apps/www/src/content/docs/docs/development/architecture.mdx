@@ -1,5 +1,5 @@
 ---
-title: 🖧 Architecture
+title: 🧱 Architecture
 description: System architecture and technical overview of Curiositi
 ---
 
@@ -11,7 +11,7 @@ Curiositi is a monorepo built with Turborepo and Bun. This document explains the
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Client Layer                            │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │              Browser (React 19)                           │   │
+│  │              Browser (React 19)                          │   │
 │  └──────────────────────────┬───────────────────────────────┘   │
 └─────────────────────────────┼───────────────────────────────────┘
                               │ HTTPS
@@ -19,7 +19,7 @@ Curiositi is a monorepo built with Turborepo and Bun. This document explains the
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Application Layer                          │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │              Platform (TanStack Start)                     │   │
+│  │              Platform (TanStack Start)                   │   │
 │  │  ┌────────────┐ ┌────────────┐ ┌────────────────────┐    │   │
 │  │  │   Routes   │ │ Components │ │  TanStack Query    │    │   │
 │  │  │ (TanStack  │ │  (shadcn/  │ │  + tRPC Client     │    │   │
@@ -30,10 +30,11 @@ Curiositi is a monorepo built with Turborepo and Bun. This document explains the
 │  │  │  Server    │ │ Nitro SSR  │ │                    │    │   │
 │  │  └────────────┘ └────────────┘ └────────────────────┘    │   │
 │  └──────────────────────────────────────────────────────────┘   │
-│                              │ QStash (Upstash)                 │
+│                              │ QStash (Upstash) /               │
+│                              │ or bunqueue (local)              │
 │                              ▼                                  │
 │  ┌──────────────────────────────────────────────────────────┐   │
-│  │              Worker (Hono on Bun)                         │   │
+│  │              Worker (Hono on Bun)                        │   │
 │  │  ┌────────────┐ ┌────────────┐ ┌────────────────────┐    │   │
 │  │  │  POST      │ │ Processors │ │  Vercel AI SDK     │    │   │
 │  │  │ /process-  │ │ (doc,      │ │  (OpenAI + Google) │    │   │
@@ -90,13 +91,13 @@ apps/platform/src/
 
 ### Worker (File Processing)
 
-The worker is a Hono server running on Bun that processes uploaded files. It exposes a single `POST /process-file` endpoint, invoked by the platform via Upstash QStash.
+The worker is a Hono server running on Bun that processes uploaded files. It exposes a single `POST /process-file` endpoint, invoked by the platform via Upstash QStash or bunqueue (for local development).
 
 **Technology Stack:**
 - **Framework:** Hono
 - **Runtime:** Bun (port 3040)
 - **AI:** Vercel AI SDK (`ai` package) with OpenAI and Google providers
-- **Queue:** Triggered via Upstash QStash
+- **Queue:** Upstash QStash (production) or bunqueue (local development)
 
 **Key Directories:**
 ```
@@ -161,7 +162,7 @@ packages/
 │       ├── space.ts    # Space operations
 │       ├── queue.ts    # Queue job dispatching
 │       └── response.ts # Response helpers
-├── queue/           # Upstash QStash job queue wrapper
+├── queue/           # Job queue wrapper (supports QStash and bunqueue)
 └── tsconfig/        # Shared TypeScript configurations
 ```
 
@@ -177,10 +178,10 @@ packages/
 2. Metadata Storage
    ├─ File metadata saved to PostgreSQL
    ├─ Status set to "pending"
-   └─ Processing job dispatched via QStash
+   └─ Processing job dispatched via QStash or bunqueue
 
 3. Background Processing (Worker)
-   ├─ QStash invokes POST /process-file on Worker
+   ├─ Queue invokes POST /process-file on Worker
    ├─ Worker downloads file from S3
    ├─ Content extracted (text from docs, description from images)
    ├─ Text chunked (800 tokens, 100 token overlap)
