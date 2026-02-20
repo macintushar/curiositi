@@ -144,8 +144,10 @@ export const env = createEnv({
 ```
 
 The platform performs conditional validation based on `QUEUE_PROVIDER`:
-- If `qstash`: requires `QSTASH_TOKEN` and `WORKER_URL`
+- If `qstash`: requires `QSTASH_TOKEN`
 - If `local`: requires `BUNQUEUE_URL`
+
+`WORKER_URL` is always required.
 
 **Worker validation** (`apps/worker/src/env.ts`):
 
