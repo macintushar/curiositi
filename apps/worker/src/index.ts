@@ -75,6 +75,11 @@ async function startBunqueueWorker() {
 				const { fileId, orgId } = job.data;
 				const jobLogger = createLogger(`job-${job.id}`);
 				await processFile({ fileId, orgId, logger: jobLogger });
+			} else {
+				curiositiLogger.warn(
+					`Unknown job name received: ${job.name}, jobId: ${job.id}`,
+					job.asJSON()
+				);
 			}
 		},
 		{
@@ -92,7 +97,7 @@ async function startBunqueueWorker() {
 	worker.on(
 		"failed",
 		(job: Job<ProcessFileJobData> | undefined, error: Error) => {
-			curiositiLogger.error(`Job ${job?.id} failed:`, error.message);
+			curiositiLogger.error(`Job ${job?.id} failed`, error);
 		}
 	);
 
