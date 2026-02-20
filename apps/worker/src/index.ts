@@ -11,6 +11,7 @@ import { createResponse } from "./utils";
 import processFile from "./process-file";
 import { createLogger } from "./create-logger";
 import { env } from "./env";
+import curiositiLogger from "@curiositi/share/logger";
 
 type ProcessFileJobData = {
 	fileId: string;
@@ -83,24 +84,26 @@ async function startBunqueueWorker() {
 
 	worker.on("completed", (job: Job<ProcessFileJobData> | undefined) => {
 		if (job) {
-			console.log(`Job ${job.id} completed`);
+			curiositiLogger.info(`Job ${job.id} completed`);
 		}
 	});
 
 	worker.on(
 		"failed",
 		(job: Job<ProcessFileJobData> | undefined, error: Error) => {
-			console.error(`Job ${job?.id} failed:`, error.message);
+			curiositiLogger.error(`Job ${job?.id} failed:`, error.message);
 		}
 	);
 
-	console.log(`Bunqueue worker started (connected to ${host}:${port})`);
+	curiositiLogger.info(
+		`Bunqueue worker started (connected to ${host}:${port})`
+	);
 }
 
 if (env.QUEUE_PROVIDER === "local") {
-	startBunqueueWorker().catch(console.error);
+	startBunqueueWorker().catch(logger.error);
 } else {
-	console.log("QStash mode - HTTP server on port 3040");
+	curiositiLogger.info("QStash mode - HTTP server on port 3040");
 }
 
 export default {

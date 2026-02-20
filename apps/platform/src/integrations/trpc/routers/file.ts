@@ -16,6 +16,7 @@ import {
 	enqueueFileForProcessing,
 } from "@curiositi/api-handlers";
 import logger from "@curiositi/share/logger";
+import { QUEUE_PROVIDER } from "@curiositi/share/constants";
 
 const fileRouter = {
 	getAllInOrg: protectedProcedure
@@ -123,7 +124,7 @@ const fileRouter = {
 
 				await s3Client.delete(file.path);
 			} catch (s3Error) {
-				console.error(`Failed to delete file from S3: ${file.path}`, s3Error);
+				logger.error(`Failed to delete file from S3: ${file.path}`, s3Error);
 			}
 
 			return { success: true };
