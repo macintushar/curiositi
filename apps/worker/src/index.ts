@@ -101,7 +101,9 @@ async function startBunqueueWorker() {
 }
 
 if (env.QUEUE_PROVIDER === "local") {
-	startBunqueueWorker().catch(logger.error);
+	startBunqueueWorker().catch((error) =>
+		curiositiLogger.error("Failed to start Bunqueue worker", error)
+	);
 } else {
 	curiositiLogger.info("QStash mode - HTTP server on port 3040");
 }
