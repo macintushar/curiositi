@@ -7,55 +7,29 @@ Curiositi is a monorepo built with Turborepo and Bun. This document explains the
 
 ## High-Level Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         Client Layer                            │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │              Browser (React 19)                          │   │
-│  └──────────────────────────┬───────────────────────────────┘   │
-└─────────────────────────────┼───────────────────────────────────┘
-                              │ HTTPS
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Application Layer                          │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │              Platform (TanStack Start)                   │   │
-│  │  ┌────────────┐ ┌────────────┐ ┌────────────────────┐    │   │
-│  │  │   Routes   │ │ Components │ │  TanStack Query    │    │   │
-│  │  │ (TanStack  │ │  (shadcn/  │ │  + tRPC Client     │    │   │
-│  │  │  Router)   │ │   React)   │ │                    │    │   │
-│  │  └────────────┘ └────────────┘ └────────────────────┘    │   │
-│  │  ┌────────────┐ ┌────────────┐ ┌────────────────────┐    │   │
-│  │  │  tRPC v11  │ │ Vite 7 +   │ │  Tailwind CSS v4   │    │   │
-│  │  │  Server    │ │ Nitro SSR  │ │                    │    │   │
-│  │  └────────────┘ └────────────┘ └────────────────────┘    │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                              │ QStash (Upstash) /               │
-│                              │ or bunqueue (local)              │
-│                              ▼                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │              Worker (Hono on Bun)                        │   │
-│  │  ┌────────────┐ ┌────────────┐ ┌────────────────────┐    │   │
-│  │  │  POST      │ │ Processors │ │  Vercel AI SDK     │    │   │
-│  │  │ /process-  │ │ (doc,      │ │  (OpenAI + Google) │    │   │
-│  │  │  file      │ │  image)    │ │                    │    │   │
-│  │  └────────────┘ └────────────┘ └────────────────────┘    │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                        Data Layer                               │
-│  ┌──────────────────────────────┐  ┌────────────────────────┐   │
-│  │        PostgreSQL            │  │     S3 Storage         │   │
-│  │       (Drizzle ORM)          │  │      (Files)           │   │
-│  │                              │  │                        │   │
-│  │  • Users / Sessions          │  │  • Uploaded files      │   │
-│  │  • Workspaces / Members      │  │                        │   │
-│  │  • Spaces / Files            │  │                        │   │
-│  │  • Embeddings (pgvector)     │  │                        │   │
-│  └──────────────────────────────┘  └────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Client["Client Layer"]
+        Browser["Browser<br/>(React 19)"]
+    end
+
+    subgraph App["Application Layer"]
+        Platform["Platform<br/>(TanStack Start)"]
+        Worker["Worker<br/>(Hono on Bun)"]
+        
+        Platform -->|"QStash / bunqueue"| Worker
+    end
+
+    subgraph Data["Data Layer"]
+        Postgres["PostgreSQL<br/>(Drizzle ORM)"]
+        S3["S3 Storage<br/>(Files)"]
+    end
+
+    Browser --"HTTPS"--> Platform
+    Platform --> Postgres
+    Platform --> S3
+    Worker --> S3
+    Worker --> Postgres
 ```
 
 ## Component Overview
@@ -170,67 +144,67 @@ packages/
 
 ### File Upload Flow
 
-```
-1. User Upload
-   ├─ Browser → Platform (tRPC or /api/upload)
-   └─ File uploaded to S3 storage
+```mermaid
+flowchart LR
+    subgraph Upload["1. User Upload"]
+        Browser["Browser"] -->|"tRPC / api/upload"| Platform
+        Platform -->|"File"| S3["S3 Storage"]
+    end
 
-2. Metadata Storage
-   ├─ File metadata saved to PostgreSQL
-   ├─ Status set to "pending"
-   └─ Processing job dispatched via QStash or bunqueue
+    subgraph Store["2. Metadata Storage"]
+        S3 -->|"File saved"| Platform
+        Platform -->|"Save metadata"| DB[(PostgreSQL)]
+        DB -->|"Status: pending"| Platform
+        Platform -->|"Dispatch job"| Queue["QStash / bunqueue"]
+    end
 
-3. Background Processing (Worker)
-   ├─ Queue invokes POST /process-file on Worker
-   ├─ Worker downloads file from S3
-   ├─ Content extracted (text from docs, description from images)
-   ├─ Text chunked (800 tokens, 100 token overlap)
-   ├─ Embeddings generated (1536-dimension vectors)
-   ├─ Chunks + embeddings stored in fileContents table
-   └─ File status updated to "completed"
+    subgraph Process["3. Background Processing"]
+        Queue -->|"Invoke"| Worker["Worker"]
+        Worker -->|"Download"| S3
+        S3 -->|"File content"| Worker
+        Worker -->|"Extract content"| Worker
+        Worker -->|"Chunk text"| Worker
+        Worker -->|"Generate embeddings"| Worker
+        Worker -->|"Store"| DB
+        Worker -->|"Status: completed"| DB
+    end
 
-4. Search Ready
-   └─ File content is now searchable via vector similarity
+    subgraph Ready["4. Search Ready"]
+        DB -.->|"File searchable"| Search["Vector Search"]
+    end
 ```
 
 ### Search Flow
 
-```
-1. Query Received
-   ├─ User enters natural language query
-   └─ Platform receives tRPC request
+```mermaid
+flowchart TB
+    subgraph Step1["1. Query Received"]
+        User["User enters query"] --> Platform
+    end
 
-2. Embedding Generation
-   ├─ Query text sent to embedding model
-   └─ Query embedding vector generated
+    subgraph Step2["2. Embedding Generation"]
+        Platform -->|"Query text"| AI["Embedding Model"]
+        AI -->|"Query vector"| Platform
+    end
 
-3. Vector Search
-   ├─ pgvector performs cosine similarity search
-   └─ Top matching chunks retrieved
+    subgraph Step3["3. Vector Search"]
+        Platform -->|"Vector"| DB[(pgvector)]
+        DB -->|"Top matching chunks"| Platform
+    end
 
-4. Result Aggregation
-   ├─ Chunks grouped by source file
-   └─ Results returned to user
+    subgraph Step4["4. Result Aggregation"]
+        Platform -->|"Group by file"| Results["Results to user"]
+    end
 ```
 
 ### Authentication Flow
 
-```
-1. Login Request
-   ├─ Email/password or Google OAuth
-   └─ Better Auth validates credentials
-
-2. Session Created
-   ├─ Session stored in PostgreSQL
-   └─ Cookie set in browser
-
-3. Workspace Context
-   ├─ User selects workspace
-   └─ All queries scoped to workspace
-
-4. Authorization
-   ├─ Each request checks session + workspace membership
-   └─ Resources filtered by workspace
+```mermaid
+flowchart TB
+    Login["1. Login Request<br/>(Email/Password or Google)"] --> Validate["Better Auth validates"]
+    Validate --> Session["2. Session Created<br/>(PostgreSQL + Cookie)"]
+    Session --> Workspace["3. Workspace Context<br/>(Select workspace)"]
+    Workspace --> Authz["4. Authorization<br/>(Check membership)"]
 ```
 
 ## Technical Decisions
@@ -284,20 +258,24 @@ packages/
 
 ### GitHub Actions Workflows
 
-```
-ci.yml (on push/PR to main):
-├─ Format check (Biome)
-├─ Lint + type check (bun run check)
-└─ Commit message validation (commitlint)
+```mermaid
+flowchart TB
+    subgraph ci["ci.yml (push/PR to main)"]
+        Format["Format check<br/>(Biome)"]
+        Lint["Lint + Type Check<br/>(bun run check)"]
+        Commit["Commit message<br/>(commitlint)"]
+    end
 
-test.yml (on push/PR to main):
-├─ Run tests (bun run test:coverage)
-└─ Upload coverage to Codecov
+    subgraph test["test.yml (push/PR to main)"]
+        Test["Run tests<br/>(bun run test:coverage)"]
+        Codecov["Upload coverage<br/>(Codecov)"]
+    end
 
-release.yml (weekly, Friday 00:00 UTC):
-├─ Generate changesets from commits
-├─ Version packages
-└─ Create GitHub releases/tags
+    subgraph release["release.yml (weekly, Friday 00:00 UTC)"]
+        Changeset["Generate changesets"]
+        Version["Version packages"]
+        GitHub["Create releases/tags"]
+    end
 ```
 
 ### Deployment

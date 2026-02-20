@@ -7,14 +7,11 @@ The queueing system handles asynchronous file processing in Curiositi. When a us
 
 ## How It Works
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│    Platform      │     │      Queue       │     │     Worker       │
-│                  │     │                  │     │                  │
-│  1. Save file    │────▶│ 2. Enqueue job   │────▶│ 3. Process file  │
-│  to S3 storage   │     │ (QStash/bunqueue)│     │ (extract + embed)│
-│  2. Return OK    │     │                  │     │                  │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
+```mermaid
+flowchart LR
+    Platform["Platform"] -->|"1. Save file<br/>to S3 storage<br/>2. Return OK"| Queue["Queue<br/>(QStash/bunqueue)"]
+    Queue -->|"2. Enqueue job"| Worker["Worker<br/>(extract + embed)"]
+    Worker -->|"3. Process file"| Complete["Process Complete"]
 ```
 
 **Flow:**
