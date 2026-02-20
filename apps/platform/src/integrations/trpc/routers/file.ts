@@ -170,19 +170,38 @@ const fileRouter = {
 				orgId: ctx.session.session.activeOrganizationId,
 			};
 
-			const enqueueParams =
-				env.QUEUE_PROVIDER === "local"
-					? {
-							...baseParams,
-							provider: QUEUE_PROVIDER.LOCAL as const,
-							bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
-						}
-					: {
-							...baseParams,
-							provider: QUEUE_PROVIDER.QSTASH as const,
-							qstashToken: env.QSTASH_TOKEN ?? "",
-							workerUrl: env.WORKER_URL ?? "",
-						};
+			if (env.QUEUE_PROVIDER === "local") {
+				const enqueueParams = {
+					...baseParams,
+					provider: QUEUE_PROVIDER.LOCAL as const,
+					bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
+				};
+				const { error: enqueueError } =
+					await enqueueFileForProcessing(enqueueParams);
+				if (enqueueError) {
+					logger.error("Error during file enqueue", enqueueError);
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to enqueue file for processing",
+					});
+				}
+				return { success: true };
+			}
+
+			if (!env.QSTASH_TOKEN || !env.WORKER_URL) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message:
+						"QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash",
+				});
+			}
+
+			const enqueueParams = {
+				...baseParams,
+				provider: QUEUE_PROVIDER.QSTASH as const,
+				qstashToken: env.QSTASH_TOKEN,
+				workerUrl: env.WORKER_URL,
+			};
 
 			const { error: enqueueError } =
 				await enqueueFileForProcessing(enqueueParams);
