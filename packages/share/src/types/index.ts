@@ -1,3 +1,5 @@
+import type { QUEUE_PROVIDER } from "../constants";
+
 export type S3Config = {
 	accessKeyId: string;
 	secretAccessKey: string;

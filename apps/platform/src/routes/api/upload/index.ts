@@ -4,6 +4,7 @@ import {
 	uploadHandler,
 } from "@curiositi/api-handlers";
 import logger from "@curiositi/share/logger";
+import { QUEUE_PROVIDER } from "@curiositi/share/constants";
 import { env } from "@platform/env";
 import { auth } from "@platform/lib/auth";
 import { authMiddleware } from "@platform/middleware/auth";
@@ -81,12 +82,12 @@ export const Route = createFileRoute("/api/upload/")({
 						env.QUEUE_PROVIDER === "local"
 							? {
 									...baseParams,
-									provider: "local" as const,
+									provider: QUEUE_PROVIDER.LOCAL as const,
 									bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
 								}
 							: {
 									...baseParams,
-									provider: "qstash" as const,
+									provider: QUEUE_PROVIDER.QSTASH as const,
 									qstashToken: env.QSTASH_TOKEN ?? "",
 									workerUrl: env.WORKER_URL ?? "",
 								};

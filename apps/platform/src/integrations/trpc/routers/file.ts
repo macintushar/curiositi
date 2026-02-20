@@ -173,12 +173,12 @@ const fileRouter = {
 				env.QUEUE_PROVIDER === "local"
 					? {
 							...baseParams,
-							provider: "local" as const,
+							provider: QUEUE_PROVIDER.LOCAL as const,
 							bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
 						}
 					: {
 							...baseParams,
-							provider: "qstash" as const,
+							provider: QUEUE_PROVIDER.QSTASH as const,
 							qstashToken: env.QSTASH_TOKEN ?? "",
 							workerUrl: env.WORKER_URL ?? "",
 						};

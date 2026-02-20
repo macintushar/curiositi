@@ -1,6 +1,7 @@
 import { createQueueClient } from "@curiositi/queue";
-import { type QueueClient, QUEUE_PROVIDER } from "@curiositi/share/types";
+import type { QueueClient } from "@curiositi/share/types";
 import { createResponse } from "./response";
+import { QUEUE_PROVIDER } from "@curiositi/share/constants";
 
 type EnqueueFileForProcessingParams =
 	| {
