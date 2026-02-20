@@ -6,7 +6,7 @@ import {
 } from "@curiositi/db/schema";
 import { createResponse } from "./response";
 import db from "@curiositi/db/client";
-import { and, eq, notExists, sql, desc } from "@curiositi/db";
+import { and, eq, notExists, sql, desc, ilike } from "@curiositi/db";
 import { embedText } from "@curiositi/share/ai";
 
 export async function getAllFiles(orgId: string, limit = 50, offset = 0) {
@@ -147,6 +147,8 @@ export async function searchFilesWithAI(
 		// 2. Semantic search via embeddings
 		const { embedding } = await embedText({ text: query, provider: "openai" });
 
+		const MIN_SIMILARITY_THRESHOLD = 0.5;
+
 		const semanticMatches = await db
 			.select({
 				file: files,
@@ -165,9 +167,9 @@ export async function searchFilesWithAI(
 			)
 			.limit(limit);
 
-		// Get spaces for semantic matches (batched query to avoid N+1)
 		const ids = new Set();
 		const newMatches = semanticMatches.filter((m) => {
+			if (m.similarity < MIN_SIMILARITY_THRESHOLD) return false;
 			if (ids.has(m.file.id)) {
 				return false;
 			} else {
@@ -213,6 +215,117 @@ export async function searchFilesWithAI(
 		}
 
 		results.sort((a, b) => b.score - a.score);
+
+		return createResponse(results, null);
+	} catch (error) {
+		return createResponse(null, error);
+	}
+}
+
+export async function searchFiles(
+	query: string,
+	orgId: string,
+	options?: { limit?: number }
+) {
+	try {
+		const limit = options?.limit ?? 15;
+		const resultsMap = new Map<string, SearchResult>();
+
+		const filenameMatches = await db
+			.select({
+				file: files,
+				spaceId: spaces.id,
+				spaceName: spaces.name,
+			})
+			.from(files)
+			.leftJoin(filesInSpace, eq(filesInSpace.fileId, files.id))
+			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
+			.where(
+				and(eq(files.organizationId, orgId), ilike(files.name, `%${query}%`))
+			)
+			.limit(limit);
+
+		for (const match of filenameMatches) {
+			resultsMap.set(match.file.id, {
+				file: match.file,
+				score: 1.0,
+				matchType: "name",
+				spaceName: match.spaceName,
+				spaceId: match.spaceId,
+			});
+		}
+
+		const { embedding } = await embedText({ text: query, provider: "openai" });
+
+		const semanticMatches = await db
+			.select({
+				file: files,
+				similarity:
+					sql<number>`1 - (${fileContents.embeddedContent} <=> ${JSON.stringify(embedding)}::vector)`.as(
+						"similarity"
+					),
+			})
+			.from(fileContents)
+			.innerJoin(files, eq(fileContents.fileId, files.id))
+			.where(eq(files.organizationId, orgId))
+			.orderBy(
+				desc(
+					sql`1 - (${fileContents.embeddedContent} <=> ${JSON.stringify(embedding)}::vector)`
+				)
+			)
+			.limit(limit);
+
+		if (semanticMatches.length > 0) {
+			const fileIds = semanticMatches.map((m) => m.file.id);
+			const spaceInfos = await db
+				.select({
+					fileId: filesInSpace.fileId,
+					spaceId: spaces.id,
+					spaceName: spaces.name,
+				})
+				.from(filesInSpace)
+				.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
+				.where(
+					sql`${filesInSpace.fileId} IN (${sql.join(
+						fileIds.map((id) => sql`${id}`),
+						sql`, `
+					)})`
+				);
+
+			const spaceMap = new Map(
+				spaceInfos.map((s) => [
+					s.fileId,
+					{ spaceId: s.spaceId, spaceName: s.spaceName },
+				])
+			);
+
+			const MIN_SIMILARITY_THRESHOLD = 0.5;
+
+			for (const match of semanticMatches) {
+				if (match.similarity < MIN_SIMILARITY_THRESHOLD) continue;
+
+				const existing = resultsMap.get(match.file.id);
+				if (existing) {
+					if (match.similarity > existing.score) {
+						existing.score = match.similarity;
+						existing.matchType = "content";
+					}
+				} else {
+					const space = spaceMap.get(match.file.id);
+					resultsMap.set(match.file.id, {
+						file: match.file,
+						score: match.similarity,
+						matchType: "content",
+						spaceName: space?.spaceName ?? null,
+						spaceId: space?.spaceId ?? null,
+					});
+				}
+			}
+		}
+
+		const results = Array.from(resultsMap.values())
+			.sort((a, b) => b.score - a.score)
+			.slice(0, limit);
 
 		return createResponse(results, null);
 	} catch (error) {
