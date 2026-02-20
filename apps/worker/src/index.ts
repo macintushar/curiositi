@@ -12,6 +12,7 @@ import processFile from "./process-file";
 import { createLogger } from "./create-logger";
 import { env } from "./env";
 import curiositiLogger from "@curiositi/share/logger";
+import { QUEUE_NAMES } from "@curiositi/share/constants";
 
 type ProcessFileJobData = {
 	fileId: string;
@@ -68,7 +69,7 @@ async function startBunqueueWorker() {
 	const port = Number.parseInt(parts[1] ?? "6789", 10);
 
 	const worker = new Worker<ProcessFileJobData>(
-		"curiositi-ingest-queue",
+		QUEUE_NAMES.INGEST,
 		async (job: Job<ProcessFileJobData>) => {
 			if (job.name === "processFile") {
 				const { fileId, orgId } = job.data;
