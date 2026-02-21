@@ -12,6 +12,7 @@ import {
 	getFilesNotInSpace,
 	deleteFile,
 	searchFilesWithAI,
+	searchFiles,
 	getRecentFiles,
 	enqueueFileForProcessing,
 } from "@curiositi/api-handlers";
@@ -143,6 +144,20 @@ const fileRouter = {
 				{
 					limit: input.limit,
 				}
+			);
+		}),
+	search: protectedProcedure
+		.input(
+			z.object({
+				query: z.string().min(1),
+				limit: z.number().min(1).max(50).optional(),
+			})
+		)
+		.query(async ({ input, ctx }) => {
+			return await searchFiles(
+				input.query,
+				ctx.session.session.activeOrganizationId,
+				{ limit: input.limit }
 			);
 		}),
 	getRecent: protectedProcedure
