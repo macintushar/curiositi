@@ -3,6 +3,7 @@ import superjson from "superjson";
 import { auth } from "@platform/lib/auth";
 import db from "@curiositi/db/client";
 import z, { ZodError } from "zod";
+import logger from "@curiositi/share/logger";
 
 /**
  * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
@@ -96,7 +97,7 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 	const result = await next();
 
 	const end = Date.now();
-	console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+	logger.info(`[TRPC] ${path} took ${end - start}ms to execute`);
 
 	return result;
 });

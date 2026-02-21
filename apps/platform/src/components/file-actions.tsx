@@ -61,13 +61,12 @@ export default function FileActions({
 			document.body.removeChild(a);
 			URL.revokeObjectURL(url);
 		} catch (error) {
-			console.error("Failed to download file", error);
+			logger.error("Failed to download file", error);
 		}
 	};
 
 	const handleOpenInNewTab = () => {
 		window.open(presignedUrl, "_blank");
-		console.log(`Opening file in new tab`, presignedUrl);
 	};
 
 	const handleReProcessFile = async () => {

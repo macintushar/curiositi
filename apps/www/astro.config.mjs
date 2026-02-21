@@ -2,8 +2,11 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import sitemap from "@astrojs/sitemap";
-import tailwindcss from "@tailwindcss/vite";
+import mermaid from "astro-mermaid";
 import icon from "astro-icon";
+
+import tailwindcss from "@tailwindcss/vite";
+
 import { GITHUB_URL } from "./src/constants";
 
 export default defineConfig({
@@ -12,6 +15,14 @@ export default defineConfig({
 		plugins: [/** @type {any} */ (tailwindcss())],
 	},
 	integrations: [
+		mermaid({
+			autoTheme: true,
+			mermaidConfig: {
+				startOnLoad: false,
+				logLevel: "error",
+				securityLevel: "strict",
+			},
+		}),
 		starlight({
 			title: "curiositi",
 			disable404Route: true,
