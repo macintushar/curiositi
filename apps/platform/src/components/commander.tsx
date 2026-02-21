@@ -100,7 +100,7 @@ function SearchResults({
 
 	if (query.length === 0) return null;
 
-	if (query.length === 1) {
+	if (!shouldSearch) {
 		return (
 			<div className="p-8 text-center text-muted-foreground text-sm">
 				Type at least 2 characters to search
@@ -122,10 +122,10 @@ function SearchResults({
 
 	const results = searchResults.data?.data || [];
 
-	if (results.length === 0 && !isLoading) {
+	if (results.length === 0) {
 		return (
 			<div className="p-8 text-center text-muted-foreground">
-				No files found for "{query}"
+				No files found for "{debouncedQuery}"
 			</div>
 		);
 	}
@@ -228,11 +228,19 @@ function CommanderContent({
 						<RecentFiles onOpenFile={onOpenFile} />
 						<CommandSeparator />
 						<CommandGroup heading="QUICK ACTIONS">
-							<CommandItem>
+							<CommandItem
+								onSelect={() => {
+									onClose();
+								}}
+							>
 								<Link2 />
 								<span>Add a link</span>
 							</CommandItem>
-							<CommandItem>
+							<CommandItem
+								onSelect={() => {
+									onClose();
+								}}
+							>
 								<Folder />
 								<span>Create a Space</span>
 							</CommandItem>

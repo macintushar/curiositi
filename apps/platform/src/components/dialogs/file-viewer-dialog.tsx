@@ -5,11 +5,15 @@ import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
+	DialogTitle,
+	DialogDescription,
 } from "@platform/components/ui/dialog";
 import {
 	Drawer,
 	DrawerContent,
 	DrawerHeader,
+	DrawerTitle,
+	DrawerDescription,
 } from "@platform/components/ui/drawer";
 import { useIsMobile } from "@platform/hooks/use-mobile";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
@@ -17,11 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import FileIcon from "@platform/components/file-icon";
 import FileContentPreview from "@platform/components/previews/file-content-preview";
 import { Skeleton } from "@platform/components/ui/skeleton";
-import {
-	IMAGE_TYPES,
-	PDF_TYPE,
-	TEXT_FILE_TYPES,
-} from "@curiositi/share/constants";
+import { IMAGE_TYPES, PDF_TYPE } from "@curiositi/share/constants";
 import { toast } from "sonner";
 import FileActions from "@platform/components/file-actions";
 import type z from "zod";
@@ -41,6 +41,14 @@ type FileData = z.infer<typeof selectFileSchema>;
 type FileViewerHeaderProps = {
 	file: FileData;
 	presignedUrl: string | undefined;
+};
+
+type FileViewerContentProps = {
+	isFileQueryLoading: boolean;
+	file: FileData | undefined;
+	fileType: FileType;
+	presignedUrl: string | undefined;
+	isMobile: boolean;
 };
 
 function FileViewerHeader({ file, presignedUrl }: FileViewerHeaderProps) {
@@ -91,13 +99,7 @@ function FileViewerContent({
 	fileType,
 	presignedUrl,
 	isMobile,
-}: {
-	isFileQueryLoading: boolean;
-	file: FileData | undefined;
-	fileType: FileType;
-	presignedUrl: string | undefined;
-	isMobile: boolean;
-}) {
+}: FileViewerContentProps) {
 	if (isFileQueryLoading) {
 		return (
 			<div className="flex flex-col h-full">
@@ -171,16 +173,19 @@ export default function FileViewerDialog({
 			? "image"
 			: PDF_TYPE === file.type
 				? "pdf"
-				: TEXT_FILE_TYPES.includes(file.type)
-					? "text"
-					: "text"
+				: "text"
 		: "text";
 
 	if (isMobile) {
 		return (
 			<Drawer open={open} onOpenChange={onOpenChange}>
 				<DrawerContent className="h-[95vh] flex flex-col p-0 gap-0">
-					<DrawerHeader className="sr-only h-fit p-0"></DrawerHeader>
+					<DrawerHeader className="sr-only h-fit p-0">
+						<DrawerTitle>File Viewer</DrawerTitle>
+						<DrawerDescription>
+							View file contents and details
+						</DrawerDescription>
+					</DrawerHeader>
 					<FileViewerContent
 						isFileQueryLoading={isFileQueryLoading}
 						file={file}
@@ -196,7 +201,10 @@ export default function FileViewerDialog({
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-none w-full min-w-full h-screen flex flex-col p-0 gap-0">
-				<DialogHeader className="sr-only h-fit p-0"></DialogHeader>
+				<DialogHeader className="sr-only h-fit p-0">
+					<DialogTitle>File Viewer</DialogTitle>
+					<DialogDescription>View file contents and details</DialogDescription>
+				</DialogHeader>
 				<FileViewerContent
 					isFileQueryLoading={isFileQueryLoading}
 					file={file}

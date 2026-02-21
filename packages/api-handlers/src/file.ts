@@ -9,6 +9,8 @@ import db from "@curiositi/db/client";
 import { and, eq, notExists, sql, desc, ilike } from "@curiositi/db";
 import { embedText } from "@curiositi/share/ai";
 
+const MIN_SIMILARITY_THRESHOLD = 0.5;
+
 export async function getAllFiles(orgId: string, limit = 50, offset = 0) {
 	try {
 		const totalResult = await db
@@ -147,8 +149,6 @@ export async function searchFilesWithAI(
 		// 2. Semantic search via embeddings
 		const { embedding } = await embedText({ text: query, provider: "openai" });
 
-		const MIN_SIMILARITY_THRESHOLD = 0.5;
-
 		const semanticMatches = await db
 			.select({
 				file: files,
@@ -231,6 +231,11 @@ export async function searchFiles(
 		const limit = options?.limit ?? 15;
 		const resultsMap = new Map<string, SearchResult>();
 
+		const escapedQuery = query
+			.replace(/\\/g, "\\\\")
+			.replace(/%/g, "\\%")
+			.replace(/_/g, "\\_");
+
 		const filenameMatches = await db
 			.select({
 				file: files,
@@ -241,7 +246,10 @@ export async function searchFiles(
 			.leftJoin(filesInSpace, eq(filesInSpace.fileId, files.id))
 			.leftJoin(spaces, eq(spaces.id, filesInSpace.spaceId))
 			.where(
-				and(eq(files.organizationId, orgId), ilike(files.name, `%${query}%`))
+				and(
+					eq(files.organizationId, orgId),
+					ilike(files.name, `%${escapedQuery}%`)
+				)
 			)
 			.limit(limit);
 
@@ -253,6 +261,13 @@ export async function searchFiles(
 				spaceName: match.spaceName,
 				spaceId: match.spaceId,
 			});
+		}
+
+		if (resultsMap.size >= limit) {
+			const results = Array.from(resultsMap.values())
+				.sort((a, b) => b.score - a.score)
+				.slice(0, limit);
+			return createResponse(results, null);
 		}
 
 		const { embedding } = await embedText({ text: query, provider: "openai" });
@@ -298,8 +313,6 @@ export async function searchFiles(
 					{ spaceId: s.spaceId, spaceName: s.spaceName },
 				])
 			);
-
-			const MIN_SIMILARITY_THRESHOLD = 0.5;
 
 			for (const match of semanticMatches) {
 				if (match.similarity < MIN_SIMILARITY_THRESHOLD) continue;

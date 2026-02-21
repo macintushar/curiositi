@@ -33,7 +33,7 @@ type FileType = "image" | "pdf" | "text";
 type FileContentPreviewProps = {
 	file: z.infer<typeof selectFileSchema>;
 	fileType: FileType;
-	isMobile: boolean;
+	isMobile?: boolean;
 	presignedUrl?: string;
 };
 
@@ -62,7 +62,7 @@ export default function FileContentPreview({
 
 	if (fileType === "pdf") {
 		return (
-			<FilePreviewCard className="h-full">
+			<FilePreviewCard className="h-full" border={!isMobile}>
 				<iframe
 					src={presignedUrl}
 					title={file.name}
