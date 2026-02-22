@@ -18,6 +18,8 @@ const SCOPE_MAP: Record<string, string> = {
 	queue: "@curiositi/queue",
 	share: "@curiositi/share",
 	api: "@curiositi/api-handlers",
+	repo: "../..", // For changes that affect the whole repo
+	www: "@curiositi/www",
 };
 
 // Helper to get commits since last tag
