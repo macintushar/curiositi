@@ -63,10 +63,8 @@ api.post(
 api.get("*", serveStatic({ root: "./public" }));
 
 async function startBunqueueWorker() {
-	const bunqueueUrl = env.BUNQUEUE_URL ?? "localhost:6789";
-	const parts = bunqueueUrl.split(":");
-	const host = parts[0] ?? "localhost";
-	const port = Number.parseInt(parts[1] ?? "6789", 10);
+	const host = env.BUNQUEUE_HOST;
+	const port = env.BUNQUEUE_PORT;
 
 	const worker = new Worker<ProcessFileJobData>(
 		QUEUE_NAMES.INGEST,
@@ -100,6 +98,13 @@ async function startBunqueueWorker() {
 			curiositiLogger.error(`Job ${job?.id} failed`, error);
 		}
 	);
+
+	worker.on("error", (error: Error & { consecutiveErrors?: number }) => {
+		curiositiLogger.error(`Worker connection error to ${host}:${port}`, {
+			error,
+			consecutiveErrors: error.consecutiveErrors,
+		});
+	});
 
 	curiositiLogger.info(
 		`Bunqueue worker started (connected to ${host}:${port})`

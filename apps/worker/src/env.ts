@@ -9,7 +9,8 @@ export const env = createEnv({
 		S3_ENDPOINT: z.string(),
 		POSTGRES_URL: z.url(),
 		QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
-		BUNQUEUE_URL: z.string().optional(),
+		BUNQUEUE_HOST: z.string().default("localhost"),
+		BUNQUEUE_PORT: z.coerce.number().default(6789),
 	},
 
 	clientPrefix: "PUBLIC_",
@@ -23,7 +24,8 @@ export const env = createEnv({
 		S3_ENDPOINT: process.env.S3_ENDPOINT,
 		POSTGRES_URL: process.env.POSTGRES_URL,
 		QUEUE_PROVIDER: process.env.QUEUE_PROVIDER,
-		BUNQUEUE_URL: process.env.BUNQUEUE_URL,
+		BUNQUEUE_HOST: process.env.BUNQUEUE_HOST,
+		BUNQUEUE_PORT: process.env.BUNQUEUE_PORT,
 	},
 
 	skipValidation:
