@@ -9,14 +9,17 @@ import type { selectFileSchema } from "@curiositi/db/schema";
 function FilePreviewCard({
 	children,
 	className,
+	border = true,
 }: {
 	children: React.ReactNode;
+	border?: boolean;
 	className?: string;
 }) {
 	return (
 		<div
 			className={cn(
 				"flex flex-col h-full min-h-0 overflow-auto rounded-lg",
+				border ? "border" : "",
 				className
 			)}
 		>
@@ -30,12 +33,14 @@ type FileType = "image" | "pdf" | "text";
 type FileContentPreviewProps = {
 	file: z.infer<typeof selectFileSchema>;
 	fileType: FileType;
+	isMobile?: boolean;
 	presignedUrl?: string;
 };
 
 export default function FileContentPreview({
 	file,
 	fileType,
+	isMobile = false,
 	presignedUrl,
 }: FileContentPreviewProps) {
 	if (!presignedUrl) {
@@ -46,7 +51,10 @@ export default function FileContentPreview({
 
 	if (fileType === "image") {
 		return (
-			<FilePreviewCard className="object-contain border flex items-center justify-center">
+			<FilePreviewCard
+				className="object-contain flex items-center justify-center"
+				border={!isMobile}
+			>
 				<img src={presignedUrl} alt={file.name} />
 			</FilePreviewCard>
 		);
@@ -54,7 +62,7 @@ export default function FileContentPreview({
 
 	if (fileType === "pdf") {
 		return (
-			<FilePreviewCard className="h-full">
+			<FilePreviewCard className="h-full" border={!isMobile}>
 				<iframe
 					src={presignedUrl}
 					title={file.name}
@@ -65,7 +73,13 @@ export default function FileContentPreview({
 	}
 
 	if (fileType === "text") {
-		return <TextFilePreview file={file} presignedUrl={presignedUrl} />;
+		return (
+			<TextFilePreview
+				file={file}
+				presignedUrl={presignedUrl}
+				isMobile={isMobile}
+			/>
+		);
 	}
 
 	return (
@@ -93,9 +107,14 @@ export default function FileContentPreview({
 type TextFilePreviewProps = {
 	file: FileContentPreviewProps["file"];
 	presignedUrl?: string;
+	isMobile?: boolean;
 };
 
-function TextFilePreview({ file, presignedUrl }: TextFilePreviewProps) {
+function TextFilePreview({
+	file,
+	presignedUrl,
+	isMobile = false,
+}: TextFilePreviewProps) {
 	const [hasMounted, setHasMounted] = useState(false);
 
 	useEffect(() => {
@@ -152,7 +171,7 @@ function TextFilePreview({ file, presignedUrl }: TextFilePreviewProps) {
 	const isMarkdown = file.type.includes("markdown");
 
 	return (
-		<FilePreviewCard className="sm:items-center border">
+		<FilePreviewCard className="sm:items-center" border={!isMobile}>
 			{isMarkdown ? (
 				<Markdown className=" px-2 prose prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-h5:text-sm prose-h6:text-xs dark:prose-invert">
 					{content}
