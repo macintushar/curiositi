@@ -16,11 +16,17 @@ export function createQstashClient(config: QstashConfig): QueueClient {
 
 	return {
 		async enqueue(payload: JobPayload): Promise<void> {
-			await queue.enqueueJSON({
-				url: `${config.workerUrl}/process-file`,
-				body: payload.data,
-				method: "POST",
-			});
+			try {
+				await queue.enqueueJSON({
+					url: `${config.workerUrl}/process-file`,
+					body: payload.data,
+					method: "POST",
+				});
+			} catch (error) {
+				throw new Error(
+					`Failed to enqueue job ${payload.type}: ${error instanceof Error ? error.message : String(error)}`
+				);
+			}
 		},
 	};
 }
