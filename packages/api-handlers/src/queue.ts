@@ -16,7 +16,8 @@ type EnqueueFileForProcessingParams =
 			provider: QUEUE_PROVIDER.LOCAL;
 			fileId: string;
 			orgId: string;
-			bunqueueUrl: string;
+			bunqueueHost: string;
+			bunqueuePort: number;
 	  };
 
 let queueClient: QueueClient | null = null;
@@ -26,7 +27,7 @@ function getQueueClient(params: EnqueueFileForProcessingParams): QueueClient {
 		return queueClient;
 	}
 
-	if (params.provider === "qstash") {
+	if (params.provider === QUEUE_PROVIDER.QSTASH) {
 		queueClient = createQueueClient({
 			provider: QUEUE_PROVIDER.QSTASH,
 			qstash: {
@@ -36,12 +37,9 @@ function getQueueClient(params: EnqueueFileForProcessingParams): QueueClient {
 			},
 		});
 	} else {
-		const parts = params.bunqueueUrl.split(":");
-		const host = parts[0] ?? "localhost";
-		const port = Number.parseInt(parts[1] ?? "6789", 10);
 		queueClient = createQueueClient({
 			provider: QUEUE_PROVIDER.LOCAL,
-			bunqueue: { host, port },
+			bunqueue: { host: params.bunqueueHost, port: params.bunqueuePort },
 		});
 	}
 
