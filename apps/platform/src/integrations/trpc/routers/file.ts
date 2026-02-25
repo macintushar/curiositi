@@ -17,6 +17,7 @@ import {
 	enqueueFileForProcessing,
 } from "@curiositi/api-handlers";
 import logger from "@curiositi/share/logger";
+import { QUEUE_PROVIDER } from "@curiositi/share/constants";
 
 const fileRouter = {
 	getAllInOrg: protectedProcedure
@@ -124,7 +125,7 @@ const fileRouter = {
 
 				await s3Client.delete(file.path);
 			} catch (s3Error) {
-				console.error(`Failed to delete file from S3: ${file.path}`, s3Error);
+				logger.error(`Failed to delete file from S3: ${file.path}`, s3Error);
 			}
 
 			return { success: true };
@@ -179,12 +180,47 @@ const fileRouter = {
 			})
 		)
 		.mutation(async ({ ctx, input }) => {
-			const { error: enqueueError } = await enqueueFileForProcessing({
+			const baseParams = {
 				fileId: input.fileId,
 				orgId: ctx.session.session.activeOrganizationId,
+			};
+
+			if (env.QUEUE_PROVIDER === "local") {
+				const enqueueParams = {
+					...baseParams,
+					provider: QUEUE_PROVIDER.LOCAL as const,
+					bunqueueHost: env.BUNQUEUE_HOST,
+					bunqueuePort: env.BUNQUEUE_PORT,
+				};
+				const { error: enqueueError } =
+					await enqueueFileForProcessing(enqueueParams);
+				if (enqueueError) {
+					logger.error("Error during file enqueue", enqueueError);
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to enqueue file for processing",
+					});
+				}
+				return { success: true };
+			}
+
+			if (!env.QSTASH_TOKEN || !env.WORKER_URL) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message:
+						"QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash",
+				});
+			}
+
+			const enqueueParams = {
+				...baseParams,
+				provider: QUEUE_PROVIDER.QSTASH as const,
 				qstashToken: env.QSTASH_TOKEN,
 				workerUrl: env.WORKER_URL,
-			});
+			};
+
+			const { error: enqueueError } =
+				await enqueueFileForProcessing(enqueueParams);
 
 			if (enqueueError) {
 				logger.error("Error during file enqueue", enqueueError);

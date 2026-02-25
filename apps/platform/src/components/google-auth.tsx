@@ -20,10 +20,6 @@ export default function GoogleAuth({ isLastUsed }: { isLastUsed?: boolean }) {
 					logger.error(res.error.message, res.error);
 					toast.error(res.error.message);
 				}
-
-				if (res.data?.url) {
-					console.log(res.data.url);
-				}
 			}}
 			variant="outline"
 			className="flex items-center gap-2 relative"

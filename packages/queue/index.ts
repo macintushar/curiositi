@@ -1,35 +1,10 @@
-import { Client } from "@upstash/qstash";
+import { createQstashClient } from "./providers/qstash";
+import { createBunqueueClient } from "./providers/bunqueue";
+import type { QueueClient, QueueConfig } from "@curiositi/share/types";
 
-type Payload = {
-	workerUrl: string;
-	fileId: string;
-	orgId: string;
-};
-
-type PushToQueueProps = {
-	qstashToken: string;
-	qstashUrl?: string;
-	payload: Payload;
-};
-
-export async function pushToQueue({
-	qstashToken,
-	qstashUrl,
-	payload,
-}: PushToQueueProps) {
-	const client = new Client({
-		token: qstashToken,
-		baseUrl: qstashUrl,
-	});
-
-	const res = await client.publishJSON({
-		url: `${payload.workerUrl}/process-file`,
-		body: {
-			fileId: payload.fileId,
-			orgId: payload.orgId,
-		},
-		method: "POST",
-	});
-
-	return res;
+export function createQueueClient(config: QueueConfig): QueueClient {
+	if (config.provider === "qstash") {
+		return createQstashClient(config.qstash);
+	}
+	return createBunqueueClient(config.bunqueue);
 }

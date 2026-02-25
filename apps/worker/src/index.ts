@@ -5,10 +5,19 @@ import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
 import { requestId, type RequestIdVariables } from "hono/request-id";
 import { zValidator } from "@hono/zod-validator";
+import { Worker, type Job } from "bunqueue/client";
 
 import { createResponse } from "./utils";
 import processFile from "./process-file";
 import { createLogger } from "./create-logger";
+import { env } from "./env";
+import curiositiLogger from "@curiositi/share/logger";
+import { QUEUE_NAMES } from "@curiositi/share/constants";
+
+type ProcessFileJobData = {
+	fileId: string;
+	orgId: string;
+};
 
 const api = new Hono<{
 	Variables: RequestIdVariables;
@@ -52,6 +61,63 @@ api.post(
 );
 
 api.get("*", serveStatic({ root: "./public" }));
+
+async function startBunqueueWorker() {
+	const host = env.BUNQUEUE_HOST;
+	const port = env.BUNQUEUE_PORT;
+
+	const worker = new Worker<ProcessFileJobData>(
+		QUEUE_NAMES.INGEST,
+		async (job: Job<ProcessFileJobData>) => {
+			if (job.name === "processFile") {
+				const { fileId, orgId } = job.data;
+				const jobLogger = createLogger(`job-${job.id}`);
+				await processFile({ fileId, orgId, logger: jobLogger });
+			} else {
+				curiositiLogger.warn(
+					`Unknown job name received: ${job.name}, jobId: ${job.id}`,
+					job.asJSON()
+				);
+			}
+		},
+		{
+			connection: { host, port },
+			concurrency: 5,
+		}
+	);
+
+	worker.on("completed", (job: Job<ProcessFileJobData> | undefined) => {
+		if (job) {
+			curiositiLogger.info(`Job ${job.id} completed`);
+		}
+	});
+
+	worker.on(
+		"failed",
+		(job: Job<ProcessFileJobData> | undefined, error: Error) => {
+			curiositiLogger.error(`Job ${job?.id} failed`, error);
+		}
+	);
+
+	worker.on("error", (error: Error & { consecutiveErrors?: number }) => {
+		curiositiLogger.error(`Worker connection error to ${host}:${port}`, {
+			error,
+			consecutiveErrors: error.consecutiveErrors,
+		});
+	});
+
+	curiositiLogger.info(
+		`Bunqueue worker started (connected to ${host}:${port})`
+	);
+}
+
+if (env.QUEUE_PROVIDER === "local") {
+	startBunqueueWorker().catch((error) =>
+		curiositiLogger.error("Failed to start Bunqueue worker", error)
+	);
+} else {
+	curiositiLogger.info("QStash mode - HTTP server on port 3040");
+}
 
 export default {
 	port: 3040,

@@ -35,3 +35,12 @@ export const CAT_LOGO = `
  (^ . ^)
  (")_("))~
  `;
+
+export enum QUEUE_NAMES {
+	INGEST = "curiositi-ingest-queue",
+}
+
+export enum QUEUE_PROVIDER {
+	QSTASH = "qstash",
+	LOCAL = "local",
+}

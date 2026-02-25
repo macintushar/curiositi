@@ -1,8 +1,8 @@
 import { cn } from "@platform/lib/utils";
 
-interface MascotProps {
+type MascotProps = {
 	className?: string;
-}
+};
 
 export default function Mascot({ className }: MascotProps) {
 	return (

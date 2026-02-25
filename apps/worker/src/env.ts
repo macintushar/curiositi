@@ -8,6 +8,9 @@ export const env = createEnv({
 		S3_BUCKET: z.string(),
 		S3_ENDPOINT: z.string(),
 		POSTGRES_URL: z.url(),
+		QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
+		BUNQUEUE_HOST: z.string().default("localhost"),
+		BUNQUEUE_PORT: z.coerce.number().default(6789),
 	},
 
 	clientPrefix: "PUBLIC_",
@@ -20,21 +23,11 @@ export const env = createEnv({
 		S3_BUCKET: process.env.S3_BUCKET,
 		S3_ENDPOINT: process.env.S3_ENDPOINT,
 		POSTGRES_URL: process.env.POSTGRES_URL,
+		QUEUE_PROVIDER: process.env.QUEUE_PROVIDER,
+		BUNQUEUE_HOST: process.env.BUNQUEUE_HOST,
+		BUNQUEUE_PORT: process.env.BUNQUEUE_PORT,
 	},
 
-	/**
-	 * By default, this library will feed the environment variables directly to
-	 * the Zod validator.
-	 *
-	 * This means that if you have an empty string for a value that is supposed
-	 * to be a number (e.g. `PORT=` in a ".env" file), Zod will incorrectly flag
-	 * it as a type mismatch violation. Additionally, if you have an empty string
-	 * for a value that is supposed to be a string with a default value (e.g.
-	 * `DOMAIN=` in an ".env" file), the default value will never be applied.
-	 *
-	 * In order to solve these issues, we recommend that all new projects
-	 * explicitly specify this option as true.
-	 */
 	skipValidation:
 		!!process.env.CI || process.env.npm_lifecycle_event === "lint",
 	emptyStringAsUndefined: false,

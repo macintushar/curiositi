@@ -4,6 +4,7 @@ import {
 	uploadHandler,
 } from "@curiositi/api-handlers";
 import logger from "@curiositi/share/logger";
+import { QUEUE_PROVIDER } from "@curiositi/share/constants";
 import { env } from "@platform/env";
 import { auth } from "@platform/lib/auth";
 import { authMiddleware } from "@platform/middleware/auth";
@@ -72,20 +73,59 @@ export const Route = createFileRoute("/api/upload/")({
 				}
 
 				if (uploadData) {
+					const baseParams = {
+						fileId: uploadData.id,
+						orgId: session.session.activeOrganizationId,
+					};
+
+					if (env.QUEUE_PROVIDER === "local") {
+						const enqueueParams = {
+							...baseParams,
+							provider: QUEUE_PROVIDER.LOCAL as const,
+							bunqueueHost: env.BUNQUEUE_HOST,
+							bunqueuePort: env.BUNQUEUE_PORT,
+						};
+						const { data: enqueueData, error: enqueueError } =
+							await enqueueFileForProcessing(enqueueParams);
+						if (enqueueError) {
+							logger.error("Error during file enqueue", enqueueError);
+							return new Response(
+								JSON.stringify(createResponse(null, enqueueError)),
+								{ status: 500 }
+							);
+						}
+						return new Response(
+							JSON.stringify(
+								createResponse({ file: uploadData, queue: enqueueData }, null)
+							),
+							{ status: 200 }
+						);
+					}
+
+					if (!env.QSTASH_TOKEN || !env.WORKER_URL) {
+						logger.error(
+							"QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash"
+						);
+						return new Response(
+							JSON.stringify(createResponse(null, "Queue configuration error")),
+							{ status: 500 }
+						);
+					}
+
+					const enqueueParams = {
+						...baseParams,
+						provider: QUEUE_PROVIDER.QSTASH as const,
+						qstashToken: env.QSTASH_TOKEN,
+						workerUrl: env.WORKER_URL,
+					};
+
 					const { data: enqueueData, error: enqueueError } =
-						await enqueueFileForProcessing({
-							fileId: uploadData.id,
-							orgId: session.session.activeOrganizationId,
-							qstashToken: env.QSTASH_TOKEN,
-							workerUrl: env.WORKER_URL,
-						});
+						await enqueueFileForProcessing(enqueueParams);
 					if (enqueueError) {
 						logger.error("Error during file enqueue", enqueueError);
 						return new Response(
 							JSON.stringify(createResponse(null, enqueueError)),
-							{
-								status: 500,
-							}
+							{ status: 500 }
 						);
 					}
 					return new Response(

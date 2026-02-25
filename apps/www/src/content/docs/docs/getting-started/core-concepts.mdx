@@ -17,20 +17,21 @@ Workspaces are the top-level containers in Curiositi. They represent teams or co
 
 ### Workspace Structure
 
-```
-Workspace
-├── Members
-│   ├── Owner
-│   ├── Admin
-│   └── Members
-├── Spaces
-│   ├── Marketing
-│   ├── Engineering
-│   └── Finance
-└── Files
-    ├── document.pdf
-    ├── report.csv
-    └── photo.png
+```mermaid
+mindmap
+  root((Workspace))
+    Members
+      Owner
+      Admin
+      Members
+    Spaces
+      Marketing
+      Engineering
+      Finance
+    Files
+      document.pdf
+      report.csv
+      photo.png
 ```
 
 ### Workspace Data Model
@@ -54,12 +55,13 @@ Spaces are Curiositi's way of organizing content. They work like folders with hi
 
 Spaces can be nested using the `parentSpaceId` field:
 
-```
-Marketing
-├── Campaigns
-│   ├── Q1 2025
-│   └── Q2 2025
-└── Brand Assets
+```mermaid
+mindmap
+  root((Marketing))
+    Campaigns
+      Q1 2025
+      Q2 2025
+    Brand Assets
 ```
 
 ### Space Data Model
@@ -90,10 +92,15 @@ Files are the core content in Curiositi. Each file goes through a processing pip
 
 ### File Lifecycle
 
-```
-Upload → Pending → Processing → Completed
-                       ↓
-                    Failed
+```mermaid
+stateDiagram-v2
+    [*] --> Upload
+    Upload --> Pending
+    Pending --> Processing
+    Processing --> Completed
+    Processing --> Failed
+    Completed --> [*]
+    Failed --> [*]
 ```
 
 ### File Statuses
@@ -169,11 +176,28 @@ Files can exist in multiple spaces simultaneously using the `filesInSpace` junct
 
 ### Many-to-Many Relationship
 
-```
-Files ←→ filesInSpace ←→ Spaces
+```mermaid
+erDiagram
+    Files ||--o{ filesInSpace : "many-to-many"
+    Spaces ||--o{ filesInSpace : "many-to-many"
 
-report.pdf → filesInSpace → Marketing/Campaigns
-report.pdf → filesInSpace → Finance/Reports
+    Files {
+        uuid id
+        string name
+        string path
+    }
+
+    Spaces {
+        uuid id
+        string name
+        uuid parentSpaceId
+    }
+
+    filesInSpace {
+        uuid id
+        uuid fileId
+        uuid spaceId
+    }
 ```
 
 ### filesInSpace Data Model
@@ -209,9 +233,19 @@ The heart of Curiositi is semantic search — finding files by meaning, not just
 
 Curiositi uses 1536-dimension embeddings:
 
-```
-"Quarterly sales report" → [0.023, -0.156, 0.892, ...]  // 1536 dimensions
-"Q4 revenue summary"     → [0.019, -0.142, 0.887, ...]  // Similar vector
+```mermaid
+mindmap
+  root((Embeddings))
+    "Quarterly sales report"
+      0.023
+      -0.156
+      0.892
+      ...
+    "Q4 revenue summary"
+      0.019
+      -0.142
+      0.887
+      ...
 ```
 
 ## Authentication and Authorization
@@ -239,23 +273,17 @@ Sessions are stored in PostgreSQL. Each session tracks the user's active workspa
 
 How data moves through Curiositi:
 
-```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│   User      │────>│   Platform   │────>│   QStash    │
-│  (Browser)  │     │  (TanStack   │     │  (Queue)    │
-│             │     │   Start)     │     │             │
-└─────────────┘     └──────────────┘     └──────┬──────┘
-       ^                    │                    │
-       │                    v                    v
-       │            ┌──────────────┐     ┌─────────────┐
-       └────────────│  PostgreSQL  │<────│   Worker    │
-                    │  + pgvector  │     │   (Hono)    │
-                    └──────────────┘     └─────────────┘
-                           │
-                           v
-                    ┌──────────────┐
-                    │  S3 Storage  │
-                    └──────────────┘
+```mermaid
+flowchart TB
+    User["User<br/>(Browser)"] -->|"Upload"| Platform["Platform<br/>(TanStack Start)"]
+    Platform -->|"Enqueue job"| Queue["Queue<br/>(QStash/bunqueue)"]
+    Platform -->|"Store metadata"| DB[(PostgreSQL<br/>+ pgvector)]
+    Queue -->|"Process"| Worker["Worker<br/>(Hono)"]
+    Worker -->|"Download/Upload"| S3["S3 Storage"]
+    Worker -->|"Store embeddings"| DB
+    User -->|"Query"| Platform
+    Platform -->|"Search"| DB
+    DB -->|"Results"| Platform
 ```
 
 ## Next Steps
