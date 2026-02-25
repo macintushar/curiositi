@@ -23,6 +23,8 @@ The following environment variables are used by Curiositi. All variables listed 
 
 These variables are required by both the platform and worker apps:
 
+> **Note:** `POSTGRES_URL` is directly used by the `@curiositi/db` package. The platform accesses the database through this shared package, so the variable is not explicitly validated in the platform's env.ts.
+
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `POSTGRES_URL` | Yes | PostgreSQL connection string |
@@ -48,7 +50,8 @@ postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 | `QUEUE_PROVIDER` | No | Queue provider: `"qstash"` (default, cloud) or `"local"` (self-hosted bunqueue) |
 | `QSTASH_TOKEN` | Conditional | Upstash QStash token (required if `QUEUE_PROVIDER=qstash`) |
 | `QSTASH_URL` | No | Custom QStash URL (uses default Upstash endpoint if not set) |
-| `BUNQUEUE_URL` | Conditional | bunqueue server URL (required if `QUEUE_PROVIDER=local`, default: `localhost:6789`) |
+| `BUNQUEUE_HOST` | Conditional | bunqueue server host (required if `QUEUE_PROVIDER=local`, default: `localhost`)
+| `BUNQUEUE_PORT` | Conditional | bunqueue server port (required if `QUEUE_PROVIDER=local`, default: `6789`) |
 
 ### Client-Side (Platform)
 
@@ -99,7 +102,8 @@ QSTASH_TOKEN=""
 QSTASH_URL=""
 
 # bunqueue (required if QUEUE_PROVIDER=local)
-BUNQUEUE_URL="localhost:6789"
+BUNQUEUE_HOST="localhost"
+BUNQUEUE_PORT="6789"
 
 # Monitoring & Error Tracking - Sentry (optional)
 VITE_SENTRY_DSN=""
@@ -124,7 +128,8 @@ export const env = createEnv({
     QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
     QSTASH_TOKEN: z.string().optional(),
     WORKER_URL: z.string(),
-    BUNQUEUE_URL: z.string().optional(),
+    BUNQUEUE_HOST: z.string().default("localhost"),
+    BUNQUEUE_PORT: z.coerce.number().default(6789),
     BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
     BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
     BETTER_AUTH_SECRET: z.string(),
@@ -145,7 +150,7 @@ export const env = createEnv({
 
 The platform performs conditional validation based on `QUEUE_PROVIDER`:
 - If `qstash`: requires `QSTASH_TOKEN`
-- If `local`: requires `BUNQUEUE_URL`
+- If `local`: requires `BUNQUEUE_HOST` and `BUNQUEUE_PORT` (defaults available)
 
 `WORKER_URL` is always required.
 
@@ -163,7 +168,8 @@ export const env = createEnv({
     S3_ENDPOINT: z.string(),
     POSTGRES_URL: z.url(),
     QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
-    BUNQUEUE_URL: z.string().optional(),
+    BUNQUEUE_HOST: z.string().default("localhost"),
+    BUNQUEUE_PORT: z.coerce.number().default(6789),
   },
   // ...
 });
@@ -255,7 +261,8 @@ bunx bunqueue start --port 6789 --data-path ./queue.db
 
 ```bash
 QUEUE_PROVIDER=local
-BUNQUEUE_URL=localhost:6789
+BUNQUEUE_HOST=localhost
+BUNQUEUE_PORT=6789
 ```
 
 The bunqueue server stores jobs in a local SQLite database (`queue.db`). Add the following to `.gitignore`:

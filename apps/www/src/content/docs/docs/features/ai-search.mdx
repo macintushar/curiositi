@@ -52,7 +52,11 @@ Matching chunks are grouped by their source file and returned with similarity sc
 
 ### Search via tRPC
 
-Search is available through the `file.searchWithAI` tRPC procedure:
+Curiositi provides two search procedures:
+
+#### Semantic Search (AI-only)
+
+Use `searchWithAI` for pure semantic search using vector embeddings:
 
 ```typescript
 const results = trpc.file.searchWithAI.useQuery({
@@ -61,6 +65,19 @@ const results = trpc.file.searchWithAI.useQuery({
   minSimilarity: 0.7,  // optional, 0.0 to 1.0
 });
 ```
+
+#### Hybrid Search (Filename + Semantic)
+
+Use `search` for combined filename and semantic search:
+
+```typescript
+const results = trpc.file.search.useQuery({
+  query: "report",
+  limit: 20,  // optional, max 50
+});
+```
+
+This combines traditional filename matching with semantic search for broader coverage.
 
 The search is automatically scoped to the user's active workspace.
 

@@ -57,15 +57,21 @@ apps/platform/src/
 ├── integrations/    # tRPC client and server setup
 ├── hooks/           # React hooks
 ├── lib/             # Utilities (auth, upload, etc.)
-├── forms/           # Form components
-├── contexts/        # React contexts
-├── middleware/       # Server middleware
+├── middleware/      # Server middleware
 └── env.ts           # Environment variable validation
 ```
 
 ### Worker (File Processing)
 
-The worker is a Hono server running on Bun that processes uploaded files. It exposes a single `POST /process-file` endpoint, invoked by the platform via Upstash QStash or bunqueue (for local development).
+The worker is a Hono server running on Bun that processes uploaded files. It exposes the following endpoints:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Root health check |
+| `/health` | GET | Health status endpoint |
+| `/process-file` | POST | File processing endpoint (invoked by QStash/bunqueue) |
+
+The `POST /process-file` endpoint is invoked by the platform via Upstash QStash or bunqueue (for local development).
 
 **Technology Stack:**
 - **Framework:** Hono

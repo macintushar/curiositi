@@ -99,7 +99,8 @@ Add to your `.env` file:
 
 ```bash
 QUEUE_PROVIDER=local
-BUNQUEUE_URL=localhost:6789
+BUNQUEUE_HOST=localhost
+BUNQUEUE_PORT=6789
 ```
 
 ### 3. Ignore Database Files
@@ -125,7 +126,8 @@ QSTASH_TOKEN="your-token"
 
 # For bunqueue (local)
 QUEUE_PROVIDER=local
-BUNQUEUE_URL=localhost:6789
+BUNQUEUE_HOST=localhost
+BUNQUEUE_PORT=6789
 ```
 
 Restart both platform and worker after changing the provider.
@@ -138,7 +140,8 @@ Restart both platform and worker after changing the provider.
 | `QSTASH_TOKEN` | qstash | Conditional | - | Upstash QStash authentication token |
 | `QSTASH_URL` | qstash | No | Upstash default | Custom QStash endpoint URL |
 | `WORKER_URL` | qstash | Yes | - | Public URL of the worker service |
-| `BUNQUEUE_URL` | local | Conditional | `localhost:6789` | bunqueue server URL |
+| `BUNQUEUE_HOST` | local | Conditional | `localhost` | bunqueue server host |
+| `BUNQUEUE_PORT` | local | Conditional | `6789` | bunqueue server port |
 
 ## Troubleshooting
 
@@ -157,7 +160,7 @@ Restart both platform and worker after changing the provider.
 2. Verify environment variables are set correctly:
    ```bash
    echo $QUEUE_PROVIDER
-   echo $QSTASH_TOKEN   # or $BUNQUEUE_URL
+   echo $QSTASH_TOKEN   # or $BUNQUEUE_HOST and $BUNQUEUE_PORT
    ```
 
 3. Check worker logs for processing errors:
@@ -181,13 +184,13 @@ Restart both platform and worker after changing the provider.
 2. Verify the port matches:
    ```bash
    # Check BUNQUEUE_URL matches the server port
-   echo $BUNQUEUE_URL
+   echo $BUNQUEUE_HOST:$BUNQUEUE_PORT
    ```
 
 3. Try a different port if 6789 is in use:
    ```bash
    bunx bunqueue start --port 6790
-   # Update BUNQUEUE_URL=localhost:6790
+   # Update BUNQUEUE_PORT=6790
    ```
 
 ### Invalid Token (QStash)

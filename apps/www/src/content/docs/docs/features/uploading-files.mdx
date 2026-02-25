@@ -124,6 +124,18 @@ await processMutation.mutateAsync({ fileId: "file-uuid" });
 // Re-enqueues the file for processing via QStash
 ```
 
+### Search Files
+
+```typescript
+// Hybrid search (filename + semantic)
+const results = trpc.file.search.useQuery({
+  query: "report",
+  limit: 20,
+});
+```
+
+This combines traditional filename matching with semantic search for broader coverage.
+
 ## File Upload Endpoint
 
 The upload endpoint is a standard HTTP POST (not tRPC) at `/api/upload`. It handles multipart form data and stores the file in S3.
