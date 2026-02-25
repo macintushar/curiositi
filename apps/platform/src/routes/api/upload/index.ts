@@ -82,7 +82,8 @@ export const Route = createFileRoute("/api/upload/")({
 						const enqueueParams = {
 							...baseParams,
 							provider: QUEUE_PROVIDER.LOCAL as const,
-							bunqueueUrl: env.BUNQUEUE_URL ?? "localhost:6789",
+							bunqueueHost: env.BUNQUEUE_HOST,
+							bunqueuePort: env.BUNQUEUE_PORT,
 						};
 						const { data: enqueueData, error: enqueueError } =
 							await enqueueFileForProcessing(enqueueParams);

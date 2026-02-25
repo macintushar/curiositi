@@ -6,8 +6,9 @@ export const env = createEnv({
 		PLATFORM_URL: z.url(),
 		QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
 		QSTASH_TOKEN: z.string().optional(),
-		WORKER_URL: z.string(),
-		BUNQUEUE_URL: z.string().optional(),
+		WORKER_URL: z.string().optional(),
+		BUNQUEUE_HOST: z.string().default("localhost"),
+		BUNQUEUE_PORT: z.coerce.number().default(6789),
 		BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
 		BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
 		BETTER_AUTH_SECRET: z.string(),
@@ -43,7 +44,8 @@ export const env = createEnv({
 		QUEUE_PROVIDER: process.env.QUEUE_PROVIDER,
 		QSTASH_TOKEN: process.env.QSTASH_TOKEN,
 		WORKER_URL: process.env.WORKER_URL,
-		BUNQUEUE_URL: process.env.BUNQUEUE_URL,
+		BUNQUEUE_HOST: process.env.BUNQUEUE_HOST,
+		BUNQUEUE_PORT: process.env.BUNQUEUE_PORT,
 	},
 
 	skipValidation:
@@ -56,11 +58,5 @@ if (env.QUEUE_PROVIDER === "qstash") {
 		throw new Error(
 			"QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash"
 		);
-	}
-}
-
-if (env.QUEUE_PROVIDER === "local") {
-	if (!env.BUNQUEUE_URL) {
-		throw new Error("BUNQUEUE_URL is required when QUEUE_PROVIDER=local");
 	}
 }
