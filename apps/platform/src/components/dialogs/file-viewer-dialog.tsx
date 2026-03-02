@@ -53,16 +53,14 @@ type FileViewerContentProps = {
 
 function FileViewerHeader({ file, presignedUrl }: FileViewerHeaderProps) {
 	return (
-		<div className="shrink-0 bg-card p-4 sm:p-6 border-t sm:border-t-0 sm:border-b rounded-t-xl sm:rounded-t-none sm:rounded-br-xl sm:rounded-bl-xl">
+		<div className="shrink-0 bg-card p-4 sm:p-6 border-t sm:border-t-0 sm:border-b rounded-t-xl sm:rounded-t-none sm:rounded-br-xl sm:rounded-bl-xl overflow-hidden">
 			<div className="flex items-start sm:items-center sm:flex-row flex-col gap-3 sm:gap-2 justify-between">
 				<div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
 					<div className="size-12 sm:size-16 bg-muted rounded-lg flex items-center justify-center overflow-hidden shrink-0">
 						<FileIcon className="size-6 sm:size-8" type={file.type} />
 					</div>
 					<div className="min-w-0">
-						<h1 className="text-lg sm:text-xl font-semibold truncate">
-							{file.name}
-						</h1>
+						<h1 className="text-lg sm:text-xl font-semibold">{file.name}</h1>
 						<p className="text-sm text-muted-foreground">
 							{file.type} &middot; {(file.size / 1024).toFixed(1)} KB
 						</p>
@@ -102,8 +100,13 @@ function FileViewerContent({
 }: FileViewerContentProps) {
 	if (isFileQueryLoading) {
 		return (
-			<div className="flex flex-col h-full">
-				<Skeleton className="h-32 w-full mb-4" />
+			<div
+				className={cn(
+					"flex flex-col flex-1 min-h-0 gap-4",
+					isMobile && "flex-col-reverse"
+				)}
+			>
+				<Skeleton className="h-32 w-full" />
 				<Skeleton className="flex-1 w-full" />
 			</div>
 		);
@@ -118,7 +121,12 @@ function FileViewerContent({
 	}
 
 	return (
-		<div className={cn("flex flex-col h-full", isMobile && "flex-col-reverse")}>
+		<div
+			className={cn(
+				"flex flex-col-reverse flex-1 min-h-0",
+				isMobile && "flex-col"
+			)}
+		>
 			<div className="no-scrollbar overflow-y-auto p-2 sm:p-4 flex-1 min-h-0">
 				<div className="flex flex-col h-full">
 					<FileContentPreview
@@ -179,7 +187,7 @@ export default function FileViewerDialog({
 	if (isMobile) {
 		return (
 			<Drawer open={open} onOpenChange={onOpenChange}>
-				<DrawerContent className="h-[95vh] flex flex-col p-0 gap-0">
+				<DrawerContent className="h-[95vh] data-[vaul-drawer-direction=bottom]:max-h-[95vh] flex flex-col p-0 gap-0">
 					<DrawerHeader className="sr-only h-fit p-0">
 						<DrawerTitle>File Viewer</DrawerTitle>
 						<DrawerDescription>

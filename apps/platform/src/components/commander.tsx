@@ -215,7 +215,7 @@ function CommanderContent({
 				value={inputValue}
 				onValueChange={setInputValue}
 			/>
-			<CommandList className="w-full h-full max-h-none">
+			<CommandList className="w-full flex-1 min-h-0 max-h-none overflow-y-auto">
 				{isSearching ? (
 					<SearchResults
 						query={inputValue}
@@ -345,14 +345,20 @@ export default function Commander() {
 
 			{isMobile ? (
 				<Drawer open={open} onOpenChange={handleOpenChange}>
-					<DrawerContent className={isSearching ? "h-[95vh]" : "max-h-[80vh]"}>
+					<DrawerContent
+						className={
+							isSearching
+								? "h-[95vh] data-[vaul-drawer-direction=bottom]:max-h-[95vh]"
+								: ""
+						}
+					>
 						<DrawerHeader className="sr-only">
 							<DrawerTitle>Search Files</DrawerTitle>
 							<DrawerDescription>
 								Search across all your files with AI-powered semantic search
 							</DrawerDescription>
 						</DrawerHeader>
-						<div className="flex flex-col overflow-hidden">
+						<div className="flex flex-col flex-1 min-h-0 overflow-hidden">
 							<CommanderContent
 								inputValue={inputValue}
 								setInputValue={setInputValue}
@@ -367,7 +373,7 @@ export default function Commander() {
 				<CommandDialog
 					open={open}
 					onOpenChange={handleOpenChange}
-					className={isSearching ? "min-w-1/2 h-[80vh]" : "min-w-1/2 h-1/2"}
+					className="min-w-1/2 h-1/2"
 					title="search dialog"
 					shouldFilter={false}
 				>

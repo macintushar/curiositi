@@ -19,7 +19,8 @@ import {
 import { Link, useRouterState } from "@tanstack/react-router";
 import Commander from "../commander";
 import { useIsMobile } from "@platform/hooks/use-mobile";
-import { MascotLogo } from "../mascot";
+import Mascot from "../mascot";
+import { cn } from "@platform/lib/utils";
 
 const routes = [{ path: "/app", label: "Home", icon: Home }];
 
@@ -30,9 +31,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 	return (
 		<Sidebar collapsible="icon" {...props}>
-			<div className="border-b border-b-sidebar-border py-2 flex items-center justify-center w-full gap-1">
-				<MascotLogo className="text-[10px] font-bold" />
-				{open && "Curiositi"}
+			<div className="border-b border-b-sidebar-border font-bold py-2 px-4 flex items-center justify-center w-full gap-2">
+				<Mascot className={cn("text-xs font-black", !open && "text-[10px]")} />
+				{open && <p className="font-mono text-xl leading-none">curiositi</p>}
 			</div>
 			<SidebarHeader className="border-b border-b-sidebar-border py-2 flex flex-col items-center justify-center">
 				<OrgSwitcher />

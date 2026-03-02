@@ -173,7 +173,7 @@ function TextFilePreview({
 	return (
 		<FilePreviewCard className="sm:items-center" border={!isMobile}>
 			{isMarkdown ? (
-				<Markdown className=" px-2 prose prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-h5:text-sm prose-h6:text-xs dark:prose-invert">
+				<Markdown className="px-4 py-4 prose prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-h5:text-sm prose-h6:text-xs dark:prose-invert [&>*:last-child]:mb-0">
 					{content}
 				</Markdown>
 			) : (
