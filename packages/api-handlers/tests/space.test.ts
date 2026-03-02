@@ -62,18 +62,11 @@ describe("Space Handler", () => {
 	});
 
 	test("deleteSpace should execute transaction", async () => {
-		// Mock transaction execution
 		mockDb.transaction.mockImplementation(async (cb: (tx: any) => any) => {
-			// Hybrid object to handle both `await query` (resolves to []) and `query.returning()`
 			const hybridResult = {
 				then: (resolve: any) => resolve([]),
 				returning: () => [mockSpace],
 			};
-
-			// 1. getAllDescendantIds queries children (select...where) -> awaits hybridResult -> []
-			// 2. Find files (select...where) -> awaits hybridResult -> []
-			// 3. Delete files (delete...where) -> awaits hybridResult -> [] (result ignored)
-			// 4. Delete root space (delete...where...returning) -> calls returning() -> [mockSpace]
 
 			mockDb.where.mockReturnValue(hybridResult);
 
@@ -83,8 +76,49 @@ describe("Space Handler", () => {
 		const result = await deleteSpace("space-123");
 
 		expect(mockDb.transaction).toHaveBeenCalled();
-		// The handler returns the result of the transaction, which returns the deleted space array
 		expect(result.data).toEqual([mockSpace]);
 		expect(result.error).toBeNull();
+	});
+
+	test("createSpace should handle DB error", async () => {
+		mockDb.returning.mockRejectedValue(new Error("Insert failed"));
+
+		const result = await createSpace({
+			name: "Test Space",
+			organizationId: "org-123",
+		});
+
+		expect(result.data).toBeNull();
+		expect(result.error).toBeInstanceOf(Error);
+	});
+
+	test("getSpaceWithAncestry should handle single space (no ancestors)", async () => {
+		const singleResult = [{ ...mockSpace, id: "root", depth: 0 }];
+
+		mockDb.execute.mockResolvedValue(singleResult);
+
+		const result = await getSpaceWithAncestry("root");
+
+		expect(result.data).not.toBeNull();
+		expect(result.data?.id).toBe("root");
+		expect(result.data?.ancestors).toHaveLength(0);
+	});
+
+	test("deleteSpace should handle transaction error", async () => {
+		mockDb.transaction.mockRejectedValue(new Error("Transaction failed"));
+
+		const result = await deleteSpace("space-123");
+
+		expect(result.data).toBeNull();
+		expect(result.error).toBeInstanceOf(Error);
+	});
+
+	test("getSpaceWithAncestry should handle DB error", async () => {
+		mockDb.execute.mockRejectedValue(new Error("Query failed"));
+
+		const result = await getSpaceWithAncestry("space-123");
+
+		expect(result.data).toBeNull();
+		expect(result.error).toBeInstanceOf(Error);
 	});
 });

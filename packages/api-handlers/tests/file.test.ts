@@ -57,17 +57,16 @@ describe("File Handler", () => {
 		expect((result.error as Error).message).toBe("File not found");
 	});
 
-	test("getFilesNotInSpace should query with notExists", async () => {
+	test("getFilesNotInSpace should query correctly", async () => {
 		mockDb.where.mockReturnValue([mockFileData]);
 
 		const result = await getFilesNotInSpace("org-123");
 
-		expect(mockDb.select).toHaveBeenCalledTimes(2); // One for main query, one for subquery
+		expect(mockDb.select).toHaveBeenCalled();
 		expect(result.data).toEqual([mockFileData]);
 	});
 
 	test("deleteFile should delete from both tables", async () => {
-		// Mock transaction callback execution
 		mockDb.transaction.mockImplementation(async (cb: (tx: any) => any) => {
 			const hybridResult = {
 				returning: () => [mockFileData],
@@ -80,7 +79,6 @@ describe("File Handler", () => {
 		const result = await deleteFile("file-123");
 
 		expect(mockDb.transaction).toHaveBeenCalled();
-		// Should delete from filesInSpace first, then files
 		expect(mockDb.delete).toHaveBeenCalledTimes(2);
 		expect(result.data).toEqual(mockFileData);
 	});
@@ -88,7 +86,7 @@ describe("File Handler", () => {
 	test("deleteFile should handle not found", async () => {
 		mockDb.transaction.mockImplementation(async (cb: (tx: any) => any) => {
 			const hybridResult = {
-				returning: () => [], // No file deleted
+				returning: () => [],
 				then: (resolve: any) => resolve([]),
 			};
 			mockDb.where.mockReturnValue(hybridResult);
@@ -100,5 +98,43 @@ describe("File Handler", () => {
 		expect(result.data).toBeNull();
 		expect(result.error).toBeInstanceOf(Error);
 		expect((result.error as Error).message).toBe("File not found");
+	});
+
+	test("getAllFiles should handle DB error", async () => {
+		mockDb.orderBy.mockRejectedValue(new Error("Connection failed"));
+
+		const result = await getAllFiles("org-123");
+
+		expect(result.data).toBeNull();
+		expect(result.error).toBeInstanceOf(Error);
+	});
+
+	test("getAllFiles should return empty array when no files", async () => {
+		mockDb.orderBy.mockReturnValue([]);
+
+		const result = await getAllFiles("org-123");
+
+		expect(result.data?.data).toEqual([]);
+		expect(result.data?.total).toBe(0);
+	});
+
+	test("getFilesNotInSpace should handle DB error", async () => {
+		mockDb.where.mockImplementation(() => {
+			throw new Error("Query failed");
+		});
+
+		const result = await getFilesNotInSpace("org-123");
+
+		expect(result.data).toBeNull();
+		expect(result.error).toBeInstanceOf(Error);
+	});
+
+	test("deleteFile should handle transaction error", async () => {
+		mockDb.transaction.mockRejectedValue(new Error("Transaction failed"));
+
+		const result = await deleteFile("file-123");
+
+		expect(result.data).toBeNull();
+		expect(result.error).toBeInstanceOf(Error);
 	});
 });

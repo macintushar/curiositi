@@ -154,4 +154,161 @@ describe("Upload Handler", () => {
 		expect(result.data).toBeNull();
 		expect(result.error?.db.error).not.toBeNull();
 	});
+
+	test("should reject empty file", async () => {
+		const emptyFile = new File([""], "empty.txt", { type: "text/plain" });
+		Object.defineProperty(emptyFile, "size", { value: 0 });
+
+		const result = await handleUpload({ ...defaultInput, file: emptyFile });
+
+		expect(result.data).toBeNull();
+		expect(mockWrite).not.toHaveBeenCalled();
+	});
+
+	test("should handle file with special characters in name", async () => {
+		const specialFile = new File(["content"], "test@file#name.txt", {
+			type: "text/plain",
+		});
+		const mockInsertedFile = {
+			id: "file-123",
+			name: "test@file#name.txt",
+			type: "text/plain",
+			size: 7,
+			path: "",
+			createdAt: new Date(),
+			organizationId: "org-123",
+			updatedAt: null,
+			uploadedById: "user-123",
+			status: "pending" as const,
+			tags: { tags: [] },
+			processedAt: null,
+		};
+		const mockUpdatedFile = {
+			...mockInsertedFile,
+			path: "/curiositi/storage/org-123/file-123-test_file_name.txt",
+		};
+		let returningCallCount = 0;
+		mockDb.returning.mockImplementation(() => {
+			returningCallCount++;
+			if (returningCallCount === 1) return [mockInsertedFile];
+			return [mockUpdatedFile];
+		});
+
+		const result = await handleUpload({ ...defaultInput, file: specialFile });
+
+		expect(result.data).toEqual(mockUpdatedFile);
+		expect(mockWrite).toHaveBeenCalledWith(
+			expect.stringContaining("test_file_name.txt"),
+			expect.any(File),
+			expect.any(Object)
+		);
+	});
+
+	test("should handle file with tags", async () => {
+		const mockInsertedFile = {
+			id: "file-123",
+			name: "test.txt",
+			type: "text/plain",
+			size: 12,
+			path: "",
+			createdAt: new Date(),
+			organizationId: "org-123",
+			updatedAt: null,
+			uploadedById: "user-123",
+			status: "pending" as const,
+			tags: { tags: ["tag1", "tag2"] },
+			processedAt: null,
+		};
+		const mockUpdatedFile = {
+			...mockInsertedFile,
+			path: "/curiositi/storage/org-123/file-123-test.txt",
+		};
+		let returningCallCount = 0;
+		mockDb.returning.mockImplementation(() => {
+			returningCallCount++;
+			if (returningCallCount === 1) return [mockInsertedFile];
+			return [mockUpdatedFile];
+		});
+
+		const result = await handleUpload({
+			...defaultInput,
+			tags: ["tag1", "tag2"],
+		});
+
+		expect(result.data).toEqual(mockUpdatedFile);
+		expect(mockDb.insert).toHaveBeenCalled();
+	});
+
+	test("should handle mime type with charset", async () => {
+		const fileWithCharset = new File(["content"], "test.txt", {
+			type: "text/plain; charset=utf-8",
+		});
+		const mockInsertedFile = {
+			id: "file-123",
+			name: "test.txt",
+			type: "text/plain; charset=utf-8",
+			size: 7,
+			path: "",
+			createdAt: new Date(),
+			organizationId: "org-123",
+			updatedAt: null,
+			uploadedById: "user-123",
+			status: "pending" as const,
+			tags: { tags: [] },
+			processedAt: null,
+		};
+		const mockUpdatedFile = {
+			...mockInsertedFile,
+			path: "/curiositi/storage/org-123/file-123-test.txt",
+		};
+		let returningCallCount = 0;
+		mockDb.returning.mockImplementation(() => {
+			returningCallCount++;
+			if (returningCallCount === 1) return [mockInsertedFile];
+			return [mockUpdatedFile];
+		});
+
+		const result = await handleUpload({
+			...defaultInput,
+			file: fileWithCharset,
+		});
+
+		expect(result.data).not.toBeNull();
+		expect(result.error).toBeNull();
+	});
+
+	test("should accept supported image types", async () => {
+		const imageFile = new File(["fake image"], "test.png", {
+			type: "image/png",
+		});
+		const mockInsertedFile = {
+			id: "file-123",
+			name: "test.png",
+			type: "image/png",
+			size: 10,
+			path: "",
+			createdAt: new Date(),
+			organizationId: "org-123",
+			updatedAt: null,
+			uploadedById: "user-123",
+			status: "pending" as const,
+			tags: { tags: [] },
+			processedAt: null,
+		};
+		const mockUpdatedFile = {
+			...mockInsertedFile,
+			path: "/curiositi/storage/org-123/file-123-test.png",
+		};
+		let returningCallCount = 0;
+		mockDb.returning.mockImplementation(() => {
+			returningCallCount++;
+			if (returningCallCount === 1) return [mockInsertedFile];
+			return [mockUpdatedFile];
+		});
+
+		const result = await handleUpload({ ...defaultInput, file: imageFile });
+
+		expect(result.data).not.toBeNull();
+		expect(result.error).toBeNull();
+	});
 });
