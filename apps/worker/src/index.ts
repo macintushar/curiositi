@@ -1,5 +1,6 @@
 import z from "zod";
 
+import { Receiver } from "@upstash/qstash";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { serveStatic } from "hono/bun";
@@ -19,6 +20,14 @@ type ProcessFileJobData = {
 	orgId: string;
 };
 
+const qstashReceiver =
+	env.QUEUE_PROVIDER === "qstash"
+		? new Receiver({
+				currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
+				nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
+			})
+		: null;
+
 const api = new Hono<{
 	Variables: RequestIdVariables;
 }>();
@@ -36,6 +45,40 @@ api.get("/health", (c) => {
 
 api.post(
 	"/process-file",
+	async (c, next) => {
+		if (env.QUEUE_PROVIDER !== "qstash" || !qstashReceiver) {
+			await next();
+			return;
+		}
+
+		const reqLogger = createLogger(c.var.requestId);
+		const signature =
+			c.req.header("Upstash-Signature") ?? c.req.header("upstash-signature");
+
+		if (!signature) {
+			reqLogger.warn("Rejected process-file request without QStash signature");
+			return c.json(createResponse(null, "Missing Upstash signature"), 401);
+		}
+
+		const body = await c.req.raw.clone().text();
+
+		try {
+			await qstashReceiver.verify({
+				body,
+				signature,
+				url: c.req.url,
+			});
+			await next();
+		} catch (error) {
+			reqLogger.warn(
+				"Rejected process-file request with invalid QStash signature",
+				{
+					error: error instanceof Error ? error.message : String(error),
+				}
+			);
+			return c.json(createResponse(null, "Invalid Upstash signature"), 401);
+		}
+	},
 	zValidator(
 		"json",
 		z.object({ fileId: z.string(), orgId: z.string() }),
