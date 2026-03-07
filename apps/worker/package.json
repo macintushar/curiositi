@@ -18,6 +18,7 @@
 		"@curiositi/share": "workspace:*",
 		"@hono/zod-validator": "^0.7.6",
 		"@opendocsg/pdf2md": "^0.2.3",
+		"@sentry/bun": "^10.38.0",
 		"@t3-oss/env-core": "^0.13.10",
 		"@upstash/qstash": "^2.9.0",
 		"ai": "^6.0.82",

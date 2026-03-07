@@ -8,17 +8,24 @@ import { chunkPages } from "./lib/chunk";
 import { embedChunks } from "@curiositi/share/ai";
 import { env } from "./env";
 import { getProcessor } from "./processors";
+import { captureWorkerException } from "./sentry";
 
 type ProcessFileProps = {
 	fileId: string;
 	orgId: string;
 	logger: Logger;
+	requestId?: string;
+	jobId?: string;
+	route?: string;
 };
 
 export default async function processFile({
 	fileId,
 	orgId,
 	logger,
+	requestId,
+	jobId,
+	route,
 }: ProcessFileProps) {
 	logger.info("Starting file processing", { fileId, orgId });
 
@@ -189,6 +196,17 @@ export default async function processFile({
 		return createResponse(res, null);
 	} catch (error) {
 		logger.error("File processing failed", { fileId, orgId, error });
+		captureWorkerException(error, {
+			operation: "process-file",
+			route,
+			requestId,
+			jobId,
+			fileId,
+			orgId,
+			extra: {
+				status: "failed",
+			},
+		});
 
 		// Update file status to failed
 		try {

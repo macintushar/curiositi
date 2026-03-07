@@ -12,6 +12,7 @@ import { createResponse } from "./utils";
 import processFile from "./process-file";
 import { createLogger } from "./create-logger";
 import { env } from "./env";
+import { captureWorkerException, isWorkerSentryEnabled } from "./sentry";
 import curiositiLogger from "@curiositi/share/logger";
 import { QUEUE_NAMES } from "@curiositi/share/constants";
 
@@ -34,6 +35,25 @@ const api = new Hono<{
 
 api.use(logger());
 api.use(requestId());
+
+api.onError((error, c) => {
+	const requestId = c.var.requestId;
+	const reqLogger = createLogger(requestId);
+	reqLogger.error("Unhandled worker request error", {
+		error,
+		method: c.req.method,
+		path: c.req.path,
+	});
+	captureWorkerException(error, {
+		operation: "http-request",
+		route: c.req.path,
+		requestId,
+		extra: {
+			method: c.req.method,
+		},
+	});
+	return c.json(createResponse(null, "Internal Server Error"), 500);
+});
 
 api.get("/", (c) => {
 	return c.text("Hello from Curiositi Worker!");
@@ -95,9 +115,20 @@ api.post(
 		try {
 			const { fileId, orgId } = c.req.valid("json");
 			const reqLogger = createLogger(c.var.requestId);
-			const res = await processFile({ fileId, orgId, logger: reqLogger });
+			const res = await processFile({
+				fileId,
+				orgId,
+				logger: reqLogger,
+				requestId: c.var.requestId,
+				route: c.req.path,
+			});
 			return c.json(createResponse(res.data, res.error));
 		} catch (error) {
+			captureWorkerException(error, {
+				operation: "process-file-request",
+				route: c.req.path,
+				requestId: c.var.requestId,
+			});
 			return c.json(createResponse(null, error), 500);
 		}
 	}
@@ -115,7 +146,12 @@ async function startBunqueueWorker() {
 			if (job.name === "processFile") {
 				const { fileId, orgId } = job.data;
 				const jobLogger = createLogger(`job-${job.id}`);
-				await processFile({ fileId, orgId, logger: jobLogger });
+				await processFile({
+					fileId,
+					orgId,
+					logger: jobLogger,
+					jobId: String(job.id),
+				});
 			} else {
 				curiositiLogger.warn(
 					`Unknown job name received: ${job.name}, jobId: ${job.id}`,
@@ -139,6 +175,15 @@ async function startBunqueueWorker() {
 		"failed",
 		(job: Job<ProcessFileJobData> | undefined, error: Error) => {
 			curiositiLogger.error(`Job ${job?.id} failed`, error);
+			captureWorkerException(error, {
+				operation: "bunqueue-job-failed",
+				jobId: job ? String(job.id) : undefined,
+				fileId: job?.data.fileId,
+				orgId: job?.data.orgId,
+				extra: {
+					jobName: job?.name,
+				},
+			});
 		}
 	);
 
@@ -147,19 +192,45 @@ async function startBunqueueWorker() {
 			error,
 			consecutiveErrors: error.consecutiveErrors,
 		});
+		captureWorkerException(error, {
+			operation: "bunqueue-connection-error",
+			extra: {
+				host,
+				port,
+				consecutiveErrors: error.consecutiveErrors,
+			},
+		});
 	});
 
 	curiositiLogger.info(
 		`Bunqueue worker started (connected to ${host}:${port})`
 	);
+
+	if (isWorkerSentryEnabled) {
+		curiositiLogger.info("Worker Sentry monitoring enabled", {
+			queueProvider: env.QUEUE_PROVIDER,
+		});
+	}
 }
 
 if (env.QUEUE_PROVIDER === "local") {
-	startBunqueueWorker().catch((error) =>
-		curiositiLogger.error("Failed to start Bunqueue worker", error)
-	);
+	startBunqueueWorker().catch((error) => {
+		curiositiLogger.error("Failed to start Bunqueue worker", error);
+		captureWorkerException(error, {
+			operation: "bunqueue-startup",
+			extra: {
+				queueProvider: env.QUEUE_PROVIDER,
+			},
+		});
+	});
 } else {
 	curiositiLogger.info("QStash mode - HTTP server on port 3040");
+
+	if (isWorkerSentryEnabled) {
+		curiositiLogger.info("Worker Sentry monitoring enabled", {
+			queueProvider: env.QUEUE_PROVIDER,
+		});
+	}
 }
 
 export default {
