@@ -1,9 +1,8 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { authMiddleware } from "@platform/middleware/auth";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
 	server: {
-		handlers: {
-			GET: () => redirect({ to: "/sign-in" }),
-		},
+		middleware: [authMiddleware],
 	},
 });
