@@ -1,5 +1,5 @@
 import { createResponse } from "./utils";
-import { and, eq } from "@curiositi/db";
+import { and, eq, sql } from "@curiositi/db";
 import db from "@curiositi/db/client";
 import { fileContents, files } from "@curiositi/db/schema";
 import read from "@curiositi/share/fs/read";
@@ -30,65 +30,90 @@ export default async function processFile({
 	logger.info("Starting file processing", { fileId, orgId });
 
 	try {
-		// Fetch file data from database
-		logger.debug("Fetching file data from database", { fileId, orgId });
-		const fileData = await db
-			.select()
-			.from(files)
-			.where(and(eq(files.id, fileId), eq(files.organizationId, orgId)));
+		logger.debug("Claiming file for processing", { fileId, orgId });
+		const claimedFile = await db
+			.update(files)
+			.set({ status: "processing", processedAt: null })
+			.where(
+				and(
+					eq(files.id, fileId),
+					eq(files.organizationId, orgId),
+					sql`${files.status} in ('pending', 'failed')`
+				)
+			)
+			.returning();
 
-		if (!fileData[0]) {
+		if (!claimedFile[0]) {
+			logger.debug("File could not be claimed, checking current status", {
+				fileId,
+				orgId,
+			});
+			const fileData = await db
+				.select()
+				.from(files)
+				.where(and(eq(files.id, fileId), eq(files.organizationId, orgId)));
+
+			if (!fileData[0]) {
+				logger.error("File not found in database", { fileId, orgId });
+				return createResponse(null, "File not found");
+			}
+
+			if (fileData[0].status === "processing") {
+				logger.info(
+					"Retry-safe duplicate delivery ignored while file is processing",
+					{
+						fileId,
+						orgId,
+					}
+				);
+				return createResponse(null, "File is already being processed");
+			}
+
+			if (fileData[0].status === "completed") {
+				logger.info(
+					"Retry-safe duplicate delivery ignored for completed file",
+					{
+						fileId,
+						orgId,
+					}
+				);
+				return createResponse(null, "File is already processed");
+			}
+
 			logger.error("File not found in database", { fileId, orgId });
 			return createResponse(null, "File not found");
 		}
 
-		if (fileData[0].status === "processing") {
-			logger.error("File is already being processed", { fileId });
-			return createResponse(null, "File is already being processed");
-		}
-
-		if (fileData[0].status === "completed") {
-			logger.error("File is already processed", { fileId });
-			return createResponse(null, "File is already processed");
-		}
-
 		logger.info("File data fetched successfully", {
 			fileId,
-			path: fileData[0].path,
+			path: claimedFile[0].path,
 		});
-
-		// Update file status to processing
-		logger.debug("Updating file status to processing", { fileId });
-		await db
-			.update(files)
-			.set({ status: "processing" })
-			.where(eq(files.id, fileId));
-		logger.info("File status updated to processing", { fileId });
+		logger.info("File claimed for retry-safe processing", { fileId, orgId });
 
 		// Read file from storage
 		logger.debug("Reading file from storage", {
-			path: fileData[0].path,
+			path: claimedFile[0].path,
 		});
 		let file: Awaited<ReturnType<typeof read>>;
 		try {
-			file = await read(fileData[0].path, {
+			file = await read(claimedFile[0].path, {
 				accessKeyId: env.S3_ACCESS_KEY_ID,
 				secretAccessKey: env.S3_SECRET_ACCESS_KEY,
 				bucket: env.S3_BUCKET,
 				endpoint: env.S3_ENDPOINT,
 			});
 			logger.info("File read successfully from storage", {
-				path: fileData[0].path,
+				path: claimedFile[0].path,
 			});
 		} catch (readError) {
 			logger.error("Failed to read file from storage", {
-				path: fileData[0].path,
+				path: claimedFile[0].path,
 				error: readError,
 			});
 			throw readError;
 		}
 
-		const filetype = fileData[0].type;
+		const filetype = claimedFile[0].type;
 		const processor = getProcessor(filetype);
 
 		if (!processor) {
@@ -99,7 +124,7 @@ export default async function processFile({
 		logger.debug("Processing file content", { fileId, filetype });
 		const pages = await processor({
 			file,
-			fileData: fileData[0],
+			fileData: claimedFile[0],
 			fileId,
 			logger,
 		});
@@ -151,29 +176,37 @@ export default async function processFile({
 			throw embedError;
 		}
 
-		// Insert chunks into database
-		logger.debug("Inserting chunks into database", {
+		logger.debug("Replacing derived file content in database", {
 			fileId,
 			chunkCount: chunks.length,
 		});
-		let res: (typeof fileContents.$inferSelect)[][];
+		let res: (typeof fileContents.$inferSelect)[];
 		try {
-			res = await Promise.all(
-				chunks.map(async (c, idx) => {
-					logger.debug("Inserting chunk", { fileId, chunkIndex: idx });
-					const insertRes = await db
-						.insert(fileContents)
-						.values({
-							fileId: fileId,
+			res = await db.transaction(async (tx) => {
+				await tx.delete(fileContents).where(eq(fileContents.fileId, fileId));
+				logger.info("Cleared prior derived content before insert", { fileId });
+
+				const insertedChunks = await tx
+					.insert(fileContents)
+					.values(
+						chunks.map((c, idx) => ({
+							fileId,
 							content: c.content,
 							embeddedContent: embeddings[idx] as number[],
 							metadata: { page_number: c.pageNumbers ?? c.pageNumber },
-						})
-						.returning();
-					return insertRes;
-				})
-			);
-			logger.info("All chunks inserted successfully", {
+						}))
+					)
+					.returning();
+
+				await tx
+					.update(files)
+					.set({ status: "completed", processedAt: new Date() })
+					.where(eq(files.id, fileId));
+
+				return insertedChunks;
+			});
+
+			logger.info("Derived file content replaced successfully", {
 				fileId,
 				insertedCount: res.length,
 			});
@@ -185,12 +218,6 @@ export default async function processFile({
 			throw insertError;
 		}
 
-		// Update file status to completed
-		logger.debug("Updating file status to completed", { fileId });
-		await db
-			.update(files)
-			.set({ status: "completed", processedAt: new Date() })
-			.where(eq(files.id, fileId));
 		logger.info("File processing completed successfully", { fileId });
 
 		return createResponse(res, null);
