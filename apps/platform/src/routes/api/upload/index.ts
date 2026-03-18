@@ -14,9 +14,6 @@ export const Route = createFileRoute("/api/upload/")({
 	server: {
 		middleware: [authMiddleware],
 		handlers: {
-			GET: async () => {
-				return new Response("Hello World!");
-			},
 			POST: async ({ request }) => {
 				const data = await request.formData();
 				const file = data.get("file") as File | null;
