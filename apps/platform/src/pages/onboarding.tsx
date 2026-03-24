@@ -30,9 +30,11 @@ function StepTwo({
 }: { userId: string } & BaseStepProps) {
 	return (
 		<div className="h-full w-full flex flex-col gap-8 items-center justify-center">
-			<div className="max-w-xl w-full h-full flex flex-col gap-8 items-center justify-center">
-				<h1 className="text-4xl font-bold">Let's create a new workspace!</h1>
-				<p className="text-xl text-center">
+			<div className="max-w-xl w-full h-full flex flex-col gap-4 items-center justify-center">
+				<h1 className="text-3xl font-bold font-mono">
+					Let's create a new workspace!
+				</h1>
+				<p className="text-md text-muted-foreground text-center">
 					Workspaces are the best way to organize your files and share them with
 					anyone.
 				</p>
@@ -66,7 +68,7 @@ export default function Onboarding() {
 	const [step, setStep] = useState<number>(1);
 
 	return (
-		<div className="flex min-h-svh max-h-svh min-w-svw max-w-svw w-svw h-svh flex-col p-4 bg-accent">
+		<div className="flex min-h-svh max-h-svh min-w-svw max-w-svw w-svw h-svh flex-col p-4 bg-muted">
 			{step === 1 && (
 				<StepOne
 					name={session.data?.user?.name || ""}

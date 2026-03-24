@@ -27,3 +27,14 @@ export const createOrgSchema = z.object({
 	name: z.string().min(3, "Workspace Name must be at least 3 characters long"),
 	slug: z.string().min(3, "Workspace Slug must be at least 3 characters long"),
 });
+
+export const updateUserSchema = z.object({
+	name: z.string().min(1, "Name must be at least 1 character long"),
+});
+
+export {
+	forgotPasswordSchema,
+	resetPasswordSchema,
+	type ForgotPasswordInput,
+	type ResetPasswordInput,
+} from "./email";

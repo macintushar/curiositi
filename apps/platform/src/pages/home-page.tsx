@@ -22,7 +22,7 @@ export default function HomePage() {
 
 	return (
 		<div className="flex flex-col h-screen overflow-scroll">
-			<div className="flex-1 px-6 pb-6">
+			<div className="flex-1 px-4">
 				<SpaceExplorerLayout
 					spaces={rootSpaces.data?.data}
 					files={orphanFiles.data?.data}

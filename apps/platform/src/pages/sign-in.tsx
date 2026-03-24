@@ -10,9 +10,15 @@ import { signInSchema } from "@curiositi/share/schemas";
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
 import LastUsedBadge from "@platform/components/last-used-badge";
+import { useRouteContext } from "@tanstack/react-router";
+import logger from "@curiositi/share/logger";
+import { useState } from "react";
 
 export default function SignIn() {
 	const navigate = useNavigate();
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { emailEnabled } = useRouteContext({ from: "/sign-in" });
+
 	const form = useForm({
 		defaultValues: {
 			email: "",
@@ -22,17 +28,26 @@ export default function SignIn() {
 			onChange: signInSchema,
 		},
 		onSubmit: async ({ value }) => {
-			const res = await authClient.signIn.email({
-				email: value.email,
-				password: value.password,
-				rememberMe: true,
-			});
-			if (res.error) {
-				toast.error(res.error.message);
-			}
-			if (res?.data?.token) {
-				toast.success("Login successful");
-				navigate({ to: "/app" });
+			setIsSubmitting(true);
+			try {
+				const res = await authClient.signIn.email({
+					email: value.email,
+					password: value.password,
+					rememberMe: true,
+				});
+				setIsSubmitting(false);
+				if (res.error) {
+					toast.error(res.error.message);
+				}
+				if (res?.data?.token) {
+					toast.success("Login successful");
+					navigate({ to: "/app" });
+				}
+			} catch (err) {
+				logger.error("Error signing in", err);
+				toast.error("An error occurred while signing in");
+			} finally {
+				setIsSubmitting(false);
 			}
 		},
 	});
@@ -74,12 +89,14 @@ export default function SignIn() {
 						field={field}
 						label="Password"
 						labelExtra={
-							<Link
-								to="/"
-								className="ml-auto text-sm underline-offset-4 hover:underline text-muted-foreground"
-							>
-								Forgot your password?
-							</Link>
+							emailEnabled ? (
+								<Link
+									to="/forgot-password"
+									className="ml-auto text-sm underline-offset-4 hover:underline text-muted-foreground"
+								>
+									Forgot your password?
+								</Link>
+							) : null
 						}
 					/>
 				)}

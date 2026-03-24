@@ -15,23 +15,21 @@ export default function NavigationButtons({
 	goForward,
 }: NavigationButtonsProps) {
 	return (
-		<div className="flex items-center">
+		<div className="flex items-center gap-2">
 			<Button
-				variant="ghost"
-				size="icon"
+				variant="outline"
 				onClick={goBack}
 				disabled={!canGoBack}
-				className="h-8 w-8"
+				className="size-7"
 				title="Go back"
 			>
 				<IconChevronLeft className="w-4 h-4" />
 			</Button>
 			<Button
-				variant="ghost"
-				size="icon"
+				variant="outline"
 				onClick={goForward}
 				disabled={!canGoForward}
-				className="h-8 w-8"
+				className="size-7"
 				title="Go forward"
 			>
 				<IconChevronRight className="w-4 h-4" />

@@ -53,7 +53,7 @@ function SpacePageComponent() {
 							</Link>
 						</BreadcrumbLink>
 					</BreadcrumbItem>
-					<BreadcrumbSeparator />
+					/
 					{space?.ancestors?.map((ancestor) => (
 						<React.Fragment key={ancestor.id}>
 							<BreadcrumbItem>
@@ -68,7 +68,7 @@ function SpacePageComponent() {
 									</Link>
 								</BreadcrumbLink>
 							</BreadcrumbItem>
-							<BreadcrumbSeparator />
+							/
 						</React.Fragment>
 					))}
 					<BreadcrumbItem>
@@ -79,38 +79,21 @@ function SpacePageComponent() {
 					</BreadcrumbItem>
 				</BreadcrumbList>
 			</Breadcrumb>
-			{space?.parentSpaceId && (
-				<Link
-					to={
-						space.ancestors && space.ancestors.length > 0
-							? "/app/space/$spaceId"
-							: "/app"
-					}
-					params={
-						space.ancestors && space.ancestors.length > 0
-							? {
-									spaceId:
-										space.ancestors[space.ancestors.length - 1]?.id ?? "",
-								}
-							: {}
-					}
-					className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-				>
-					<IconArrowLeft className="w-4 h-4" />
-					Back
-				</Link>
-			)}
 		</div>
 	);
 
 	return (
-		<SpaceExplorerLayout
-			spaces={childSpaces.data?.data}
-			files={filesInSpace.data?.data}
-			isLoading={isLoading}
-			emptyMessage="This space is empty."
-			spaceId={spaceId}
-			header={headerContent}
-		/>
+		<div className="flex flex-col h-screen overflow-scroll">
+			<div className="flex-1 px-6 pb-6">
+				<SpaceExplorerLayout
+					spaces={childSpaces.data?.data}
+					files={filesInSpace.data?.data}
+					isLoading={isLoading}
+					emptyMessage="This space is empty."
+					spaceId={spaceId}
+					header={headerContent}
+				/>
+			</div>
+		</div>
 	);
 }

@@ -17,10 +17,11 @@ import {
 } from "@platform/components/ui/sidebar";
 import { authClient } from "@platform/lib/auth-client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OrgDialog from "../dialogs/org-dialog";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
+import { useElementScrollRestoration } from "@tanstack/react-router";
 
 export function OrgSwitcher() {
 	const { isMobile } = useSidebar();
@@ -31,13 +32,20 @@ export function OrgSwitcher() {
 
 	const [open, setOpen] = useState(false);
 
-	if (isActiveOrgLoading || isOrgsLoading) {
+
+  useEffect(() => {
+    if (!activeOrg && orgs) {
+      authClient.organization.setActive({organizationId: orgs[0].id})
+    }
+	}, [activeOrg, orgs])
+
+  if (isActiveOrgLoading || isOrgsLoading) {
 		return <Skeleton className="h-12" />;
 	}
-	if (!activeOrg || !orgs) {
-		return null;
-	}
 
+  if (!orgs) {
+		return null;
+   }
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>

@@ -7,14 +7,6 @@ import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
 
 const config = defineConfig({
-	ssr: {
-		external: ["bun"],
-	},
-	build: {
-		rollupOptions: {
-			external: ["bun"],
-		},
-	},
 	plugins: [
 		devtools(),
 		nitro(),
@@ -26,6 +18,9 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 	],
+	server: {
+		allowedHosts: ["*", "f682-49-207-151-221.ngrok-free.app"],
+	},
 });
 
 export default config;

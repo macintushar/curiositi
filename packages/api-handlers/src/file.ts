@@ -9,7 +9,7 @@ import db from "@curiositi/db/client";
 import { and, eq, notExists, sql, desc, ilike } from "@curiositi/db";
 import { embedText } from "@curiositi/share/ai";
 
-const MIN_SIMILARITY_THRESHOLD = 0.5;
+const MIN_SIMILARITY_THRESHOLD = 0.1;
 
 export async function getAllFiles(orgId: string, limit = 50, offset = 0) {
 	try {

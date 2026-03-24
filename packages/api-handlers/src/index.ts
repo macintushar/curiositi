@@ -4,3 +4,4 @@ export { createResponse } from "./response";
 export * from "./space";
 export * from "./queue";
 export * from "./file";
+export * from "./invitation";

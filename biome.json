@@ -1,80 +1,80 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.15/schema.json",
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
-	},
-	"files": {
-		"ignoreUnknown": false,
-		"includes": [
-			"**",
-			"!apps/platform/src/routeTree.gen.ts",
-			"!apps/platform/src/components/ui/*",
-			"!apps/worker/.cache",
-			"!packages/db/drizzle/*"
-		]
-	},
-	"formatter": {
-		"enabled": true,
-		"formatWithErrors": false,
-		"indentStyle": "tab"
-	},
-	"assist": {
-		"actions": {
-			"source": {
-				"organizeImports": "off"
-			}
-		}
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true,
-			"style": {
-				"noHeadElement": "off"
-			},
-			"correctness": {
-				"noChildrenProp": "off",
-				"noUnusedImports": "error"
-			},
-			"suspicious": {
-				"noUnknownAtRules": "off",
-				"noArrayIndexKey": "off"
-			}
-		},
-		"domains": {
-			"react": "recommended",
-			"project": "recommended",
-			"tailwind": "recommended"
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"jsxQuoteStyle": "double",
-			"quoteStyle": "double",
-			"semicolons": "always",
-			"trailingCommas": "es5",
-			"arrowParentheses": "always"
-		},
-		"globals": []
-	},
-	"css": {
-		"parser": {
-			"tailwindDirectives": true
-		}
-	},
-	"overrides": [
-		{
-			"includes": ["**/tests/**", "**/*.test.ts", "**/*.spec.ts"],
-			"linter": {
-				"rules": {
-					"suspicious": {
-						"noExplicitAny": "off",
-						"noThenProperty": "off"
-					}
-				}
-			}
-		}
-	]
+  "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!apps/platform/src/routeTree.gen.ts",
+      "!apps/platform/src/components/ui/*",
+      "!apps/worker/.cache",
+      "!packages/db/drizzle/*"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "tab"
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "noHeadElement": "off"
+      },
+      "correctness": {
+        "noChildrenProp": "off",
+        "noUnusedImports": "error"
+      },
+      "suspicious": {
+        "noUnknownAtRules": "off",
+        "noArrayIndexKey": "off"
+      }
+    },
+    "domains": {
+      "react": "recommended",
+      "project": "recommended",
+      "tailwind": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "es5",
+      "arrowParentheses": "always"
+    },
+    "globals": []
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/tests/**", "**/*.test.ts", "**/*.spec.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noThenProperty": "off"
+          }
+        }
+      }
+    }
+  ]
 }

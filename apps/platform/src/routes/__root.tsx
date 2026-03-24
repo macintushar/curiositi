@@ -16,12 +16,12 @@ import type { TRPCRouter } from "@platform/integrations/trpc/router";
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
 import { Toaster } from "@platform/components/ui/sonner";
-import { ThemeProvider } from "@platform/components/theme-provider";
+import { ThemeProvider } from "@platform/components/theme/provider";
 
 type MyRouterContext = {
 	queryClient: QueryClient;
-
 	trpc: TRPCOptionsProxy<TRPCRouter>;
+	emailEnabled?: boolean;
 };
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

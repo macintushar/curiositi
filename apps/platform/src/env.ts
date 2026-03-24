@@ -12,6 +12,8 @@ export const env = createEnv({
 		BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
 		BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
 		BETTER_AUTH_SECRET: z.string(),
+		RESEND_API_KEY: z.string().optional(),
+		EMAIL_FROM_ADDRESS: z.string().optional(),
 		S3_ACCESS_KEY_ID: z.string(),
 		S3_SECRET_ACCESS_KEY: z.string(),
 		S3_BUCKET: z.string(),
@@ -46,6 +48,8 @@ export const env = createEnv({
 		WORKER_URL: process.env.WORKER_URL,
 		BUNQUEUE_HOST: process.env.BUNQUEUE_HOST,
 		BUNQUEUE_PORT: process.env.BUNQUEUE_PORT,
+		RESEND_API_KEY: process.env.RESEND_API_KEY,
+		EMAIL_FROM_ADDRESS: process.env.EMAIL_FROM_ADDRESS,
 	},
 
 	skipValidation:
@@ -59,4 +63,8 @@ if (env.QUEUE_PROVIDER === "qstash") {
 			"QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash"
 		);
 	}
+}
+
+if (env.RESEND_API_KEY && !env.EMAIL_FROM_ADDRESS) {
+	throw new Error("EMAIL_FROM_ADDRESS is required when RESEND_API_KEY is set");
 }
