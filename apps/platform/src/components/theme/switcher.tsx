@@ -1,7 +1,7 @@
-import { Button, buttonVariants } from "../ui/button";
+import { Button, type buttonVariants } from "../ui/button";
 import { useTheme } from "./provider";
 import { themes } from ".";
-import { VariantProps } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,

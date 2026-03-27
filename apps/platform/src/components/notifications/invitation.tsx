@@ -9,10 +9,9 @@ import { Card, CardContent } from "../ui/card";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { toast } from "sonner";
-import { Invitation } from ".";
+import type { Invitation } from ".";
 
 dayjs.extend(relativeTime);
-
 
 export function InvitationCard({ invitation }: { invitation: Invitation }) {
 	const [isAccepting, setIsAccepting] = useState(false);

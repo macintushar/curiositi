@@ -21,7 +21,6 @@ import { useEffect, useState } from "react";
 import OrgDialog from "../dialogs/org-dialog";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
-import { useElementScrollRestoration } from "@tanstack/react-router";
 
 export function OrgSwitcher() {
 	const { isMobile } = useSidebar();
@@ -32,20 +31,19 @@ export function OrgSwitcher() {
 
 	const [open, setOpen] = useState(false);
 
+	useEffect(() => {
+		if (!activeOrg && orgs) {
+			authClient.organization.setActive({ organizationId: orgs[0].id });
+		}
+	}, [activeOrg, orgs]);
 
-  useEffect(() => {
-    if (!activeOrg && orgs) {
-      authClient.organization.setActive({organizationId: orgs[0].id})
-    }
-	}, [activeOrg, orgs])
-
-  if (isActiveOrgLoading || isOrgsLoading) {
+	if (isActiveOrgLoading || isOrgsLoading) {
 		return <Skeleton className="h-12" />;
 	}
 
-  if (!orgs) {
+	if (!orgs || !activeOrg) {
 		return null;
-   }
+	}
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>

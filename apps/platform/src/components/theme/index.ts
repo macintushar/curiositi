@@ -1,11 +1,11 @@
 import {
-	Icon,
+	type Icon,
 	IconDeviceLaptop,
 	IconDeviceMobile,
 	IconMoonStars,
 	IconSunHigh,
 } from "@tabler/icons-react";
-import { Theme } from "./provider";
+import type { Theme } from "./provider";
 
 export const themes: {
 	label: string;

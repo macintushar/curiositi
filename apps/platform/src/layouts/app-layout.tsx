@@ -1,7 +1,6 @@
 "use client";
 
 import { AppSidebar } from "@platform/components/app-sidebar";
-import SettingsDialog from "@platform/components/dialogs/settings-dialog";
 import MobileNav from "@platform/components/mobile-nav";
 import {
 	SidebarInset,
@@ -11,7 +10,6 @@ import {
 import { NavigationHistoryProvider } from "@platform/contexts/navigation-history-context";
 import { useIsMobile } from "@platform/hooks/use-mobile";
 import { cn } from "@platform/lib/utils";
-import { MailIcon } from "lucide-react";
 import dayjs from "dayjs";
 import { authClient } from "@platform/lib/auth-client";
 import { Badge } from "@platform/components/ui/badge";
@@ -54,24 +52,21 @@ function Greeting({ name }: { name?: string }) {
 				? GreetingType.Afternoon
 				: GreetingType.Night;
 
-  return (
-    <div className="flex gap-2 items-center">
-		<h1 className="text-lg font-mono tracking-tight">
-			{greeting},
-      </h1>
-      <Badge className="rounded-none p-0.5 h-fit w-fit bg-foreground dark:bg-muted">
+	return (
+		<div className="flex gap-2 items-center">
+			<h1 className="text-lg font-mono tracking-tight">{greeting},</h1>
+			<Badge className="rounded-none p-0.5 h-fit w-fit bg-foreground dark:bg-muted">
 				<p className="text-lg font-doto tracking-wider pl-1 text-white leading-none font-semibold">
-				{name ?? "curious user"}
+					{name ?? "curious user"}
 				</p>
-         </Badge>
-    </div>
+			</Badge>
+		</div>
 	);
 }
 
 export default function AppLayout({ children }: React.PropsWithChildren) {
 	const isMobile = useIsMobile();
-	const { data: session } =
-		authClient.useSession();
+	const { data: session } = authClient.useSession();
 	return (
 		<NavigationHistoryProvider>
 			<SidebarProvider>

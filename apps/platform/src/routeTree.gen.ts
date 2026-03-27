@@ -21,9 +21,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppNotificationsRouteImport } from './routes/app/notifications'
+import { Route as AppChatIndexRouteImport } from './routes/app/chat/index'
 import { Route as ApiUploadIndexRouteImport } from './routes/api/upload/index'
 import { Route as AppSpaceSpaceIdRouteImport } from './routes/app/space/$spaceId'
+import { Route as AppChatConversationIdRouteImport } from './routes/app/chat/$conversationId'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
+import { Route as ApiChatConversationIdRouteImport } from './routes/api/chat/$conversationId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const SignUpRoute = SignUpRouteImport.update({
@@ -86,6 +89,11 @@ const AppNotificationsRoute = AppNotificationsRouteImport.update({
   path: '/notifications',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppChatIndexRoute = AppChatIndexRouteImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const ApiUploadIndexRoute = ApiUploadIndexRouteImport.update({
   id: '/api/upload/',
   path: '/api/upload/',
@@ -96,9 +104,19 @@ const AppSpaceSpaceIdRoute = AppSpaceSpaceIdRouteImport.update({
   path: '/space/$spaceId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppChatConversationIdRoute = AppChatConversationIdRouteImport.update({
+  id: '/chat/$conversationId',
+  path: '/chat/$conversationId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatConversationIdRoute = ApiChatConversationIdRouteImport.update({
+  id: '/api/chat/$conversationId',
+  path: '/api/chat/$conversationId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -121,9 +139,12 @@ export interface FileRoutesByFullPath {
   '/app/settings': typeof AppSettingsRoute
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/chat/$conversationId': typeof AppChatConversationIdRoute
   '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload/': typeof ApiUploadIndexRoute
+  '/app/chat/': typeof AppChatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -138,9 +159,12 @@ export interface FileRoutesByTo {
   '/app/settings': typeof AppSettingsRoute
   '/app': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/chat/$conversationId': typeof AppChatConversationIdRoute
   '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload': typeof ApiUploadIndexRoute
+  '/app/chat': typeof AppChatIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -157,9 +181,12 @@ export interface FileRoutesById {
   '/app/settings': typeof AppSettingsRoute
   '/app/': typeof AppIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/chat/$conversationId': typeof ApiChatConversationIdRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/app/chat/$conversationId': typeof AppChatConversationIdRoute
   '/app/space/$spaceId': typeof AppSpaceSpaceIdRoute
   '/api/upload/': typeof ApiUploadIndexRoute
+  '/app/chat/': typeof AppChatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,9 +204,12 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/'
     | '/api/auth/$'
+    | '/api/chat/$conversationId'
     | '/api/trpc/$'
+    | '/app/chat/$conversationId'
     | '/app/space/$spaceId'
     | '/api/upload/'
+    | '/app/chat/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -194,9 +224,12 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app'
     | '/api/auth/$'
+    | '/api/chat/$conversationId'
     | '/api/trpc/$'
+    | '/app/chat/$conversationId'
     | '/app/space/$spaceId'
     | '/api/upload'
+    | '/app/chat'
   id:
     | '__root__'
     | '/'
@@ -212,9 +245,12 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/'
     | '/api/auth/$'
+    | '/api/chat/$conversationId'
     | '/api/trpc/$'
+    | '/app/chat/$conversationId'
     | '/app/space/$spaceId'
     | '/api/upload/'
+    | '/app/chat/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -228,6 +264,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiChatConversationIdRoute: typeof ApiChatConversationIdRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
   ApiUploadIndexRoute: typeof ApiUploadIndexRoute
 }
@@ -318,6 +355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppNotificationsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/chat/': {
+      id: '/app/chat/'
+      path: '/chat'
+      fullPath: '/app/chat/'
+      preLoaderRoute: typeof AppChatIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/api/upload/': {
       id: '/api/upload/'
       path: '/api/upload'
@@ -332,11 +376,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSpaceSpaceIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/chat/$conversationId': {
+      id: '/app/chat/$conversationId'
+      path: '/chat/$conversationId'
+      fullPath: '/app/chat/$conversationId'
+      preLoaderRoute: typeof AppChatConversationIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/api/trpc/$': {
       id: '/api/trpc/$'
       path: '/api/trpc/$'
       fullPath: '/api/trpc/$'
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat/$conversationId': {
+      id: '/api/chat/$conversationId'
+      path: '/api/chat/$conversationId'
+      fullPath: '/api/chat/$conversationId'
+      preLoaderRoute: typeof ApiChatConversationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -353,14 +411,18 @@ interface AppRouteRouteChildren {
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppChatConversationIdRoute: typeof AppChatConversationIdRoute
   AppSpaceSpaceIdRoute: typeof AppSpaceSpaceIdRoute
+  AppChatIndexRoute: typeof AppChatIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppNotificationsRoute: AppNotificationsRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppChatConversationIdRoute: AppChatConversationIdRoute,
   AppSpaceSpaceIdRoute: AppSpaceSpaceIdRoute,
+  AppChatIndexRoute: AppChatIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
@@ -378,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiChatConversationIdRoute: ApiChatConversationIdRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
   ApiUploadIndexRoute: ApiUploadIndexRoute,
 }
