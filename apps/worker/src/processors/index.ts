@@ -1,19 +1,36 @@
 import type { Processor } from "./types";
 import docProcessor from "./doc";
 import imageProcessor from "./image";
+import wordProcessor from "./word";
+import excelProcessor from "./excel";
+import powerpointProcessor from "./powerpoint";
 import {
 	TEXT_FILE_TYPES,
 	PDF_TYPE,
 	IMAGE_TYPES,
+	WORD_TYPES,
+	EXCEL_TYPES,
+	POWERPOINT_TYPES,
 } from "@curiositi/share/constants";
 
-export { docProcessor, imageProcessor };
+export {
+	docProcessor,
+	imageProcessor,
+	wordProcessor,
+	excelProcessor,
+	powerpointProcessor,
+};
 export type { Processor, ProcessorContext, FileData } from "./types";
 
 const PROCESSOR_MAP: Record<string, Processor> = {
 	[PDF_TYPE]: docProcessor,
 	...Object.fromEntries(TEXT_FILE_TYPES.map((type) => [type, docProcessor])),
 	...Object.fromEntries(IMAGE_TYPES.map((type) => [type, imageProcessor])),
+	...Object.fromEntries(WORD_TYPES.map((type) => [type, wordProcessor])),
+	...Object.fromEntries(EXCEL_TYPES.map((type) => [type, excelProcessor])),
+	...Object.fromEntries(
+		POWERPOINT_TYPES.map((type) => [type, powerpointProcessor])
+	),
 };
 
 export function getProcessor(mimeType: string): Processor | null {

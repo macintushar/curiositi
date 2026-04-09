@@ -1,36 +1,55 @@
+import { getEncoding } from "js-tiktoken";
 import type { PageContent } from "./md";
+import { buildContextPrefix } from "./embedding-context";
 
 type ChunkOptions = {
-	/** Max tokens per chunk (~4 chars/token). Default: 800 */
 	maxChunkSize?: number;
-	/** Overlap tokens for context continuity. Default: 100 */
 	overlap?: number;
+	fileName?: string;
+	fileType?: string;
+	documentTitle?: string;
+	csvHeaders?: string[];
 };
 
 export type ChunkWithMetadata = {
 	content: string;
+	embeddedText: string;
 	pageNumber: number;
-	/** If chunk spans multiple pages, this contains all page numbers */
 	pageNumbers?: number[];
 };
 
-/**
- * Chunks page content while preserving page number metadata.
- * Optimized for embedding models like OpenAI ada-002.
- */
+let encoder: ReturnType<typeof getEncoding> | null = null;
+
+function getEncoder() {
+	if (!encoder) {
+		encoder = getEncoding("cl100k_base");
+	}
+	return encoder;
+}
+
+function countTokens(text: string): number {
+	const enc = getEncoder();
+	return enc.encode(text).length;
+}
+
 export function chunkPages(
 	pages: PageContent[],
 	options: ChunkOptions = {}
 ): ChunkWithMetadata[] {
-	const { maxChunkSize = 800, overlap = 100 } = options;
-
-	const CHARS_PER_TOKEN = 4;
-	const maxChars = maxChunkSize * CHARS_PER_TOKEN;
-	const overlapChars = overlap * CHARS_PER_TOKEN;
+	const {
+		maxChunkSize = 300,
+		overlap = 60,
+		fileName = "",
+		fileType = "",
+		documentTitle,
+		csvHeaders,
+	} = options;
 
 	const chunks: ChunkWithMetadata[] = [];
 	let currentChunk = "";
 	let currentPageNumbers: number[] = [];
+
+	const totalPages = pages.length;
 
 	for (const page of pages) {
 		const paragraphs = page.content.split(/\n\n+/);
@@ -39,20 +58,36 @@ export function chunkPages(
 			const trimmed = para.trim();
 			if (!trimmed) continue;
 
-			const combinedLength = currentChunk.length + trimmed.length;
+			const combinedTokens = countTokens(`${currentChunk}\n\n${trimmed}`);
 
-			if (combinedLength > maxChars && currentChunk) {
-				// Push current chunk with page metadata
+			if (combinedTokens > maxChunkSize && currentChunk) {
+				const pageStart = currentPageNumbers[0] ?? -1;
+				const pageEnd =
+					currentPageNumbers[currentPageNumbers.length - 1] ?? pageStart;
+				const sectionTitle = page.sectionTitle;
+
+				const prefix = buildContextPrefix({
+					fileName,
+					fileType,
+					pageStart,
+					pageEnd,
+					totalPages,
+					documentTitle,
+					sectionTitle,
+					csvHeaders,
+				});
+
 				chunks.push({
 					content: currentChunk.trim(),
-					pageNumber: currentPageNumbers[0] ?? -1,
+					embeddedText: prefix + currentChunk.trim(),
+					pageNumber: pageStart,
 					...(currentPageNumbers.length > 1 && {
 						pageNumbers: currentPageNumbers,
 					}),
 				});
 
-				// Start new chunk with overlap
-				const overlapText = currentChunk.slice(-overlapChars).trim();
+				const overlapTokens = getEncoder().encode(currentChunk).slice(-overlap);
+				const overlapText = getEncoder().decode(overlapTokens).trim();
 				currentChunk = overlapText ? `${overlapText}\n\n${trimmed}` : trimmed;
 				currentPageNumbers = [page.pageNumber];
 			} else {
@@ -64,11 +99,28 @@ export function chunkPages(
 		}
 	}
 
-	// last chunk
 	if (currentChunk.trim()) {
+		const pageStart = currentPageNumbers[0] ?? -1;
+		const pageEnd =
+			currentPageNumbers[currentPageNumbers.length - 1] ?? pageStart;
+		const lastPage = pages[pages.length - 1];
+		const sectionTitle = lastPage?.sectionTitle;
+
+		const prefix = buildContextPrefix({
+			fileName,
+			fileType,
+			pageStart,
+			pageEnd,
+			totalPages,
+			documentTitle,
+			sectionTitle,
+			csvHeaders,
+		});
+
 		chunks.push({
 			content: currentChunk.trim(),
-			pageNumber: currentPageNumbers[0] ?? -1,
+			embeddedText: prefix + currentChunk.trim(),
+			pageNumber: pageStart,
 			...(currentPageNumbers.length > 1 && { pageNumbers: currentPageNumbers }),
 		});
 	}
@@ -76,32 +128,46 @@ export function chunkPages(
 	return chunks.filter((c) => c.content.trim().length > 0);
 }
 
-/**
- * Simple string chunking (for non-PDF content or when page tracking isn't needed).
- */
 export default function chunkText(
 	content: string,
 	options: ChunkOptions = {}
-): string[] {
-	const { maxChunkSize = 800, overlap = 100 } = options;
-
-	const CHARS_PER_TOKEN = 4;
-	const maxChars = maxChunkSize * CHARS_PER_TOKEN;
-	const overlapChars = overlap * CHARS_PER_TOKEN;
+): ChunkWithMetadata[] {
+	const {
+		maxChunkSize = 300,
+		overlap = 60,
+		fileName = "",
+		fileType = "",
+		documentTitle,
+	} = options;
 
 	const paragraphs = content.split(/\n\n+/);
-	const chunks: string[] = [];
+	const chunks: ChunkWithMetadata[] = [];
 	let currentChunk = "";
 
 	for (const para of paragraphs) {
 		const trimmed = para.trim();
 		if (!trimmed) continue;
 
-		const combinedLength = currentChunk.length + trimmed.length;
+		const combinedTokens = countTokens(`${currentChunk}\n\n${trimmed}`);
 
-		if (combinedLength > maxChars && currentChunk) {
-			chunks.push(currentChunk.trim());
-			const overlapText = currentChunk.slice(-overlapChars).trim();
+		if (combinedTokens > maxChunkSize && currentChunk) {
+			const prefix = buildContextPrefix({
+				fileName,
+				fileType,
+				pageStart: 1,
+				pageEnd: 1,
+				totalPages: 1,
+				documentTitle,
+			});
+
+			chunks.push({
+				content: currentChunk.trim(),
+				embeddedText: prefix + currentChunk.trim(),
+				pageNumber: 1,
+			});
+
+			const overlapTokens = getEncoder().encode(currentChunk).slice(-overlap);
+			const overlapText = getEncoder().decode(overlapTokens).trim();
 			currentChunk = overlapText ? `${overlapText}\n\n${trimmed}` : trimmed;
 		} else {
 			currentChunk += (currentChunk ? "\n\n" : "") + trimmed;
@@ -109,8 +175,21 @@ export default function chunkText(
 	}
 
 	if (currentChunk.trim()) {
-		chunks.push(currentChunk.trim());
+		const prefix = buildContextPrefix({
+			fileName,
+			fileType,
+			pageStart: 1,
+			pageEnd: 1,
+			totalPages: 1,
+			documentTitle,
+		});
+
+		chunks.push({
+			content: currentChunk.trim(),
+			embeddedText: prefix + currentChunk.trim(),
+			pageNumber: 1,
+		});
 	}
 
-	return chunks.filter((c) => c.trim().length > 0);
+	return chunks.filter((c) => c.content.trim().length > 0);
 }

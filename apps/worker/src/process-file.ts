@@ -9,6 +9,7 @@ import { embedChunks } from "@curiositi/share/ai";
 import { env } from "./env";
 import { getProcessor } from "./processors";
 import { captureWorkerException } from "./sentry";
+import { isCsvMimeType, extractCsvHeaders } from "./lib/file-type-utils";
 
 type ProcessFileProps = {
 	fileId: string;
@@ -114,6 +115,7 @@ export default async function processFile({
 		}
 
 		const filetype = claimedFile[0].type;
+		const fileName = claimedFile[0].name;
 		const processor = getProcessor(filetype);
 
 		if (!processor) {
@@ -133,13 +135,23 @@ export default async function processFile({
 			pageCount: pages.length,
 		});
 
+		const documentTitle = pages[0]?.metadata?.title;
+		const csvHeaders = isCsvMimeType(filetype)
+			? extractCsvHeaders(pages[0]?.content ?? "")
+			: undefined;
+
 		logger.debug("Chunking pages", {
 			fileId,
 			pageCount: pages.length,
 		});
 		let chunks: Awaited<ReturnType<typeof chunkPages>>;
 		try {
-			chunks = chunkPages(pages);
+			chunks = chunkPages(pages, {
+				fileName,
+				fileType: filetype,
+				documentTitle,
+				csvHeaders,
+			});
 			logger.info("Pages chunked successfully", {
 				fileId,
 				chunkCount: chunks.length,
@@ -160,7 +172,7 @@ export default async function processFile({
 		let embeddings: number[][];
 		try {
 			const embeddingResult = await embedChunks({
-				chunks: chunks.map((c) => c.content),
+				chunks: chunks.map((c) => c.embeddedText),
 				provider: "openai",
 			});
 			embeddings = embeddingResult.embeddings;
@@ -193,7 +205,11 @@ export default async function processFile({
 							fileId,
 							content: c.content,
 							embeddedContent: embeddings[idx] as number[],
-							metadata: { page_number: c.pageNumbers ?? c.pageNumber },
+							metadata: {
+								page_number: c.pageNumbers ?? c.pageNumber,
+								file_name: fileName,
+								file_type: filetype,
+							},
 						}))
 					)
 					.returning();
