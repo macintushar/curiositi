@@ -1,4 +1,4 @@
-import type { selectSpaceSchema } from "@curiositi/db/schema";
+import type { selectSpaceSchema } from "@curiositi/share/db-schemas";
 import type z from "zod";
 import FilePreview from "./previews/file-preview";
 import SpacePreview from "./previews/space-preview";

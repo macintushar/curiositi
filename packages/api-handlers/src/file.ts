@@ -8,6 +8,7 @@ import { createResponse } from "./response";
 import db from "@curiositi/db/client";
 import { and, eq, notExists, sql, desc, ilike } from "@curiositi/db";
 import { embedText } from "@curiositi/share/ai";
+import type { SearchResult } from "@curiositi/share/types";
 
 const MIN_SIMILARITY_THRESHOLD = 0.3;
 
@@ -88,13 +89,8 @@ export async function deleteFile(fileId: string) {
 
 export type FileTags = { tags?: string[] };
 
-export type SearchResult = {
-	file: typeof files.$inferSelect;
-	score: number;
-	matchType: "name" | "content" | "tag" | "space";
-	spaceName?: string | null;
-	spaceId?: string | null;
-};
+// Re-export SearchResult type from share package
+export type { SearchResult };
 
 /**
  * Enhanced search across files, tags, and spaces

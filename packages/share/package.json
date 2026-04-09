@@ -12,7 +12,8 @@
 		"./constants": "./src/constants/index.ts",
 		"./types": "./src/types/index.ts",
 		"./ai": "./src/ai/index.ts",
-		"./models": "./src/models/index.ts"
+		"./models": "./src/models/index.ts",
+		"./db-schemas": "./src/db-schemas/index.ts"
 	},
 	"scripts": {
 		"lint": "biome check .",

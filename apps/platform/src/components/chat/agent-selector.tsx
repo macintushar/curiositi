@@ -13,7 +13,7 @@ import {
 } from "@tabler/icons-react";
 import { useChatStore, type Agent } from "@platform/stores/chat-store";
 import useAppStore from "@platform/stores/appStore";
-import { isSystemAgentId } from "@curiositi/agent";
+import { isSystemAgentId } from "@curiositi/share/types";
 
 type AgentSelectorProps = {
 	onOpenSettings?: () => void;
