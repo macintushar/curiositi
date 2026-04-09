@@ -41,8 +41,8 @@ function Greeting({ name }: { name?: string }) {
 	const time24h = now.format("HH:mm");
 
 	const timeSplit: SplitTime = {
-		hour: parseInt(time24h.split(" ")[0].split(":")[0]),
-		minute: parseInt(time24h.split(" ")[0].split(":")[1]),
+		hour: parseInt(time24h.split(" ")[0].split(":")[0], 10),
+		minute: parseInt(time24h.split(" ")[0].split(":")[1], 10),
 	};
 
 	const greeting =

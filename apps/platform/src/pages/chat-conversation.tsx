@@ -18,14 +18,18 @@ import { useChatStore } from "@platform/stores/chat-store";
 import { Button } from "@platform/components/ui/button";
 import { useChat } from "@platform/hooks/use-chat";
 import { cn } from "@platform/lib/utils";
-
+import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 
 function getMessageText(message: UIMessage): string {
 	const textPart = message.parts.find((p) => p.type === "text");
 	return textPart?.text ?? "";
 }
 
-export default function ChatConversation({ conversationId }: { conversationId: string }) {
+export default function ChatConversation({
+	conversationId,
+}: {
+	conversationId: string;
+}) {
 	const {
 		messages,
 		input,
@@ -38,14 +42,47 @@ export default function ChatConversation({ conversationId }: { conversationId: s
 		status,
 	} = useChat({ conversationId });
 
-	const { pendingMessage, setPendingMessage } = useChatStore();
+	const {
+		pendingMessage,
+		setPendingMessage,
+		setAvailableAgents,
+		setSelectedAgentId,
+		availableAgents,
+		selectedAgentId,
+	} = useChatStore();
 
 	useEffect(() => {
-		if (pendingMessage && status === "ready" && messages.length === 0) {
+		const loadAgents = async () => {
+			const result = await trpcClient.chat.getAvailableAgents.query();
+			setAvailableAgents(result.agents as typeof availableAgents);
+			if (result.agents.length > 0 && !selectedAgentId) {
+				const askAgent = result.agents.find(
+					(a: (typeof availableAgents)[number]) => a.id === "system:ask"
+				);
+				setSelectedAgentId(askAgent?.id ?? result.agents[0]?.id ?? null);
+			}
+		};
+		loadAgents();
+	}, [setAvailableAgents, setSelectedAgentId, selectedAgentId]);
+
+	useEffect(() => {
+		if (
+			pendingMessage &&
+			status === "ready" &&
+			messages.length === 0 &&
+			selectedAgentId
+		) {
 			sendMessage({ text: pendingMessage });
 			setPendingMessage(null);
 		}
-	}, [pendingMessage, status, messages.length, sendMessage, setPendingMessage]);
+	}, [
+		pendingMessage,
+		status,
+		messages.length,
+		sendMessage,
+		setPendingMessage,
+		selectedAgentId,
+	]);
 
 	const onSubmit = () => {
 		handleSubmit();
@@ -110,7 +147,7 @@ export default function ChatConversation({ conversationId }: { conversationId: s
 														onClick={() => {
 															try {
 																navigator.clipboard.writeText(messageText);
-															} catch (e) {
+															} catch (_e) {
 																toast.error("Failed to copy text");
 															}
 														}}

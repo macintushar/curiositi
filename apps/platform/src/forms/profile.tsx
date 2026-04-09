@@ -1,15 +1,10 @@
 import { updateUserSchema } from "@curiositi/share/schemas";
 import { Button } from "@platform/components/ui/button";
-import {
-	Field,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-} from "@platform/components/ui/field";
+import { Field, FieldError, FieldGroup } from "@platform/components/ui/field";
 import { Input } from "@platform/components/ui/input";
 import { authClient } from "@platform/lib/auth-client";
 import { handleFormSubmit } from "@platform/lib/utils";
-import { IconLoader, IconLoader2, IconLoader3 } from "@tabler/icons-react";
+import { IconLoader2 } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -36,7 +31,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
 					name: value.name,
 				});
 				setIsSubmitting(false);
-			} catch (error) {
+			} catch (_error) {
 				toast.error("Something went wrong, please try again.");
 			} finally {
 				setIsSubmitting(false);
