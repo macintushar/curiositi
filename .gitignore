@@ -46,3 +46,6 @@ storage
 
 # Cache
 **/.cache/**
+
+# Docs
+.docs/
