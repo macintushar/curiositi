@@ -1,0 +1,39 @@
+{
+	"name": "@curiositi/agent",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"license": "AGPL-3.0",
+	"exports": {
+		".": "./src/index.ts",
+		"./tools": "./src/tools/index.ts",
+		"./prompts": "./src/prompts/index.ts",
+		"./mcp": "./src/mcp-server.ts"
+	},
+	"scripts": {
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format .",
+		"format:fix": "biome format --write ."
+	},
+	"dependencies": {
+		"@ai-sdk/anthropic": "^3.0.0",
+		"@ai-sdk/google": "^3.0.26",
+		"@ai-sdk/openai": "^3.0.27",
+		"@curiositi/db": "workspace:*",
+		"@curiositi/share": "workspace:*",
+		"ai": "^6.0.82",
+		"ai-sdk-ollama": "^3.8.2",
+		"zod": "^4.3.6"
+	},
+	"optionalDependencies": {
+		"@modelcontextprotocol/sdk": "^1.29.0"
+	},
+	"devDependencies": {
+		"@curiositi/tsconfig": "workspace:*",
+		"@modelcontextprotocol/sdk": "^1.29.0",
+		"@types/bun": "latest",
+		"biome": "latest",
+		"typescript": "^5.9.3"
+	}
+}
