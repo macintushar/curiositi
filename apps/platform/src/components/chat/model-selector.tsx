@@ -21,16 +21,15 @@ import {
 	IconChevronDown,
 	IconSearch,
 	IconEye,
-	IconInfoCircle,
-	IconStar,
-	IconStarFilled,
 	IconLoader2,
 	IconChevronUp,
+	IconAlertTriangle,
 } from "@tabler/icons-react";
 import ProviderLogo from "./provider-logo";
 import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Separator } from "../ui/separator";
+import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
+import { useQuery } from "@tanstack/react-query";
 
 type CostTier = "$" | "$$" | "$$$" | "$$$+";
 
@@ -53,9 +52,8 @@ type ModelListItemProps = {
 	model: Model;
 	provider: Provider;
 	isSelected: boolean;
-	isFavorite: boolean;
 	onClick: (e: React.MouseEvent) => void;
-	onToggleFavorite: (e: React.MouseEvent) => void;
+	providerEnabled: boolean;
 };
 
 function ModelListItem({
@@ -63,15 +61,19 @@ function ModelListItem({
 	isSelected,
 	onClick,
 	provider,
+	providerEnabled,
 }: ModelListItemProps) {
 	const costTier = getCostTier(model);
 
 	return (
-		<div
+		<Button
+			type="button"
+			variant="ghost"
 			onClick={onClick}
 			className={cn(
-				"group w-full text-left p-3 rounded-xl transition-all duration-200 cursor-pointer",
-				isSelected && "bg-muted"
+				"group w-full h-auto text-left p-3 rounded-xl transition-all duration-200 cursor-pointer justify-start",
+				isSelected && "bg-muted",
+				!providerEnabled && "opacity-50"
 			)}
 		>
 			<div className="flex items-center gap-3">
@@ -114,7 +116,7 @@ function ModelListItem({
 					)}
 				</div>
 			</div>
-		</div>
+		</Button>
 	);
 }
 
@@ -123,12 +125,26 @@ export default function ModelSelector() {
 		useChatStore();
 	const [open, setOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [favorites, setFavorites] = useState<Set<string>>(new Set());
 	const [activeProvider, setActiveProvider] = useState<string>(
 		selectedModelProvider || "openai"
 	);
 
+	const { data: modelsData } = useQuery({
+		queryKey: ["agent-models"],
+		queryFn: () => trpcClient.agent.getModels.query({}),
+	});
+
 	const providers = getProviders();
+
+	const providerStatuses = useMemo(() => {
+		const statuses: Record<string, boolean> = {};
+		if (modelsData?.providerStatuses) {
+			for (const ps of modelsData.providerStatuses) {
+				statuses[ps.provider] = ps.enabled;
+			}
+		}
+		return statuses;
+	}, [modelsData?.providerStatuses]);
 
 	const allModels = useMemo(() => {
 		const models: Array<{ model: Model; provider: Provider }> = [];
@@ -163,19 +179,6 @@ export default function ModelSelector() {
 		return allModels.find(({ model }) => model.id === selectedModelId);
 	}, [allModels, selectedModelId]);
 
-	const toggleFavorite = (e: React.MouseEvent, modelId: string) => {
-		e.stopPropagation();
-		setFavorites((prev) => {
-			const next = new Set(prev);
-			if (next.has(modelId)) {
-				next.delete(modelId);
-			} else {
-				next.add(modelId);
-			}
-			return next;
-		});
-	};
-
 	const handleModelSelect = (
 		e: React.MouseEvent,
 		model: Model,
@@ -190,6 +193,8 @@ export default function ModelSelector() {
 		e.stopPropagation();
 		setActiveProvider(providerId);
 	};
+
+	const activeProviderEnabled = providerStatuses[activeProvider] ?? true;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -247,21 +252,37 @@ export default function ModelSelector() {
 						{SUPPORTED_PROVIDERS.map((providerId) => {
 							const provider = providers.find((p) => p.id === providerId);
 							if (!provider) return null;
+							const enabled = providerStatuses[providerId] ?? true;
 
 							return (
-								<Button
-									key={providerId}
-									type="button"
-									onClick={(e) => handleProviderClick(e, providerId)}
-									variant={
-										activeProvider === providerId ? "activeGhost" : "ghost"
-									}
-									className={cn(
-										"w-10 h-10 rounded-lg flex items-center justify-center transition-colors"
+								<Tooltip key={providerId}>
+									<TooltipTrigger asChild>
+										<Button
+											type="button"
+											onClick={(e) => handleProviderClick(e, providerId)}
+											variant={
+												activeProvider === providerId ? "activeGhost" : "ghost"
+											}
+											className={cn(
+												"w-10 h-10 rounded-lg flex items-center justify-center transition-colors relative",
+												!enabled && "opacity-50"
+											)}
+										>
+											<ProviderLogo
+												providerId={providerId}
+												className="w-5 h-5"
+											/>
+											{!enabled && (
+												<IconAlertTriangle className="w-3 h-3 absolute -top-0.5 -right-0.5 text-amber-500" />
+											)}
+										</Button>
+									</TooltipTrigger>
+									{!enabled && (
+										<TooltipContent side="right">
+											API key not configured
+										</TooltipContent>
 									)}
-								>
-									<ProviderLogo providerId={providerId} className="w-5 h-5" />
-								</Button>
+								</Tooltip>
 							);
 						})}
 					</div>
@@ -285,9 +306,8 @@ export default function ModelSelector() {
 										selectedModelId === model.id &&
 										selectedModelProvider === provider.id
 									}
-									isFavorite={favorites.has(model.id)}
 									onClick={(e) => handleModelSelect(e, model, provider)}
-									onToggleFavorite={(e) => toggleFavorite(e, model.id)}
+									providerEnabled={activeProviderEnabled}
 								/>
 							))
 						)}

@@ -37,38 +37,38 @@ export default function ChatConversations() {
 	}
 
 	if (!conversations || conversations.length === 0) {
-		return <p>No conversations found.</p>;
+		return (
+			<SidebarMenuSub className="text-sm">
+				No conversations found.
+			</SidebarMenuSub>
+		);
 	}
 
 	return (
-		<>
-			<Collapsible open={open} onOpenChange={setOpen}>
-				<CollapsibleTrigger className="flex justify-between items-center w-full">
-					<SidebarGroupLabel>Recent Conversations</SidebarGroupLabel>
-					{open ? (
-						<ChevronUp className="size-4 text-muted-foreground" />
-					) : (
-						<ChevronDown className="size-4 text-muted-foreground" />
-					)}
-				</CollapsibleTrigger>
-				<CollapsibleContent>
-					<SidebarMenuSub>
-						{conversations.map((conv) => (
-							<Link
-								to={"/app/chat/$conversationId"}
-								params={{ conversationId: conv.id }}
-							>
-								<SidebarMenuSubButton
-									key={conv.id}
-									isActive={conv.id === conversationId}
-								>
-									{conv.title ?? "New Chat"}
-								</SidebarMenuSubButton>
-							</Link>
-						))}
-					</SidebarMenuSub>
-				</CollapsibleContent>
-			</Collapsible>
-		</>
+		<Collapsible open={open} onOpenChange={setOpen}>
+			<CollapsibleTrigger className="flex justify-between items-center w-full">
+				<SidebarGroupLabel>Recent Conversations</SidebarGroupLabel>
+				{open ? (
+					<ChevronUp className="size-4 text-muted-foreground" />
+				) : (
+					<ChevronDown className="size-4 text-muted-foreground" />
+				)}
+			</CollapsibleTrigger>
+			<CollapsibleContent>
+				<SidebarMenuSub>
+					{conversations.map((conv) => (
+						<Link
+							key={conv.id}
+							to={"/app/chat/$conversationId"}
+							params={{ conversationId: conv.id }}
+						>
+							<SidebarMenuSubButton isActive={conv.id === conversationId}>
+								{conv.title ?? "New Chat"}
+							</SidebarMenuSubButton>
+						</Link>
+					))}
+				</SidebarMenuSub>
+			</CollapsibleContent>
+		</Collapsible>
 	);
 }

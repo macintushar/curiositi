@@ -53,11 +53,7 @@ import {
 	TableRow,
 } from "@platform/components/ui/table";
 import { Input } from "./ui/input";
-import {
-	IconAdjustmentsHorizontal,
-	IconFilter,
-	IconFilter2,
-} from "@tabler/icons-react";
+import { IconAdjustmentsHorizontal } from "@tabler/icons-react";
 
 type DataTablePaginationProps<TData> = {
 	table: ReturnType<typeof useReactTable<TData>>;
@@ -403,7 +399,7 @@ export default function PaginatedTable<TData, TValue>({
 						/>
 					)}
 					{showViewOptions && <DataTableViewOptions table={table} />}
-					{/*{action}*/}
+					{action}
 				</div>
 			)}
 			<div className="overflow-hidden rounded-md border">

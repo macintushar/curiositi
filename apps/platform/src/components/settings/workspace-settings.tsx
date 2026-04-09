@@ -1,10 +1,10 @@
+import { useState } from "react";
 import { UserPlusIcon } from "lucide-react";
-import { Button } from "../ui/button";
-import InvitedUsers from "./invited-users";
 import SettingsLayout, { ActionCard, LayoutHead } from "./settings-layout";
 import UsersTable from "./users-table";
-import { useState } from "react";
+import InvitedUsers from "./invited-users";
 import InviteDialog from "../dialogs/invite-dialog";
+import { Button } from "../ui/button";
 
 export default function WorkspaceSettings() {
 	const [inviteOpen, setInviteOpen] = useState(false);

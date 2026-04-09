@@ -2,18 +2,20 @@ import { ArrowUp } from "lucide-react";
 import { Button } from "../ui/button";
 import {
 	PromptInput,
-	PromptInputAction,
 	PromptInputActions,
 	PromptInputTextarea,
 } from "../ui/prompt-input";
 import ModelSelector from "./model-selector";
-import { IconPaperclip } from "@tabler/icons-react";
+import AgentSelector from "./agent-selector";
+import { ContextList, ContextSelector } from "./context";
+import ToolToggles from "./tool-toggles";
 
 type ChatInputProps = {
 	isLoading: boolean;
 	input: string;
 	setInput: (value: string) => void;
 	onSubmit: () => void;
+	onOpenSettings?: () => void;
 };
 
 export default function ChatInput({
@@ -21,6 +23,7 @@ export default function ChatInput({
 	input,
 	setInput,
 	onSubmit,
+	onOpenSettings,
 }: ChatInputProps) {
 	return (
 		<PromptInput
@@ -28,23 +31,21 @@ export default function ChatInput({
 			value={input}
 			onValueChange={setInput}
 			onSubmit={onSubmit}
-			className="border-input bg-background w-full rounded-2xl flex flex-col gap-1"
+			className="border-input bg-background w-full max-w-lg rounded-2xl flex flex-col gap-1"
 		>
+			<ContextList />
 			<PromptInputTextarea
 				placeholder="Type a message..."
 				className="dark:bg-background"
 			/>
 			<PromptInputActions className="flex w-full items-end justify-between gap-2 px-2 pb-1">
-				<PromptInputAction tooltip="Attach files">
-					<label htmlFor="file-upload">
-						<input type="file" multiple className="hidden" id="file-upload" />
-						<Button variant="ghost" size="icon-sm" className="rounded-full">
-							<IconPaperclip />
-						</Button>
-					</label>
-				</PromptInputAction>
+				<div className="flex items-center gap-2">
+					<ContextSelector />
+					<ToolToggles />
+				</div>
 
 				<div className="flex gap-3">
+					<AgentSelector onOpenSettings={onOpenSettings} />
 					<ModelSelector />
 
 					<Button
