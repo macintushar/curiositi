@@ -88,7 +88,8 @@ export const SYSTEM_AGENTS: Record<string, SystemAgent> = {
 	},
 };
 
-export const isSystemAgentId = (id: string): boolean => id in SYSTEM_AGENTS;
+export const isSystemAgentId = (id: string): boolean =>
+	Object.hasOwn(SYSTEM_AGENTS, id);
 
 export const getSystemAgent = (id: string): SystemAgent | undefined =>
 	SYSTEM_AGENTS[id];

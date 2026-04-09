@@ -381,6 +381,7 @@ export const spacesRelations = relations(spaces, ({ one, many }) => ({
 	parentSpace: one(spaces, {
 		fields: [spaces.parentSpaceId],
 		references: [spaces.id],
+		relationName: "parentSpace",
 	}),
 	childSpaces: many(spaces, { relationName: "parentSpace" }),
 	filesInSpace: many(filesInSpace),
@@ -560,7 +561,7 @@ export const messages = createTable(
 		toolCalls: d.jsonb(),
 		tokenCount: d.integer(),
 		costUSD: d.real(),
-		agentId: d.text(),
+		agentId: d.uuid().references(() => agents.id, { onDelete: "set null" }),
 		metadata: d.jsonb(),
 		createdAt: d
 			.timestamp({ withTimezone: true })
@@ -684,33 +685,3 @@ export const conversationsRelations = relations(
 		messages: many(messages),
 	})
 );
-
-///////////////////////////////////////////////////////////
-//                                                         //
-//					Organization Relations Update     	  //
-//                                                         //
-///////////////////////////////////////////////////////////
-
-export const organizationRelationsUpdate = relations(
-	organization,
-	({ many }) => ({
-		members: many(member),
-		invitations: many(invitation),
-		roles: many(organizationRoles),
-		spaces: many(spaces),
-		files: many(files),
-		tools: many(tools),
-		agents: many(agents),
-		conversations: many(conversations),
-	})
-);
-
-export const userRelationsUpdate = relations(user, ({ many }) => ({
-	accounts: many(account),
-	sessions: many(session),
-	members: many(member),
-	invitationsSent: many(invitation),
-	filesUploaded: many(files, { relationName: "uploadedBy" }),
-	agentsCreated: many(agents, { relationName: "createdBy" }),
-	conversationsCreated: many(conversations, { relationName: "createdBy" }),
-}));

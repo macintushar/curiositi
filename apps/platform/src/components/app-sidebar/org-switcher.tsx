@@ -32,7 +32,7 @@ export function OrgSwitcher() {
 	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
-		if (!activeOrg && orgs) {
+		if (!activeOrg && orgs && orgs.length > 0) {
 			authClient.organization.setActive({ organizationId: orgs[0].id });
 		}
 	}, [activeOrg, orgs]);
