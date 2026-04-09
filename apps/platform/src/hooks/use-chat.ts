@@ -9,13 +9,10 @@ import { useQuery } from "@tanstack/react-query";
 
 type UseChatOptions = {
 	conversationId: string;
-	agentId?: string;
-	modelId?: string;
-	modelProvider?: string;
 };
 
 function createUIMessageFromText(
-  id: string,
+	id: string,
 	role: "user" | "assistant" | "system",
 	content: string
 ): UIMessage {
@@ -27,14 +24,20 @@ function createUIMessageFromText(
 }
 
 export function useChat(options: UseChatOptions) {
-	const { selectedAgentId, selectedModelId, selectedModelProvider } =
-		useChatStore();
+	const {
+		selectedAgentId,
+		selectedModelId,
+		selectedModelProvider,
+		searchProvider,
+		webSearchEnabled,
+		fileSearchEnabled,
+		files,
+	} = useChatStore();
 
 	const conversationId = options.conversationId;
-	const agentId = options.agentId ?? selectedAgentId ?? undefined;
-	const modelId = options.modelId ?? selectedModelId ?? undefined;
-	const modelProvider =
-		options.modelProvider ?? selectedModelProvider ?? undefined;
+	const agentId = selectedAgentId ?? undefined;
+	const modelId = selectedModelId ?? undefined;
+	const modelProvider = selectedModelProvider ?? undefined;
 
 	const [input, setInput] = useState("");
 
@@ -46,9 +49,22 @@ export function useChat(options: UseChatOptions) {
 				...(agentId && { agentId }),
 				...(modelId && { modelId }),
 				...(modelProvider && { modelProvider }),
+				...(searchProvider && { searchProvider }),
+				webSearchEnabled,
+				fileSearchEnabled,
+				...(files.length > 0 && { fileIds: files.map((f) => f.id) }),
 			},
 		});
-	}, [conversationId, agentId, modelId, modelProvider]);
+	}, [
+		conversationId,
+		agentId,
+		modelId,
+		modelProvider,
+		searchProvider,
+		webSearchEnabled,
+		fileSearchEnabled,
+		files,
+	]);
 
 	const {
 		messages,
@@ -71,8 +87,8 @@ export function useChat(options: UseChatOptions) {
 	useEffect(() => {
 		if (existingMessages?.messages && messages.length === 0) {
 			const historicalMessages = existingMessages.messages.map((m) =>
-        createUIMessageFromText(
-          m.id,
+				createUIMessageFromText(
+					m.id,
 					m.role as "user" | "assistant" | "system",
 					m.content
 				)
@@ -86,10 +102,9 @@ export function useChat(options: UseChatOptions) {
 	const createNewConversation = useCallback(async () => {
 		const result = await trpcClient.chat.createConversation.mutate({
 			title: undefined,
-			agentId: agentId || undefined,
 		});
 		return result.conversation.id;
-	}, [agentId]);
+	}, []);
 
 	const handleSubmit = useCallback(
 		(e?: React.SubmitEvent) => {

@@ -9,8 +9,10 @@ import {
 	createMessage,
 	updateConversationTitle,
 	deleteConversation,
+	getAgentsByOrganization,
+	ensureDefaultAgents,
 } from "@curiositi/db";
-import { getAgentById, ensureDefaultAgent } from "@curiositi/db";
+import { getAllSystemAgents } from "@curiositi/agent";
 
 import type { TRPCRouterRecord } from "@trpc/server";
 
@@ -49,37 +51,13 @@ const chatRouter = {
 		.input(
 			z.object({
 				title: z.string().max(200).optional(),
-				agentId: z.string().optional(),
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
-			const agentId = input.agentId;
-			if (agentId) {
-				const agent = await getAgentById(agentId);
-				if (!agent) {
-					throw new TRPCError({
-						code: "NOT_FOUND",
-						message: "Agent not found",
-					});
-				}
-				if (agent.organizationId !== ctx.session.session.activeOrganizationId) {
-					throw new TRPCError({
-						code: "FORBIDDEN",
-						message: "You do not have access to this agent",
-					});
-				}
-			}
-
-			const defaultAgent = await ensureDefaultAgent(
-				ctx.session.session.activeOrganizationId,
-				ctx.session.user.id
-			);
-
 			const conversation = await createConversation({
 				title: input.title,
 				source: "web",
 				organizationId: ctx.session.session.activeOrganizationId,
-				agentId: agentId ?? defaultAgent.id,
 				createdById: ctx.session.user.id,
 			});
 
@@ -179,6 +157,7 @@ const chatRouter = {
 				toolCalls: z.array(z.record(z.string(), z.unknown())).optional(),
 				tokenCount: z.number().optional(),
 				costUSD: z.number().optional(),
+				agentId: z.string().optional(),
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
@@ -206,40 +185,30 @@ const chatRouter = {
 				toolCalls: input.toolCalls,
 				tokenCount: input.tokenCount,
 				costUSD: input.costUSD,
+				agentId: input.agentId,
 			});
 
 			return { message };
 		}),
 
-	getAgentForConversation: protectedProcedure
-		.input(z.object({ conversationId: z.string() }))
-		.query(async ({ input, ctx }) => {
-			const conversation = await getConversationById(input.conversationId);
-			if (!conversation) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Conversation not found",
-				});
-			}
-			if (
-				conversation.organizationId !== ctx.session.session.activeOrganizationId
-			) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "You do not have access to this conversation",
-				});
-			}
-
-			const agent = await getAgentById(conversation.agentId);
-			if (!agent) {
-				throw new TRPCError({
-					code: "NOT_FOUND",
-					message: "Agent not found",
-				});
-			}
-
-			return { agent };
-		}),
+	getAvailableAgents: protectedProcedure.query(async ({ ctx }) => {
+		const orgId = ctx.session.session.activeOrganizationId;
+		const dbAgents = await getAgentsByOrganization(orgId);
+		if (dbAgents.length === 0) {
+			await ensureDefaultAgents(orgId, ctx.session.user.id);
+		}
+		const systemAgents = getAllSystemAgents().map((sa) => ({
+			...sa,
+			description: sa.description,
+			organizationId: "",
+			createdById: null,
+			isActive: true,
+			createdAt: new Date(),
+			updatedAt: null,
+		}));
+		const agents = [...systemAgents, ...dbAgents];
+		return { agents };
+	}),
 } satisfies TRPCRouterRecord;
 
 export default chatRouter;

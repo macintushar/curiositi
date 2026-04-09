@@ -1,8 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { auth } from "@platform/lib/auth";
 import { authMiddleware } from "@platform/middleware/auth";
-import { streamText, convertToModelMessages, type UIMessage } from "ai";
-import { getProviderModel, createTools } from "@curiositi/agent";
+import {
+	streamText,
+	convertToModelMessages,
+	type UIMessage,
+	stepCountIs,
+} from "ai";
+import {
+	getProviderModel,
+	createTools,
+	isSystemAgentId,
+	getSystemAgent,
+	getDefaultProvider,
+	getDefaultModelForProvider,
+	DEFAULT_SYSTEM_AGENT_ID,
+} from "@curiositi/agent";
+import { discoverMcpTools } from "@curiositi/agent/mcp";
 import {
 	getAgentById,
 	getConversationById,
@@ -17,6 +31,10 @@ const requestSchema = z.object({
 	agentId: z.string().optional(),
 	modelId: z.string().optional(),
 	modelProvider: z.enum(SUPPORTED_PROVIDERS).optional(),
+	searchProvider: z.enum(["firecrawl", "exa", "webfetch"]).optional(),
+	webSearchEnabled: z.boolean().optional(),
+	fileSearchEnabled: z.boolean().optional(),
+	fileIds: z.array(z.string()).optional(),
 });
 
 export const Route = createFileRoute("/api/chat/$conversationId")({
@@ -30,12 +48,7 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 					headers: request.headers,
 				});
 
-				if (
-					!session ||
-					!session.user ||
-					!session.session ||
-					!session.session.activeOrganizationId
-				) {
+				if (!session?.user || !session.session?.activeOrganizationId) {
 					return new Response(JSON.stringify({ error: "Unauthorized" }), {
 						status: 401,
 						headers: { "Content-Type": "application/json" },
@@ -67,6 +80,10 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 					agentId?: string;
 					modelId?: string;
 					modelProvider?: "openai" | "google" | "anthropic" | "ollama";
+					searchProvider?: "firecrawl" | "exa" | "webfetch";
+					webSearchEnabled?: boolean;
+					fileSearchEnabled?: boolean;
+					fileIds?: string[];
 				};
 				try {
 					const rawBody = await request.json();
@@ -79,18 +96,28 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 					);
 				}
 
-				const agentId = body.agentId ?? conversation.agentId;
-
 				try {
-					const agent = await getAgentById(agentId);
-					if (!agent) {
+					const agentId = body.agentId ?? DEFAULT_SYSTEM_AGENT_ID;
+					const isSystemAgent = isSystemAgentId(agentId);
+					const systemAgent = isSystemAgent ? getSystemAgent(agentId) : null;
+
+					if (isSystemAgent && !systemAgent) {
 						return new Response(JSON.stringify({ error: "Agent not found" }), {
 							status: 404,
 							headers: { "Content-Type": "application/json" },
 						});
 					}
 
-					if (agent.organizationId !== orgId) {
+					const dbAgent = isSystemAgent ? null : await getAgentById(agentId);
+
+					if (!systemAgent && !dbAgent) {
+						return new Response(JSON.stringify({ error: "Agent not found" }), {
+							status: 404,
+							headers: { "Content-Type": "application/json" },
+						});
+					}
+
+					if (dbAgent && dbAgent.organizationId !== orgId) {
 						return new Response(JSON.stringify({ error: "Forbidden" }), {
 							status: 403,
 							headers: { "Content-Type": "application/json" },
@@ -99,37 +126,119 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 
 					const uiMessages = body.messages as UIMessage[];
 
-					// Use model from request if provided, otherwise fall back to agent's model
-					const requestModelProvider =
-						body.modelProvider ?? agent.modelProvider;
-					const requestModelId = body.modelId ?? agent.modelId;
+					const inferredProviderFromModel = body.modelId?.includes("/")
+						? (body.modelId.split("/")[0] ?? "")
+						: "";
+					const providerCandidate =
+						body.modelProvider ||
+						inferredProviderFromModel ||
+						getDefaultProvider();
 
-					// Parse model ID - handle both "provider/model" and "model" formats
-					const modelId = requestModelId.includes("/")
-						? (requestModelId.split("/")[1] ?? requestModelId)
-						: requestModelId;
+					if (
+						!SUPPORTED_PROVIDERS.includes(
+							providerCandidate as (typeof SUPPORTED_PROVIDERS)[number]
+						)
+					) {
+						return new Response(
+							JSON.stringify({ error: "Invalid model provider" }),
+							{
+								status: 400,
+								headers: { "Content-Type": "application/json" },
+							}
+						);
+					}
 
-					logger.info(`Using model: ${requestModelProvider}/${modelId}`, {
+					const modelProvider =
+						providerCandidate as (typeof SUPPORTED_PROVIDERS)[number];
+					const defaultModelForProvider =
+						getDefaultModelForProvider(modelProvider);
+					const requestedModelId = body.modelId ?? defaultModelForProvider;
+
+					if (!requestedModelId) {
+						return new Response(
+							JSON.stringify({ error: "Model not selected" }),
+							{
+								status: 400,
+								headers: { "Content-Type": "application/json" },
+							}
+						);
+					}
+
+					const modelId = requestedModelId.includes("/")
+						? requestedModelId.split("/").slice(1).join("/") || requestedModelId
+						: requestedModelId;
+
+					logger.info(`Using model: ${modelProvider}/${modelId}`, {
 						conversationId,
 						modelId,
 						agentId,
-						requestModelProvider,
-						requestModelId,
 					});
 
-					const model = getProviderModel(requestModelProvider, modelId);
+					const model = getProviderModel(modelProvider, modelId);
 
-					const toolConfigs = agent.agentTools
-						.filter((at) => at.enabled)
-						.map((at) => ({
-							name: at.tool?.name ?? "unknown",
-							enabled: at.enabled,
-							config: (at.config as Record<string, unknown>) ?? undefined,
-						}));
+					const toolConfigs = isSystemAgent
+						? (systemAgent?.tools ?? []).map((t) => ({
+								name: t.name,
+								enabled: t.enabled,
+								config: t.config,
+							}))
+						: (dbAgent?.agentTools ?? [])
+								.filter((at) => {
+									const toolIdentifier = at.tool?.toolKey ?? at.tool?.name;
+									if (!at.enabled) return false;
+									if (
+										toolIdentifier === "webSearch" &&
+										body.webSearchEnabled === false
+									)
+										return false;
+									if (
+										toolIdentifier === "fileSearch" &&
+										body.fileSearchEnabled === false
+									)
+										return false;
+									return true;
+								})
+								.map((at) => {
+									const toolIdentifier =
+										at.tool?.toolKey ?? at.tool?.name ?? "unknown";
+									const config = (at.config as Record<string, unknown>) ?? {};
+									if (toolIdentifier === "fileSearch" && body.fileIds) {
+										config.fileIds = body.fileIds;
+									}
+									return {
+										name: toolIdentifier,
+										enabled: at.enabled,
+										config,
+									};
+								});
 
-					const tools = createTools(orgId, agent.modelProvider, toolConfigs);
+					const tools = createTools(orgId, modelProvider, toolConfigs, {
+						searchProvider: body.searchProvider ?? "firecrawl",
+					});
 
-					// Get the last user message for saving
+					const systemPrompt =
+						systemAgent?.systemPrompt ?? dbAgent?.systemPrompt;
+					const maxToolCalls =
+						systemAgent?.maxToolCalls ?? dbAgent?.maxToolCalls ?? 10;
+					const assistantAgentId = systemAgent?.id ?? dbAgent?.id;
+
+					if (!systemPrompt || !assistantAgentId) {
+						return new Response(
+							JSON.stringify({ error: "Agent configuration is invalid" }),
+							{
+								status: 400,
+								headers: { "Content-Type": "application/json" },
+							}
+						);
+					}
+
+					try {
+						const mcpTools = await discoverMcpTools(orgId);
+						Object.assign(tools, mcpTools);
+					} catch {
+						// MCP tools unavailable, continue with built-in tools
+					}
+
 					const lastUserMessage = uiMessages[uiMessages.length - 1];
 					if (lastUserMessage?.role === "user") {
 						const textContent = lastUserMessage.parts
@@ -149,10 +258,10 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 
 					const result = streamText({
 						model,
-						system: agent.systemPrompt,
+						system: systemPrompt,
 						messages: await convertToModelMessages(uiMessages),
-						temperature: agent.temperature ?? undefined,
 						tools: Object.keys(tools).length > 0 ? tools : undefined,
+						stopWhen: stepCountIs(maxToolCalls),
 						onFinish: async ({ text }) => {
 							try {
 								if (text) {
@@ -160,6 +269,7 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 										conversationId,
 										role: "assistant",
 										content: text,
+										agentId: assistantAgentId,
 									});
 								}
 							} catch (err) {
@@ -168,7 +278,6 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 						},
 					});
 
-					// Consume stream to ensure onFinish runs even if client disconnects
 					result.consumeStream();
 
 					return result.toUIMessageStreamResponse();

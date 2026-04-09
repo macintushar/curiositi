@@ -1,7 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure } from "../init";
 import type { TRPCRouterRecord } from "@trpc/server";
-import { getPendingInvitationsForEmail } from "@curiositi/api-handlers";
 import { auth } from "@platform/lib/auth";
 
 const invitationRouter = {
@@ -22,7 +21,7 @@ const invitationRouter = {
 		} catch (error) {
 			throw new TRPCError({
 				code: "INTERNAL_SERVER_ERROR",
-				message: "Failed to fetch invitations. Err:" + error,
+				message: `Failed to fetch invitations. Err:${error}`,
 			});
 		}
 	}),
