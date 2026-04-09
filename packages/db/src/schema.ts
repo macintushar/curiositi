@@ -186,6 +186,9 @@ export const userRelations = relations(user, ({ many }) => ({
 	sessions: many(session),
 	members: many(member),
 	invitationsSent: many(invitation),
+	filesUploaded: many(files, { relationName: "uploadedBy" }),
+	agentsCreated: many(agents, { relationName: "createdBy" }),
+	conversationsCreated: many(conversations, { relationName: "createdBy" }),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
@@ -204,6 +207,13 @@ export const organizationRelations = relations(organization, ({ many }) => ({
 	members: many(member),
 	invitations: many(invitation),
 	roles: many(organizationRoles),
+	spaces: many(spaces),
+	files: many(files),
+	tools: many(tools),
+	agents: many(agents),
+	conversations: many(conversations),
+	mcpServers: many(mcpServers),
+	settings: many(organizationSettings),
 }));
 
 export const memberRelations = relations(member, ({ one }) => ({
@@ -395,3 +405,353 @@ export const filesInSpace = createTable(
 	}),
 	(t) => [index("space_idx").on(t.spaceId)]
 );
+
+export const filesInSpaceRelations = relations(filesInSpace, ({ one }) => ({
+	file: one(files, { fields: [filesInSpace.fileId], references: [files.id] }),
+	space: one(spaces, {
+		fields: [filesInSpace.spaceId],
+		references: [spaces.id],
+	}),
+}));
+
+export const spacesRelations = relations(spaces, ({ one, many }) => ({
+	organization: one(organization, {
+		fields: [spaces.organizationId],
+		references: [organization.id],
+	}),
+	parentSpace: one(spaces, {
+		fields: [spaces.parentSpaceId],
+		references: [spaces.id],
+	}),
+	childSpaces: many(spaces, { relationName: "parentSpace" }),
+	filesInSpace: many(filesInSpace),
+}));
+
+export const filesRelations = relations(files, ({ one, many }) => ({
+	organization: one(organization, {
+		fields: [files.organizationId],
+		references: [organization.id],
+	}),
+	uploadedBy: one(user, {
+		fields: [files.uploadedById],
+		references: [user.id],
+	}),
+	contents: many(fileContents),
+	filesInSpace: many(filesInSpace),
+}));
+
+export const fileContentsRelations = relations(fileContents, ({ one }) => ({
+	file: one(files, { fields: [fileContents.fileId], references: [files.id] }),
+}));
+
+///////////////////////////////////////////////////////////
+//                                                         //
+//					Agent Schemas               		  //
+//                                                         //
+///////////////////////////////////////////////////////////
+
+export const modelProviderEnum = pgEnum("model_provider", [
+	"openai",
+	"google",
+	"anthropic",
+	"ollama",
+]);
+
+export const toolTypeEnum = pgEnum("tool_type", ["builtin", "mcp"]);
+
+export const searchProviderEnum = pgEnum("search_provider", [
+	"firecrawl",
+	"exa",
+	"webfetch",
+]);
+
+export const tools = createTable(
+	"tools",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		toolKey: d.text(),
+		name: d.text().notNull(),
+		displayName: d.text().notNull(),
+		description: d.text().notNull(),
+		type: toolTypeEnum().notNull().default("builtin"),
+		mcpServerId: d.uuid().references(() => mcpServers.id),
+		organizationId: d
+			.text()
+			.notNull()
+			.references(() => organization.id),
+		config: d.jsonb().notNull().default({}),
+		isActive: d.boolean().default(true).notNull(),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [
+		index("tool_organization_idx").on(t.organizationId),
+		index("tool_name_idx").on(t.name),
+		index("tool_key_idx").on(t.toolKey),
+	]
+);
+
+export const agents = createTable(
+	"agents",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		name: d.text().notNull(),
+		description: d.text(),
+		organizationId: d
+			.text()
+			.notNull()
+			.references(() => organization.id),
+		createdById: d.text().references(() => user.id),
+		systemPrompt: d.text().notNull(),
+		maxToolCalls: d.integer().default(10).notNull(),
+		isDefault: d.boolean().default(false).notNull(),
+		isActive: d.boolean().default(true).notNull(),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [
+		index("agent_organization_idx").on(t.organizationId),
+		index("agent_created_by_idx").on(t.createdById),
+	]
+);
+
+export const agentTools = createTable(
+	"agent_tools",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		agentId: d
+			.uuid()
+			.notNull()
+			.references(() => agents.id, { onDelete: "cascade" }),
+		toolId: d
+			.uuid()
+			.notNull()
+			.references(() => tools.id, { onDelete: "cascade" }),
+		enabled: d.boolean().default(true).notNull(),
+		priority: d.integer().default(0).notNull(),
+		config: d.jsonb().default({}),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+	}),
+	(t) => [
+		index("agent_tool_agent_idx").on(t.agentId),
+		index("agent_tool_tool_idx").on(t.toolId),
+	]
+);
+
+export const conversationSourceEnum = pgEnum("conversation_source", [
+	"web",
+	"slack",
+]);
+
+export const conversations = createTable(
+	"conversations",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		externalId: d.text().unique(),
+		title: d.text(),
+		source: conversationSourceEnum().notNull(),
+		organizationId: d
+			.text()
+			.notNull()
+			.references(() => organization.id),
+		createdById: d
+			.text()
+			.notNull()
+			.references(() => user.id),
+		metadata: d.jsonb(),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [
+		index("conversation_organization_idx").on(t.organizationId),
+		index("conversation_external_idx").on(t.externalId),
+	]
+);
+
+export const messageRoleEnum = pgEnum("message_role", [
+	"user",
+	"assistant",
+	"system",
+	"tool",
+]);
+
+export const messages = createTable(
+	"messages",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		conversationId: d
+			.uuid()
+			.notNull()
+			.references(() => conversations.id, { onDelete: "cascade" }),
+		role: messageRoleEnum().notNull(),
+		content: d.text().notNull(),
+		attachments: d.jsonb(),
+		toolCalls: d.jsonb(),
+		tokenCount: d.integer(),
+		costUSD: d.real(),
+		agentId: d.text(),
+		metadata: d.jsonb(),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+	}),
+	(t) => [
+		index("message_conversation_idx").on(t.conversationId),
+		index("message_agent_idx").on(t.agentId),
+	]
+);
+
+export const mcpServers = createTable(
+	"mcp_servers",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		name: d.text().notNull(),
+		url: d.text().notNull(),
+		headers: d.jsonb().default({}),
+		isActive: d.boolean().default(true).notNull(),
+		organizationId: d
+			.text()
+			.notNull()
+			.references(() => organization.id),
+		discoveredTools: d.integer().default(0),
+		lastConnectedAt: d.timestamp({ withTimezone: true }),
+		createdAt: d
+			.timestamp({ withTimezone: true })
+			.$defaultFn(() => new Date())
+			.notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [index("mcp_server_org_idx").on(t.organizationId)]
+);
+
+export const organizationSettings = createTable(
+	"organization_settings",
+	(d) => ({
+		id: d.uuid().primaryKey().defaultRandom(),
+		organizationId: d
+			.text()
+			.notNull()
+			.references(() => organization.id),
+		key: d.text().notNull(),
+		value: d.jsonb().notNull(),
+		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	}),
+	(t) => [index("org_settings_org_key_idx").on(t.organizationId, t.key)]
+);
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+	conversation: one(conversations, {
+		fields: [messages.conversationId],
+		references: [conversations.id],
+	}),
+	agent: one(agents, {
+		fields: [messages.agentId],
+		references: [agents.id],
+	}),
+}));
+
+export const mcpServersRelations = relations(mcpServers, ({ one, many }) => ({
+	organization: one(organization, {
+		fields: [mcpServers.organizationId],
+		references: [organization.id],
+	}),
+	tools: many(tools),
+}));
+
+export const organizationSettingsRelations = relations(
+	organizationSettings,
+	({ one }) => ({
+		organization: one(organization, {
+			fields: [organizationSettings.organizationId],
+			references: [organization.id],
+		}),
+	})
+);
+
+export const toolsRelations = relations(tools, ({ one, many }) => ({
+	organization: one(organization, {
+		fields: [tools.organizationId],
+		references: [organization.id],
+	}),
+	mcpServer: one(mcpServers, {
+		fields: [tools.mcpServerId],
+		references: [mcpServers.id],
+	}),
+	agentTools: many(agentTools),
+}));
+
+export const agentsRelations = relations(agents, ({ one, many }) => ({
+	organization: one(organization, {
+		fields: [agents.organizationId],
+		references: [organization.id],
+	}),
+	createdBy: one(user, {
+		fields: [agents.createdById],
+		references: [user.id],
+	}),
+	agentTools: many(agentTools),
+	messages: many(messages),
+}));
+
+export const agentToolsRelations = relations(agentTools, ({ one }) => ({
+	agent: one(agents, { fields: [agentTools.agentId], references: [agents.id] }),
+	tool: one(tools, { fields: [agentTools.toolId], references: [tools.id] }),
+}));
+
+export const conversationsRelations = relations(
+	conversations,
+	({ one, many }) => ({
+		organization: one(organization, {
+			fields: [conversations.organizationId],
+			references: [organization.id],
+		}),
+		createdBy: one(user, {
+			fields: [conversations.createdById],
+			references: [user.id],
+		}),
+		messages: many(messages),
+	})
+);
+
+///////////////////////////////////////////////////////////
+//                                                         //
+//					Organization Relations Update     	  //
+//                                                         //
+///////////////////////////////////////////////////////////
+
+export const organizationRelationsUpdate = relations(
+	organization,
+	({ many }) => ({
+		members: many(member),
+		invitations: many(invitation),
+		roles: many(organizationRoles),
+		spaces: many(spaces),
+		files: many(files),
+		tools: many(tools),
+		agents: many(agents),
+		conversations: many(conversations),
+	})
+);
+
+export const userRelationsUpdate = relations(user, ({ many }) => ({
+	accounts: many(account),
+	sessions: many(session),
+	members: many(member),
+	invitationsSent: many(invitation),
+	filesUploaded: many(files, { relationName: "uploadedBy" }),
+	agentsCreated: many(agents, { relationName: "createdBy" }),
+	conversationsCreated: many(conversations, { relationName: "createdBy" }),
+}));
