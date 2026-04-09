@@ -18,9 +18,6 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 	],
-	server: {
-		allowedHosts: ["*", "f682-49-207-151-221.ngrok-free.app"],
-	},
 	ssr: {
 		external: ["bun"],
 	},
