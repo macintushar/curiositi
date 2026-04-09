@@ -20,10 +20,32 @@ export const IMAGE_TYPES = [
 	"image/gif",
 ];
 
+export const WORD_TYPES = [
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/msword",
+];
+
+export const EXCEL_TYPES = [
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"application/vnd.ms-excel",
+];
+
+export const POWERPOINT_TYPES = [
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+	"application/vnd.ms-powerpoint",
+];
+
+export const OFFICE_TYPES = [
+	...WORD_TYPES,
+	...EXCEL_TYPES,
+	...POWERPOINT_TYPES,
+];
+
 export const ALLOWED_MIME_TYPES = [
 	...TEXT_FILE_TYPES,
 	...IMAGE_TYPES,
 	PDF_TYPE,
+	...OFFICE_TYPES,
 ];
 
 export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB

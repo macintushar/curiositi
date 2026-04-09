@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import type { AIProvider } from "../src/ai";
+import type { EmbeddingProvider } from "../src/ai";
 
 describe("AI Module Types", () => {
-	test("AIProvider type should be openai or google", () => {
-		const openai: AIProvider = "openai";
-		const google: AIProvider = "google";
+	test("EmbeddingProvider type should be openai or google", () => {
+		const openai: EmbeddingProvider = "openai";
+		const google: EmbeddingProvider = "google";
 
 		expect(openai).toBe("openai");
 		expect(google).toBe("google");
