@@ -18,6 +18,11 @@ const config = defineConfig({
 		tanstackStart(),
 		viteReact(),
 	],
+	build: {
+		rollupOptions: {
+			external: ["bun"],
+		},
+	},
 	ssr: {
 		external: ["bun"],
 	},
