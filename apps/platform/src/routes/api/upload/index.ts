@@ -36,12 +36,7 @@ export const Route = createFileRoute("/api/upload/")({
 
 				const session = await auth.api.getSession({ headers: request.headers });
 
-				if (
-					!session ||
-					!session.user ||
-					!session.session ||
-					!session.session.activeOrganizationId
-				) {
+				if (!session?.user || !session.session?.activeOrganizationId) {
 					return new Response("Unauthorized", { status: 401 });
 				}
 

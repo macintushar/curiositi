@@ -1,0 +1,41 @@
+---
+title: 🤖 Agentic Chat
+description: Converse intuitively with your workspaces using AI Agents and Model Context Protocol integrations.
+---
+
+Agentic Chat supercharges Curiositi by shifting from pure semantic search into interactive, continuous workflows powered by Large Language Models (LLMs). This means you aren't just finding a single file—you can ask complex multi-part questions, and Curiositi will actively execute tools to research, extract, and synthesize the answer.
+
+## What is an Agent?
+
+An **Agent** in Curiositi is a configured AI assistant that holds a persistent context window to carry out instructions based on a system prompt. You can create multiple agents per workspace, giving each different directives or tool sets. For instance, you could have a "Legal Analyst Agent" prioritizing regulatory documents, and an "Engineering Assistant Agent" with access to codebase metadata.
+
+### Creating and Managing Agents
+- **System Prompts**: Customize the personality and goals of the agent.
+- **Provider Choice**: Select which underlying backend powers the agent's logic (e.g., OpenAI, Google, Anthropic, Ollama).
+- **Tool Access Constraints**: Define the maximum number of multi-step tool calls the Agent is allowed to perform, controlling autonomy vs reliability.
+
+## Conversations
+
+Curiositi manages chat history in **Conversations**. This gives you persistent records of interactions. When you re-open a Conversation, the context of previous tool calls and answers remains intact, allowing you to pick up exactly where you left off.
+
+## Tools and Capabilities
+
+The true power of Agentic Chat stems from the **Tools** available for agents to utilize. Unlike simple chatbots, Curiositi agents can autonomously query the platform and external services.
+
+### Built-in Tools
+Curiositi agents ship with built-in primitives to understand your data:
+- **Semantic File Search (`file-search`)**: Agent can retrieve vectorized chunk data to read direct sections of PDFs, Docs, spreadsheets, or images.
+- **Web Search**: The agent can look up current external information using web fetchers (like Firecrawl or traditional web searches) and blend it with your internal context.
+
+### Model Context Protocol (MCP) Support
+
+Curiositi embraces the **[Model Context Protocol](https://modelcontextprotocol.io/) (MCP)** standard. 
+This allows you to add custom tools and context servers running anywhere (locally or hosted) simply by configuring an MCP server endpoint.
+
+- **Drop-in Extensibility**: Add capabilities like Jira ticketing, GitHub issue reading, or direct database connections without writing a new plugin for Curiositi.
+- **Agent specific configurations**: You can tie specific MCP tools to specific Agents dynamically.
+
+## Quick Actions
+- Open the Chat interface from application sidebar.
+- Switch between different Agents to match the problem you are solving.
+- Add additional MCP server links in Workspace Settings to vastly expand Agent utility.

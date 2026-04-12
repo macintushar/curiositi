@@ -4,7 +4,7 @@ import { Skeleton } from "@platform/components/ui/skeleton";
 import { Markdown } from "@platform/components/ui/markdown";
 import { cn } from "@platform/lib/utils";
 import type z from "zod";
-import type { selectFileSchema } from "@curiositi/db/schema";
+import type { selectFileSchema } from "@curiositi/share/db-schemas";
 
 function FilePreviewCard({
 	children,

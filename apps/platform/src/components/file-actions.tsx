@@ -1,4 +1,4 @@
-import type { selectFileSchema } from "@curiositi/db/schema";
+import type { selectFileSchema } from "@curiositi/share/db-schemas";
 import { Button } from "@platform/components/ui/button";
 import {
 	DropdownMenu,

@@ -39,7 +39,7 @@ const docProcessor: Processor = async ({ file, fileData, logger }) => {
 	logger.debug("Parsing PDF to markdown", { fileId, processor: "doc" });
 
 	try {
-		const { pages } = await parsePdf(file);
+		const { pages, metadata } = await parsePdf(file);
 		const hasContent = pages.some((page) => page.content.trim().length > 10);
 
 		if (!hasContent) {
@@ -52,6 +52,7 @@ const docProcessor: Processor = async ({ file, fileData, logger }) => {
 			const result = await extractDocumentText({
 				file: fileBuffer,
 				provider: "openai",
+				mediaType: fileData.type,
 			});
 
 			logger.info("PDF extracted via AI successfully", {
@@ -59,7 +60,13 @@ const docProcessor: Processor = async ({ file, fileData, logger }) => {
 				processor: "doc",
 			});
 
-			return [{ pageNumber: 1, content: result.text }];
+			return [
+				{
+					pageNumber: 1,
+					content: result.text,
+					metadata: { extractedVia: "ai" },
+				},
+			];
 		}
 
 		logger.info("PDF parsed successfully", {
@@ -67,6 +74,13 @@ const docProcessor: Processor = async ({ file, fileData, logger }) => {
 			pageCount: pages.length,
 			processor: "doc",
 		});
+
+		if (metadata?.title) {
+			for (const page of pages) {
+				if (!page.metadata) page.metadata = {};
+				page.metadata.title = metadata.title;
+			}
+		}
 
 		return pages;
 	} catch (parseError) {

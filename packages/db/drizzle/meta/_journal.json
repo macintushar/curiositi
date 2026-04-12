@@ -13,14 +13,21 @@
       "idx": 1,
       "version": "7",
       "when": 1767548486442,
-      "tag": "0001_auth-schemas",
+      "tag": "0001_auth-schema",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1769066694976,
-      "tag": "0002_careful_serpent_society",
+      "when": 1776003799999,
+      "tag": "0002_app_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776010500000,
+      "tag": "0003_encrypt_mcp_headers",
       "breakpoints": true
     }
   ]

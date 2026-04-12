@@ -60,7 +60,7 @@ export default function SignIn() {
 			subtitle="Sign in to access curiositi"
 			onSubmit={() => form.handleSubmit()}
 			submitButton={
-				<Button type="submit" className="relative">
+				<Button type="submit" className="relative" disabled={isSubmitting}>
 					Login
 					{lastUsed === "email" && <LastUsedBadge />}
 				</Button>

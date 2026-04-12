@@ -6,9 +6,9 @@ import {
 	IMAGE_DESCRIPTION_PROMPT,
 } from "./prompts";
 
-export type AIProvider = "openai" | "google";
+export type EmbeddingProvider = "openai" | "google";
 
-export function embeddingModel(name: AIProvider) {
+export function embeddingModel(name: EmbeddingProvider) {
 	switch (name) {
 		case "openai": {
 			return openai.embedding("text-embedding-3-small");
@@ -21,7 +21,7 @@ export function embeddingModel(name: AIProvider) {
 
 type EmbedChunksProps = {
 	chunks: string[];
-	provider: AIProvider;
+	provider: EmbeddingProvider;
 };
 
 export async function embedChunks({ chunks, provider }: EmbedChunksProps) {
@@ -36,16 +36,13 @@ export async function embedChunks({ chunks, provider }: EmbedChunksProps) {
 			google: {
 				dimensions: 1536,
 			},
-			ollama: {
-				dimensions: 1536,
-			},
 		},
 	});
 }
 
 type EmbedTextProps = {
 	text: string;
-	provider: AIProvider;
+	provider: EmbeddingProvider;
 };
 
 export async function embedText({ text, provider }: EmbedTextProps) {
@@ -59,20 +56,17 @@ export async function embedText({ text, provider }: EmbedTextProps) {
 			google: {
 				dimensions: 1536,
 			},
-			ollama: {
-				dimensions: 1536,
-			},
 		},
 	});
 }
 
-export function textModel(name: AIProvider) {
+export function textModel(name: EmbeddingProvider) {
 	switch (name) {
 		case "openai": {
-			return openai("gpt-5-mini-2025-08-07");
+			return openai("gpt-4o-mini");
 		}
 		case "google": {
-			return google("gemini-3-flash-preview");
+			return google("gemini-2.0-flash");
 		}
 	}
 }
@@ -82,7 +76,7 @@ export async function describeImage({
 	provider,
 }: {
 	image: string | Uint8Array | Buffer | ArrayBuffer | URL;
-	provider: AIProvider;
+	provider: EmbeddingProvider;
 }) {
 	return await generateText({
 		model: textModel(provider),
@@ -95,12 +89,14 @@ export async function describeImage({
 
 type ExtractDocumentTextProps = {
 	file: ArrayBuffer;
-	provider: AIProvider;
+	provider: EmbeddingProvider;
+	mediaType?: string;
 };
 
 export async function extractDocumentText({
 	file,
 	provider,
+	mediaType = "application/pdf",
 }: ExtractDocumentTextProps) {
 	return await generateText({
 		model: textModel(provider),
@@ -116,7 +112,7 @@ export async function extractDocumentText({
 					{
 						type: "file",
 						data: file,
-						mediaType: "application/pdf",
+						mediaType,
 					},
 				],
 			},

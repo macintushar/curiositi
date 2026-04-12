@@ -1,4 +1,4 @@
-import { InvitationStatus } from "better-auth/plugins";
+import type { InvitationStatus } from "better-auth/plugins";
 
 export function EmptyState() {
 	return (
@@ -16,13 +16,13 @@ export function EmptyState() {
 }
 
 export type Invitation = {
-  id: string;
-  organizationId: string;
-  email: string;
-  role: "member" | "admin" | "owner";
-  status: InvitationStatus;
-  inviterId: string;
-  expiresAt: Date;
-  createdAt: Date;
-  organizationName: string;
-}
+	id: string;
+	organizationId: string;
+	email: string;
+	role: "member" | "admin" | "owner";
+	status: InvitationStatus;
+	inviterId: string;
+	expiresAt: Date;
+	createdAt: Date;
+	organizationName: string;
+};

@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { Home, Bell } from "lucide-react";
+import { Home, Bell, MessageCircle } from "lucide-react";
 
 import { NavUser } from "./nav-user";
 import { OrgSwitcher } from "./org-switcher";
@@ -14,7 +14,6 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarSeparator,
 	useSidebar,
 } from "@platform/components/ui/sidebar";
 import { Link, useRouterState } from "@tanstack/react-router";
@@ -26,16 +25,9 @@ import type { FileRouteTypes } from "@platform/routeTree.gen";
 import { IconSettings, IconSunMoon } from "@tabler/icons-react";
 import useAppStore from "@platform/stores/appStore";
 import SettingsDialog from "../dialogs/settings-dialog";
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuPortal,
-	DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { themes } from "../theme";
-import { useTheme } from "../theme/provider";
-import { ButtonSwitcher, DropdownSwitcher } from "../theme/switcher";
+
+import { DropdownSwitcher } from "../theme/switcher";
+import ChatConversations from "./chat-conversations";
 
 type Route = {
 	path: FileRouteTypes["to"];
@@ -52,6 +44,12 @@ const routes: Route[] = [
 		icon: Home,
 	},
 	{
+		path: "/app/chat",
+		label: "Chat with AI",
+		position: "main",
+		icon: MessageCircle,
+	},
+	{
 		path: "/app/notifications",
 		label: "Notifications",
 		position: "secondary",
@@ -62,7 +60,6 @@ const routes: Route[] = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 	const { open } = useSidebar();
 	const isMobile = useIsMobile();
-	const { theme, setTheme } = useTheme();
 	const router = useRouterState();
 	const { isSettingsDialogOpen, toggleSettingsDialog } = useAppStore();
 
@@ -101,10 +98,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 										</SidebarMenuItem>
 									)
 							)}
+							<ChatConversations />
 						</SidebarMenu>
 					</SidebarGroup>
 					<SidebarGroup className="space-y-2">
-						<SidebarMenu className="border-b border-b-sidebar-border">
+						<SidebarMenu>
 							{routes.map(
 								(route) =>
 									route.position === "secondary" && (
@@ -121,7 +119,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 											</SidebarMenuButton>
 										</SidebarMenuItem>
 									)
-              )}
+							)}
 							<SidebarMenuItem>
 								<SidebarMenuButton
 									tooltip="Settings"
@@ -133,16 +131,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 								</SidebarMenuButton>
 								<SettingsDialog />
 							</SidebarMenuItem>
-            </SidebarMenu>
-            <SidebarMenu>
-              <DropdownSwitcher trigger={
-                <SidebarMenuItem>
-                  <SidebarMenuButton>
-                    <IconSunMoon />
-                    Theme
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              } />
+						</SidebarMenu>
+						<SidebarMenu>
+							<DropdownSwitcher
+								trigger={
+									<SidebarMenuButton>
+										<IconSunMoon />
+										Theme
+									</SidebarMenuButton>
+								}
+							/>
 						</SidebarMenu>
 					</SidebarGroup>
 				</div>

@@ -1,7 +1,7 @@
-import { Button, buttonVariants } from "../ui/button";
+import { Button, type buttonVariants } from "../ui/button";
 import { useTheme } from "./provider";
 import { themes } from ".";
-import { VariantProps } from "class-variance-authority";
+import type { VariantProps } from "class-variance-authority";
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -20,7 +20,11 @@ export function ButtonSwitcher({
 	const { theme, setTheme } = useTheme();
 	const currentTheme = themes.find((t) => t.value === theme);
 	if (!currentTheme) return null;
-	const nextTheme = themes[(themes.indexOf(currentTheme!) + 1) % themes.length];
+	const currentThemeIndex = themes.findIndex(
+		(t) => t.value === currentTheme.value
+	);
+	const nextTheme = themes[(currentThemeIndex + 1) % themes.length];
+	if (!nextTheme) return null;
 	return (
 		<Button onClick={() => setTheme(nextTheme.value)} size="icon-lg" {...props}>
 			<currentTheme.icon />

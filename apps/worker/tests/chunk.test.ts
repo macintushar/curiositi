@@ -1,4 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test, mock } from "bun:test";
+
+mock.module("js-tiktoken", () => {
+	const encoder = {
+		encode: (text: string) => new Uint32Array(text.length),
+		decode: (tokens: Uint32Array) => "overlap",
+	};
+	return { getEncoding: () => encoder };
+});
+
 import chunkText, { chunkPages } from "../src/lib/chunk";
 import type { PageContent } from "../src/lib/md";
 
@@ -17,7 +26,7 @@ describe("Chunk Text", () => {
 		const chunks = chunkText(content);
 
 		expect(chunks).toHaveLength(1);
-		expect(chunks[0]).toBe(content);
+		expect(chunks[0]?.content).toBe(content);
 	});
 
 	test("should handle empty content", () => {
@@ -56,7 +65,7 @@ describe("Chunk Text", () => {
 
 		expect(chunks.length).toBeGreaterThan(0);
 		for (const chunk of chunks) {
-			expect(chunk.length).toBeLessThanOrEqual(50 * 4 + 100);
+			expect(chunk.content.length).toBeLessThanOrEqual(50 * 4 + 100);
 		}
 	});
 
@@ -74,8 +83,20 @@ describe("Chunk Text", () => {
 		const chunks = chunkText(content);
 
 		for (const chunk of chunks) {
-			expect(chunk.trim().length).toBeGreaterThan(0);
+			expect(chunk.content.trim().length).toBeGreaterThan(0);
 		}
+	});
+
+	test("should include embeddedText with context prefix", () => {
+		const content = "Test content for embedding";
+
+		const chunks = chunkText(content, {
+			fileName: "test.pdf",
+			fileType: "application/pdf",
+		});
+
+		expect(chunks[0]?.embeddedText).toContain("Document: test.pdf");
+		expect(chunks[0]?.content).toBe("Test content for embedding");
 	});
 });
 
@@ -161,5 +182,22 @@ describe("Chunk Pages", () => {
 		expect(chunks.length).toBeGreaterThan(1);
 		const allHavePageNumbers = chunks.every((c) => c.pageNumber >= 1);
 		expect(allHavePageNumbers).toBe(true);
+	});
+
+	test("should include embeddedText with document context", () => {
+		const pages: PageContent[] = [
+			{ pageNumber: 1, content: "First page content here" },
+			{ pageNumber: 2, content: "Second page content here" },
+		];
+
+		const chunks = chunkPages(pages, {
+			fileName: "report.pdf",
+			fileType: "application/pdf",
+		});
+
+		for (const chunk of chunks) {
+			expect(chunk.embeddedText).toContain("Document: report.pdf");
+			expect(chunk.embeddedText).toContain(chunk.content);
+		}
 	});
 });

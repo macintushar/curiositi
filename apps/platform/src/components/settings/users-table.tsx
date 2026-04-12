@@ -21,7 +21,6 @@ import {
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { MoreHorizontalIcon } from "lucide-react";
-import { t } from "node_modules/nitro/dist/_dev.d.mts";
 
 type Member = {
 	id: string;

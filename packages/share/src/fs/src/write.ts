@@ -1,5 +1,4 @@
 import { S3Client } from "bun";
-
 import logger from "../../logger";
 import type { S3Config } from "../../types";
 

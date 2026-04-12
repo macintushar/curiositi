@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import SpaceExplorerLayout from "@platform/layouts/space-explorer-layout";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 import { useQuery } from "@tanstack/react-query";
-import { IconArrowLeft, IconHome } from "@tabler/icons-react";
+import { IconHome } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
 import {
 	Breadcrumb,
@@ -10,7 +10,6 @@ import {
 	BreadcrumbLink,
 	BreadcrumbList,
 	BreadcrumbPage,
-	BreadcrumbSeparator,
 } from "@platform/components/ui/breadcrumb";
 import React from "react";
 

@@ -30,7 +30,7 @@ import {
 	formatDate,
 	getFileTypeLabel,
 } from "@platform/lib/search-utils";
-import type { SearchResult } from "@curiositi/api-handlers";
+import type { SearchResult } from "@curiositi/share/types";
 import FileViewerDialog from "./dialogs/file-viewer-dialog";
 import { FileTags, useDebounce } from "./file-helpers";
 import { useState, useEffect } from "react";

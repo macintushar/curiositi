@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { selectSpaceSchema } from "@curiositi/db/schema";
+import type { selectSpaceSchema } from "@curiositi/share/db-schemas";
 import type z from "zod";
 import { Button } from "@platform/components/ui/button";
 import SpaceDialog from "@platform/components/dialogs/space-dialog";

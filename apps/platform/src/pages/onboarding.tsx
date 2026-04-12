@@ -54,7 +54,7 @@ function StepThree({ handleNextStep }: BaseStepProps) {
 		<div className="h-full w-full flex flex-col gap-8 items-center justify-center">
 			<div className="max-w-xl w-full h-full flex flex-col gap-8 items-center justify-center">
 				<h1 className="text-6xl font-bold">🎉 You're all set! 🎉</h1>
-				<p className="text-3xl font-semibold text-center">
+				<p className="text-3xl font-semibold text-center font-doto">
 					Welcome to Curiositi!
 				</p>
 				<Button onClick={handleNextStep}>Jump In!</Button>

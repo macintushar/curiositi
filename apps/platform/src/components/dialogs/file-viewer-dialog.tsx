@@ -25,7 +25,7 @@ import { IMAGE_TYPES, PDF_TYPE } from "@curiositi/share/constants";
 import { toast } from "sonner";
 import FileActions from "@platform/components/file-actions";
 import type z from "zod";
-import type { selectFileSchema } from "@curiositi/db/schema";
+import type { selectFileSchema } from "@curiositi/share/db-schemas";
 import { cn } from "@platform/lib/utils";
 
 type FileViewerDialogProps = {
