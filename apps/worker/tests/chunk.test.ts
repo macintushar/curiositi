@@ -1,4 +1,13 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test, mock } from "bun:test";
+
+mock.module("js-tiktoken", () => {
+	const encoder = {
+		encode: (text: string) => new Uint32Array(text.length),
+		decode: (tokens: Uint32Array) => "overlap",
+	};
+	return { getEncoding: () => encoder };
+});
+
 import chunkText, { chunkPages } from "../src/lib/chunk";
 import type { PageContent } from "../src/lib/md";
 
