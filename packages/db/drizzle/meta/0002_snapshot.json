@@ -1,5 +1,5 @@
 {
-  "id": "b3c5bbdd-fb7e-4dd7-aaa7-77ca9b9d91a3",
+  "id": "f5567bff-36b8-4435-95c9-61f15cb7f6ec",
   "prevId": "e050366f-610c-4a7d-a4f3-087fb03e0497",
   "version": "7",
   "dialect": "postgresql",
@@ -258,7 +258,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "agent_tool_unique": {
+          "name": "agent_tool_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "agent_id",
+            "tool_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1266,13 +1275,13 @@
         },
         "cost_usd": {
           "name": "cost_usd",
-          "type": "real",
+          "type": "numeric(18, 8)",
           "primaryKey": false,
           "notNull": false
         },
         "agent_id": {
           "name": "agent_id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -1333,6 +1342,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "curiositi_messages_agent_id_curiositi_agents_id_fk": {
+          "name": "curiositi_messages_agent_id_curiositi_agents_id_fk",
+          "tableFrom": "curiositi_messages",
+          "tableTo": "curiositi_agents",
+          "columnsFrom": [
+            "agent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1530,29 +1552,7 @@
           "notNull": false
         }
       },
-      "indexes": {
-        "org_settings_org_key_idx": {
-          "name": "org_settings_org_key_idx",
-          "columns": [
-            {
-              "expression": "organization_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "key",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "curiositi_organization_settings_organization_id_organization_id_fk": {
           "name": "curiositi_organization_settings_organization_id_organization_id_fk",
@@ -1569,7 +1569,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "org_settings_org_key_unique": {
+          "name": "org_settings_org_key_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "organization_id",
+            "key"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1842,7 +1851,7 @@
           "name": "tool_key",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -1985,7 +1994,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "tool_key_org_unique": {
+          "name": "tool_key_org_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "tool_key",
+            "organization_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -2185,7 +2203,6 @@
       "schema": "public",
       "values": [
         "firecrawl",
-        "exa",
         "webfetch"
       ]
     },

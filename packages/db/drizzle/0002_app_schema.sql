@@ -2,7 +2,7 @@ CREATE TYPE "public"."conversation_source" AS ENUM('web', 'slack');--> statement
 CREATE TYPE "public"."file_status" AS ENUM('pending', 'processing', 'completed', 'failed');--> statement-breakpoint
 CREATE TYPE "public"."message_role" AS ENUM('user', 'assistant', 'system', 'tool');--> statement-breakpoint
 CREATE TYPE "public"."model_provider" AS ENUM('openai', 'google', 'anthropic', 'ollama');--> statement-breakpoint
-CREATE TYPE "public"."search_provider" AS ENUM('firecrawl', 'exa', 'webfetch');--> statement-breakpoint
+CREATE TYPE "public"."search_provider" AS ENUM('firecrawl', 'webfetch');--> statement-breakpoint
 CREATE TYPE "public"."tool_type" AS ENUM('builtin', 'mcp');--> statement-breakpoint
 CREATE TABLE "curiositi_agent_tools" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -11,7 +11,8 @@ CREATE TABLE "curiositi_agent_tools" (
 	"enabled" boolean DEFAULT true NOT NULL,
 	"priority" integer DEFAULT 0 NOT NULL,
 	"config" jsonb DEFAULT '{}'::jsonb,
-	"created_at" timestamp with time zone NOT NULL
+	"created_at" timestamp with time zone NOT NULL,
+	CONSTRAINT "agent_tool_unique" UNIQUE("agent_id","tool_id")
 );
 --> statement-breakpoint
 CREATE TABLE "curiositi_agents" (
@@ -95,8 +96,8 @@ CREATE TABLE "curiositi_messages" (
 	"attachments" jsonb,
 	"tool_calls" jsonb,
 	"token_count" integer,
-	"cost_usd" real,
-	"agent_id" text,
+	"cost_usd" numeric(18, 8),
+	"agent_id" uuid,
 	"metadata" jsonb,
 	"created_at" timestamp with time zone NOT NULL
 );
@@ -106,7 +107,8 @@ CREATE TABLE "curiositi_organization_settings" (
 	"organization_id" text NOT NULL,
 	"key" text NOT NULL,
 	"value" jsonb NOT NULL,
-	"updated_at" timestamp with time zone
+	"updated_at" timestamp with time zone,
+	CONSTRAINT "org_settings_org_key_unique" UNIQUE("organization_id","key")
 );
 --> statement-breakpoint
 CREATE TABLE "curiositi_spaces" (
@@ -122,7 +124,7 @@ CREATE TABLE "curiositi_spaces" (
 --> statement-breakpoint
 CREATE TABLE "curiositi_tools" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"tool_key" text,
+	"tool_key" text NOT NULL,
 	"name" text NOT NULL,
 	"display_name" text NOT NULL,
 	"description" text NOT NULL,
@@ -132,7 +134,8 @@ CREATE TABLE "curiositi_tools" (
 	"config" jsonb DEFAULT '{}'::jsonb NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp with time zone NOT NULL,
-	"updated_at" timestamp with time zone
+	"updated_at" timestamp with time zone,
+	CONSTRAINT "tool_key_org_unique" UNIQUE("tool_key","organization_id")
 );
 --> statement-breakpoint
 ALTER TABLE "user" ADD COLUMN "last_login_method" text;--> statement-breakpoint
@@ -149,6 +152,7 @@ ALTER TABLE "curiositi_files_in_space" ADD CONSTRAINT "curiositi_files_in_space_
 ALTER TABLE "curiositi_files_in_space" ADD CONSTRAINT "curiositi_files_in_space_space_id_curiositi_spaces_id_fk" FOREIGN KEY ("space_id") REFERENCES "public"."curiositi_spaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "curiositi_mcp_servers" ADD CONSTRAINT "curiositi_mcp_servers_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "curiositi_messages" ADD CONSTRAINT "curiositi_messages_conversation_id_curiositi_conversations_id_fk" FOREIGN KEY ("conversation_id") REFERENCES "public"."curiositi_conversations"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "curiositi_messages" ADD CONSTRAINT "curiositi_messages_agent_id_curiositi_agents_id_fk" FOREIGN KEY ("agent_id") REFERENCES "public"."curiositi_agents"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "curiositi_organization_settings" ADD CONSTRAINT "curiositi_organization_settings_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "curiositi_spaces" ADD CONSTRAINT "curiositi_spaces_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "curiositi_spaces" ADD CONSTRAINT "curiositi_spaces_parent_space_id_curiositi_spaces_id_fk" FOREIGN KEY ("parent_space_id") REFERENCES "public"."curiositi_spaces"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -169,7 +173,6 @@ CREATE INDEX "space_idx" ON "curiositi_files_in_space" USING btree ("space_id");
 CREATE INDEX "mcp_server_org_idx" ON "curiositi_mcp_servers" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "message_conversation_idx" ON "curiositi_messages" USING btree ("conversation_id");--> statement-breakpoint
 CREATE INDEX "message_agent_idx" ON "curiositi_messages" USING btree ("agent_id");--> statement-breakpoint
-CREATE INDEX "org_settings_org_key_idx" ON "curiositi_organization_settings" USING btree ("organization_id","key");--> statement-breakpoint
 CREATE INDEX "space_id_idx" ON "curiositi_spaces" USING btree ("id");--> statement-breakpoint
 CREATE INDEX "space_organization_id_idx" ON "curiositi_spaces" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "tool_organization_idx" ON "curiositi_tools" USING btree ("organization_id");--> statement-breakpoint

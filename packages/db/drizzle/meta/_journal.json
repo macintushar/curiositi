@@ -13,21 +13,14 @@
       "idx": 1,
       "version": "7",
       "when": 1767548486442,
-      "tag": "0001_auth-schemas",
+      "tag": "0001_auth-schema",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1775740580435,
-      "tag": "0002_tan_blue_shield",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1775920968050,
-      "tag": "0003_blushing_jasper_sitwell",
+      "when": 1776003799999,
+      "tag": "0002_app_schema",
       "breakpoints": true
     }
   ]
