@@ -6,7 +6,6 @@ type BuildContextPrefixProps = {
 	totalPages: number;
 	documentTitle?: string;
 	sectionTitle?: string;
-	sheetName?: string;
 	csvHeaders?: string[];
 	isScanned?: boolean;
 	isImage?: boolean;
@@ -33,10 +32,6 @@ export function buildContextPrefix(opts: BuildContextPrefixProps): string {
 
 	if (opts.isImage || isImageType(opts.fileType)) {
 		lines.push("Type: Image");
-	}
-
-	if (opts.sheetName) {
-		lines.push(`Sheet: ${opts.sheetName}`);
 	}
 
 	if (opts.totalPages > 1) {

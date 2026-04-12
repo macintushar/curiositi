@@ -1,4 +1,4 @@
-export { createAgent, getProviderModel } from "./create";
+export { runAgent, getProviderModel } from "./create";
 export {
 	fileSearchTool,
 	webSearchTool,
@@ -38,6 +38,7 @@ export type {
 	ToolConfig,
 	AgentConfig,
 	CreateAgentParams,
+	RunAgentParams,
 	FileSearchToolConfig,
 	WebSearchToolConfig,
 	ConversationMessage,
@@ -45,5 +46,7 @@ export type {
 	ToolCall,
 	AgentCosts,
 	UIMessage,
+	ModelMessage,
+	LanguageModel,
 	SystemAgent,
 } from "./types";

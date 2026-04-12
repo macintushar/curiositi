@@ -80,7 +80,7 @@ export const SYSTEM_AGENTS: Record<string, SystemAgent> = {
 		systemPrompt:
 			"You are a research assistant. Provide thorough, well-researched answers with citations.",
 		maxToolCalls: 100,
-		isDefault: true,
+		isDefault: false,
 		tools: [
 			{ name: "fileSearch", enabled: true },
 			{ name: "webSearch", enabled: true },

@@ -1,33 +1,84 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SettingsLayout, { ActionCard, LayoutHead } from "./settings-layout";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { cn } from "@platform/lib/utils";
+import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const searchProviders = [
 	{
-		id: "firecrawl",
+		id: "firecrawl" as const,
 		name: "Firecrawl",
 		description: "Best for deep scraping and structured extraction",
 	},
 	{
-		id: "exa",
-		name: "Exa AI",
-		description: "Neural search, finds relevant pages by semantic meaning",
-	},
-	{
-		id: "webfetch",
+		id: "webfetch" as const,
 		name: "WebFetch",
 		description: "Lightweight direct URL fetching",
 	},
-] as const;
+];
 
 export default function SearchSettings() {
-	const [selectedProvider, setSelectedProvider] = useState("firecrawl");
+	const queryClient = useQueryClient();
+	const [selectedProvider, setSelectedProvider] = useState<
+		"firecrawl" | "webfetch"
+	>("firecrawl");
 	const [maxResults, setMaxResults] = useState("5");
 	const [includeDomains, setIncludeDomains] = useState("");
 	const [excludeDomains, setExcludeDomains] = useState("");
+
+	const { data: savedSettings } = useQuery({
+		queryKey: ["settings", "search"],
+		queryFn: () => trpcClient.settings.getSearch.query(),
+	});
+
+	useEffect(() => {
+		if (savedSettings) {
+			setSelectedProvider(savedSettings.provider);
+			setMaxResults(String(savedSettings.maxResults));
+			setIncludeDomains(savedSettings.includeDomains.join(", "));
+			setExcludeDomains(savedSettings.excludeDomains.join(", "));
+		}
+	}, [savedSettings]);
+
+	const saveSettings = useMutation({
+		mutationFn: (input: {
+			provider: "firecrawl" | "webfetch";
+			maxResults: number;
+			includeDomains: string[];
+			excludeDomains: string[];
+		}) => trpcClient.settings.setSearch.mutate(input),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["settings", "search"] });
+			toast.success("Search settings saved");
+		},
+		onError: () => {
+			toast.error("Failed to save search settings");
+		},
+	});
+
+	const handleSave = () => {
+		const parsedMax = parseInt(maxResults, 10);
+		if (Number.isNaN(parsedMax) || parsedMax < 1) {
+			toast.error("Max results must be a positive number");
+			return;
+		}
+		saveSettings.mutate({
+			provider: selectedProvider,
+			maxResults: parsedMax,
+			includeDomains: includeDomains
+				.split(",")
+				.map((d) => d.trim())
+				.filter(Boolean),
+			excludeDomains: excludeDomains
+				.split(",")
+				.map((d) => d.trim())
+				.filter(Boolean),
+		});
+	};
 
 	return (
 		<SettingsLayout
@@ -135,7 +186,9 @@ export default function SearchSettings() {
 					</div>
 
 					<div className="pt-2">
-						<Button>Save Settings</Button>
+						<Button onClick={handleSave} disabled={saveSettings.isPending}>
+							Save Settings
+						</Button>
 					</div>
 				</div>
 			</ActionCard>

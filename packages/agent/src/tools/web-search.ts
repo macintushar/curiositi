@@ -23,17 +23,6 @@ type FirecrawlResponse = {
 	}>;
 };
 
-type ExaResult = {
-	title: string;
-	url: string;
-	text: string;
-	score: number;
-};
-
-type ExaResponse = {
-	results: ExaResult[];
-};
-
 function mapFirecrawlResults(data: FirecrawlResponse): SearchResult[] {
 	return (data.data ?? []).map((r) => ({
 		title: r.metadata?.title ?? "",
@@ -80,64 +69,8 @@ function filterByDomains(
 	});
 }
 
-async function searchExa(query: string, maxResults: number) {
-	try {
-		const apiKey = process.env.EXA_API_KEY;
-		if (!apiKey) {
-			return {
-				error: "EXA_API_KEY not configured",
-				results: [],
-				query,
-			};
-		}
-
-		const response = await fetch("https://api.exa.ai/search", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"x-api-key": apiKey,
-			},
-			body: JSON.stringify({
-				query,
-				numResults: maxResults,
-				useAutoprompt: true,
-				text: { maxCharacters: 500 },
-			}),
-		});
-
-		if (!response.ok) {
-			return {
-				error: `Exa API error: ${response.status}`,
-				results: [],
-				query,
-			};
-		}
-
-		const data = (await response.json()) as ExaResponse;
-		const results = (data.results ?? []).map((r) => ({
-			title: r.title,
-			url: r.url,
-			snippet: r.text,
-		}));
-
-		return { results, query };
-	} catch (error) {
-		console.error("Exa search error:", error);
-		return {
-			error: error instanceof Error ? error.message : "Unknown error",
-			results: [],
-			query,
-		};
-	}
-}
-
 export function webSearchTool(config: WebSearchToolConfig = {}) {
-	const {
-		provider = "firecrawl",
-		maxResults = 5,
-		includeDomains = [],
-		excludeDomains = [],
-	} = config;
+	const { maxResults = 5, includeDomains = [], excludeDomains = [] } = config;
 
 	return tool({
 		description: `Search the web for current information.
@@ -149,18 +82,6 @@ Returns relevant search results with titles, snippets, and URLs.`,
 
 		execute: async ({ query }: WebSearchParams) => {
 			try {
-				if (provider === "exa") {
-					const exaResult = await searchExa(query, maxResults);
-					return {
-						...exaResult,
-						results: filterByDomains(
-							exaResult.results,
-							includeDomains,
-							excludeDomains
-						),
-					};
-				}
-
 				const apiKey = process.env.FIRECRAWL_API_KEY;
 				if (!apiKey) {
 					return {

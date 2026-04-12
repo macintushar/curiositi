@@ -8,6 +8,7 @@ import {
 	pgTableCreator,
 	text,
 	timestamp,
+	unique,
 } from "drizzle-orm/pg-core";
 import {
 	selectSpaceSchema,
@@ -421,7 +422,6 @@ export const toolTypeEnum = pgEnum("tool_type", ["builtin", "mcp"]);
 
 export const searchProviderEnum = pgEnum("search_provider", [
 	"firecrawl",
-	"exa",
 	"webfetch",
 ]);
 
@@ -429,7 +429,7 @@ export const tools = createTable(
 	"tools",
 	(d) => ({
 		id: d.uuid().primaryKey().defaultRandom(),
-		toolKey: d.text(),
+		toolKey: d.text().notNull(),
 		name: d.text().notNull(),
 		displayName: d.text().notNull(),
 		description: d.text().notNull(),
@@ -451,6 +451,7 @@ export const tools = createTable(
 		index("tool_organization_idx").on(t.organizationId),
 		index("tool_name_idx").on(t.name),
 		index("tool_key_idx").on(t.toolKey),
+		unique("tool_key_org_unique").on(t.toolKey, t.organizationId),
 	]
 );
 
@@ -504,6 +505,7 @@ export const agentTools = createTable(
 	(t) => [
 		index("agent_tool_agent_idx").on(t.agentId),
 		index("agent_tool_tool_idx").on(t.toolId),
+		unique("agent_tool_unique").on(t.agentId, t.toolId),
 	]
 );
 
@@ -560,7 +562,7 @@ export const messages = createTable(
 		attachments: d.jsonb(),
 		toolCalls: d.jsonb(),
 		tokenCount: d.integer(),
-		costUSD: d.real(),
+		costUSD: d.numeric({ precision: 18, scale: 8 }),
 		agentId: d.uuid().references(() => agents.id, { onDelete: "set null" }),
 		metadata: d.jsonb(),
 		createdAt: d
@@ -609,7 +611,7 @@ export const organizationSettings = createTable(
 		value: d.jsonb().notNull(),
 		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 	}),
-	(t) => [index("org_settings_org_key_idx").on(t.organizationId, t.key)]
+	(t) => [unique("org_settings_org_key_unique").on(t.organizationId, t.key)]
 );
 
 export const messagesRelations = relations(messages, ({ one }) => ({

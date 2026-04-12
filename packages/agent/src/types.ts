@@ -1,7 +1,5 @@
-import type { UIMessage } from "ai";
-import type { SupportedProvider } from "@curiositi/share/models";
-
-export type AIProvider = SupportedProvider;
+import type { UIMessage, ModelMessage, LanguageModel, ToolSet } from "ai";
+export type { AIProvider } from "@curiositi/share/models";
 
 export type ToolConfig = {
 	name: string;
@@ -26,6 +24,14 @@ export type CreateAgentParams = {
 	organizationId: string;
 };
 
+export type RunAgentParams = {
+	model: LanguageModel;
+	systemPrompt: string;
+	messages: ModelMessage[];
+	tools?: ToolSet;
+	maxToolCalls?: number;
+};
+
 export type FileSearchToolConfig = {
 	maxResults?: number;
 	minSimilarity?: number;
@@ -34,10 +40,9 @@ export type FileSearchToolConfig = {
 	fileIds?: string[];
 };
 
-export type SearchProvider = "firecrawl" | "exa" | "webfetch";
+export type SearchProvider = "firecrawl" | "webfetch";
 
 export type WebSearchToolConfig = {
-	provider?: SearchProvider;
 	maxResults?: number;
 	includeDomains?: string[];
 	excludeDomains?: string[];
@@ -74,5 +79,5 @@ export type AgentCosts = {
 	costUSD: number;
 };
 
-export type { UIMessage };
+export type { UIMessage, ModelMessage, LanguageModel };
 export type { SystemAgent } from "./system-agents";

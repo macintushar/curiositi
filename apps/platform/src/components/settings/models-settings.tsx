@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SettingsLayout, { ActionCard, LayoutHead } from "./settings-layout";
 import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
@@ -12,20 +12,49 @@ import {
 import ProviderLogo from "../chat/provider-logo";
 import { Star, StarOff } from "lucide-react";
 import { cn } from "@platform/lib/utils";
+import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function ModelsSettings() {
+	const queryClient = useQueryClient();
 	const providers = getProviders();
+
+	const allSupportedModels = SUPPORTED_PROVIDERS.flatMap((p) =>
+		getModelsForProvider(p).map((m) => m.id)
+	);
+
 	const [enabledModels, setEnabledModels] = useState<Set<string>>(
-		new Set(
-			SUPPORTED_PROVIDERS.flatMap((p) =>
-				getModelsForProvider(p).map((m) => m.id)
-			)
-		)
+		new Set(allSupportedModels)
 	);
 	const [defaultModel, setDefaultModel] =
 		useState<string>("openai/gpt-4o-mini");
 	const [activeProvider, setActiveProvider] =
 		useState<(typeof SUPPORTED_PROVIDERS)[number]>("openai");
+
+	const { data: savedSettings } = useQuery({
+		queryKey: ["settings", "models"],
+		queryFn: () => trpcClient.settings.getModels.query(),
+	});
+
+	useEffect(() => {
+		if (savedSettings) {
+			setEnabledModels(new Set(savedSettings.enabledModels));
+			setDefaultModel(savedSettings.defaultModel);
+		}
+	}, [savedSettings]);
+
+	const saveSettings = useMutation({
+		mutationFn: (input: { enabledModels: string[]; defaultModel: string }) =>
+			trpcClient.settings.setModels.mutate(input),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["settings", "models"] });
+			toast.success("Model settings saved");
+		},
+		onError: () => {
+			toast.error("Failed to save model settings");
+		},
+	});
 
 	const toggleModel = (modelId: string) => {
 		setEnabledModels((prev) => {
@@ -36,6 +65,13 @@ export default function ModelsSettings() {
 				next.add(modelId);
 			}
 			return next;
+		});
+	};
+
+	const handleSave = () => {
+		saveSettings.mutate({
+			enabledModels: Array.from(enabledModels),
+			defaultModel,
 		});
 	};
 
@@ -157,6 +193,12 @@ export default function ModelsSettings() {
 							</div>
 						);
 					})}
+				</div>
+
+				<div className="pt-4">
+					<Button onClick={handleSave} disabled={saveSettings.isPending}>
+						Save Settings
+					</Button>
 				</div>
 			</ActionCard>
 		</SettingsLayout>

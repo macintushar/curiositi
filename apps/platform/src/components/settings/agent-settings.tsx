@@ -14,6 +14,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogFooter,
+	DialogDescription,
 } from "../ui/dialog";
 import {
 	Table,
@@ -31,14 +32,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "../ui/command";
-import {
-	IconPlus,
-	IconPencil,
-	IconTrash,
-	IconCheck,
-	IconLoader2,
-	IconShield,
-} from "@tabler/icons-react";
+import { Plus, Pencil, Trash2, Check, Loader2, Shield } from "lucide-react";
 import { cn } from "@platform/lib/utils";
 import { toast } from "sonner";
 
@@ -84,6 +78,8 @@ export default function AgentSettings() {
 	const [editorOpen, setEditorOpen] = useState(false);
 	const [editingAgent, setEditingAgent] = useState<AgentRow | null>(null);
 	const [saving, setSaving] = useState(false);
+	const [toolsLoading, setToolsLoading] = useState(false);
+	const [deleteTarget, setDeleteTarget] = useState<AgentRow | null>(null);
 
 	const [formName, setFormName] = useState("");
 	const [formDescription, setFormDescription] = useState("");
@@ -138,6 +134,7 @@ export default function AgentSettings() {
 	}
 
 	async function loadAgentTools(agentId: string) {
+		setToolsLoading(true);
 		try {
 			const result = await trpcClient.agent.getTools.query({ agentId });
 			const linkedToolIds = (result.tools as AgentToolLink[])
@@ -145,7 +142,10 @@ export default function AgentSettings() {
 				.map((t) => t.toolId);
 			setFormToolIds(linkedToolIds);
 		} catch {
+			toast.error("Failed to load agent tools");
 			setFormToolIds([]);
+		} finally {
+			setToolsLoading(false);
 		}
 	}
 
@@ -195,9 +195,15 @@ export default function AgentSettings() {
 			toast.error("Cannot delete default agent");
 			return;
 		}
+		setDeleteTarget(agent);
+	}
+
+	async function confirmDelete() {
+		if (!deleteTarget) return;
 		try {
-			await trpcClient.agent.delete.mutate({ agentId: agent.id });
+			await trpcClient.agent.delete.mutate({ agentId: deleteTarget.id });
 			toast.success("Agent deleted");
+			setDeleteTarget(null);
 			await loadData();
 		} catch (err) {
 			toast.error(
@@ -229,7 +235,7 @@ export default function AgentSettings() {
 				description="Manage your organization's agents."
 			>
 				<div className="flex items-center justify-center py-12">
-					<IconLoader2 className="w-6 h-6 animate-spin" />
+					<Loader2 className="w-6 h-6 animate-spin" />
 				</div>
 			</SettingsLayout>
 		);
@@ -247,7 +253,7 @@ export default function AgentSettings() {
 						description={`${agents.length} agent${agents.length !== 1 ? "s" : ""} configured`}
 					/>
 					<Button onClick={openCreateDialog} size="sm">
-						<IconPlus className="size-4" />
+						<Plus className="size-4" />
 						Create agent
 					</Button>
 				</div>
@@ -282,7 +288,7 @@ export default function AgentSettings() {
 											<span className="font-medium">{agent.name}</span>
 											{agent.id.startsWith("system:") && (
 												<Badge variant="outline" className="text-xs">
-													<IconShield className="size-3 mr-1" />
+													<Shield className="size-3 mr-1" />
 													System
 												</Badge>
 											)}
@@ -310,7 +316,7 @@ export default function AgentSettings() {
 												disabled={agent.id.startsWith("system:")}
 												onClick={() => openEditDialog(agent)}
 											>
-												<IconPencil className="size-4" />
+												<Pencil className="size-4" />
 											</Button>
 											<Button
 												variant="ghost"
@@ -320,7 +326,7 @@ export default function AgentSettings() {
 												}
 												onClick={() => handleDelete(agent)}
 											>
-												<IconTrash className="size-4" />
+												<Trash2 className="size-4" />
 											</Button>
 										</div>
 									</TableCell>
@@ -413,46 +419,52 @@ export default function AgentSettings() {
 							>
 								Tools
 							</label>
-							<Command className="border rounded-lg">
-								<CommandInput
-									id="agent-tools-search"
-									placeholder="Search tools..."
-								/>
-								<CommandList>
-									<CommandEmpty>No tools found.</CommandEmpty>
-									<CommandGroup>
-										{tools.map((tool) => {
-											const selected = formToolIds.includes(tool.id);
-											return (
-												<CommandItem
-													key={tool.id}
-													onSelect={() => toggleTool(tool.id)}
-													className="flex items-center gap-2 cursor-pointer"
-												>
-													<div
-														className={cn(
-															"flex size-4 items-center justify-center rounded-sm border",
-															selected
-																? "bg-primary text-primary-foreground border-primary"
-																: "border-muted-foreground"
-														)}
+							{toolsLoading ? (
+								<div className="flex items-center justify-center py-6 border rounded-lg">
+									<IconLoader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+								</div>
+							) : (
+								<Command className="border rounded-lg">
+									<CommandInput
+										id="agent-tools-search"
+										placeholder="Search tools..."
+									/>
+									<CommandList>
+										<CommandEmpty>No tools found.</CommandEmpty>
+										<CommandGroup>
+											{tools.map((tool) => {
+												const selected = formToolIds.includes(tool.id);
+												return (
+													<CommandItem
+														key={tool.id}
+														onSelect={() => toggleTool(tool.id)}
+														className="flex items-center gap-2 cursor-pointer"
 													>
-														{selected && <IconCheck className="size-3" />}
-													</div>
-													<div className="flex-1">
-														<div className="text-sm font-medium">
-															{tool.displayName}
+														<div
+															className={cn(
+																"flex size-4 items-center justify-center rounded-sm border",
+																selected
+																	? "bg-primary text-primary-foreground border-primary"
+																	: "border-muted-foreground"
+															)}
+														>
+															{selected && <Check className="size-3" />}
 														</div>
-														<div className="text-xs text-muted-foreground truncate">
-															{tool.description}
+														<div className="flex-1">
+															<div className="text-sm font-medium">
+																{tool.displayName}
+															</div>
+															<div className="text-xs text-muted-foreground truncate">
+																{tool.description}
+															</div>
 														</div>
-													</div>
-												</CommandItem>
-											);
-										})}
-									</CommandGroup>
-								</CommandList>
-							</Command>
+													</CommandItem>
+												);
+											})}
+										</CommandGroup>
+									</CommandList>
+								</Command>
+							)}
 							<p className="text-xs text-muted-foreground">
 								Select tools this agent has access to.
 							</p>
@@ -467,9 +479,35 @@ export default function AgentSettings() {
 						>
 							Cancel
 						</Button>
-						<Button onClick={handleSave} disabled={saving}>
-							{saving && <IconLoader2 className="size-4 animate-spin" />}
+						<Button onClick={handleSave} disabled={saving || toolsLoading}>
+							{saving && <Loader2 className="size-4 animate-spin" />}
 							{editingAgent ? "Update" : "Create"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			<Dialog
+				open={deleteTarget !== null}
+				onOpenChange={(open) => {
+					if (!open) setDeleteTarget(null);
+				}}
+			>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Delete Agent</DialogTitle>
+						<DialogDescription>
+							Are you sure you want to delete{" "}
+							<span className="font-medium">{deleteTarget?.name}</span>? This
+							action cannot be undone.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button variant="outline" onClick={() => setDeleteTarget(null)}>
+							Cancel
+						</Button>
+						<Button variant="destructive" onClick={confirmDelete}>
+							Delete
 						</Button>
 					</DialogFooter>
 				</DialogContent>

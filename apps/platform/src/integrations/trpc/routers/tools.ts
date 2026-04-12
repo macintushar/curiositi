@@ -8,13 +8,17 @@ import {
 	createMcpServer,
 	updateMcpServer,
 	deleteMcpServer,
+	getToolsByOrganization,
+	setToolActive,
 } from "@curiositi/db";
-import { discoverMcpTools } from "@curiositi/agent/mcp";
-import { getAvailableTools } from "@curiositi/agent/tools";
+import { discoverMcpTools, reloadMcpTools } from "@curiositi/agent/mcp";
 
 const toolsRouter = {
-	listBuiltIn: protectedProcedure.query(() => {
-		return { tools: getAvailableTools() };
+	listBuiltIn: protectedProcedure.query(async ({ ctx }) => {
+		const orgId = ctx.session.session.activeOrganizationId;
+		const orgTools = await getToolsByOrganization(orgId);
+		const builtInTools = orgTools.filter((t) => t.type === "builtin");
+		return { tools: builtInTools };
 	}),
 
 	list: protectedProcedure.query(async ({ ctx }) => {
@@ -52,12 +56,14 @@ const toolsRouter = {
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
+			const orgId = ctx.session.session.activeOrganizationId;
 			const server = await createMcpServer({
 				name: input.name,
 				url: input.url,
 				headers: input.headers,
-				organizationId: ctx.session.session.activeOrganizationId,
+				organizationId: orgId,
 			});
+			await reloadMcpTools(orgId);
 			return { server };
 		}),
 
@@ -72,6 +78,7 @@ const toolsRouter = {
 			})
 		)
 		.mutation(async ({ input, ctx }) => {
+			const orgId = ctx.session.session.activeOrganizationId;
 			const existing = await getMcpServerById(input.id);
 			if (!existing) {
 				throw new TRPCError({
@@ -79,9 +86,7 @@ const toolsRouter = {
 					message: "MCP server not found",
 				});
 			}
-			if (
-				existing.organizationId !== ctx.session.session.activeOrganizationId
-			) {
+			if (existing.organizationId !== orgId) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "You do not have access to this server",
@@ -90,12 +95,14 @@ const toolsRouter = {
 
 			const { id, ...data } = input;
 			const server = await updateMcpServer(id, data);
+			await reloadMcpTools(orgId);
 			return { server };
 		}),
 
 	delete: protectedProcedure
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ input, ctx }) => {
+			const orgId = ctx.session.session.activeOrganizationId;
 			const existing = await getMcpServerById(input.id);
 			if (!existing) {
 				throw new TRPCError({
@@ -103,9 +110,7 @@ const toolsRouter = {
 					message: "MCP server not found",
 				});
 			}
-			if (
-				existing.organizationId !== ctx.session.session.activeOrganizationId
-			) {
+			if (existing.organizationId !== orgId) {
 				throw new TRPCError({
 					code: "FORBIDDEN",
 					message: "You do not have access to this server",
@@ -113,6 +118,7 @@ const toolsRouter = {
 			}
 
 			await deleteMcpServer(input.id);
+			await reloadMcpTools(orgId);
 			return { success: true };
 		}),
 
@@ -127,6 +133,28 @@ const toolsRouter = {
 			})),
 		};
 	}),
+
+	toggleBuiltIn: protectedProcedure
+		.input(z.object({ id: z.string(), isActive: z.boolean() }))
+		.mutation(async ({ input, ctx }) => {
+			const orgId = ctx.session.session.activeOrganizationId;
+			const orgTools = await getToolsByOrganization(orgId);
+			const tool = orgTools.find((t) => t.id === input.id);
+			if (!tool) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Tool not found",
+				});
+			}
+			if (tool.type !== "builtin") {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Only built-in tools can be toggled this way",
+				});
+			}
+			const updated = await setToolActive(input.id, input.isActive);
+			return { tool: updated };
+		}),
 } satisfies TRPCRouterRecord;
 
 export default toolsRouter;

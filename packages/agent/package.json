@@ -19,6 +19,7 @@
 	"dependencies": {
 		"@ai-sdk/anthropic": "^3.0.0",
 		"@ai-sdk/google": "^3.0.26",
+		"@ai-sdk/mcp": "^1.0.36",
 		"@ai-sdk/openai": "^3.0.27",
 		"@curiositi/db": "workspace:*",
 		"@curiositi/share": "workspace:*",

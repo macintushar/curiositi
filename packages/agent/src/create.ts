@@ -1,10 +1,14 @@
-import { ToolLoopAgent, stepCountIs } from "ai";
+import {
+	streamText,
+	stepCountIs,
+	type ToolSet,
+	type StreamTextOnFinishCallback,
+} from "ai";
 import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
 import { anthropic } from "@ai-sdk/anthropic";
 import { createOllama } from "ai-sdk-ollama";
-import type { CreateAgentParams, AIProvider } from "./types";
-import { createTools } from "./tools";
+import type { AIProvider, RunAgentParams } from "./types";
 
 export function getProviderModel(provider: AIProvider, modelName: string) {
 	switch (provider) {
@@ -25,27 +29,19 @@ export function getProviderModel(provider: AIProvider, modelName: string) {
 	}
 }
 
-export async function createAgent(
-	params: CreateAgentParams & {
-		model: ReturnType<typeof getProviderModel>;
-		provider: AIProvider;
-	}
-) {
-	const {
-		model,
-		provider,
-		systemPrompt,
-		maxToolCalls = 10,
-		tools,
-		organizationId,
-	} = params;
+export type RunAgentOptions = {
+	onFinish?: StreamTextOnFinishCallback<ToolSet>;
+};
 
-	const agentTools = await createTools(organizationId, provider, tools);
+export function runAgent(params: RunAgentParams, options?: RunAgentOptions) {
+	const { model, systemPrompt, messages, tools, maxToolCalls = 10 } = params;
 
-	return new ToolLoopAgent({
+	return streamText({
 		model,
-		instructions: systemPrompt,
-		tools: agentTools,
+		system: systemPrompt,
+		messages,
+		tools: tools && Object.keys(tools).length > 0 ? tools : undefined,
 		stopWhen: stepCountIs(maxToolCalls),
+		onFinish: options?.onFinish,
 	});
 }

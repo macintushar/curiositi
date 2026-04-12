@@ -1,12 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { auth } from "@platform/lib/auth";
 import { authMiddleware } from "@platform/middleware/auth";
-import {
-	streamText,
-	convertToModelMessages,
-	type UIMessage,
-	stepCountIs,
-} from "ai";
+import { convertToModelMessages, type UIMessage, type ToolSet } from "ai";
 import {
 	getProviderModel,
 	createTools,
@@ -15,6 +10,7 @@ import {
 	getDefaultProvider,
 	getDefaultModelForProvider,
 	DEFAULT_SYSTEM_AGENT_ID,
+	runAgent,
 } from "@curiositi/agent";
 import { discoverMcpTools } from "@curiositi/agent/mcp";
 import {
@@ -31,7 +27,7 @@ const requestSchema = z.object({
 	agentId: z.string().optional(),
 	modelId: z.string().optional(),
 	modelProvider: z.enum(SUPPORTED_PROVIDERS).optional(),
-	searchProvider: z.enum(["firecrawl", "exa", "webfetch"]).optional(),
+	searchProvider: z.enum(["firecrawl", "webfetch"]).optional(),
 	webSearchEnabled: z.boolean().optional(),
 	fileSearchEnabled: z.boolean().optional(),
 	fileIds: z.array(z.string()).optional(),
@@ -80,7 +76,7 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 					agentId?: string;
 					modelId?: string;
 					modelProvider?: "openai" | "google" | "anthropic" | "ollama";
-					searchProvider?: "firecrawl" | "exa" | "webfetch";
+					searchProvider?: "firecrawl" | "webfetch";
 					webSearchEnabled?: boolean;
 					fileSearchEnabled?: boolean;
 					fileIds?: string[];
@@ -212,9 +208,19 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 									};
 								});
 
-					const tools = createTools(orgId, modelProvider, toolConfigs, {
+					const builtinTools = createTools(orgId, modelProvider, toolConfigs, {
 						searchProvider: body.searchProvider ?? "firecrawl",
 					});
+
+					let mcpTools: ToolSet = {};
+					try {
+						mcpTools = await discoverMcpTools(orgId);
+					} catch {
+						// MCP tools unavailable, continue with built-in tools
+					}
+
+					// Builtins take precedence — same name wins over MCP
+					const tools: ToolSet = { ...mcpTools, ...builtinTools };
 
 					const systemPrompt =
 						systemAgent?.systemPrompt ?? dbAgent?.systemPrompt;
@@ -230,13 +236,6 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 								headers: { "Content-Type": "application/json" },
 							}
 						);
-					}
-
-					try {
-						const mcpTools = await discoverMcpTools(orgId);
-						Object.assign(tools, mcpTools);
-					} catch {
-						// MCP tools unavailable, continue with built-in tools
 					}
 
 					const lastUserMessage = uiMessages[uiMessages.length - 1];
@@ -256,27 +255,59 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 						}
 					}
 
-					const result = streamText({
-						model,
-						system: systemPrompt,
-						messages: await convertToModelMessages(uiMessages),
-						tools: Object.keys(tools).length > 0 ? tools : undefined,
-						stopWhen: stepCountIs(maxToolCalls),
-						onFinish: async ({ text }) => {
-							try {
-								if (text) {
-									await createMessage({
-										conversationId,
-										role: "assistant",
-										content: text,
-										agentId: assistantAgentId,
-									});
-								}
-							} catch (err) {
-								logger.error("Failed to save assistant message:", err);
-							}
+					const result = runAgent(
+						{
+							model,
+							systemPrompt,
+							messages: await convertToModelMessages(uiMessages),
+							tools,
+							maxToolCalls,
 						},
-					});
+						{
+							onFinish: async ({ steps }) => {
+								try {
+									const toolCallHistory = steps.flatMap((step) =>
+										step.toolCalls.map((tc) => {
+											const toolCallId = tc.toolCallId;
+											const name = tc.toolName;
+											const args =
+												"args" in tc
+													? (tc.args as Record<string, unknown>)
+													: (tc.input as Record<string, unknown>);
+											const resultEntry = step.toolResults.find(
+												(tr) => tr.toolCallId === toolCallId
+											);
+											const result =
+												resultEntry && "result" in resultEntry
+													? resultEntry.result
+													: resultEntry && "output" in resultEntry
+														? resultEntry.output
+														: undefined;
+											return { id: toolCallId, name, args, result };
+										})
+									);
+
+									const lastStep = steps[steps.length - 1];
+									const text = lastStep?.text ?? "";
+
+									if (text || toolCallHistory.length > 0) {
+										await createMessage({
+											conversationId,
+											role: "assistant",
+											content: text,
+											toolCalls:
+												toolCallHistory.length > 0
+													? toolCallHistory
+													: undefined,
+											agentId: assistantAgentId,
+										});
+									}
+								} catch (err) {
+									logger.error("Failed to save assistant message:", err);
+								}
+							},
+						}
+					);
 
 					result.consumeStream();
 

@@ -7,7 +7,7 @@ export type CtxFile = {
 	type: string;
 };
 
-export type SearchProvider = "firecrawl" | "exa" | "webfetch";
+export type SearchProvider = "firecrawl" | "webfetch";
 
 export type Agent = {
 	id: string;

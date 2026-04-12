@@ -324,3 +324,12 @@ export async function ensureDefaultAgents(orgId: string, userId: string) {
 export async function unlinkAllToolsFromAgent(agentId: string) {
 	await db.delete(agentTools).where(eq(agentTools.agentId, agentId));
 }
+
+export async function setToolActive(toolId: string, isActive: boolean) {
+	const [updated] = await db
+		.update(tools)
+		.set({ isActive })
+		.where(eq(tools.id, toolId))
+		.returning();
+	return updated ?? null;
+}
