@@ -16,8 +16,10 @@ flowchart TB
     subgraph App["Application Layer"]
         Platform["Platform<br/>(TanStack Start)"]
         Worker["Worker<br/>(Hono on Bun)"]
+        Agent["Agent Module<br/>(AI SDK + MCP)"]
         
         Platform -->|"QStash / bunqueue"| Worker
+        Platform -->|"Chat/Tool Calls"| Agent
     end
 
     subgraph Data["Data Layer"]
@@ -115,13 +117,23 @@ Curiositi Tables:
 ├── spaces           # Hierarchical spaces (parentSpaceId for nesting)
 ├── files            # File metadata (name, type, size, S3 key, status)
 ├── fileContents     # Extracted content chunks + vector embeddings (1536d)
-└── filesInSpace     # Many-to-many junction table
+├── filesInSpace     # Many-to-many junction table
+├── agents           # Configurable AI agents
+├── tools            # Built-in and MCP tools available to agents
+├── agent_tools      # Junction for tools enabled on a specific agent
+├── mcp_servers      # Connected Model Context Protocol servers
+├── conversations    # Chat conversation metadata
+└── messages         # Logs of user, system, and tool messages
 ```
 
 ### Shared Packages
 
 ```
 packages/
+├── agent/           # AI Agents and Model Context Protocol logic
+│   └── src/
+│       ├── mcp-server.ts    # MCP Client manager and routing
+│       └── tools/           # Custom executable tools (e.g., file-search)
 ├── db/              # Database schema and Drizzle config
 │   └── src/
 │       ├── schema.ts   # All table definitions

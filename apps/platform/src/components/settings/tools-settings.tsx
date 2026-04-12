@@ -17,6 +17,7 @@ import { useState } from "react";
 import { Plus, Trash2, ExternalLink, CheckCircle, XCircle } from "lucide-react";
 import { trpcClient } from "@platform/integrations/tanstack-query/root-provider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 type ServerRow = {
 	id: string;
@@ -91,7 +92,17 @@ export default function ToolsSettings() {
 		let headers: Record<string, string> | undefined;
 		if (newServer.headers.trim()) {
 			try {
-				headers = JSON.parse(newServer.headers);
+				const parsed = JSON.parse(newServer.headers);
+				if (
+					typeof parsed !== "object" ||
+					parsed === null ||
+					Array.isArray(parsed) ||
+					!Object.values(parsed).every((v) => typeof v === "string")
+				) {
+					toast.error("Headers must be a flat JSON object with string values");
+					return;
+				}
+				headers = parsed as Record<string, string>;
 			} catch {
 				return;
 			}
@@ -309,8 +320,9 @@ export default function ToolsSettings() {
 										variant="ghost"
 										size="icon"
 										onClick={() => handleRemoveServer(server as ServerRow)}
+										aria-label={`Delete ${server.name}`}
 									>
-										<Trash2 className="w-4 h-4" />
+										<Trash2 className="w-4 h-4" aria-hidden="true" />
 									</Button>
 								</div>
 							</div>

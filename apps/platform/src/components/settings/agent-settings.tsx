@@ -35,6 +35,7 @@ import {
 import { Plus, Pencil, Trash2, Check, Loader2, Shield } from "lucide-react";
 import { cn } from "@platform/lib/utils";
 import { toast } from "sonner";
+import { IconLoader2 } from "@tabler/icons-react";
 
 type AgentRow = {
 	id: string;
@@ -315,8 +316,9 @@ export default function AgentSettings() {
 												size="icon-sm"
 												disabled={agent.id.startsWith("system:")}
 												onClick={() => openEditDialog(agent)}
+												aria-label={`Edit ${agent.name}`}
 											>
-												<Pencil className="size-4" />
+												<Pencil className="size-4" aria-hidden="true" />
 											</Button>
 											<Button
 												variant="ghost"
@@ -325,8 +327,9 @@ export default function AgentSettings() {
 													agent.id.startsWith("system:") || agent.isDefault
 												}
 												onClick={() => handleDelete(agent)}
+												aria-label={`Delete ${agent.name}`}
 											>
-												<Trash2 className="size-4" />
+												<Trash2 className="size-4" aria-hidden="true" />
 											</Button>
 										</div>
 									</TableCell>
@@ -421,7 +424,7 @@ export default function AgentSettings() {
 							</label>
 							{toolsLoading ? (
 								<div className="flex items-center justify-center py-6 border rounded-lg">
-									<IconLoader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+									<Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
 								</div>
 							) : (
 								<Command className="border rounded-lg">

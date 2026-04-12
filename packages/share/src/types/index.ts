@@ -40,7 +40,6 @@ export type QueueConfig =
 
 export type { SearchResult } from "./search";
 
-// System Agent types
 export type ToolConfig = {
 	name: string;
 	enabled: boolean;
@@ -57,7 +56,6 @@ export type SystemAgent = {
 	tools: ToolConfig[];
 };
 
-// System Agent constants
 export const SYSTEM_AGENTS: Record<string, SystemAgent> = {
 	"system:ask": {
 		id: "system:ask",

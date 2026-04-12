@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import SettingsLayout, { ActionCard, LayoutHead } from "./settings-layout";
 import { Button } from "../ui/button";
@@ -61,6 +63,10 @@ export default function ModelsSettings() {
 			const next = new Set(prev);
 			if (next.has(modelId)) {
 				next.delete(modelId);
+				if (modelId === defaultModel) {
+					const fallback = Array.from(next)[0] ?? allSupportedModels[0] ?? "";
+					setDefaultModel(fallback);
+				}
 			} else {
 				next.add(modelId);
 			}
@@ -69,8 +75,14 @@ export default function ModelsSettings() {
 	};
 
 	const handleSave = () => {
+		const finalEnabled = new Set(enabledModels);
+		if (!finalEnabled.has(defaultModel)) {
+			finalEnabled.add(defaultModel);
+			setEnabledModels(finalEnabled);
+			toast.info("Default model was re-enabled automatically");
+		}
 		saveSettings.mutate({
-			enabledModels: Array.from(enabledModels),
+			enabledModels: Array.from(finalEnabled),
 			defaultModel,
 		});
 	};

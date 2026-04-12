@@ -175,17 +175,21 @@ export async function createDefaultTools(organizationId: string) {
 		.where(
 			and(
 				eq(tools.organizationId, organizationId),
-				or(eq(tools.toolKey, "fileSearch"), eq(tools.name, "fileSearch")),
-				eq(tools.isActive, true)
+				or(eq(tools.toolKey, "fileSearch"), eq(tools.name, "fileSearch"))
 			)
 		)
 		.limit(1);
 
-	if (existingFileSearchTool && !existingFileSearchTool.toolKey) {
-		await db
-			.update(tools)
-			.set({ toolKey: "fileSearch" })
-			.where(eq(tools.id, existingFileSearchTool.id));
+	if (existingFileSearchTool) {
+		const updates: Partial<typeof existingFileSearchTool> = {};
+		if (!existingFileSearchTool.toolKey) updates.toolKey = "fileSearch";
+		if (!existingFileSearchTool.isActive) updates.isActive = true;
+		if (Object.keys(updates).length > 0) {
+			await db
+				.update(tools)
+				.set(updates)
+				.where(eq(tools.id, existingFileSearchTool.id));
+		}
 	}
 
 	const fileSearchTool =
@@ -218,17 +222,21 @@ export async function createDefaultTools(organizationId: string) {
 		.where(
 			and(
 				eq(tools.organizationId, organizationId),
-				or(eq(tools.toolKey, "webSearch"), eq(tools.name, "webSearch")),
-				eq(tools.isActive, true)
+				or(eq(tools.toolKey, "webSearch"), eq(tools.name, "webSearch"))
 			)
 		)
 		.limit(1);
 
-	if (existingWebSearchTool && !existingWebSearchTool.toolKey) {
-		await db
-			.update(tools)
-			.set({ toolKey: "webSearch" })
-			.where(eq(tools.id, existingWebSearchTool.id));
+	if (existingWebSearchTool) {
+		const updates: Partial<typeof existingWebSearchTool> = {};
+		if (!existingWebSearchTool.toolKey) updates.toolKey = "webSearch";
+		if (!existingWebSearchTool.isActive) updates.isActive = true;
+		if (Object.keys(updates).length > 0) {
+			await db
+				.update(tools)
+				.set(updates)
+				.where(eq(tools.id, existingWebSearchTool.id));
+		}
 	}
 
 	const webSearchTool =

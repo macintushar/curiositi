@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import SettingsLayout, { ActionCard, LayoutHead } from "./settings-layout";
 import { Button } from "../ui/button";
@@ -62,8 +64,8 @@ export default function SearchSettings() {
 
 	const handleSave = () => {
 		const parsedMax = parseInt(maxResults, 10);
-		if (Number.isNaN(parsedMax) || parsedMax < 1) {
-			toast.error("Max results must be a positive number");
+		if (Number.isNaN(parsedMax) || parsedMax < 1 || parsedMax > 50) {
+			toast.error("Max results must be between 1 and 50");
 			return;
 		}
 		saveSettings.mutate({

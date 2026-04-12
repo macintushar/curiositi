@@ -12,6 +12,7 @@ import {
 	setToolActive,
 } from "@curiositi/db";
 import { discoverMcpTools, reloadMcpTools } from "@curiositi/agent/mcp";
+import logger from "@curiositi/share/logger";
 
 const toolsRouter = {
 	listBuiltIn: protectedProcedure.query(async ({ ctx }) => {
@@ -63,7 +64,9 @@ const toolsRouter = {
 				headers: input.headers,
 				organizationId: orgId,
 			});
-			await reloadMcpTools(orgId);
+			reloadMcpTools(orgId).catch((err) =>
+				logger.error("[MCP] Failed to reload tools after create:", err)
+			);
 			return { server };
 		}),
 
@@ -95,7 +98,9 @@ const toolsRouter = {
 
 			const { id, ...data } = input;
 			const server = await updateMcpServer(id, data);
-			await reloadMcpTools(orgId);
+			reloadMcpTools(orgId).catch((err) =>
+				logger.error("[MCP] Failed to reload tools after update:", err)
+			);
 			return { server };
 		}),
 
@@ -118,7 +123,9 @@ const toolsRouter = {
 			}
 
 			await deleteMcpServer(input.id);
-			await reloadMcpTools(orgId);
+			reloadMcpTools(orgId).catch((err) =>
+				logger.error("[MCP] Failed to reload tools after delete:", err)
+			);
 			return { success: true };
 		}),
 

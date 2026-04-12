@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import type { WebSearchToolConfig } from "../types";
+import logger from "@curiositi/share/logger";
 
 export type WebSearchParams = {
 	query: string;
@@ -91,17 +92,25 @@ Returns relevant search results with titles, snippets, and URLs.`,
 					};
 				}
 
-				const response = await fetch("https://api.firecrawl.dev/v1/search", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-						Authorization: `Bearer ${apiKey}`,
-					},
-					body: JSON.stringify({
-						query,
-						limit: maxResults,
-					}),
-				});
+				const controller = new AbortController();
+				const timeoutId = setTimeout(() => controller.abort(), 10_000);
+				let response: Response;
+				try {
+					response = await fetch("https://api.firecrawl.dev/v1/search", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${apiKey}`,
+						},
+						body: JSON.stringify({
+							query,
+							limit: maxResults,
+						}),
+						signal: controller.signal,
+					});
+				} finally {
+					clearTimeout(timeoutId);
+				}
 
 				if (!response.ok) {
 					return {
@@ -120,7 +129,7 @@ Returns relevant search results with titles, snippets, and URLs.`,
 
 				return { results: results.slice(0, maxResults), query };
 			} catch (error) {
-				console.error("Web search error:", error);
+				logger.error("Web search error", error);
 				return {
 					error: error instanceof Error ? error.message : "Unknown error",
 					results: [],

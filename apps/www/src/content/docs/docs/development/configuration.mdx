@@ -62,6 +62,18 @@ postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 | `VITE_SENTRY_ORG` | No | Sentry organization slug |
 | `VITE_SENTRY_PROJECT` | No | Sentry project slug |
 
+### AI Providers & Search (Platform & Worker)
+
+At least one AI provider is strongly recommended to enable Agentic Chat and embeddings. Web Search requires Firecrawl.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | Conditional | OpenAI API Key (required for OpenAI Chat and Embeddings) |
+| `ANTHROPIC_API_KEY` | Conditional | Anthropic API Key (required for Anthropic Claude Chat) |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Conditional | Google API Key (required for Gemini Chat and Embeddings) |
+| `OLLAMA_BASE_URL` | Conditional | Base URL for Ollama local instances |
+| `FIRECRAWL_API_KEY` | Conditional | API Key for the Firecrawl web fetcher tool |
+
 ### Monitoring
 
 | Variable | Required | Description |
@@ -105,7 +117,20 @@ QSTASH_URL=""
 BUNQUEUE_HOST="localhost"
 BUNQUEUE_PORT="6789"
 
-# Monitoring & Error Tracking - Sentry (optional)
+# Email (optional - enables email features when set)
+RESEND_API_KEY=""
+EMAIL_FROM_ADDRESS="noreply@curiositi.com"
+
+# AI Providers - at least one is required for agent chat
+OPENAI_API_KEY=""
+ANTHROPIC_API_KEY=""
+GOOGLE_GENERATIVE_AI_API_KEY=""
+OLLAMA_BASE_URL=""
+
+# Web Search (required if web search tool is enabled)
+FIRECRAWL_API_KEY=""
+
+# Monitoring & Error Tracking - Sentry configuration for both client and server
 VITE_SENTRY_DSN=""
 VITE_SENTRY_ORG=""
 VITE_SENTRY_PROJECT=""

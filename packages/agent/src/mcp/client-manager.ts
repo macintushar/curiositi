@@ -30,7 +30,11 @@ class MCPClientManager {
 		}
 
 		entry.initializing = this._initialize(orgId, entry);
-		await entry.initializing;
+		try {
+			await entry.initializing;
+		} finally {
+			entry.initializing = null;
+		}
 	}
 
 	private async _initialize(orgId: string, entry: OrgMcpEntry): Promise<void> {
@@ -39,7 +43,6 @@ class MCPClientManager {
 			servers = await getActiveMcpServers(orgId);
 		} catch (error) {
 			logger.error(`[MCP] Failed to load servers for org ${orgId}:`, error);
-			entry.initialized = true;
 			return;
 		}
 

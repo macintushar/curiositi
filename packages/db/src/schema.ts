@@ -280,7 +280,6 @@ export const spaces = createTable(
 	]
 );
 
-// Re-export schemas from share package for consistency
 export { selectSpaceSchema, createSpaceSchema };
 
 export const fileStatusEnum = pgEnum("file_status", [
@@ -322,7 +321,6 @@ export const files = createTable(
 	]
 );
 
-// Re-export schemas from share package for consistency
 export { selectFileSchema, createFileSchema };
 
 export const fileContents = createTable(
@@ -363,7 +361,10 @@ export const filesInSpace = createTable(
 			.notNull(),
 		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 	}),
-	(t) => [index("space_idx").on(t.spaceId)]
+	(t) => [
+		index("space_idx").on(t.spaceId),
+		unique("files_in_space_unique").on(t.fileId, t.spaceId),
+	]
 );
 
 export const filesInSpaceRelations = relations(filesInSpace, ({ one }) => ({

@@ -172,41 +172,44 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 
 					const model = getProviderModel(modelProvider, modelId);
 
-					const toolConfigs = isSystemAgent
+					const rawToolEntries = isSystemAgent
 						? (systemAgent?.tools ?? []).map((t) => ({
-								name: t.name,
+								identifier: t.name,
 								enabled: t.enabled,
-								config: t.config,
+								config: (t.config as Record<string, unknown>) ?? {},
 							}))
-						: (dbAgent?.agentTools ?? [])
-								.filter((at) => {
-									const toolIdentifier = at.tool?.toolKey ?? at.tool?.name;
-									if (!at.enabled) return false;
-									if (
-										toolIdentifier === "webSearch" &&
-										body.webSearchEnabled === false
-									)
-										return false;
-									if (
-										toolIdentifier === "fileSearch" &&
-										body.fileSearchEnabled === false
-									)
-										return false;
-									return true;
-								})
-								.map((at) => {
-									const toolIdentifier =
-										at.tool?.toolKey ?? at.tool?.name ?? "unknown";
-									const config = (at.config as Record<string, unknown>) ?? {};
-									if (toolIdentifier === "fileSearch" && body.fileIds) {
-										config.fileIds = body.fileIds;
-									}
-									return {
-										name: toolIdentifier,
-										enabled: at.enabled,
-										config,
-									};
-								});
+						: (dbAgent?.agentTools ?? []).map((at) => ({
+								identifier: at.tool?.toolKey ?? at.tool?.name ?? "unknown",
+								enabled: at.enabled,
+								config: (at.config as Record<string, unknown>) ?? {},
+							}));
+
+					const toolConfigs = rawToolEntries
+						.filter((entry) => {
+							if (!entry.enabled) return false;
+							if (
+								entry.identifier === "webSearch" &&
+								body.webSearchEnabled === false
+							)
+								return false;
+							if (
+								entry.identifier === "fileSearch" &&
+								body.fileSearchEnabled === false
+							)
+								return false;
+							return true;
+						})
+						.map((entry) => {
+							const config = { ...entry.config };
+							if (entry.identifier === "fileSearch" && body.fileIds) {
+								config.fileIds = body.fileIds;
+							}
+							return {
+								name: entry.identifier,
+								enabled: entry.enabled,
+								config,
+							};
+						});
 
 					const builtinTools = createTools(orgId, modelProvider, toolConfigs, {
 						searchProvider: body.searchProvider ?? "firecrawl",
@@ -316,10 +319,7 @@ export const Route = createFileRoute("/api/chat/$conversationId")({
 					logger.error("Error in chat API:", error);
 					return new Response(
 						JSON.stringify({
-							error:
-								error instanceof Error
-									? error.message
-									: "Internal server error",
+							error: "Internal server error",
 						}),
 						{ status: 500, headers: { "Content-Type": "application/json" } }
 					);

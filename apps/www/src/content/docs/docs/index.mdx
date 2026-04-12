@@ -24,6 +24,10 @@ Curiositi transforms how you manage digital content. Instead of remembering exac
 		Every file is automatically processed to extract content, chunk it, and
 		create searchable vector embeddings.
 	</Card>
+	<Card title="Agentic Chat" icon="comment">
+		Interact with your data using AI agents. Create custom agents, integrate
+		MCP servers, and chat with context-aware AI.
+	</Card>
 	<Card title="Fast and Scalable" icon="rocket">
 		Built on PostgreSQL with pgvector, Upstash QStash for async processing,
 		and Bun for performance.
@@ -70,9 +74,9 @@ Visit the [Getting Started](/docs/getting-started/getting-started) guide for det
 
 | Category | Formats |
 |----------|---------|
-| **Documents** | PDF |
+| **Documents** | PDF, Word (.docx), PowerPoint (.pptx) |
 | **Text** | Plain text (.txt), Markdown (.md), CSV |
-| **Data** | JSON, XML |
+| **Data** | JSON, XML, Excel (.xlsx) |
 | **Web** | HTML |
 | **Images** | JPEG, PNG, WebP, GIF (with AI-generated descriptions) |
 
@@ -84,6 +88,7 @@ Curiositi is built as a monorepo with Turborepo and Bun:
 
 - **Platform** — React 19 web app with TanStack Start, tRPC v11, and Tailwind CSS v4
 - **Worker** — Hono server on Bun for AI-powered file processing
+- **Agents** — specialized MCP integration capabilities to bring external intelligence
 - **Database** — PostgreSQL with Drizzle ORM and pgvector for embeddings
 - **Storage** — S3-compatible object storage for files
 - **Queue** — Upstash QStash for background job processing
