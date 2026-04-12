@@ -261,13 +261,18 @@ export async function createDefaultTools(organizationId: string) {
 	return { fileSearchTool, webSearchTool };
 }
 
-export async function getToolsByOrganization(organizationId: string) {
+export async function getToolsByOrganization(
+	organizationId: string,
+	includeDisabled = false
+) {
+	const whereClause = includeDisabled
+		? eq(tools.organizationId, organizationId)
+		: and(eq(tools.organizationId, organizationId), eq(tools.isActive, true));
+
 	return db
 		.select()
 		.from(tools)
-		.where(
-			and(eq(tools.organizationId, organizationId), eq(tools.isActive, true))
-		)
+		.where(whereClause)
 		.orderBy(desc(tools.createdAt));
 }
 

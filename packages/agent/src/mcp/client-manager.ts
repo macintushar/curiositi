@@ -21,6 +21,14 @@ class MCPClientManager {
 		return entry;
 	}
 
+	private getEncryptionSecret(): string {
+		const key = process.env.BETTER_AUTH_SECRET;
+		if (!key) {
+			throw new Error("BETTER_AUTH_SECRET must be configured");
+		}
+		return key;
+	}
+
 	async initialize(orgId: string): Promise<void> {
 		const entry = this.getOrCreateEntry(orgId);
 		if (entry.initialized) return;
@@ -40,11 +48,13 @@ class MCPClientManager {
 	private async _initialize(orgId: string, entry: OrgMcpEntry): Promise<void> {
 		let servers: Awaited<ReturnType<typeof getActiveMcpServers>>;
 		try {
-			servers = await getActiveMcpServers(orgId);
+			servers = await getActiveMcpServers(orgId, this.getEncryptionSecret());
 		} catch (error) {
 			logger.error(`[MCP] Failed to load servers for org ${orgId}:`, error);
 			return;
 		}
+
+		const pendingClients = new Map<string, MCPClient>();
 
 		await Promise.allSettled(
 			servers.map(async (server) => {
@@ -56,7 +66,13 @@ class MCPClientManager {
 							headers: (server.headers as Record<string, string>) ?? undefined,
 						},
 					});
-					entry.clients.set(server.id, client);
+
+					if (this.orgs.get(orgId) !== entry) {
+						await client.close();
+						return;
+					}
+
+					pendingClients.set(server.id, client);
 					logger.info(
 						`[MCP] Connected to server: ${server.name} (org: ${orgId})`
 					);
@@ -68,6 +84,24 @@ class MCPClientManager {
 				}
 			})
 		);
+
+		if (this.orgs.get(orgId) !== entry) {
+			for (const [id, client] of pendingClients) {
+				try {
+					await client.close();
+				} catch (error) {
+					logger.error(
+						`[MCP] Error closing stale client ${id} (org: ${orgId}):`,
+						error
+					);
+				}
+			}
+			return;
+		}
+
+		for (const [id, client] of pendingClients) {
+			entry.clients.set(id, client);
+		}
 
 		entry.initialized = true;
 	}
@@ -103,6 +137,16 @@ class MCPClientManager {
 	async shutdown(orgId: string): Promise<void> {
 		const entry = this.orgs.get(orgId);
 		if (!entry) return;
+		this.orgs.delete(orgId);
+
+		if (entry.initializing) {
+			await entry.initializing.catch((error) => {
+				logger.error(
+					`[MCP] Initialization failed during shutdown for org ${orgId}:`,
+					error
+				);
+			});
+		}
 
 		for (const [id, client] of entry.clients) {
 			try {
@@ -114,8 +158,6 @@ class MCPClientManager {
 				);
 			}
 		}
-
-		this.orgs.delete(orgId);
 	}
 }
 

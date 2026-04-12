@@ -46,6 +46,7 @@ export type WebSearchToolConfig = {
 	maxResults?: number;
 	includeDomains?: string[];
 	excludeDomains?: string[];
+	searchProvider?: SearchProvider;
 };
 
 export type ConversationMessage = {

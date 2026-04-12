@@ -41,7 +41,7 @@ export function createTools(
 		if (name === "webSearch" && options?.searchProvider) {
 			tools[name] = factory(organizationId, provider, {
 				...(config as Record<string, unknown>),
-				provider: options.searchProvider,
+				searchProvider: options.searchProvider,
 			});
 		} else {
 			tools[name] = factory(organizationId, provider, config);

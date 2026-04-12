@@ -583,7 +583,8 @@ export const mcpServers = createTable(
 		id: d.uuid().primaryKey().defaultRandom(),
 		name: d.text().notNull(),
 		url: d.text().notNull(),
-		headers: d.jsonb().default({}),
+		headers: d.jsonb(),
+		headersEncrypted: d.text(),
 		isActive: d.boolean().default(true).notNull(),
 		organizationId: d
 			.text()

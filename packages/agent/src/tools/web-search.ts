@@ -71,7 +71,17 @@ function filterByDomains(
 }
 
 export function webSearchTool(config: WebSearchToolConfig = {}) {
-	const { maxResults = 5, includeDomains = [], excludeDomains = [] } = config;
+	const {
+		maxResults = 5,
+		includeDomains = [],
+		excludeDomains = [],
+		searchProvider,
+	} = config;
+	const resolvedSearchProvider =
+		searchProvider ??
+		((config as Record<string, unknown>).provider === "webfetch"
+			? "webfetch"
+			: "firecrawl");
 
 	return tool({
 		description: `Search the web for current information.
@@ -83,6 +93,15 @@ Returns relevant search results with titles, snippets, and URLs.`,
 
 		execute: async ({ query }: WebSearchParams) => {
 			try {
+				if (resolvedSearchProvider === "webfetch") {
+					return {
+						error:
+							"Web search is not supported for the webfetch provider. Use the webFetch tool with a direct URL.",
+						results: [],
+						query,
+					};
+				}
+
 				const apiKey = process.env.FIRECRAWL_API_KEY;
 				if (!apiKey) {
 					return {

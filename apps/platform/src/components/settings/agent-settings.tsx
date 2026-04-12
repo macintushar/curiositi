@@ -35,7 +35,6 @@ import {
 import { Plus, Pencil, Trash2, Check, Loader2, Shield } from "lucide-react";
 import { cn } from "@platform/lib/utils";
 import { toast } from "sonner";
-import { IconLoader2 } from "@tabler/icons-react";
 
 type AgentRow = {
 	id: string;

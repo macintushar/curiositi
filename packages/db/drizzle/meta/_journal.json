@@ -22,6 +22,13 @@
       "when": 1776003799999,
       "tag": "0002_app_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776010500000,
+      "tag": "0003_encrypt_mcp_headers",
+      "breakpoints": true
     }
   ]
 }

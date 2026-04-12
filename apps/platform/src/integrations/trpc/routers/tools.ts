@@ -13,18 +13,22 @@ import {
 } from "@curiositi/db";
 import { discoverMcpTools, reloadMcpTools } from "@curiositi/agent/mcp";
 import logger from "@curiositi/share/logger";
+import { env } from "@platform/env";
+
+const encryptionSecret = env.BETTER_AUTH_SECRET;
 
 const toolsRouter = {
 	listBuiltIn: protectedProcedure.query(async ({ ctx }) => {
 		const orgId = ctx.session.session.activeOrganizationId;
-		const orgTools = await getToolsByOrganization(orgId);
+		const orgTools = await getToolsByOrganization(orgId, true);
 		const builtInTools = orgTools.filter((t) => t.type === "builtin");
 		return { tools: builtInTools };
 	}),
 
 	list: protectedProcedure.query(async ({ ctx }) => {
 		const servers = await getAllMcpServers(
-			ctx.session.session.activeOrganizationId
+			ctx.session.session.activeOrganizationId,
+			encryptionSecret
 		);
 		return { servers };
 	}),
@@ -32,7 +36,7 @@ const toolsRouter = {
 	getById: protectedProcedure
 		.input(z.object({ id: z.string() }))
 		.query(async ({ input, ctx }) => {
-			const server = await getMcpServerById(input.id);
+			const server = await getMcpServerById(input.id, encryptionSecret);
 			if (!server) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
@@ -63,6 +67,7 @@ const toolsRouter = {
 				url: input.url,
 				headers: input.headers,
 				organizationId: orgId,
+				encryptionSecret,
 			});
 			reloadMcpTools(orgId).catch((err) =>
 				logger.error("[MCP] Failed to reload tools after create:", err)
@@ -82,7 +87,7 @@ const toolsRouter = {
 		)
 		.mutation(async ({ input, ctx }) => {
 			const orgId = ctx.session.session.activeOrganizationId;
-			const existing = await getMcpServerById(input.id);
+			const existing = await getMcpServerById(input.id, encryptionSecret);
 			if (!existing) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
@@ -97,7 +102,7 @@ const toolsRouter = {
 			}
 
 			const { id, ...data } = input;
-			const server = await updateMcpServer(id, data);
+			const server = await updateMcpServer(id, data, encryptionSecret);
 			reloadMcpTools(orgId).catch((err) =>
 				logger.error("[MCP] Failed to reload tools after update:", err)
 			);
@@ -108,7 +113,7 @@ const toolsRouter = {
 		.input(z.object({ id: z.string() }))
 		.mutation(async ({ input, ctx }) => {
 			const orgId = ctx.session.session.activeOrganizationId;
-			const existing = await getMcpServerById(input.id);
+			const existing = await getMcpServerById(input.id, encryptionSecret);
 			if (!existing) {
 				throw new TRPCError({
 					code: "NOT_FOUND",
@@ -145,7 +150,7 @@ const toolsRouter = {
 		.input(z.object({ id: z.string(), isActive: z.boolean() }))
 		.mutation(async ({ input, ctx }) => {
 			const orgId = ctx.session.session.activeOrganizationId;
-			const orgTools = await getToolsByOrganization(orgId);
+			const orgTools = await getToolsByOrganization(orgId, true);
 			const tool = orgTools.find((t) => t.id === input.id);
 			if (!tool) {
 				throw new TRPCError({
