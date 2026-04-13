@@ -3,7 +3,7 @@ import { describe, expect, test, mock } from "bun:test";
 mock.module("js-tiktoken", () => {
 	const encoder = {
 		encode: (text: string) => new Uint32Array(text.length),
-		decode: (tokens: Uint32Array) => "overlap",
+		decode: (_tokens: Uint32Array) => "overlap",
 	};
 	return { getEncoding: () => encoder };
 });
