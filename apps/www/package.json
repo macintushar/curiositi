@@ -25,5 +25,8 @@
 		"sharp": "^0.34.2",
 		"tailwindcss": "^4.1.18",
 		"zod": "3.25.76"
+	},
+	"devDependencies": {
+		"wrangler": "^4.82.0"
 	}
 }
