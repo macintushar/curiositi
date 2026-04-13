@@ -27,7 +27,6 @@ export const WORD_TYPES = [
 
 export const EXCEL_TYPES = [
 	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-	"application/vnd.ms-excel",
 ];
 
 export const POWERPOINT_TYPES = [

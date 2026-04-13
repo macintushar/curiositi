@@ -216,7 +216,10 @@ export default async function processFile({
 
 				await tx
 					.update(files)
-					.set({ status: "completed", processedAt: new Date() })
+					.set({
+						status: "completed",
+						processedAt: new Date(),
+					})
 					.where(eq(files.id, fileId));
 
 				return insertedChunks;

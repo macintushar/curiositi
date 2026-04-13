@@ -1,6 +1,5 @@
 import type { Processor } from "./types";
 import mammoth from "mammoth";
-import { extractDocumentText } from "@curiositi/share/ai";
 import type { PageContent } from "../lib/md";
 
 function parseHtmlSections(html: string): PageContent[] {
@@ -95,29 +94,12 @@ const wordProcessor: Processor = async ({ file, fileData, logger }) => {
 		const hasContent = html.replace(/<[^>]*>/g, "").trim().length > 10;
 
 		if (!hasContent) {
-			logger.info("No text found via mammoth, falling back to AI extraction", {
+			logger.info("No text found via mammoth, returning empty result", {
 				fileId,
 				processor: "word",
 			});
 
-			const aiResult = await extractDocumentText({
-				file: arrayBuffer,
-				provider: "openai",
-				mediaType: fileData.type,
-			});
-
-			logger.info("Word document extracted via AI successfully", {
-				fileId,
-				processor: "word",
-			});
-
-			return [
-				{
-					pageNumber: 1,
-					content: aiResult.text,
-					metadata: { extractedVia: "ai" },
-				},
-			];
+			return [];
 		}
 
 		const sections = parseHtmlSections(html);

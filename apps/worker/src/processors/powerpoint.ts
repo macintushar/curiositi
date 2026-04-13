@@ -1,6 +1,5 @@
 import type { Processor } from "./types";
 import PPTX2Json from "pptx2json";
-import { extractDocumentText } from "@curiositi/share/ai";
 import type { PageContent } from "../lib/md";
 
 type SlideData = {
@@ -157,29 +156,10 @@ const powerpointProcessor: Processor = async ({ file, fileData, logger }) => {
 		}
 
 		if (pages.length === 0) {
-			logger.info(
-				"No meaningful content found via pptx2json, falling back to AI extraction",
-				{ fileId, processor: "powerpoint" }
-			);
-
-			const aiResult = await extractDocumentText({
-				file: arrayBuffer,
-				provider: "openai",
-				mediaType: fileData.type,
-			});
-
-			logger.info("PowerPoint document extracted via AI successfully", {
+			logger.info("No meaningful content found in PowerPoint file", {
 				fileId,
 				processor: "powerpoint",
 			});
-
-			return [
-				{
-					pageNumber: 1,
-					content: aiResult.text,
-					metadata: { extractedVia: "ai" },
-				},
-			];
 		}
 
 		logger.info("PowerPoint document processed successfully", {

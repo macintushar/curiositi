@@ -1,26 +1,58 @@
 import type { Processor } from "./types";
-import * as XLSX from "xlsx";
-import { extractDocumentText } from "@curiositi/share/ai";
+import ExcelJS from "exceljs";
 import type { PageContent } from "../lib/md";
-
 const MAX_SHEETS = 50;
 const MAX_ROWS_PER_CHUNK = 10;
 
-function sheetToRows(sheet: XLSX.WorkSheet): {
+function cellToString(cell: ExcelJS.CellValue | undefined): string {
+	if (cell === undefined || cell === null) {
+		return "";
+	}
+
+	if (cell instanceof Date) {
+		return cell.toISOString();
+	}
+
+	if (typeof cell === "object") {
+		if ("text" in cell && typeof cell.text === "string") {
+			return cell.text;
+		}
+
+		if ("result" in cell && cell.result !== undefined && cell.result !== null) {
+			return String(cell.result);
+		}
+
+		if ("richText" in cell && Array.isArray(cell.richText)) {
+			return cell.richText.map((part) => part.text).join("");
+		}
+
+		if ("hyperlink" in cell && typeof cell.hyperlink === "string") {
+			return "text" in cell && cell.text ? String(cell.text) : cell.hyperlink;
+		}
+	}
+
+	return String(cell);
+}
+
+function sheetToRows(sheet: ExcelJS.Worksheet): {
 	headers: string[];
 	rows: string[][];
 } {
-	const json = XLSX.utils.sheet_to_json<string[]>(sheet, {
-		header: 1,
-		defval: "",
+	const allRows: string[][] = [];
+
+	sheet.eachRow({ includeEmpty: false }, (row) => {
+		const rowValues = Array.isArray(row.values)
+			? row.values.slice(1).map((cell) => cellToString(cell).trim())
+			: [];
+		allRows.push(rowValues);
 	});
 
-	if (json.length === 0) {
+	if (allRows.length === 0) {
 		return { headers: [], rows: [] };
 	}
 
-	const headers = (json[0] ?? []).map((h) => String(h).trim());
-	const rows = json
+	const headers = (allRows[0] ?? []).map((h) => String(h).trim());
+	const rows = allRows
 		.slice(1)
 		.map((row) => (row ?? []).map((cell) => String(cell).trim()));
 
@@ -87,24 +119,23 @@ const excelProcessor: Processor = async ({ file, fileData, logger }) => {
 
 	try {
 		const arrayBuffer = await file.arrayBuffer();
-		const buffer = Buffer.from(arrayBuffer);
 
-		const workbook = XLSX.read(buffer, { type: "buffer" });
-		const sheetNames = workbook.SheetNames.slice(0, MAX_SHEETS);
+		const workbook = new ExcelJS.Workbook();
+		await workbook.xlsx.load(arrayBuffer);
+		const sheets = workbook.worksheets.slice(0, MAX_SHEETS);
 
-		if (workbook.SheetNames.length > MAX_SHEETS) {
+		if (workbook.worksheets.length > MAX_SHEETS) {
 			logger.warn("Excel file has many sheets, truncating", {
 				fileId,
-				totalSheets: workbook.SheetNames.length,
+				totalSheets: workbook.worksheets.length,
 				processedSheets: MAX_SHEETS,
 			});
 		}
 
 		const pages: PageContent[] = [];
 
-		for (const sheetName of sheetNames) {
-			const sheet = workbook.Sheets[sheetName];
-			if (!sheet) continue;
+		for (const sheet of sheets) {
+			const sheetName = sheet.name;
 			const { headers, rows } = sheetToRows(sheet);
 
 			if (rows.length === 0) {
@@ -129,34 +160,15 @@ const excelProcessor: Processor = async ({ file, fileData, logger }) => {
 		}
 
 		if (pages.length === 0) {
-			logger.info(
-				"No meaningful data found via xlsx, falling back to AI extraction",
-				{ fileId, processor: "excel" }
-			);
-
-			const aiResult = await extractDocumentText({
-				file: arrayBuffer,
-				provider: "openai",
-				mediaType: fileData.type,
-			});
-
-			logger.info("Excel document extracted via AI successfully", {
+			logger.info("No meaningful data found in Excel file", {
 				fileId,
 				processor: "excel",
 			});
-
-			return [
-				{
-					pageNumber: 1,
-					content: aiResult.text,
-					metadata: { extractedVia: "ai" },
-				},
-			];
 		}
 
 		logger.info("Excel document processed successfully", {
 			fileId,
-			sheetCount: sheetNames.length,
+			sheetCount: sheets.length,
 			chunkCount: pages.length,
 			processor: "excel",
 		});
