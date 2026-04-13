@@ -1,0 +1,7 @@
+{
+	"name": "curiositi-www",
+  "compatibility_date": "2026-04-13",
+	"assets": {
+		"directory": "./dist"
+	}
+}
