@@ -14,9 +14,20 @@ An **Agent** in Curiositi is a configured AI assistant that holds a persistent c
 - **Provider Choice**: Select which underlying backend powers the agent's logic (e.g., OpenAI, Google, Anthropic, Ollama).
 - **Tool Access Constraints**: Define the maximum number of multi-step tool calls the Agent is allowed to perform, controlling autonomy vs reliability.
 
+### System Agents
+
+Curiositi provides two built-in system agents:
+
+| Agent | ID | Description | Max Tool Calls |
+|-------|----|-------------|---------------|
+| Ask | `system:ask` | General-purpose assistant for everyday questions and tasks | 10 |
+| Deep Research | `system:deep-research` | Thorough research agent that explores topics in depth, cites sources, and provides comprehensive analysis | 100 |
+
 ## Conversations
 
 Curiositi manages chat history in **Conversations**. This gives you persistent records of interactions. When you re-open a Conversation, the context of previous tool calls and answers remains intact, allowing you to pick up exactly where you left off.
+
+Conversations can originate from different sources (currently `web` and `slack`), tracked via the `source` field.
 
 ## Tools and Capabilities
 
@@ -24,8 +35,9 @@ The true power of Agentic Chat stems from the **Tools** available for agents to 
 
 ### Built-in Tools
 Curiositi agents ship with built-in primitives to understand your data:
-- **Semantic File Search (`file-search`)**: Agent can retrieve vectorized chunk data to read direct sections of PDFs, Docs, spreadsheets, or images.
-- **Web Search**: The agent can look up current external information using web fetchers (like Firecrawl or traditional web searches) and blend it with your internal context.
+- **File Search (`fileSearch`)**: Agent can retrieve vectorized chunk data to read direct sections of PDFs, Docs, spreadsheets, or images. Supports filtering by spaces, file types, and similarity thresholds.
+- **Web Search (`webSearch`)**: The agent can look up current external information using Firecrawl and blend it with your internal context. Supports domain filtering (include/exclude lists).
+- **Web Fetch (`webFetch`)**: Fetch and extract content from a specific URL when you have a direct link. Includes SSRF protection to prevent requests to private/internal addresses.
 
 ### Model Context Protocol (MCP) Support
 
@@ -34,6 +46,16 @@ This allows you to add custom tools and context servers running anywhere (locall
 
 - **Drop-in Extensibility**: Add capabilities like Jira ticketing, GitHub issue reading, or direct database connections without writing a new plugin for Curiositi.
 - **Agent specific configurations**: You can tie specific MCP tools to specific Agents dynamically.
+- **Tool Discovery**: MCP servers automatically discover and register available tools when connected.
+
+### Supported AI Providers
+
+| Provider | Default Model | Requires API Key |
+|----------|--------------|-----------------|
+| OpenAI | `gpt-5-mini` | `OPENAI_API_KEY` |
+| Google | `gemini-3-flash-preview` | `GOOGLE_GENERATIVE_AI_API_KEY` |
+| Anthropic | `claude-haiku-4-5` | `ANTHROPIC_API_KEY` |
+| Ollama | (user-configured) | `OLLAMA_BASE_URL` |
 
 ## Quick Actions
 - Open the Chat interface from application sidebar.

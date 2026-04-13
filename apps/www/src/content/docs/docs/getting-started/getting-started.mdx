@@ -81,19 +81,63 @@ curiositi/
 │   │       ├── layouts/   # Layout components
 │   │       ├── integrations/ # tRPC client and server setup
 │   │       ├── hooks/     # React hooks
-│   │       ├── lib/       # Utilities (auth, upload, etc.)
+│   │       ├── lib/       # Utilities (auth, upload, search, etc.)
+│   │       ├── contexts/  # React context providers
+│   │       ├── forms/     # Form components
+│   │       ├── stores/    # State management
+│   │       ├── server/    # Server configuration
+│   │       ├── middleware/ # Server middleware
 │   │       └── env.ts     # Environment variable validation
 │   ├── worker/            # File processing worker (Hono on Bun)
 │   │   └── src/
-│   │       ├── processors/# File type processors (doc, image)
-│   │       ├── lib/       # Chunking and markdown utilities
+│   │       ├── processors/# File type processors (doc, image, word, excel, powerpoint)
+│   │       ├── lib/       # Chunking, embedding context, file-type utils, markdown
+│   │       ├── process-file.ts # Main file processing logic
+│   │       ├── create-logger.ts # Per-request logger factory
+│   │       ├── sentry.ts  # Sentry error tracking
+│   │       ├── utils.ts   # Response helpers
+│   │       ├── index.ts   # Hono server + bunqueue worker entry point
 │   │       └── env.ts     # Environment variable validation
 │   └── www/               # Documentation site (Starlight on Vercel)
 ├── packages/
+│   ├── agent/             # AI Agents, tools, and MCP logic
+│   │   └── src/
+│   │       ├── create.ts  # Agent creation and streaming
+│   │       ├── constants.ts # Model configs and provider defaults
+│   │       ├── types.ts   # Type definitions
+│   │       ├── system-agents.ts # System agent definitions
+│   │       ├── prompts/   # Agent prompt templates
+│   │       ├── mcp/       # MCP client implementation
+│   │       └── tools/     # Built-in tools (file-search, web-search, webfetch)
 │   ├── db/                # Database schema and Drizzle ORM config
-│   ├── share/             # Shared utilities (logger, fs, constants, AI)
+│   │   └── src/
+│   │       ├── schema.ts   # All table definitions
+│   │       ├── client.ts   # Database client
+│   │       └── index.ts    # Exports
+│   ├── share/             # Shared utilities
+│   │   └── src/
+│   │       ├── ai/         # AI model definitions, embeddings, prompts
+│   │       ├── constants/  # MIME types, file size limits, allowed types
+│   │       ├── db-schemas/ # Zod validation schemas for space/file
+│   │       ├── fs/         # File system helpers
+│   │       ├── logger/     # Structured logging utility
+│   │       ├── models/     # AI model catalog (bundled models.dev data)
+│   │       ├── schemas/    # Shared Zod schemas (upload, auth, email)
+│   │       └── types/      # Shared type definitions (queue, search, agents)
 │   ├── api-handlers/      # Shared API handler logic
-│   ├── queue/             # Job queue (Upstash QStash)
+│   │   └── src/
+│   │       ├── upload.ts   # File upload handling
+│   │       ├── file.ts     # File operations
+│   │       ├── space.ts    # Space operations
+│   │       ├── queue.ts    # Queue job dispatching
+│   │       ├── invitation.ts # Workspace invitation handling
+│   │       └── response.ts # Response helpers
+│   ├── email/             # Email package (Resend integration)
+│   ├── queue/             # Job queue wrapper (supports QStash and bunqueue)
+│   │   ├── index.ts        # Queue client factory
+│   │   └── providers/
+│   │       ├── qstash.ts   # Upstash QStash provider
+│   │       └── bunqueue.ts # Local bunqueue provider
 │   └── tsconfig/          # Shared TypeScript configurations
 ├── .env.example           # Environment variable template
 ├── package.json

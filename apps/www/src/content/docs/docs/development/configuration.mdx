@@ -32,6 +32,7 @@ These variables are required by both the platform and worker apps:
 | `S3_BUCKET` | Yes | S3 bucket name |
 | `S3_ACCESS_KEY_ID` | Yes | S3 access key |
 | `S3_SECRET_ACCESS_KEY` | Yes | S3 secret key |
+| `OPENAI_API_KEY` | Yes | OpenAI API key (required for file processing/embeddings in worker) |
 
 Connection string format:
 ```
@@ -43,15 +44,17 @@ postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `PLATFORM_URL` | Yes | Public URL of the platform app (default: `http://localhost:3030`) |
-| `WORKER_URL` | Yes | URL of the worker service (default: `http://localhost:3040`) |
+| `WORKER_URL` | Conditional | URL of the worker service (required if `QUEUE_PROVIDER=qstash`, default: `http://localhost:3040`) |
 | `BETTER_AUTH_SECRET` | Yes | Secret key for Better Auth session signing |
 | `BETTER_AUTH_GOOGLE_CLIENT_ID` | Yes | Google OAuth client ID |
 | `BETTER_AUTH_GOOGLE_CLIENT_SECRET` | Yes | Google OAuth client secret |
 | `QUEUE_PROVIDER` | No | Queue provider: `"qstash"` (default, cloud) or `"local"` (self-hosted bunqueue) |
 | `QSTASH_TOKEN` | Conditional | Upstash QStash token (required if `QUEUE_PROVIDER=qstash`) |
 | `QSTASH_URL` | No | Custom QStash URL (uses default Upstash endpoint if not set) |
-| `BUNQUEUE_HOST` | Conditional | bunqueue server host (required if `QUEUE_PROVIDER=local`, default: `localhost`)
+| `BUNQUEUE_HOST` | Conditional | bunqueue server host (required if `QUEUE_PROVIDER=local`, default: `localhost`) |
 | `BUNQUEUE_PORT` | Conditional | bunqueue server port (required if `QUEUE_PROVIDER=local`, default: `6789`) |
+| `RESEND_API_KEY` | No | Resend API key for email features |
+| `EMAIL_FROM_ADDRESS` | Conditional | Sender email address (required if `RESEND_API_KEY` is set, default: `noreply@curiositi.com`) |
 
 ### Client-Side (Platform)
 
@@ -61,6 +64,16 @@ postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]
 | `VITE_SENTRY_DSN` | No | Sentry DSN for error tracking |
 | `VITE_SENTRY_ORG` | No | Sentry organization slug |
 | `VITE_SENTRY_PROJECT` | No | Sentry project slug |
+
+### Worker Only
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENAI_API_KEY` | Yes | OpenAI API key (required for embeddings and document extraction) |
+| `WORKER_SENTRY_DSN` | No | Sentry DSN for worker error tracking |
+| `SENTRY_ENVIRONMENT` | No | Sentry environment label (default: `development`) |
+| `QSTASH_CURRENT_SIGNING_KEY` | Conditional | QStash current signing key (required if `QUEUE_PROVIDER=qstash`) |
+| `QSTASH_NEXT_SIGNING_KEY` | Conditional | QStash next signing key (required if `QUEUE_PROVIDER=qstash`) |
 
 ### AI Providers & Search (Platform & Worker)
 
@@ -94,9 +107,16 @@ S3_BUCKET=""
 S3_ACCESS_KEY_ID=""
 S3_SECRET_ACCESS_KEY=""
 
+# Worker AI provider credential (required for file processing / embeddings)
+OPENAI_API_KEY=""
+
+# Worker monitoring
+WORKER_SENTRY_DSN=""
+SENTRY_ENVIRONMENT="development"
+
 # === PLATFORM ONLY ===
 
-# Server Configuration
+# Server Configuration - Basic application settings and environment URLs
 PLATFORM_URL="http://localhost:3030"
 WORKER_URL="http://localhost:3040"
 
@@ -112,6 +132,8 @@ QUEUE_PROVIDER="qstash"
 # QStash (required if QUEUE_PROVIDER=qstash)
 QSTASH_TOKEN=""
 QSTASH_URL=""
+QSTASH_CURRENT_SIGNING_KEY=""
+QSTASH_NEXT_SIGNING_KEY=""
 
 # bunqueue (required if QUEUE_PROVIDER=local)
 BUNQUEUE_HOST="localhost"
@@ -122,7 +144,6 @@ RESEND_API_KEY=""
 EMAIL_FROM_ADDRESS="noreply@curiositi.com"
 
 # AI Providers - at least one is required for agent chat
-OPENAI_API_KEY=""
 ANTHROPIC_API_KEY=""
 GOOGLE_GENERATIVE_AI_API_KEY=""
 OLLAMA_BASE_URL=""
@@ -152,12 +173,14 @@ export const env = createEnv({
     PLATFORM_URL: z.url(),
     QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
     QSTASH_TOKEN: z.string().optional(),
-    WORKER_URL: z.string(),
+    WORKER_URL: z.string().optional(),
     BUNQUEUE_HOST: z.string().default("localhost"),
     BUNQUEUE_PORT: z.coerce.number().default(6789),
     BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
     BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
     BETTER_AUTH_SECRET: z.string(),
+    RESEND_API_KEY: z.string().optional(),
+    EMAIL_FROM_ADDRESS: z.string().optional(),
     S3_ACCESS_KEY_ID: z.string(),
     S3_SECRET_ACCESS_KEY: z.string(),
     S3_BUCKET: z.string(),
@@ -171,13 +194,22 @@ export const env = createEnv({
   },
   // Conditional validation happens at runtime after env is loaded
 });
+
+// Conditional validation:
+if (env.QUEUE_PROVIDER === "qstash") {
+  if (!env.QSTASH_TOKEN || !env.WORKER_URL) {
+    throw new Error("QSTASH_TOKEN and WORKER_URL are required when QUEUE_PROVIDER=qstash");
+  }
+}
+
+if (env.RESEND_API_KEY && !env.EMAIL_FROM_ADDRESS) {
+  throw new Error("EMAIL_FROM_ADDRESS is required when RESEND_API_KEY is set");
+}
 ```
 
 The platform performs conditional validation based on `QUEUE_PROVIDER`:
-- If `qstash`: requires `QSTASH_TOKEN`
+- If `qstash`: requires `QSTASH_TOKEN` and `WORKER_URL`
 - If `local`: requires `BUNQUEUE_HOST` and `BUNQUEUE_PORT` (defaults available)
-
-`WORKER_URL` is always required.
 
 **Worker validation** (`apps/worker/src/env.ts`):
 
@@ -187,17 +219,30 @@ import { z } from "zod";
 
 export const env = createEnv({
   server: {
+    OPENAI_API_KEY: z.string(),
     S3_ACCESS_KEY_ID: z.string(),
     S3_SECRET_ACCESS_KEY: z.string(),
     S3_BUCKET: z.string(),
     S3_ENDPOINT: z.string(),
     POSTGRES_URL: z.url(),
+    WORKER_SENTRY_DSN: z.string().optional(),
+    SENTRY_ENVIRONMENT: z.string().optional(),
     QUEUE_PROVIDER: z.enum(["qstash", "local"]).default("qstash"),
+    QSTASH_CURRENT_SIGNING_KEY: z.string().optional(),
+    QSTASH_NEXT_SIGNING_KEY: z.string().optional(),
     BUNQUEUE_HOST: z.string().default("localhost"),
     BUNQUEUE_PORT: z.coerce.number().default(6789),
   },
   // ...
 });
+
+// Conditional validation:
+if (env.QUEUE_PROVIDER === "qstash" && 
+    (!env.QSTASH_CURRENT_SIGNING_KEY || !env.QSTASH_NEXT_SIGNING_KEY)) {
+  throw new Error(
+    "QSTASH_CURRENT_SIGNING_KEY and QSTASH_NEXT_SIGNING_KEY are required when QUEUE_PROVIDER=qstash"
+  );
+}
 ```
 
 ## Hardcoded Configuration
@@ -210,18 +255,36 @@ Some configuration values are set directly in code rather than through environme
 |---------|-------|----------|
 | Max file size | 50MB | `packages/share/src/constants/index.ts` |
 | Large image threshold | 5MB | `packages/share/src/constants/index.ts` |
-| Chunk size | 800 tokens | `apps/worker/src/lib/chunk.ts` |
-| Chunk overlap | 100 tokens | `apps/worker/src/lib/chunk.ts` |
+| Chunk size | 300 tokens | `apps/worker/src/lib/chunk.ts` |
+| Chunk overlap | 60 tokens | `apps/worker/src/lib/chunk.ts` |
 | Embedding dimensions | 1536 | `packages/db/src/schema.ts` |
 
 ### AI Models
 
-AI model names are hardcoded in `packages/share/src/ai/index.ts`:
+AI model names are configured in `packages/share/src/models/index.ts` and `packages/agent/src/constants.ts`:
 
-| Provider | Embedding Model | Text Model |
+**Default Chat Models (for Agentic Chat):**
+
+| Provider | Default Model |
+|----------|--------------|
+| OpenAI | `gpt-5-mini` |
+| Google | `gemini-3-flash-preview` |
+| Anthropic | `claude-haiku-4-5` |
+| Ollama | (user-configured) |
+
+**Embedding Models (for file processing):**
+
+| Provider | Embedding Model | Dimensions |
 |----------|----------------|------------|
-| OpenAI | `text-embedding-3-small` | `gpt-5-mini-2025-08-07` |
-| Google | `gemini-embedding-001` | `gemini-3-flash-preview` |
+| OpenAI | `text-embedding-3-small` | 1536 |
+| Google | `gemini-embedding-001` | 1536 |
+
+**Text Extraction Models (for document/image processing in worker):**
+
+| Provider | Model |
+|----------|-------|
+| OpenAI | `gpt-4o-mini` |
+| Google | `gemini-2.0-flash` |
 
 ### Ports
 

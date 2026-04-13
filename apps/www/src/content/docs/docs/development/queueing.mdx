@@ -19,7 +19,9 @@ flowchart LR
 1. User uploads a file via the Platform
 2. Platform saves the file to S3 storage and creates a database record with status `pending`
 3. Platform enqueues a processing job via the configured queue provider
-4. Queue invokes the Worker at `POST /process-file`
+4. Queue invokes the Worker:
+   - **QStash**: Sends a signed HTTP POST to `/process-file` with the job payload
+   - **bunqueue**: Worker polls the bunqueue server for jobs and processes them
 5. Worker downloads the file, extracts content, creates embeddings, and updates the database
 
 ## Provider Comparison
@@ -67,6 +69,8 @@ Add to your `.env` file:
 QUEUE_PROVIDER=qstash
 QSTASH_TOKEN="your-qstash-token-here"
 QSTASH_URL="https://your-qstash-url.upstash.io"
+QSTASH_CURRENT_SIGNING_KEY="your-current-signing-key"
+QSTASH_NEXT_SIGNING_KEY="your-next-signing-key"
 WORKER_URL="https://your-worker-url.com"
 ```
 
@@ -74,7 +78,8 @@ WORKER_URL="https://your-worker-url.com"
 
 QStash is ready when:
 - `QUEUE_PROVIDER=qstash`
-- `QSTASH_TOKEN` is set
+- `QSTASH_TOKEN` is set (used by the platform to enqueue jobs)
+- `QSTASH_CURRENT_SIGNING_KEY` and `QSTASH_NEXT_SIGNING_KEY` are set (used by the worker to verify incoming requests)
 - `WORKER_URL` points to your worker deployment
 
 ## Setting Up bunqueue
@@ -137,9 +142,11 @@ Restart both platform and worker after changing the provider.
 | Variable | Provider | Required | Default | Description |
 |----------|----------|----------|---------|-------------|
 | `QUEUE_PROVIDER` | Both | No | `qstash` | Queue provider: `qstash` or `local` |
-| `QSTASH_TOKEN` | qstash | Conditional | - | Upstash QStash authentication token |
+| `QSTASH_TOKEN` | qstash | Conditional | - | Upstash QStash authentication token (platform) |
 | `QSTASH_URL` | qstash | No | Upstash default | Custom QStash endpoint URL |
-| `WORKER_URL` | qstash | Yes | - | Public URL of the worker service |
+| `QSTASH_CURRENT_SIGNING_KEY` | qstash | Conditional | - | Current signing key for request verification (worker) |
+| `QSTASH_NEXT_SIGNING_KEY` | qstash | Conditional | - | Next signing key for request verification (worker) |
+| `WORKER_URL` | qstash | Conditional | - | Public URL of the worker service (required by platform) |
 | `BUNQUEUE_HOST` | local | Conditional | `localhost` | bunqueue server host |
 | `BUNQUEUE_PORT` | local | Conditional | `6789` | bunqueue server port |
 

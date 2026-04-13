@@ -12,12 +12,16 @@ Adding content to Curiositi is straightforward. Upload files through the web int
 | Format | MIME Type | Notes |
 |--------|-----------|-------|
 | PDF | `application/pdf` | Full text extraction |
-| Word | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | Full text extraction (.docx) |
-| PowerPoint | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | Slide text extraction (.pptx) |
-| Excel | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | Tabular data extraction (.xlsx) |
+| Word (.docx) | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` | Full text extraction via mammoth, AI fallback |
+| Word (.doc) | `application/msword` | AI-powered text extraction |
+| PowerPoint (.pptx) | `application/vnd.openxmlformats-officedocument.presentationml.presentation` | Slide text extraction, AI fallback |
+| PowerPoint (.ppt) | `application/vnd.ms-powerpoint` | AI-powered text extraction |
+| Excel (.xlsx) | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` | Tabular data extraction with sheet-aware chunking |
+| Excel (.xls) | `application/vnd.ms-excel` | AI-powered text extraction |
 | Plain Text | `text/plain` | Direct content indexing |
+| Plaintext | `plaintext` | Direct content indexing |
 | Markdown | `text/markdown` | Rendered text extracted |
-| CSV | `text/csv` | Tabular data as text |
+| CSV | `text/csv` | Tabular data as text with header-aware chunking |
 | HTML | `text/html` | Rendered text extracted |
 | XML | `text/xml`, `application/xml` | Raw content extracted |
 | JSON | `application/json` | Raw content extracted |
@@ -50,14 +54,21 @@ Images larger than 5 MB are considered "large" and handled accordingly during pr
 1. Upload
    ├─ File uploaded to S3 storage
    ├─ File metadata saved to PostgreSQL (status: "pending")
-   └─ Processing job dispatched via QStash
+   └─ Processing job dispatched via QStash or bunqueue
 
 2. Worker Processing (POST /process-file)
    ├─ Worker downloads file from S3
    ├─ Content extracted based on file type:
-   │   ├─ Documents: text extraction
+   │   ├─ Documents: text extraction (PDF, text, markdown, HTML, CSV, JSON, XML)
+   │   ├─ Word (.docx): mammoth extraction with AI fallback
+   │   ├─ Word (.doc): AI-powered extraction
+   │   ├─ Excel (.xlsx): sheet-aware extraction with header-aware chunking
+   │   ├─ Excel (.xls): AI-powered extraction
+   │   ├─ PowerPoint (.pptx): slide text extraction with AI fallback
+   │   ├─ PowerPoint (.ppt): AI-powered extraction
    │   └─ Images: AI vision model generates description
-   ├─ Text chunked (800 tokens per chunk, 100 token overlap)
+   ├─ Text chunked (300 tokens per chunk, 60 token overlap)
+   ├─ Context prefix added (file name, type, page numbers, section titles)
    ├─ Vector embeddings generated (1536 dimensions)
    ├─ Chunks + embeddings stored in fileContents table
    └─ File status updated to "completed"
@@ -148,9 +159,10 @@ The upload endpoint is a standard HTTP POST (not tRPC) at `/api/upload`. It hand
 ### File Stuck at "Pending"
 
 1. Check the worker is running: `bun --filter @curiositi/worker dev`
-2. Verify `QSTASH_TOKEN` and `QSTASH_URL` are set correctly in `.env`
-3. Verify `WORKER_URL` points to your worker instance (default: `http://localhost:3040`)
-4. Check worker logs for errors
+2. If using QStash: verify `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, and `QSTASH_NEXT_SIGNING_KEY` are set correctly in `.env`
+3. If using bunqueue: verify `BUNQUEUE_HOST` and `BUNQUEUE_PORT` are set correctly and the bunqueue server is running
+4. Verify `WORKER_URL` points to your worker instance (default: `http://localhost:3040`)
+5. Check worker logs for errors
 
 ### Processing Failed
 

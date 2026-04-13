@@ -47,6 +47,34 @@ Workspaces are stored as `organization` records in the database (via Better Auth
 | `metadata` | text | Optional metadata |
 | `createdAt` | timestamp | Creation time |
 
+### Workspace Roles
+
+Workspaces support role-based access through the `organizationRoles` table:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | text | Primary key |
+| `organizationId` | text | Reference to workspace |
+| `role` | text | Role name |
+| `permission` | text | Permission granted to this role |
+| `createdAt` | timestamp | Creation time |
+| `updatedAt` | timestamp | Last modification time |
+
+### Invitations
+
+Users can be invited to workspaces via the `invitation` table:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | text | Primary key |
+| `email` | text | Invitee email address |
+| `inviterId` | text | Reference to inviting user |
+| `organizationId` | text | Reference to workspace |
+| `role` | text | Role to assign |
+| `status` | text | Invitation status |
+| `createdAt` | timestamp | Creation time |
+| `expiresAt` | timestamp | Expiration time |
+
 ## Spaces
 
 Spaces are Curiositi's way of organizing content. They work like folders with hierarchical nesting.
@@ -135,9 +163,17 @@ When a file is uploaded:
 
 1. **Upload** — File streams to S3 storage
 2. **Metadata** — File record created in database with status `pending`
-3. **Queue** — Processing job dispatched via Upstash QStash
-4. **Content Extraction** — Worker extracts text (documents) or generates descriptions (images)
-5. **Chunking** — Content split into chunks (800 tokens, 100 token overlap)
+3. **Queue** — Processing job dispatched via Upstash QStash or bunqueue
+4. **Content Extraction** — Worker extracts text based on file type:
+   - **PDF, text, markdown, HTML, CSV, JSON, XML**: Direct text extraction
+   - **Word (.docx)**: mammoth library extraction with AI fallback
+   - **Word (.doc)**: AI-powered extraction
+   - **Excel (.xlsx)**: Sheet-aware extraction with header-aware chunking
+   - **Excel (.xls)**: AI-powered extraction
+   - **PowerPoint (.pptx)**: Slide text extraction with AI fallback
+   - **PowerPoint (.ppt)**: AI-powered extraction
+   - **Images**: AI vision model generates description
+5. **Chunking** — Content split into chunks (300 tokens, 60 token overlap) with context prefix (file name, type, page numbers, section titles)
 6. **Embedding** — Each chunk converted to a 1536-dimension vector
 7. **Storage** — Chunks and embeddings saved to `fileContents` table
 8. **Complete** — File status updated to `completed`
@@ -167,8 +203,10 @@ Files are broken into chunks for precise semantic search.
 
 ### Chunking Parameters
 
-- **Chunk size:** 800 tokens
-- **Overlap:** 100 tokens
+- **Chunk size:** 300 tokens
+- **Overlap:** 60 tokens
+
+Each chunk also includes a context prefix with metadata (file name, file type, page numbers, section titles, CSV headers) prepended to the content before embedding. This improves search relevance by providing contextual signals alongside the raw text.
 
 ## The Junction Pattern
 
@@ -222,15 +260,132 @@ erDiagram
 Curiositi supports intelligent agentic workflows, enabling you to converse with your data and perform actions via chat.
 
 ### Agents
-Agents are AI entities powered by LLMs (e.g., OpenAI, Anthropic, Google) configured with specific system prompts and tool access limits. They exist within a workspace and can use various tools to fulfill requests.
+Agents are AI entities powered by LLMs (e.g., OpenAI, Anthropic, Google, Ollama) configured with specific system prompts and tool access limits. They exist within a workspace and can use various tools to fulfill requests.
+
+### Agent Data Model
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key (auto-generated) |
+| `name` | text | Agent display name |
+| `description` | text | Optional description |
+| `organizationId` | text | Owning workspace |
+| `createdById` | text | User who created the agent |
+| `systemPrompt` | text | System prompt for the agent |
+| `maxToolCalls` | integer | Maximum tool calls per conversation turn (default: 10) |
+| `isDefault` | boolean | Whether this is the default agent |
+| `isActive` | boolean | Whether the agent is active |
+| `createdAt` | timestamp | Creation time |
+| `updatedAt` | timestamp | Last modification time |
+
+### System Agents
+
+Curiositi provides two built-in system agents:
+
+| Agent | ID | Description | Max Tool Calls |
+|-------|----|-------------|---------------|
+| Ask | `system:ask` | General-purpose assistant for everyday questions | 10 |
+| Deep Research | `system:deep-research` | Thorough research agent that explores topics in depth | 100 |
 
 ### Tools and MCP
 Tools expand an agent's capabilities:
-- **Built-in Tools**: Foundational actions (like semantic file search, web search).
+- **Built-in Tools**: Foundational actions available to agents:
+  - **File Search (`fileSearch`)**: Semantic search across uploaded documents and files
+  - **Web Search (`webSearch`)**: Search the web using Firecrawl for current information
+  - **Web Fetch (`webFetch`)**: Fetch and extract content from a specific URL
 - **Model Context Protocol (MCP)**: Curiositi integrates with MCP servers to bring external capabilities, data, and context directly to your agents without custom integrations.
+
+### Tool Data Model
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `toolKey` | text | Unique key identifier (e.g., `fileSearch`, `webSearch`) |
+| `name` | text | Internal name |
+| `displayName` | text | Human-readable name |
+| `description` | text | Tool description |
+| `type` | enum | `builtin` or `mcp` |
+| `mcpServerId` | UUID / null | Reference to MCP server (for MCP tools) |
+| `organizationId` | text | Owning workspace |
+| `config` | jsonb | Tool configuration (default: `{}`) |
+| `isActive` | boolean | Whether the tool is active |
+| `createdAt` | timestamp | Creation time |
+| `updatedAt` | timestamp | Last modification time |
+
+### Agent-Tool Junction (agentTools)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `agentId` | UUID | Reference to agent |
+| `toolId` | UUID | Reference to tool |
+| `enabled` | boolean | Whether the tool is enabled for this agent |
+| `priority` | integer | Tool priority (default: 0) |
+| `config` | jsonb | Agent-specific tool configuration |
+| `createdAt` | timestamp | Creation time |
 
 ### Conversations
 Conversations capture the interactions (messages and tool call context) between users and an agent, providing a persistent history of queries and analysis.
+
+### Conversation Data Model
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `externalId` | text / null | External identifier (unique) |
+| `title` | text / null | Conversation title |
+| `source` | enum | `web` or `slack` |
+| `organizationId` | text | Owning workspace |
+| `createdById` | text | User who started the conversation |
+| `metadata` | jsonb / null | Optional metadata |
+| `createdAt` | timestamp | Creation time |
+| `updatedAt` | timestamp | Last modification time |
+
+### Message Data Model
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `conversationId` | UUID | Reference to conversation |
+| `role` | enum | `user`, `assistant`, `system`, or `tool` |
+| `content` | text | Message content |
+| `attachments` | jsonb / null | File attachments |
+| `toolCalls` | jsonb / null | Tool call data |
+| `tokenCount` | integer / null | Token usage count |
+| `costUSD` | numeric / null | Cost in USD |
+| `agentId` | UUID / null | Reference to agent (set null on agent deletion) |
+| `metadata` | jsonb / null | Optional metadata |
+| `createdAt` | timestamp | Creation time |
+
+### MCP Servers
+
+MCP servers provide external tools and context to agents:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `name` | text | Server display name |
+| `url` | text | MCP server endpoint URL |
+| `headers` | jsonb / null | Custom headers for authentication |
+| `headersEncrypted` | text / null | Encrypted headers |
+| `isActive` | boolean | Whether the server is active |
+| `organizationId` | text | Owning workspace |
+| `discoveredTools` | integer | Number of tools discovered (default: 0) |
+| `lastConnectedAt` | timestamp / null | Last successful connection time |
+| `createdAt` | timestamp | Creation time |
+| `updatedAt` | timestamp | Last modification time |
+
+### Organization Settings
+
+Workspace-level settings are stored in the `organizationSettings` table:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Primary key |
+| `organizationId` | text | Reference to workspace |
+| `key` | text | Setting key |
+| `value` | jsonb | Setting value |
+| `updatedAt` | timestamp | Last modification time |
 
 ## Semantic Search
 

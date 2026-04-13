@@ -65,7 +65,12 @@ apps/platform/src/
 
 ### Worker (File Processing)
 
-The worker is a Hono server running on Bun that processes uploaded files. It exposes the following endpoints:
+The worker is a Hono server running on Bun that processes uploaded files. It operates in two modes depending on the queue provider:
+
+- **QStash mode**: Runs as an HTTP server on port 3040. QStash sends signed requests to `POST /process-file`, and the worker verifies the signature before processing.
+- **bunqueue mode**: Starts a bunqueue worker that polls the local bunqueue server for jobs. Also runs the HTTP server for health checks.
+
+It exposes the following endpoints:
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -73,13 +78,12 @@ The worker is a Hono server running on Bun that processes uploaded files. It exp
 | `/health` | GET | Health status endpoint |
 | `/process-file` | POST | File processing endpoint (invoked by QStash/bunqueue) |
 
-The `POST /process-file` endpoint is invoked by the platform via Upstash QStash or bunqueue (for local development).
-
 **Technology Stack:**
 - **Framework:** Hono
 - **Runtime:** Bun (port 3040)
 - **AI:** Vercel AI SDK (`ai` package) with OpenAI and Google providers
 - **Queue:** Upstash QStash (production) or bunqueue (local development)
+- **Security:** QStash request signature verification for production
 
 **Key Directories:**
 ```
@@ -87,12 +91,20 @@ apps/worker/src/
 ├── processors/      # File type processors
 │   ├── doc.ts      # Document processor (PDF, text, etc.)
 │   ├── image.ts    # Image processor (JPEG, PNG, etc.)
+│   ├── word.ts     # Word document processor (.docx, .doc)
+│   ├── excel.ts    # Excel spreadsheet processor (.xlsx, .xls)
+│   ├── powerpoint.ts # PowerPoint processor (.pptx, .ppt)
 │   └── types.ts    # Processor type definitions
 ├── lib/
-│   ├── chunk.ts    # Text chunking (800 tokens, 100 overlap)
-│   └── md.ts       # Markdown utilities
+│   ├── chunk.ts           # Text chunking (300 tokens, 60 overlap)
+│   ├── embedding-context.ts # Context prefix builder for embeddings
+│   ├── file-type-utils.ts # CSV detection and header extraction
+│   └── md.ts              # Markdown utilities
 ├── process-file.ts # Main file processing logic
-├── index.ts        # Hono server entry point
+├── create-logger.ts # Per-request logger factory
+├── sentry.ts       # Sentry error tracking integration
+├── utils.ts        # Response helpers
+├── index.ts        # Hono server entry point + bunqueue worker
 └── env.ts          # Environment variable validation
 ```
 
@@ -111,19 +123,22 @@ Better Auth Tables:
 ├── account
 ├── organization
 ├── member
-└── verification
+├── verification
+└── invitation
 
 Curiositi Tables:
-├── spaces           # Hierarchical spaces (parentSpaceId for nesting)
-├── files            # File metadata (name, type, size, S3 key, status)
-├── fileContents     # Extracted content chunks + vector embeddings (1536d)
-├── filesInSpace     # Many-to-many junction table
-├── agents           # Configurable AI agents
-├── tools            # Built-in and MCP tools available to agents
-├── agent_tools      # Junction for tools enabled on a specific agent
-├── mcp_servers      # Connected Model Context Protocol servers
-├── conversations    # Chat conversation metadata
-└── messages         # Logs of user, system, and tool messages
+├── spaces               # Hierarchical spaces (parentSpaceId for nesting)
+├── files                # File metadata (name, type, size, S3 key, status)
+├── fileContents         # Extracted content chunks + vector embeddings (1536d)
+├── filesInSpace         # Many-to-many junction table
+├── agents               # Configurable AI agents
+├── tools                # Built-in and MCP tools available to agents
+├── agent_tools          # Junction for tools enabled on a specific agent
+├── mcp_servers          # Connected Model Context Protocol servers
+├── conversations        # Chat conversation metadata
+├── messages             # Logs of user, system, and tool messages
+├── organization_roles   # Workspace role permissions
+└── organization_settings # Workspace-level key-value settings
 ```
 
 ### Shared Packages
@@ -132,8 +147,22 @@ Curiositi Tables:
 packages/
 ├── agent/           # AI Agents and Model Context Protocol logic
 │   └── src/
+│       ├── create.ts        # Agent creation and streaming (runAgent)
+│       ├── constants.ts     # Model configs, provider defaults
+│       ├── types.ts         # Agent and tool type definitions
+│       ├── system-agents.ts # System agent definitions (re-exported from share)
+│       ├── prompts/         # Agent prompt templates
 │       ├── mcp-server.ts    # MCP Client manager and routing
-│       └── tools/           # Custom executable tools (e.g., file-search)
+│       ├── mcp/             # MCP client implementation
+│       │   ├── client-manager.ts  # MCP connection lifecycle
+│       │   ├── client.ts          # MCP client
+│       │   ├── discovery.ts       # MCP tool discovery
+│       │   └── tool-adapter.ts   # MCP tool adapter
+│       └── tools/           # Built-in tools
+│           ├── file-search.ts      # Semantic file search
+│           ├── web-search.ts       # Firecrawl web search
+│           ├── webfetch-search.ts  # URL content fetcher
+│           └── index.ts            # Tool registry and factory
 ├── db/              # Database schema and Drizzle config
 │   └── src/
 │       ├── schema.ts   # All table definitions
@@ -141,20 +170,29 @@ packages/
 │       └── index.ts    # Exports
 ├── share/           # Shared utilities
 │   └── src/
-│       ├── ai/         # AI model definitions (OpenAI, Google)
+│       ├── ai/         # AI model definitions (OpenAI, Google) and prompts
 │       ├── constants/  # MIME types, file size limits, allowed types
+│       ├── db-schemas/ # Zod validation schemas for space/file
 │       ├── fs/         # File system helpers
 │       ├── logger/     # Structured logging utility
-│       ├── schemas/    # Shared Zod schemas
-│       └── types/      # Shared type definitions
+│       ├── models/     # AI model catalog (bundled models.dev data)
+│       ├── schemas/    # Shared Zod schemas (upload, auth, email)
+│       └── types/      # Shared type definitions (queue, search, agents)
 ├── api-handlers/    # Shared API handler logic
 │   └── src/
-│       ├── upload.ts   # File upload handling
-│       ├── file.ts     # File operations
-│       ├── space.ts    # Space operations
-│       ├── queue.ts    # Queue job dispatching
-│       └── response.ts # Response helpers
+│       ├── upload.ts      # File upload handling
+│       ├── file.ts        # File operations
+│       ├── space.ts       # Space operations
+│       ├── queue.ts       # Queue job dispatching
+│       ├── invitation.ts  # Workspace invitation handling
+│       └── response.ts    # Response helpers
+├── email/          # Email package (Resend integration)
+│   └── index.ts
 ├── queue/           # Job queue wrapper (supports QStash and bunqueue)
+│   ├── index.ts          # Queue client factory
+│   └── providers/
+│       ├── qstash.ts     # Upstash QStash provider
+│       └── bunqueue.ts   # Local bunqueue provider
 └── tsconfig/        # Shared TypeScript configurations
 ```
 
