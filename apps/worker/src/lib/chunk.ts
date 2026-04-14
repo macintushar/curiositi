@@ -1,6 +1,59 @@
 import { getEncoding } from "js-tiktoken";
 import type { PageContent } from "./md";
 import { buildContextPrefix } from "./embedding-context";
+import {
+	PDF_TYPE,
+	WORD_TYPES,
+	EXCEL_TYPES,
+	IMAGE_TYPES,
+	POWERPOINT_TYPES,
+} from "@curiositi/share/constants";
+
+const CSV_TYPES = ["text/csv"];
+
+type ChunkStrategy = {
+	maxChunkSize: number;
+	overlap: number;
+};
+
+function resolveStrategy(
+	fileType: string,
+	pages: PageContent[],
+	explicit: { maxChunkSize?: number; overlap?: number }
+): ChunkStrategy {
+	const hasExplicit =
+		explicit.maxChunkSize !== undefined || explicit.overlap !== undefined;
+
+	if (hasExplicit) {
+		return {
+			maxChunkSize: explicit.maxChunkSize ?? 300,
+			overlap: explicit.overlap ?? 60,
+		};
+	}
+
+	const isAiExtracted = pages.every((p) => p.metadata?.extractedVia === "ai");
+	if (isAiExtracted || IMAGE_TYPES.includes(fileType)) {
+		return { maxChunkSize: 1000, overlap: 0 };
+	}
+
+	if (EXCEL_TYPES.includes(fileType) || CSV_TYPES.includes(fileType)) {
+		return { maxChunkSize: 300, overlap: 0 };
+	}
+
+	if (
+		fileType === PDF_TYPE ||
+		WORD_TYPES.includes(fileType) ||
+		fileType.startsWith("text/")
+	) {
+		return { maxChunkSize: 500, overlap: 80 };
+	}
+
+	if (POWERPOINT_TYPES.includes(fileType)) {
+		return { maxChunkSize: 300, overlap: 60 };
+	}
+
+	return { maxChunkSize: 300, overlap: 60 };
+}
 
 type ChunkOptions = {
 	maxChunkSize?: number;
@@ -16,6 +69,8 @@ export type ChunkWithMetadata = {
 	embeddedText: string;
 	pageNumber: number;
 	pageNumbers?: number[];
+	sectionTitle?: string;
+	sourceMetadata?: Record<string, string>;
 };
 
 let encoder: ReturnType<typeof getEncoding> | null = null;
@@ -36,22 +91,74 @@ export function chunkPages(
 	pages: PageContent[],
 	options: ChunkOptions = {}
 ): ChunkWithMetadata[] {
-	const {
-		maxChunkSize = 300,
-		overlap = 60,
-		fileName = "",
-		fileType = "",
-		documentTitle,
-		csvHeaders,
-	} = options;
+	const { fileName = "", fileType = "", documentTitle, csvHeaders } = options;
+
+	const { maxChunkSize, overlap } = resolveStrategy(fileType, pages, {
+		maxChunkSize: options.maxChunkSize,
+		overlap: options.overlap,
+	});
 
 	const chunks: ChunkWithMetadata[] = [];
 	let currentChunk = "";
 	let currentPageNumbers: number[] = [];
+	let currentSectionTitle: string | undefined;
+	let currentSourceMetadata: Record<string, string> | undefined;
 
 	const totalPages = pages.length;
 
+	function flushPending(): void {
+		if (!currentChunk.trim()) return;
+		const pageStart = currentPageNumbers[0] ?? -1;
+		const pageEnd =
+			currentPageNumbers[currentPageNumbers.length - 1] ?? pageStart;
+		const prefix = buildContextPrefix({
+			fileName,
+			fileType,
+			pageStart,
+			pageEnd,
+			totalPages,
+			documentTitle,
+			sectionTitle: currentSectionTitle,
+			csvHeaders,
+		});
+		chunks.push({
+			content: currentChunk.trim(),
+			embeddedText: prefix + currentChunk.trim(),
+			pageNumber: pageStart,
+			...(currentPageNumbers.length > 1 && { pageNumbers: currentPageNumbers }),
+			...(currentSectionTitle && { sectionTitle: currentSectionTitle }),
+			...(currentSourceMetadata && { sourceMetadata: currentSourceMetadata }),
+		});
+		currentChunk = "";
+		currentPageNumbers = [];
+		currentSectionTitle = undefined;
+		currentSourceMetadata = undefined;
+	}
+
 	for (const page of pages) {
+		if (page.embeddingContent !== undefined) {
+			flushPending();
+			if (!page.content.trim()) continue;
+			const prefix = buildContextPrefix({
+				fileName,
+				fileType,
+				pageStart: page.pageNumber,
+				pageEnd: page.pageNumber,
+				totalPages,
+				documentTitle,
+				sectionTitle: page.sectionTitle,
+				csvHeaders,
+			});
+			chunks.push({
+				content: page.content.trim(),
+				embeddedText: prefix + page.embeddingContent.trim(),
+				pageNumber: page.pageNumber,
+				...(page.sectionTitle && { sectionTitle: page.sectionTitle }),
+				...(page.metadata && { sourceMetadata: page.metadata }),
+			});
+			continue;
+		}
+
 		const paragraphs = page.content.split(/\n\n+/);
 
 		for (const para of paragraphs) {
@@ -64,7 +171,6 @@ export function chunkPages(
 				const pageStart = currentPageNumbers[0] ?? -1;
 				const pageEnd =
 					currentPageNumbers[currentPageNumbers.length - 1] ?? pageStart;
-				const sectionTitle = page.sectionTitle;
 
 				const prefix = buildContextPrefix({
 					fileName,
@@ -73,7 +179,7 @@ export function chunkPages(
 					pageEnd,
 					totalPages,
 					documentTitle,
-					sectionTitle,
+					sectionTitle: currentSectionTitle,
 					csvHeaders,
 				});
 
@@ -84,13 +190,29 @@ export function chunkPages(
 					...(currentPageNumbers.length > 1 && {
 						pageNumbers: currentPageNumbers,
 					}),
+					...(currentSectionTitle && { sectionTitle: currentSectionTitle }),
+					...(currentSourceMetadata && {
+						sourceMetadata: currentSourceMetadata,
+					}),
 				});
 
-				const overlapTokens = getEncoder().encode(currentChunk).slice(-overlap);
-				const overlapText = getEncoder().decode(overlapTokens).trim();
-				currentChunk = overlapText ? `${overlapText}\n\n${trimmed}` : trimmed;
+				if (overlap > 0) {
+					const overlapTokens = getEncoder()
+						.encode(currentChunk)
+						.slice(-overlap);
+					const overlapText = getEncoder().decode(overlapTokens).trim();
+					currentChunk = overlapText ? `${overlapText}\n\n${trimmed}` : trimmed;
+				} else {
+					currentChunk = trimmed;
+				}
 				currentPageNumbers = [page.pageNumber];
+				currentSectionTitle = page.sectionTitle;
+				currentSourceMetadata = page.metadata;
 			} else {
+				if (!currentChunk) {
+					currentSectionTitle = page.sectionTitle;
+					currentSourceMetadata = page.metadata;
+				}
 				currentChunk += (currentChunk ? "\n\n" : "") + trimmed;
 				if (!currentPageNumbers.includes(page.pageNumber)) {
 					currentPageNumbers.push(page.pageNumber);
@@ -99,31 +221,7 @@ export function chunkPages(
 		}
 	}
 
-	if (currentChunk.trim()) {
-		const pageStart = currentPageNumbers[0] ?? -1;
-		const pageEnd =
-			currentPageNumbers[currentPageNumbers.length - 1] ?? pageStart;
-		const lastPage = pages[pages.length - 1];
-		const sectionTitle = lastPage?.sectionTitle;
-
-		const prefix = buildContextPrefix({
-			fileName,
-			fileType,
-			pageStart,
-			pageEnd,
-			totalPages,
-			documentTitle,
-			sectionTitle,
-			csvHeaders,
-		});
-
-		chunks.push({
-			content: currentChunk.trim(),
-			embeddedText: prefix + currentChunk.trim(),
-			pageNumber: pageStart,
-			...(currentPageNumbers.length > 1 && { pageNumbers: currentPageNumbers }),
-		});
-	}
+	flushPending();
 
 	return chunks.filter((c) => c.content.trim().length > 0);
 }
@@ -166,9 +264,13 @@ export default function chunkText(
 				pageNumber: 1,
 			});
 
-			const overlapTokens = getEncoder().encode(currentChunk).slice(-overlap);
-			const overlapText = getEncoder().decode(overlapTokens).trim();
-			currentChunk = overlapText ? `${overlapText}\n\n${trimmed}` : trimmed;
+			if (overlap > 0) {
+				const overlapTokens = getEncoder().encode(currentChunk).slice(-overlap);
+				const overlapText = getEncoder().decode(overlapTokens).trim();
+				currentChunk = overlapText ? `${overlapText}\n\n${trimmed}` : trimmed;
+			} else {
+				currentChunk = trimmed;
+			}
 		} else {
 			currentChunk += (currentChunk ? "\n\n" : "") + trimmed;
 		}

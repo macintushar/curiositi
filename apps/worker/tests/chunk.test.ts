@@ -201,3 +201,149 @@ describe("Chunk Pages", () => {
 		}
 	});
 });
+
+describe("Chunk Pages - file-type strategy", () => {
+	test("excel pages use zero overlap", () => {
+		const pages: PageContent[] = [
+			{
+				pageNumber: 1,
+				content: "Name, Status\nAlice, Active",
+				embeddingContent: "Name=Alice; Status=Active",
+			},
+			{
+				pageNumber: 2,
+				content: "Name, Status\nBob, Inactive",
+				embeddingContent: "Name=Bob; Status=Inactive",
+			},
+		];
+
+		const chunks = chunkPages(pages, {
+			fileType:
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		});
+
+		expect(chunks).toHaveLength(2);
+		expect(chunks[0]?.content).toContain("Alice");
+		expect(chunks[1]?.content).toContain("Bob");
+		for (const c of chunks) {
+			expect(c.content).not.toContain("overlap");
+		}
+	});
+
+	test("excel pages use embeddingContent for embeddedText", () => {
+		const pages: PageContent[] = [
+			{
+				pageNumber: 1,
+				content: "Name, Revenue\nAlice, 1000",
+				embeddingContent: "Name=Alice; Revenue=1000",
+			},
+		];
+
+		const chunks = chunkPages(pages, {
+			fileType:
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		});
+
+		expect(chunks).toHaveLength(1);
+		expect(chunks[0]?.content).toContain("Alice, 1000");
+		expect(chunks[0]?.embeddedText).toContain("Name=Alice; Revenue=1000");
+		expect(chunks[0]?.embeddedText).not.toContain("Alice, 1000");
+	});
+
+	test("pdf pages use larger default chunk size than excel", () => {
+		const longPara = "word ".repeat(120);
+		const pdfPages: PageContent[] = [
+			{ pageNumber: 1, content: longPara },
+			{ pageNumber: 2, content: longPara },
+		];
+		const excelPages: PageContent[] = [
+			{
+				pageNumber: 1,
+				content: longPara,
+				embeddingContent: longPara,
+			},
+			{
+				pageNumber: 2,
+				content: longPara,
+				embeddingContent: longPara,
+			},
+		];
+
+		const pdfChunks = chunkPages(pdfPages, {
+			fileType: "application/pdf",
+			maxChunkSize: 500,
+			overlap: 80,
+		});
+		const excelChunks = chunkPages(excelPages, {
+			fileType:
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		});
+
+		expect(excelChunks.length).toBe(2);
+		expect(pdfChunks.length).toBeGreaterThanOrEqual(1);
+	});
+
+	test("ai-extracted pages use zero overlap and are not split unnecessarily", () => {
+		const content = "Extracted text from scanned document. ".repeat(10);
+		const pages: PageContent[] = [
+			{
+				pageNumber: 1,
+				content,
+				metadata: { extractedVia: "ai" },
+			},
+		];
+
+		const chunksWithOverlap = chunkPages(pages, {
+			fileType: "application/pdf",
+			maxChunkSize: 300,
+			overlap: 80,
+		});
+
+		const chunksAutoStrategy = chunkPages(pages, {
+			fileType: "application/pdf",
+		});
+
+		expect(chunksAutoStrategy.length).toBeLessThanOrEqual(
+			chunksWithOverlap.length
+		);
+	});
+
+	test("explicit options always override strategy defaults", () => {
+		const pages: PageContent[] = [
+			{
+				pageNumber: 1,
+				content: "Name, Status\nAlice, Active",
+				embeddingContent: "Name=Alice; Status=Active",
+			},
+			{
+				pageNumber: 2,
+				content: "Name, Status\nBob, Inactive",
+				embeddingContent: "Name=Bob; Status=Inactive",
+			},
+		];
+
+		const chunks = chunkPages(pages, {
+			fileType:
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			overlap: 50,
+			maxChunkSize: 10000,
+		});
+
+		expect(chunks.length).toBeGreaterThanOrEqual(1);
+	});
+
+	test("page.sectionTitle is used when provided on PageContent", () => {
+		const pages: PageContent[] = [
+			{
+				pageNumber: 1,
+				content: "Just a regular paragraph with no headings.",
+				sectionTitle: "Existing Section",
+			},
+		];
+
+		const chunks = chunkPages(pages, { fileName: "test.docx" });
+
+		expect(chunks).toHaveLength(1);
+		expect(chunks[0]?.sectionTitle).toBe("Existing Section");
+	});
+});

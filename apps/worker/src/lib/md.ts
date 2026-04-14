@@ -4,6 +4,7 @@ import pdf from "@opendocsg/pdf2md";
 export type PageContent = {
 	pageNumber: number;
 	content: string;
+	embeddingContent?: string;
 	sectionTitle?: string;
 	metadata?: Record<string, string>;
 };

@@ -35,6 +35,7 @@ export type RunAgentParams = {
 export type FileSearchToolConfig = {
 	maxResults?: number;
 	minSimilarity?: number;
+	excerptLength?: number;
 	searchSpaces?: string[] | "all";
 	fileTypes?: string[];
 	fileIds?: string[];

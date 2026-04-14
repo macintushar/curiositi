@@ -142,14 +142,15 @@ export async function searchFilesWithAI(
 		const results: SearchResult[] = [];
 		const limit = options?.limit ?? 20;
 
-		// 2. Semantic search via embeddings
 		const { embedding } = await embedText({ text: query, provider: "openai" });
+
+		const embeddingStr = `[${embedding.join(",")}]`;
 
 		const semanticMatches = await db
 			.select({
 				file: files,
 				similarity:
-					sql<number>`1 - (${fileContents.embeddedContent} <=> ${JSON.stringify(embedding)}::vector)`.as(
+					sql<number>`(0.7 * (1 - (${fileContents.embeddedContent} <=> ${embeddingStr}::vector)) + 0.3 * ts_rank(to_tsvector('english', ${fileContents.content}), plainto_tsquery('english', ${query})))`.as(
 						"similarity"
 					),
 			})
@@ -157,9 +158,7 @@ export async function searchFilesWithAI(
 			.innerJoin(files, eq(fileContents.fileId, files.id))
 			.where(eq(files.organizationId, orgId))
 			.orderBy(
-				desc(
-					sql`1 - (${fileContents.embeddedContent} <=> ${JSON.stringify(embedding)}::vector)`
-				)
+				sql`(0.7 * (1 - (${fileContents.embeddedContent} <=> ${embeddingStr}::vector)) + 0.3 * ts_rank(to_tsvector('english', ${fileContents.content}), plainto_tsquery('english', ${query}))) DESC`
 			)
 			.limit(limit);
 
@@ -268,11 +267,13 @@ export async function searchFiles(
 
 		const { embedding } = await embedText({ text: query, provider: "openai" });
 
+		const embeddingStr = `[${embedding.join(",")}]`;
+
 		const semanticMatches = await db
 			.select({
 				file: files,
 				similarity:
-					sql<number>`1 - (${fileContents.embeddedContent} <=> ${JSON.stringify(embedding)}::vector)`.as(
+					sql<number>`(0.7 * (1 - (${fileContents.embeddedContent} <=> ${embeddingStr}::vector)) + 0.3 * ts_rank(to_tsvector('english', ${fileContents.content}), plainto_tsquery('english', ${query})))`.as(
 						"similarity"
 					),
 			})
@@ -280,9 +281,7 @@ export async function searchFiles(
 			.innerJoin(files, eq(fileContents.fileId, files.id))
 			.where(eq(files.organizationId, orgId))
 			.orderBy(
-				desc(
-					sql`1 - (${fileContents.embeddedContent} <=> ${JSON.stringify(embedding)}::vector)`
-				)
+				sql`(0.7 * (1 - (${fileContents.embeddedContent} <=> ${embeddingStr}::vector)) + 0.3 * ts_rank(to_tsvector('english', ${fileContents.content}), plainto_tsquery('english', ${query}))) DESC`
 			)
 			.limit(limit);
 

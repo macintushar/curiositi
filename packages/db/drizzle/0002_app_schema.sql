@@ -72,14 +72,15 @@ CREATE TABLE "curiositi_files_in_space" (
 	"file_id" uuid NOT NULL,
 	"space_id" uuid NOT NULL,
 	"created_at" timestamp with time zone NOT NULL,
-	"updated_at" timestamp with time zone
+	"updated_at" timestamp with time zone,
+	CONSTRAINT "files_in_space_unique" UNIQUE("file_id","space_id")
 );
 --> statement-breakpoint
 CREATE TABLE "curiositi_mcp_servers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"url" text NOT NULL,
-	"headers" jsonb DEFAULT '{}'::jsonb,
+	"headers_encrypted" text,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"organization_id" text NOT NULL,
 	"discovered_tools" integer DEFAULT 0,
@@ -166,6 +167,7 @@ CREATE INDEX "conversation_organization_idx" ON "curiositi_conversations" USING 
 CREATE INDEX "conversation_external_idx" ON "curiositi_conversations" USING btree ("external_id");--> statement-breakpoint
 CREATE INDEX "file_idx" ON "curiositi_file_contents" USING btree ("file_id");--> statement-breakpoint
 CREATE INDEX "content_idx" ON "curiositi_file_contents" USING btree ("content");--> statement-breakpoint
+CREATE INDEX "file_contents_embedding_hnsw_idx" ON "curiositi_file_contents" USING hnsw ("embedded_content" vector_cosine_ops);--> statement-breakpoint
 CREATE INDEX "uploaded_by_idx" ON "curiositi_files" USING btree ("uploaded_by_id");--> statement-breakpoint
 CREATE INDEX "organization_idx" ON "curiositi_files" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "name_idx" ON "curiositi_files" USING btree ("name");--> statement-breakpoint

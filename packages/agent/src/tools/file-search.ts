@@ -9,11 +9,9 @@ export type FileSearchParams = {
 };
 
 function getEmbeddingProvider(provider: AIProvider): EmbeddingProvider {
-	// Only openai and google support embeddings
 	if (provider === "openai" || provider === "google") {
 		return provider;
 	}
-	// Default to openai for providers without native embedding support
 	return "openai";
 }
 
@@ -22,12 +20,21 @@ export function createFileSearchTool(
 	provider: AIProvider,
 	config: FileSearchToolConfig = {}
 ) {
-	const { maxResults = 5, minSimilarity = 0.5, fileIds } = config;
+	const {
+		maxResults = 5,
+		minSimilarity = 0.3,
+		excerptLength = 1500,
+		fileIds,
+		searchSpaces,
+	} = config;
+
+	const spaceIds =
+		searchSpaces && searchSpaces !== "all" ? searchSpaces : undefined;
 
 	return tool({
 		description: `Search through uploaded documents and files to find relevant information.
 Use this when the user asks about content in their files or documents.
-Returns relevant excerpts with source file names.`,
+Returns relevant excerpts with source file names, sections, and page numbers.`,
 		inputSchema: z.object({
 			query: z.string().describe("The search query to find relevant documents"),
 		}),
@@ -40,11 +47,17 @@ Returns relevant excerpts with source file names.`,
 					provider: embeddingProvider,
 				});
 
-				const results = await searchFileContents(organizationId, embedding, {
-					maxResults,
-					minSimilarity,
-					fileIds,
-				});
+				const results = await searchFileContents(
+					organizationId,
+					embedding,
+					query,
+					{
+						maxResults,
+						minSimilarity,
+						fileIds,
+						spaceIds,
+					}
+				);
 
 				if (results.length === 0) {
 					return {
@@ -59,8 +72,16 @@ Returns relevant excerpts with source file names.`,
 					results: results.map((r) => ({
 						fileName: r.fileName,
 						fileType: r.fileType,
-						excerpt: r.content.slice(0, 500),
+						excerpt: r.content.slice(0, excerptLength),
 						similarity: r.similarity,
+						...(r.sectionTitle && { sectionTitle: r.sectionTitle }),
+						...(r.pageNumber !== undefined && { pageNumber: r.pageNumber }),
+						...(r.sheetName && { sheetName: r.sheetName }),
+						...(r.rowStart !== undefined && { rowStart: r.rowStart }),
+						...(r.rowEnd !== undefined && { rowEnd: r.rowEnd }),
+						...(r.headers && { headers: r.headers }),
+						...(r.slideNumber !== undefined && { slideNumber: r.slideNumber }),
+						...(r.extractedVia && { extractedVia: r.extractedVia }),
 					})),
 					query,
 				};

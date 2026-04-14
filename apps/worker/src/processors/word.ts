@@ -1,69 +1,70 @@
 import type { Processor } from "./types";
 import mammoth from "mammoth";
+import TurndownService from "turndown";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
+import type { Root, Heading, Content } from "mdast";
 import type { PageContent } from "../lib/md";
 
-function parseHtmlSections(html: string): PageContent[] {
-	const headingRegex = /<h([1-6])[^>]*>(.*?)<\/h\1>/gi;
-	const sections: PageContent[] = [];
-	let lastIndex = 0;
-	let match: RegExpExecArray | null;
+const turndown = new TurndownService({
+	headingStyle: "atx",
+	bulletListMarker: "-",
+});
 
-	match = headingRegex.exec(html);
-	while (match !== null) {
-		const headingContent = (match[2] ?? "").replace(/<[^>]*>/g, "").trim();
-		const startIdx = match.index;
+const parser = unified().use(remarkParse);
+const serializer = unified().use(remarkStringify);
 
-		if (startIdx > lastIndex) {
-			const precedingContent = html
-				.slice(lastIndex, startIdx)
-				.replace(/<[^>]*>/g, " ")
-				.replace(/\s+/g, " ")
-				.trim();
-			if (precedingContent) {
-				sections.push({
-					pageNumber: sections.length + 1,
-					content: precedingContent,
-				});
+function extractHeadingText(heading: Heading): string {
+	return heading.children
+		.map((child) => {
+			if (child.type === "text") return child.value;
+			if ("children" in child) {
+				return (child.children as Array<{ value: string }>)
+					.map((c) => c.value)
+					.join("");
 			}
-		}
+			return "";
+		})
+		.join("");
+}
 
+function splitMarkdownIntoSections(markdown: string): PageContent[] {
+	const tree = parser.parse(markdown) as Root;
+
+	const sections: PageContent[] = [];
+	let currentTitle: string | undefined;
+	let currentNodes: Content[] = [];
+
+	function flushSection(): void {
+		if (currentNodes.length === 0) return;
+		const subtree: Root = { type: "root", children: currentNodes };
+		const content = String(serializer.stringify(subtree)).trim();
+		if (!content) return;
 		sections.push({
 			pageNumber: sections.length + 1,
-			content: "",
-			sectionTitle: headingContent,
+			content,
+			...(currentTitle && {
+				sectionTitle: currentTitle,
+				metadata: { sectionTitle: currentTitle },
+			}),
 		});
-
-		lastIndex = headingRegex.lastIndex;
-		match = headingRegex.exec(html);
 	}
 
-	if (lastIndex < html.length) {
-		const remainingContent = html
-			.slice(lastIndex)
-			.replace(/<[^>]*>/g, " ")
-			.replace(/\s+/g, " ")
-			.trim();
-		if (remainingContent) {
-			const lastSection = sections[sections.length - 1];
-			if (lastSection && !lastSection.content) {
-				lastSection.content = remainingContent;
-			} else {
-				sections.push({
-					pageNumber: sections.length + 1,
-					content: remainingContent,
-				});
-			}
+	for (const node of tree.children) {
+		if (node.type === "heading") {
+			flushSection();
+			currentTitle = extractHeadingText(node as Heading);
+			currentNodes = [];
+		} else {
+			currentNodes.push(node);
 		}
 	}
 
-	if (sections.length === 0 && html.trim()) {
-		sections.push({
-			pageNumber: 1,
-			content: html
-				.replace(/<[^>]*>/g, " ")
-				.replace(/\s+/g, " ")
-				.trim(),
-		});
+	flushSection();
+
+	if (sections.length === 0 && markdown.trim()) {
+		sections.push({ pageNumber: 1, content: markdown.trim() });
 	}
 
 	return sections;
@@ -102,7 +103,13 @@ const wordProcessor: Processor = async ({ file, fileData, logger }) => {
 			return [];
 		}
 
-		const sections = parseHtmlSections(html);
+		const markdown = turndown.turndown(html);
+
+		if (!markdown.trim()) {
+			return [];
+		}
+
+		const sections = splitMarkdownIntoSections(markdown);
 
 		logger.info("Word document processed successfully", {
 			fileId,

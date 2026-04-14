@@ -209,6 +209,26 @@ export default async function processFile({
 								page_number: c.pageNumbers ?? c.pageNumber,
 								file_name: fileName,
 								file_type: filetype,
+								chunk_index: idx,
+								...(c.sectionTitle && { section_title: c.sectionTitle }),
+								...(c.sourceMetadata?.sheetName && {
+									sheet_name: c.sourceMetadata.sheetName,
+								}),
+								...(c.sourceMetadata?.startRow && {
+									row_start: c.sourceMetadata.startRow,
+								}),
+								...(c.sourceMetadata?.endRow && {
+									row_end: c.sourceMetadata.endRow,
+								}),
+								...(c.sourceMetadata?.slideNumber && {
+									slide_number: c.sourceMetadata.slideNumber,
+								}),
+								...(c.sourceMetadata?.extractedVia && {
+									extracted_via: c.sourceMetadata.extractedVia,
+								}),
+								...(c.sourceMetadata?.headers && {
+									headers: c.sourceMetadata.headers,
+								}),
 							},
 						}))
 					)

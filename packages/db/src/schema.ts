@@ -21,7 +21,7 @@ export const createTable = pgTableCreator((name) => `curiositi_${name}`);
 
 /////////////////////////////////////////////////////////////
 //                                                         //
-//				Drizzle Schemas - Auto Generated           //
+//				Better Auth Schemas - Auto Generated             //
 //                                                         //
 /////////////////////////////////////////////////////////////
 
@@ -250,7 +250,7 @@ export const organizationRolesRelations = relations(
 
 /////////////////////////////////////////////////////////////
 //                                                         //
-//					Curiositi Schemas           		   //
+//					          Curiositi Schemas           		     //
 //                                                         //
 /////////////////////////////////////////////////////////////
 
@@ -340,7 +340,14 @@ export const fileContents = createTable(
 			.notNull(),
 		updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 	}),
-	(t) => [index("file_idx").on(t.fileId), index("content_idx").on(t.content)]
+	(t) => [
+		index("file_idx").on(t.fileId),
+		index("content_idx").on(t.content),
+		index("file_contents_embedding_hnsw_idx").using(
+			"hnsw",
+			t.embeddedContent.op("vector_cosine_ops")
+		),
+	]
 );
 
 export const filesInSpace = createTable(
@@ -583,7 +590,6 @@ export const mcpServers = createTable(
 		id: d.uuid().primaryKey().defaultRandom(),
 		name: d.text().notNull(),
 		url: d.text().notNull(),
-		headers: d.jsonb(),
 		headersEncrypted: d.text(),
 		isActive: d.boolean().default(true).notNull(),
 		organizationId: d

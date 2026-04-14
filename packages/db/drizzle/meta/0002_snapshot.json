@@ -1,5 +1,5 @@
 {
-  "id": "f5567bff-36b8-4435-95c9-61f15cb7f6ec",
+  "id": "31bd7b16-746a-42f0-bc5b-647910db0b42",
   "prevId": "e050366f-610c-4a7d-a4f3-087fb03e0497",
   "version": "7",
   "dialect": "postgresql",
@@ -626,6 +626,22 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "file_contents_embedding_hnsw_idx": {
+          "name": "file_contents_embedding_hnsw_idx",
+          "columns": [
+            {
+              "expression": "embedded_content",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last",
+              "opclass": "vector_cosine_ops"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "hnsw",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -893,7 +909,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "files_in_space_unique": {
+          "name": "files_in_space_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "file_id",
+            "space_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1040,12 +1065,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "headers": {
-          "name": "headers",
-          "type": "jsonb",
+        "headers_encrypted": {
+          "name": "headers_encrypted",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'::jsonb"
+          "notNull": false
         },
         "is_active": {
           "name": "is_active",

@@ -59,36 +59,61 @@ function sheetToRows(sheet: ExcelJS.Worksheet): {
 	return { headers, rows };
 }
 
+function rowToKeyValue(row: string[], headers: string[]): string {
+	return headers
+		.map((h, i) => `${h}=${row[i] ?? ""}`)
+		.filter((_, i) => (row[i] ?? "").length > 0)
+		.join("; ");
+}
+
 function chunkRows(
 	rows: string[][],
 	headers: string[]
-): { content: string; startRow: number; endRow: number }[] {
-	const chunks: { content: string; startRow: number; endRow: number }[] = [];
+): {
+	content: string;
+	embeddingContent: string;
+	startRow: number;
+	endRow: number;
+}[] {
+	const chunks: {
+		content: string;
+		embeddingContent: string;
+		startRow: number;
+		endRow: number;
+	}[] = [];
 	let currentRows: string[][] = [];
 	let currentStartRow = 1;
 	let currentTokens = 0;
 
+	function flushChunk(endIndex: number): void {
+		if (currentRows.length === 0) return;
+		const headerLine = headers.join(", ");
+		const csvLines = currentRows.map((r) => r.join(", ")).join("\n");
+		const content = `${headerLine}\n${csvLines}`;
+		const kvLines = currentRows
+			.map((r) => rowToKeyValue(r, headers))
+			.join("\n");
+		const embeddingContent = `${headerLine}\n${kvLines}`;
+		chunks.push({
+			content,
+			embeddingContent,
+			startRow: currentStartRow,
+			endRow: endIndex,
+		});
+	}
+
 	for (let i = 0; i < rows.length; i++) {
 		const row = rows[i];
 		if (!row) continue;
-		const rowStr = row.join(", ");
-		const rowTokens = rowStr.length / 4;
+		const rowTokens = row.join(", ").length / 4;
 
 		if (
 			currentRows.length >= MAX_ROWS_PER_CHUNK ||
 			currentTokens + rowTokens > 300
 		) {
-			if (currentRows.length > 0) {
-				const headerLine = headers.join(", ");
-				const content = `${headerLine}\n${currentRows.map((r) => r.join(", ")).join("\n")}`;
-				chunks.push({
-					content,
-					startRow: currentStartRow,
-					endRow: currentStartRow + currentRows.length - 1,
-				});
-			}
+			flushChunk(currentStartRow + currentRows.length - 1);
 			currentRows = [];
-			currentStartRow = i + 1;
+			currentStartRow = i + 2;
 			currentTokens = 0;
 		}
 
@@ -96,15 +121,7 @@ function chunkRows(
 		currentTokens += rowTokens;
 	}
 
-	if (currentRows.length > 0) {
-		const headerLine = headers.join(", ");
-		const content = `${headerLine}\n${currentRows.map((r) => r.join(", ")).join("\n")}`;
-		chunks.push({
-			content,
-			startRow: currentStartRow,
-			endRow: currentStartRow + currentRows.length - 1,
-		});
-	}
+	flushChunk(currentStartRow + currentRows.length - 1);
 
 	return chunks;
 }
@@ -148,6 +165,7 @@ const excelProcessor: Processor = async ({ file, fileData, logger }) => {
 				pages.push({
 					pageNumber: pages.length + 1,
 					content: chunk.content,
+					embeddingContent: chunk.embeddingContent,
 					sectionTitle: sheetName,
 					metadata: {
 						sheetName,
